@@ -65,7 +65,7 @@ def text(prop):
 
 
 def fetch_verified(ds_id):
-    rows, cursor = [], None
+    rows, cursor, seen = [], None, set()
     while True:
         body = {"page_size": 100,
                 "filter": {"property": "Status", "select": {"equals": "Verified"}}}
@@ -76,12 +76,17 @@ def fetch_verified(ds_id):
         if not data.get("has_more"):
             return rows
         cursor = data.get("next_cursor")
+        if not cursor or cursor in seen:
+            raise SystemExit("Invalid Notion pagination cursor")
+        seen.add(cursor)
 
 
 def build(rows, fields, need):
     out, seen = [], set()
     for page in rows:
         props = page.get("properties", {})
+        if text(props.get("Status")) != "Verified":
+            continue
         r = {f: text(props.get(f)) for f in fields}
         if not all(r.get(k, "").strip() for k in need):
             continue
@@ -111,7 +116,8 @@ def write_safely(name, rows, dedupe_key=None):
     old = 0
     if os.path.exists(path):
         try:
-            old = len(json.load(open(path, encoding="utf-8")).get("rows", []))
+            with open(path, encoding="utf-8") as existing:
+                old = len(json.load(existing).get("rows", []))
         except Exception:
             old = 0
     if old and len(rows) < old * MIN_KEEP:
