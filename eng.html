@@ -392,7 +392,7 @@ let extN=0;
 function setExt(rows){
   for(let i=CARDS.length-1;i>=0;i--) if(String(CARDS[i].mid).startsWith('n-')) CARDS.splice(i,1);
   extN=0;
-  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Front) return;
+  (rows||[]).forEach(r=>{ if(r.Status!=='Verified'||r.Subject!==SUBJ) return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Front) return;
     const mid='n-'+String(r.url||r.Front).split('?')[0].split('/').pop();
     if(CARDS.some(c=>c.mid===mid)) return;
     CARDS.push({id:CARDS.length,cat:hit[0],f:r.Front,b:r.Back||'',ref:r.Ref||'',mid}); extN++; });
@@ -411,9 +411,11 @@ async function fetchRows(view){
     if(p&&typeof p.text==="string"){ try{ p=JSON.parse(p.text); }catch(e){} }
     if(!p||!Array.isArray(p.results)) throw new Error('bad payload');
     p.results.forEach(x=>{ if(x.Subject===SUBJ){ const y={}; for(const k in x) y[k]=unesc(x[k]); out.push(y); } });
-    if(!p.has_more||!p.next_cursor) break; cursor=p.next_cursor;
+    if(!p.has_more) return out;
+    if(!p.next_cursor||p.next_cursor===cursor) throw new Error('invalid pagination');
+    cursor=p.next_cursor;
   }
-  return out;
+  throw new Error('pagination limit reached');
 }
 async function loadExt(){
   if(!mcp||!SUBJ) return;
@@ -429,7 +431,7 @@ const QDS='collection://21fcc8d7-5e96-4061-a02f-d71fc5705812', QKEY=D.markKey+'-
 function hashN(s){ let h=7; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%1000003; return h; }
 function setExtQ(rows){
   for(let i=QS.length-1;i>=0;i--) if(String(QS[i].id).startsWith('n-')) QS.splice(i,1);
-  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Question||!r.Correct) return;
+  (rows||[]).forEach(r=>{ if(r.Status!=='Verified'||r.Subject!==SUBJ) return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Question||!r.Correct) return;
     const opts=[r.Correct,r['Wrong 1'],r['Wrong 2'],r['Wrong 3']].filter(x=>x&&String(x).trim());
     if(opts.length<2) return;
     const id='n-'+String(r.url||r.Question).split('?')[0].split('/').pop();
@@ -438,7 +440,7 @@ function setExtQ(rows){
     QS.push({id,cat:hit[0],q:r.Question,opts,exp:r.Explanation||'',order:idx,right:0}); });
 }
 const EMBQ=[];
-try{ const _c=JSON.parse(localStorage.getItem(QKEY)||'[]'); const _m=new Map(); EMBQ.forEach(r=>_m.set(r.url,r)); _c.forEach(r=>_m.set(r.url,r)); setExtQ([..._m.values()]); buildDeck(); }catch(e){}
+try{ let _c=[]; try{ const cached=JSON.parse(localStorage.getItem(QKEY)||'[]'); if(Array.isArray(cached)) _c=cached; }catch(e){} const _m=new Map(); EMBQ.forEach(r=>_m.set(r.url,r)); _c.forEach(r=>_m.set(r.url,r)); setExtQ([..._m.values()]); buildDeck(); }catch(e){}
 async function loadExtQ(){
   if(!SUBJ) return;
   if(!mcp){ qStat='ไม่ได้เชื่อม Notion — ใช้ข้อสอบที่ฝังไว้ (ข้อมูล ณ 10 พ.ย. 2026)'; qStatErr=false; renderQ(); loadStatic(); return; }
@@ -461,20 +463,33 @@ async function loadExtQ(){
 async function loadStatic(){
   await 0;
   if(!SUBJ) return;
-  try{
-    const [q,c]=await Promise.all([
-      fetch('data/quiz.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)),
-      fetch('data/cards.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);
-    const rows=(q.rows||[]).filter(x=>x.Subject===SUBJ);
+  // A broken quiz response must not prevent card updates.
+  const read=async name=>{
+    try{
+      const r=await fetch('data/'+name+'.json',{cache:'no-store'});
+      if(!r.ok) return null;
+      const data=await r.json();
+      return data&&Array.isArray(data.rows)?data:null;
+    }catch(e){ return null; }
+  };
+  const [q,c]=await Promise.all([read('quiz'),read('cards')]);
+  if(c){
+    const rows=c.rows.filter(x=>x.Subject===SUBJ);
+    setExt(rows); try{ localStorage.setItem(EXT_KEY,JSON.stringify(rows)); }catch(e){}
+    cardsRow(); if(!shown) renderCard();
+  }
+  if(q){
+    const rows=q.rows.filter(x=>x.Subject===SUBJ);
     setExtQ(rows); try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
-    if(c&&c.rows){ const cr=c.rows.filter(x=>x.Subject===SUBJ); setExt(cr); try{ localStorage.setItem(EXT_KEY,JSON.stringify(cr)); }catch(e){} cardsRow(); if(!shown) renderCard(); }
     const n=QS.filter(x=>String(x.id).startsWith('n-')).length;
     qStat='โหลดจากไฟล์ข้อมูลสำเร็จ · เพิ่ม '+n+' ข้อ · อัปเดต '+(q.updated||'-'); qStatErr=false;
-    if(qpos>=QS.length) qpos=0; buildDeck(); renderQ();
-  }catch(e){}
+  }else{
+    qStat='โหลดไฟล์ข้อสอบไม่สำเร็จ — ใช้ข้อมูลที่เก็บไว้'; qStatErr=true;
+  }
+  buildDeck(); renderQ();
 }
 setInterval(()=>{ if(!cur&&!$('#tab-cards').hidden){ cardsRow(); renderCard(); } },20000);
-if(!D.sum.length) document.querySelectorAll('.tabs button').forEach(b=>{ if(b.dataset.tab!=='cards') b.hidden=true; });
+if(!D.sum.length) document.querySelector('[data-tab="sum"]').hidden=true;
 cardsRow(); renderCard(); renderSum(); buildDeck(); renderQ();
 </script>
 
