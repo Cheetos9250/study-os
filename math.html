@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Math for Life</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: tabbed study sheet (cards / summary / practice) in one centred column. */
+:root{
+  --paper:#f2f4f8; --surface:#ffffff; --ink:#1a2320; --muted:#5b6a64; --line:#d3dcd7;
+  --accent:#2f5fb3; --accent-soft:#dbe5f6; --known:#e6f2d5; --ok:#1c7c4a; --ok-soft:#e2f3e9; --bad:#b3261e; --bad-soft:#fbe6e4;
+  --ui:"IBM Plex Sans Thai","Noto Sans Thai","Leelawadee UI",Tahoma,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12171a; --surface:#1b2226; --ink:#e7eeea; --muted:#9db0a8; --line:#2d3a40;
+  --accent:#8fb2f2; --accent-soft:#1f2e4a; --known:#26331c; --ok:#62d394; --ok-soft:#15301f; --bad:#ff8a80; --bad-soft:#3b1c1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12171a; --surface:#1b2226; --ink:#e7eeea; --muted:#9db0a8; --line:#2d3a40;
+  --accent:#8fb2f2; --accent-soft:#1f2e4a; --known:#26331c; --ok:#62d394; --ok-soft:#15301f; --bad:#ff8a80; --bad-soft:#3b1c1a; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16.5px;line-height:1.65}
+.wrap{max-width:800px;margin:0 auto;padding-block:26px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;align-items:baseline;gap:6px 16px;flex-wrap:wrap;margin-bottom:18px}
+header h1{font-size:clamp(26px,6vw,36px);line-height:1.15;margin:0;font-weight:700;text-wrap:balance}
+header span{color:var(--muted);font-size:15px}
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:20px;overflow-x:auto}
+.tabs button{font:inherit;font-weight:500;background:none;border:0;color:var(--muted);padding:10px 14px;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+button:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:inherit;font-size:14.5px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip .n{font-family:var(--mono);font-size:11.5px;opacity:.75;margin-left:5px}
+.controls{justify-content:space-between;margin:12px 0 16px}
+.count{color:var(--muted);font-size:14px;font-family:var(--mono)}
+.stage{perspective:1400px}
+.card{position:relative;width:100%;height:clamp(300px,64vw,380px);cursor:pointer;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);border-radius:10px}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 22px 30px;text-align:center;overflow:auto}
+.back{transform:rotateY(180deg)}
+.card.is-known .face{background:var(--known)}
+.cat-tag{position:absolute;top:10px;left:14px;font-size:12.5px;color:var(--muted)}
+.hint{position:absolute;bottom:10px;left:0;right:0;font-size:12.5px;color:var(--muted)}
+.front-t.big{font-size:clamp(40px,11vw,60px);line-height:1.2}
+.front-t{font-size:clamp(21px,5vw,28px);font-weight:700;line-height:1.4;text-wrap:balance}
+.back-t{font-size:clamp(17px,4vw,21px);line-height:1.7;max-width:34em}
+.back-t b{color:var(--accent)}
+.nav{justify-content:center;margin-top:16px;gap:10px}
+.btn{font:inherit;font-weight:500;border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 18px;cursor:pointer;min-width:46px}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.know[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.ref{position:absolute;bottom:10px;left:0;right:0;font:500 12px var(--mono);color:var(--accent)}
+.btn.no{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.btn.yes{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.sync{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:10px;background:var(--accent-soft);margin-top:16px}
+.sync p{margin:0;font-size:15px}.sync .ok{color:var(--ok)}.sync .err{color:var(--bad)}
+.srs{gap:14px;font:600 14px var(--mono);margin:4px 0 12px}
+.srs .n{color:#2f6fd0}.srs .l{color:var(--bad)}.srs .d{color:var(--ok)}
+.srs b{font-size:18px;margin-right:3px}
+.rate4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.rate4 .btn{display:flex;flex-direction:column;gap:2px;padding:9px 4px;min-width:0;font-size:15px}
+.rate4 .btn small{font:500 12px var(--mono);opacity:.85}
+.rate4 .r1{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.rate4 .r2{border-color:var(--line);color:var(--ink)}
+.rate4 .r3{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.rate4 .r4{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.show{display:none!important;width:100%;margin-top:16px;padding:13px}
+.typebox{margin-top:14px}.typebox input{flex:1;min-width:0;font:inherit;font-size:18px;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.typebox input:focus{outline:3px solid var(--accent);outline-offset:1px}
+.typebox p{margin:8px 0 0;font-size:16px;min-height:1.5em}.typebox .okk{color:var(--ok);font-weight:600}.typebox .nok{color:var(--bad);font-weight:600}
+.rate4 .btn.sug{box-shadow:0 0 0 3px var(--accent)}
+.keys{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
+.empty{padding:50px 20px;text-align:center;color:var(--muted)}
+/* summary */
+.sec{margin:0 0 26px}
+.sec h2{font-size:20px;margin:0 0 8px;padding-left:12px;border-left:4px solid var(--accent);line-height:1.4}
+.sec .chtag{font-family:var(--mono);font-size:12px;color:var(--accent);display:block}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;min-width:100%;background:var(--surface);font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 11px;text-align:left;vertical-align:top;line-height:1.6}
+th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
+td:first-child{font-weight:500;min-width:7.5em}
+.tip{background:var(--accent-soft);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:15px}
+/* quiz */
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.qbar{height:4px;background:var(--line);border-radius:2px;margin-bottom:14px}
+.qbar i{display:block;height:100%;background:var(--accent);width:0;border-radius:2px;transition:width .25s}
+.qmeta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13.5px;color:var(--muted);margin-bottom:8px}
+.qmeta b{font-family:var(--mono);color:var(--ink)}
+.qtext{font-size:18px;font-weight:500;margin:0 0 14px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:9px;padding:10px 13px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt .k{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--muted);min-width:16px;padding-top:2px}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.dim{opacity:.6}
+.explain{margin-top:14px;border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;font-size:15.5px}
+.explain.good{border-left-color:var(--ok)} .explain.bad{border-left-color:var(--bad)}
+.explain b.v{display:block;margin-bottom:2px}
+.qnav{display:flex;justify-content:space-between;gap:8px;margin-top:16px;align-items:center;flex-wrap:wrap}
+.score{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.score .big{font-family:var(--mono);font-size:30px;font-weight:600}
+.cells{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0}
+.cell{width:28px;height:28px;border:1px solid var(--line);background:var(--surface);border-radius:5px;font:500 11px var(--mono);color:var(--muted);cursor:pointer;padding:0}
+.cell.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.cell.no{background:var(--bad);border-color:var(--bad);color:#fff}
+.cell.cur{outline:2px solid var(--ink);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){.card,.qbar i{transition:none}}
+</style>
+<div class="wrap">
+  <header><h1>Math for Life</h1><span>สรุป · แฟลชการ์ด · แบบฝึก Ch05–07 (การเงิน · เซต · ความน่าจะเป็นและสถิติ)</span></header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="cards">แฟลชการ์ด</button>
+    <button role="tab" aria-selected="false" data-tab="sum">สรุปบทเรียน</button>
+    <button role="tab" aria-selected="false" data-tab="prac">แบบฝึก</button>
+  </nav>
+  <section id="tab-cards">
+    <div class="row" id="cats"></div>
+    <div class="row controls">
+      <div class="row">
+        <button class="chip" id="dirBtn" aria-pressed="false" type="button">ด้านหน้า: หัวข้อ</button>
+        <button class="chip" id="typBtn" type="button" hidden>พิมพ์ตอบ: เปิด</button>
+        <button class="chip" id="limBtn" type="button">การ์ดใหม่/วัน: 20</button>
+        <button class="chip" id="resetSrs" type="button">ล้างความคืบหน้า</button>
+      </div>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="row srs" id="srsCounts"></div>
+    <div class="stage" id="stage"></div>
+    <div id="typeBox" class="typebox" hidden>
+      <div class="row"><input id="typeIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="พิมพ์คำตอบ แล้วกด Enter"><button class="btn primary" id="typeGo" type="button">ตรวจ</button></div>
+      <p id="typeRes" role="status"></p>
+    </div>
+    <button class="btn primary show" id="showBtn" type="button" hidden>แสดงคำตอบ</button>
+    <div class="rate4" id="rate4" hidden>
+      <button class="btn r1" data-r="1" type="button">ลืม<small></small></button>
+      <button class="btn r2" data-r="2" type="button">ยาก<small></small></button>
+      <button class="btn r3" data-r="3" type="button">ปกติ<small></small></button>
+      <button class="btn r4" data-r="4" type="button">ง่าย<small></small></button>
+    </div>
+    <p class="keys">แตะการ์ดหรือกด Space = พลิก · 1 ลืม · 2 ยาก · 3 ปกติ · 4 ง่าย</p>
+    <div class="sync" id="sync" hidden><p id="syncText"></p><button class="btn yes" id="syncBtn" type="button">บันทึกผลลง Notion</button><p id="syncMsg" role="status"></p></div>
+  </section>
+  <section id="tab-sum" hidden>
+    <div class="row" id="sumCats" style="margin-bottom:18px"></div>
+    <div id="sumBody"></div>
+  </section>
+  <section id="tab-prac" hidden>
+    <div class="row" id="qCats" style="margin-bottom:14px"></div>
+    <div id="qBody"></div>
+  </section>
+</div>
+<script>
+const D = {"key": "math", "title": "Math for Life", "sub": "สรุป · แฟลชการ์ด · แบบฝึก Ch05–07 (การเงิน · เซต · ความน่าจะเป็นและสถิติ)", "theme": {"paper": "#f2f4f8", "accent": "#2f5fb3", "soft": "#dbe5f6", "accentd": "#8fb2f2", "softd": "#1f2e4a"}, "cats": [["c5", "05 Financial Math"], ["c6", "06 Sets & Venn"], ["c7", "07 Prob & Stats"]], "cards": [["c5", "Ratio กับ Proportion ต่างกันอย่างไร?", "Ratio = เปรียบเทียบขนาดของสองปริมาณ (5 to 4, 5:4, 5/4)\nProportion = สมการว่าสองอัตราส่วนเท่ากัน a/b = c/d", "Ch.5", "05-1"], ["c5", "Property of proportions คืออะไร?", "ผลคูณ means = ผลคูณ extremes\na/b = c/d → b × c = a × d", "Ch.5", "05-2"], ["c5", "ทำ 4 to 52 และ 1½ to 3¾ ให้อยู่ในรูปอย่างต่ำ", "4:52 = 1:13\n1½ : 3¾ = 2:5", "Ch.5", "05-3"], ["c5", "บ้าน 1,650,000 เสียภาษี 4,125 บ้าน 3,200,000 เสียเท่าไร?", "4,125/1,650,000 = x/3,200,000 → x = 8,000 บาท", "Ch.5", "05-4"], ["c5", "Percent คืออะไร และแปลง 8% เป็นทศนิยมอย่างไร?", "อัตราส่วนต่อ 100\nเลื่อนจุดทศนิยมไปซ้าย 2 ตำแหน่ง ตัด % → 8% = 0.08", "Ch.5", "05-5"], ["c5", "โจทย์ “A is P% of W” ตั้งสัดส่วนอย่างไร?", "P/100 = A/W\nW = ตัวที่ตามหลัง “of” · A = ส่วน (amount) · P = rate", "Ch.5", "05-6"], ["c5", "150 is 12% of ? และ 63 is ?% of 420", "150 ÷ 0.12 = 1,250\n63 ÷ 420 = 15%", "Ch.5", "05-7"], ["c5", "เงินเดือน 25,000 ถูกหัก 9% กี่บาท? ภาษี 8,250 = 1.5% ของรายได้ รายได้เท่าไร?", "25,000 × 0.09 = 2,250\n8,250 ÷ 0.015 = 550,000", "Ch.5", "05-8"], ["c5", "สูตร Discount และ Sale price?", "d = p × m (markdown)\ns = p − d = p × c (c = complement = 1 − m)", "Ch.5", "05-9"], ["c5", "รองเท้า 500 ลด 20% · เสื้อ 390 ลด 15% → ส่วนลดและราคาขาย?", "รองเท้า: ลด 100 → 400\nเสื้อ: ลด 58.50 → 331.50", "Ch.5", "05-10"], ["c5", "ลด 20% เหลือ 384 ราคาเดิมเท่าไร? กระเป๋า 3,520 ขาย 2,288 ลดกี่ %?", "p = s/c = 384/0.8 = 480\nc = 2,288/3,520 = 0.65 → markdown 35%", "Ch.5", "05-11"], ["c5", "Sales tax และ Total price คำนวณอย่างไร? (ยาง 4,500 VAT 7%)", "Tax = Price × rate · Total = Price × (1 + rate)\n4,500 × 1.07 = 4,815", "Ch.5", "05-12"], ["c5", "สูตร Simple interest และ Future value?", "I = Prt\nA = P + I = P(1 + rt)", "Ch.5", "05-13"], ["c5", "กู้ 180,000 คืน 261,000 ใน 3 ปี ดอกเบี้ยกี่ %?", "I = 81,000 → r = 81,000 ÷ (180,000 × 3) = 15%", "Ch.5", "05-14"], ["c5", "ฝาก 50,000 ดอกเบี้ย 5¾% แบบ simple 5 ปี ได้เท่าไร?", "A = 50,000(1 + 0.0575 × 5) = 64,375", "Ch.5", "05-15"], ["c5", "Exact กับ Ordinary interest ต่างกันอย่างไร? (กู้ 120,000 18% 174 วัน)", "Exact ÷ 365 · Ordinary ÷ 360 (ธุรกิจส่วนใหญ่ใช้)\nI = 120,000 × 0.18 × 174/360 = 10,440 → คืน 130,440", "Ch.5", "05-16"], ["c5", "Closed-end กับ Open-end credit ต่างกันอย่างไร?", "Closed-end = ผ่อนงวดเท่ากันตามระยะเวลา (installment)\nOpen-end = บัตรเครดิต วงเงินสูงสุด ชำระยืดหยุ่น", "Ch.5", "05-17"], ["c5", "Add-on interest: คอม 24,500 ผ่อน 3 ปี 15% งวดละเท่าไร?", "A = 24,500(1 + 0.15 × 3) = 35,525\nN = 36 → m = 35,525/36 ≈ 986.81", "Ch.5", "05-18"], ["c5", "Average daily balance: 10 วัน @10,000 + 20 วัน @9,500 ดอกเบี้ย 18%?", "ADB = 290,000/30 = 9,666.67\nI = 9,666.67 × 0.18 × 30/365 ≈ 143.01", "Ch.5", "05-19"], ["c5", "สูตร Compound interest?", "A = P(1 + i)^N\ni = r/n · N = nt (n: ปีละ 1, 2, 4, 12, 360)", "Ch.5", "05-20"], ["c5", "ฝาก 10,000 8% 3 ปี Simple vs Compound?", "Simple 12,400 · Compound ≈ 12,597 (10,800 → 11,664 → 12,597)\nทบต้นได้มากกว่า ≈ 197", "Ch.5", "05-21"], ["c5", "1,000,000 ที่ 3% 10 ปี ทบรายปี/ครึ่งปี/ไตรมาส?", "รายปี ≈ 1,343,916 · ครึ่งปี ≈ 1,346,855 · ไตรมาส ≈ 1,348,349", "Ch.5", "05-22"], ["c5", "เงินเดือน 300,000 เงินเฟ้อ 5% อีก 25 ปีต้องได้เท่าไร?", "300,000(1.05)^25 ≈ 1,015,906", "Ch.5", "05-23"], ["c5", "อยากได้ 75,000 ใน 5 ปี ฝาก 5% ทบรายไตรมาส ต้องฝากเท่าไร?", "P = 75,000 ÷ (1.0125)^20 ≈ 58,501", "Ch.5", "05-24"], ["c5", "กรมธรรม์ 5,000,000 ใน 30 ปี เงินเฟ้อ 5% มีค่าเท่าไรวันนี้?", "5,000,000 ÷ 1.05^30 ≈ 1,156,887", "Ch.5", "05-25"], ["c6", "Description กับ Roster method ต่างกันอย่างไร?", "Description = บรรยายเงื่อนไข (เดือนที่มี 30 วัน)\nRoster = แจกแจงสมาชิก {April, June, September, November}", "Ch.6", "06-1"], ["c6", "{counting numbers between 10 and 20} เขียนแบบ roster?", "{11, 12, …, 19} — “between” ไม่รวมปลายทั้งสอง", "Ch.6", "06-2"], ["c6", "{1, 2, 3, …} กับ {0, 1, 2, …} คือเซตอะไร?", "Counting (natural) numbers · Whole numbers", "Ch.6", "06-3"], ["c6", "Equal กับ Equivalent sets ต่างกันอย่างไร?", "Equal = สมาชิกเหมือนกันทุกตัว ({1,2,3} = {3,2,1})\nEquivalent = จำนวนสมาชิกเท่ากัน ({1,2,3} กับ {a,b,c})", "Ch.6", "06-4"], ["c6", "Cardinality คืออะไร? {e, n, j, o, y} มีเท่าไร?", "จำนวนสมาชิกของเซต → 5", "Ch.6", "06-5"], ["c6", "Finite กับ Infinite set ต่างกันอย่างไร?", "Finite = cardinality เป็น 0 หรือจำนวนนับ\nInfinite = ไม่ใช่ เช่น {1000, 2000, 3000, …}", "Ch.6", "06-6"], ["c6", "Universal set กับ Empty set คืออะไร?", "U = สมาชิกทั้งหมดที่พิจารณา ต้องกำหนดและคงที่ในโจทย์\n∅ หรือ { } = ไม่มีสมาชิก มีแบบเดียว cardinality 0", "Ch.6", "06-7"], ["c6", "A ⊆ B, proper และ improper subset คืออะไร?", "A ⊆ B: ทุกสมาชิกของ A อยู่ใน B\nProper (A ⊂ B) = ไม่เท่ากับเซตเดิม · Improper = ตัวเซตเอง", "Ch.6", "06-8"], ["c6", "A = {2, 4, 6, 8} มี subset กี่ชุด proper กี่ชุด?", "2^4 = 16 ชุด → proper 15 ชุด (ไม่นับตัวเอง)", "Ch.6", "06-9"], ["c6", "Venn diagram ใช้อะไรแทนอะไร?", "สี่เหลี่ยม = Universal set · วงกลม/วงรี = เซตต่าง ๆ", "Ch.6", "06-10"], ["c6", "Union, Intersection, Complement คืออะไร?", "A ∪ B = อยู่ใน A หรือ B หรือทั้งคู่\nA ∩ B = อยู่ในทั้งสอง\nA' = อยู่ใน U แต่ไม่อยู่ใน A", "Ch.6", "06-11"], ["c6", "U = {1..9}, A = {2,4,6,8}, B = {1,3,5,7}, C = {5,7} → A∪C, B∪C, A∪B?", "A ∪ C = {2,4,5,6,7,8}\nB ∪ C = {1,3,5,7}\nA ∪ B = {1,…,8}", "Ch.6", "06-12"], ["c6", "สูตรนับ |A ∪ B|?", "|A ∪ B| = |A| + |B| − |A ∩ B|\nคณิต 45 อังกฤษ 41 ทั้งคู่ 12 → 74", "Ch.6", "06-13"], ["c6", "วงดนตรี 50 ออร์เคสตรา 36 ซ้ำ 14 รถ 40 ที่นั่ง 2 คันพอไหม?", "50 + 36 − 14 = 72 ≤ 80 → พอ", "Ch.6", "06-14"], ["c6", "สำรวจ 100 คน: M45 E41 H40, ME15 MH18 EH17, ทั้งสาม 7 → แค่ M, E, H?", "สองวิชาพอดี: ME 8, MH 11, EH 10\nแค่ M 19 · แค่ E 16 · แค่ H 12", "Ch.6", "06-15"], ["c6", "(ต่อ) ไม่เรียนเลยกี่คน? ไม่เรียนคณิตกี่คน?", "รวมอย่างน้อยหนึ่งวิชา 83 → ไม่เรียนเลย 17\nไม่เรียนคณิต 100 − 45 = 55", "Ch.6", "06-16"], ["c6", "เริ่มเติมตัวเลขในโจทย์สำรวจสามเซตจากตรงไหน?", "ตรงกลาง (ทั้งสามเซต) → ส่วนซ้อนสองวง (ลบตรงกลางออก) → วงเดี่ยว → นอกทุกวง", "Ch.6", "06-17"], ["c6", "มื้ออาหาร: B130 L180 D275, BL68 BD112 LD90, ทั้งสาม 58 → อย่างน้อยหนึ่งมื้อ / มื้อเดียว?", "แค่เช้า 8 · แค่กลางวัน 80 · แค่เย็น 131 · BL 10 · BD 54 · LD 32\nอย่างน้อยหนึ่งมื้อ 373 · มื้อเดียว 219", "Ch.6", "06-18"], ["c6", "(ต่อ) กินแค่มื้อเย็น และกินสองมื้อพอดีกี่คน?", "แค่มื้อเย็น 131 · สองมื้อพอดี 10 + 54 + 32 = 96", "Ch.6", "06-19"], ["c7", "Experiment, Sample space, Event คืออะไร?", "Experiment = การสังเกตเหตุการณ์\nSample space = เซตผลลัพธ์ทั้งหมด\nEvent = subset ของ sample space", "Ch.7", "07-1"], ["c7", "โยนเหรียญ 1 ครั้งและทอยเต๋า 1 ลูก sample space มีกี่ผลลัพธ์?", "2 × 6 = 12 (ใช้ tree diagram ช่วยแจกแจง)", "Ch.7", "07-2"], ["c7", "สูตรความน่าจะเป็นเมื่อทุกผลลัพธ์มีโอกาสเท่ากัน?", "P(E) = s/n\ns = จำนวนที่สนใจ · n = จำนวนใน sample space", "Ch.7", "07-3"], ["c7", "ไพ่ 52 ใบ: P(ace), P(heart), P(face card)?", "1/13 · 1/4 · 12/52 = 3/13", "Ch.7", "07-4"], ["c7", "“or” และ “and” แปลเป็นอะไรในความน่าจะเป็น?", "or = ∪ (union) · and = ∩ (intersection)\nP(A ∪ B) = P(A) + P(B) − P(A ∩ B)", "Ch.7", "07-5"], ["c7", "ไพ่: P(สอง or คิง), P(สอง and heart), P(สอง or heart), P(สอง and คิง)?", "8/52 = 2/13 · 1/52 · 16/52 = 4/13 · 0", "Ch.7", "07-6"], ["c7", "คำว่า statistics มีความหมาย 2 แบบอะไร?", "1) ข้อมูลจำนวนมาก รวมตาราง/แผนภูมิ\n2) วิธีเก็บ วิเคราะห์ และตีความข้อมูล", "Ch.7", "07-7"], ["c7", "Frequency distribution และ class interval คืออะไร?", "ตารางจัดข้อมูลเป็นกลุ่ม (classes) และนับความถี่\nInterval = ผลต่างของขอบล่างของ class ที่ติดกัน", "Ch.7", "07-8"], ["c7", "Mean, Median, Mode คืออะไร?", "Mean = ผลรวม ÷ จำนวน\nMedian = ค่ากลางหลังเรียง (คู่ = เฉลี่ยสองตัวกลาง)\nMode = ค่าที่เกิดบ่อยที่สุด (ไม่มี หรือมีหลายค่าได้)", "Ch.7", "07-9"], ["c7", "โบว์ลิ่ง จันทร์ vs พฤหัส: mean/median/mode บอกอะไร?", "จันทร์ 185/175/160 · พฤหัส 170/180/185\nMean จันทร์สูงเพราะเกม 287 เกมเดียว — ต้องดูหลายค่า", "Ch.7", "07-10"], ["c7", "หา mean, median, mode ของ 4, 10, 9, 8, 9, 4, 5", "Mean 7 · Median 8 · Mode 4 และ 9", "Ch.7", "07-11"], ["c7", "หา mean, median, mode ของ 6, 5, 4, 7, 1, 9", "Mean ≈ 5.33 · Median 5.5 · ไม่มี mode", "Ch.7", "07-12"], ["c7", "ใบเกรด 3A 3D+ 3D 2A 1A 2C → GPA?", "(12 + 4.5 + 3 + 8 + 4 + 4) ÷ 14 = 35.5 ÷ 14 ≈ 2.54", "Ch.7", "07-13"], ["c7", "Range คืออะไร มีข้อจำกัดอะไร?", "ค่ามากสุด − ค่าน้อยสุด\nบอกแค่สองค่าปลาย ไม่บอกข้อมูลตัวอื่น", "Ch.7", "07-14"], ["c7", "ขั้นตอนหา Standard deviation (ประชากร)?", "1) หา mean 2) ลบ mean 3) ยกกำลังสอง 4) รวม 5) ÷ N = variance 6) ถอดราก = σ", "Ch.7", "07-15"], ["c7", "Set A {8,9,9,9,10} กับ Set B {2,9,9,12,13}?", "Mean = Median = Mode = 9 เท่ากัน\nRange 2 vs 11 · σ ≈ 0.63 vs 3.85", "Ch.7", "07-16"], ["c7", "คะแนน 92, 85, 65, 89, 96, 71 → σ?", "Mean 83 · Variance ≈ 126.33 · σ ≈ 11.24", "Ch.7", "07-17"], ["c7", "Quartile คืออะไร หาตำแหน่งอย่างไร?", "3 ค่าแบ่งข้อมูลเรียงแล้วเป็น 4 ส่วน (Q2 = median)\nตำแหน่ง Qr = r(N + 1)/4 แล้ว interpolate", "Ch.7", "07-18"], ["c7", "21, 25, 29, 32, 48, 52, 57, 64 → Q1 และ Q3?", "Q1: ตำแหน่ง 2.25 → 25 + 0.25(4) = 26\nQ3: ตำแหน่ง 6.75 → 52 + 0.75(5) = 55.75", "Ch.7", "07-19"], ["c7", "Percentile rank คำนวณอย่างไร?", "(จำนวนที่ต่ำกว่า ÷ N) × 100\nคะแนน 70 จาก 10 คน มี 6 คนต่ำกว่า → 60", "Ch.7", "07-20"], ["c7", "Lisa อันดับ 85 จากบนในห้อง 240 คน → percentile rank?", "ต่ำกว่า 240 − 85 = 155 คน → 155/240 × 100 ≈ 65", "Ch.7", "07-21"], ["c7", "สูตร Class rank จาก percentile?", "Class rank = N − ⌊(percentile/100) × N⌋\nLee P85 ห้อง 50 คน → 50 − 42 = 8", "Ch.7", "07-22"], ["c7", "{53, 60, 63, 65, 67, 71, 75, 83, 86, 95} → PR ของ 95, median, Q1, คะแนนที่ P70?", "PR ของ 95 = 90 · Median 69 · Q1 = 62.25 · P70 → ตำแหน่ง 7 → 75", "Ch.7", "07-23"]], "sum": [{"cat": "c5", "h": "สูตรดอกเบี้ย", "head": ["หัวข้อ", "สรุป"], "rows": [["Simple", "I = Prt · A = P(1+rt)"], ["Compound", "A = P(1+i)^N · i = r/m · N = mt"], ["Present value", "P = A/(1+i)^N"], ["Add-on ค่างวด", "m = P(1+rt) / (12t)"], ["Credit card", "I = ADB × r × วัน/365"]], "tip": "วันบางส่วนของปี: ÷365 (exact) หรือ ÷360 (ordinary)"}, {"cat": "c5", "h": "เปอร์เซ็นต์", "head": ["หัวข้อ", "สรุป"], "rows": [["Sale price", "Original × (1 − d)"], ["With tax", "Original × (1 + tax)"], ["หาราคาเดิม", "p = s / c"], ["A is P% of W", "P/100 = A/W"]]}, {"cat": "c6", "h": "สัญลักษณ์เซต", "head": ["หัวข้อ", "สรุป"], "rows": [["∈ / ∉", "เป็น / ไม่เป็นสมาชิก"], ["⊆", "subset"], ["∪", "union (หรือ)"], ["∩", "intersection (และ)"], ["Aᶜ", "complement"], ["∅", "เซตว่าง"], ["n(A)", "cardinality"], ["2^n", "จำนวน subsets"]]}, {"cat": "c6", "h": "แบบสำรวจ", "head": ["หัวข้อ", "สรุป"], "rows": [["สองเซต", "|A∪B| = |A| + |B| − |A∩B|"], ["สามเซต", "เติมจากพื้นที่ซ้อนทั้งสามออกไป"]]}, {"cat": "c7", "h": "ความน่าจะเป็น", "head": ["หัวข้อ", "สรุป"], "rows": [["P(E)", "เอื้อ ÷ ทั้งหมด"], ["P(A∪B)", "P(A)+P(B)−P(A∩B)"], ["Mutually exclusive", "P(A∩B) = 0"]]}, {"cat": "c7", "h": "สถิติ", "head": ["หัวข้อ", "สรุป"], "rows": [["Mean / Median / Mode", "ค่ากลาง"], ["Weighted avg", "Σ(ค่า×น้ำหนัก)/Σน้ำหนัก"], ["Range", "Max − Min"], ["σ", "√Variance"], ["Quartile", "r(N+1)/4"], ["Percentile rank", "ต่ำกว่า ÷ N × 100"]]}], "quiz": [["c5", "โคล่า 4 กระป๋อง 39 บาท 12 กระป๋อง?", ["117", "156", "78", "130"], 0, "ราคา ×3"], ["c5", "ลด 20% จาก 500 บาท เหลือ?", ["400", "480", "100", "420"], 0, "500 × 0.8 = 400"], ["c5", "ลด 20% เหลือ 384 ราคาเดิม?", ["480", "460", "307.2", "404"], 0, "384 ÷ 0.8 = 480"], ["c5", "สูตร Simple interest?", ["I = Prt", "I = P(1+r)^t", "I = P/rt", "I = P+rt"], 0, "r ต่อปี t เป็นปี"], ["c5", "Future value แบบ Simple?", ["P(1 + rt)", "P(1 + r)^t", "P × r × t", "P/(1+rt)"], 0, "A = P + I"], ["c5", "กู้ 120,000 @18% 174 วัน (ordinary) ดอกเบี้ย?", ["10,440", "10,308", "7,200", "12,000"], 0, "120,000 × 0.18 × 174/360"], ["c5", "Add-on 24,500 ผ่อน 3 ปี @15% ค่างวดประมาณ?", ["986.81", "680.56", "1,000", "840"], 0, "A=35,525 ÷ 36"], ["c5", "บัตรเครดิตคิดดอกเบี้ยจาก?", ["Average daily balance", "ยอดวันสุดท้าย", "ยอดวันแรก", "วงเงิน"], 0, "รวมยอดรายวัน ÷ วันในรอบบิล"], ["c5", "Compound future value?", ["P(1+i)^N", "P(1+rt)", "P/(1+i)^N", "P×i×N"], 0, "i = อัตราต่อรอบทบ"], ["c5", "ทบต้นรายเดือน อัตรา 12% ต่อปี i เท่ากับ?", ["1% ต่อเดือน", "12%", "0.1%", "6%"], 0, "i = r/m = 12%/12"], ["c5", "Present value?", ["A/(1+i)^N", "A(1+i)^N", "A×i", "A−i"], 0, "ย้อนมูลค่าอนาคตเป็นปัจจุบัน"], ["c5", "63 is ?% of 420", ["15%", "6.3%", "30%", "66%"], 0, "63/420 = 0.15"], ["c6", "ข้อใดเป็น Roster method?", ["{2, 4, 6, 8}", "เลขคู่น้อยกว่า 10", "เซตของนักศึกษา", "เซตว่าง"], 0, "แจกแจงสมาชิก"], ["c6", "เซต 4 สมาชิกมีกี่ subsets?", ["16", "8", "4", "32"], 0, "2^4"], ["c6", "Equivalent sets คือ?", ["จำนวนสมาชิกเท่ากัน", "สมาชิกเหมือนกัน", "เซตว่าง", "subset"], 0, "Equal คือสมาชิกเหมือนกัน"], ["c6", "Aᶜ คือ?", ["สมาชิกใน U ที่ไม่อยู่ใน A", "A ∪ U", "A ∩ U", "∅"], 0, "ส่วนเติมเต็ม"], ["c6", "|A ∪ B| เท่ากับ?", ["|A|+|B|−|A∩B|", "|A|+|B|", "|A|×|B|", "|A|−|B|"], 0, "ไม่นับส่วนซ้ำสองครั้ง"], ["c6", "คณิต 45 อังกฤษ 41 ทั้งสอง 12 เรียนอย่างน้อยหนึ่งวิชา?", ["74", "86", "98", "57"], 0, "45+41−12"], ["c6", "สัญลักษณ์เซตว่างคือ?", ["∅", "U", "∈", "⊆"], 0, "ไม่มีสมาชิก"], ["c6", "แบบสำรวจสามเซต เริ่มเติมจาก?", ["พื้นที่ซ้อนทั้งสามวง", "นอกวงทั้งหมด", "วงเดี่ยว", "ตามอำเภอใจ"], 0, "ไล่จากกลางออก"], ["c6", "วงดนตรี 50 ออร์เคสตรา 36 ทั้งสอง 14 รวมกี่คน?", ["72", "86", "100", "64"], 0, "50+36−14"], ["c6", "สำรวจ 100 คน ไม่เรียนเลยในโจทย์สไลด์?", ["17", "83", "55", "12"], 0, "100 − 83"], ["c7", "โยนเหรียญ + ทอยลูกเต๋า sample space?", ["12", "8", "36", "6"], 0, "2×6"], ["c7", "P(Ace) ไพ่ 52 ใบ?", ["1/13", "1/4", "1/52", "4/13"], 0, "4/52"], ["c7", "P(สอง and คิง) ในการหยิบ 1 ใบ?", ["0", "1/52", "2/13", "1/13"], 0, "ไพ่ใบเดียวเป็นทั้งสองและคิงไม่ได้"], ["c7", "P(สอง or โพแดง)?", ["4/13", "17/52", "1/52", "2/13"], 0, "(4+13−1)/52"], ["c7", "Mean ของ 3,5,5,8,9?", ["6", "5", "8", "5.5"], 0, "30/5"], ["c7", "Median ของ 3,5,5,8,9?", ["5", "6", "8", "9"], 0, "ตัวกลางคือค่าที่ 3"], ["c7", "GPA ใช้ค่าเฉลี่ยแบบใด?", ["Weighted average", "Median", "Mode", "Range"], 0, "น้ำหนักคือหน่วยกิต"], ["c7", "Range =", ["Max − Min", "Max + Min", "Mean − Min", "σ²"], 0, "ความกว้างข้อมูล"], ["c7", "SD เกี่ยวข้องกับ Variance อย่างไร?", ["SD = √Variance", "SD = Variance²", "SD = Variance/2", "ไม่เกี่ยว"], 0, "σ = √σ²"], ["c7", "ตำแหน่ง Quartile Qr?", ["r(N+1)/4", "rN/2", "r/4N", "N/r"], 0, "แล้ว interpolate"], ["c7", "Lisa อันดับ 85 จาก 240 percentile rank?", ["≈ 65", "≈ 35", "≈ 85", "≈ 15"], 0, "155/240 × 100"], ["c7", "ทำไมต้องดู σ ด้วย?", ["ค่ากลางเท่ากันแต่การกระจายต่างได้", "σ เท่ากับ mean", "ไม่จำเป็น", "Median ผิดเสมอ"], 0, "ตัวอย่าง Set A vs B"]], "pages": {"c5": "40cf0298-4125-8180-99e7-c79a6a3470db", "c6": "40cf0298-4125-818d-8f8b-f99986bad72f", "c7": "40cf0298-4125-8189-84aa-ee20d3d5b426"}, "markKey": "math-flashcards-v1"};
+const KEY = 'study-' + D.key;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+let store = {known:[], ans:{}};
+try{ const r = localStorage.getItem(KEY); if(r) store = Object.assign(store, JSON.parse(r)); }catch(e){}
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} };
+const CATS = D.cats; // [[id,label],...]
+const catLabel = id => (CATS.find(c=>c[0]===id)||[0,id])[1];
+
+function chipRow(box, sel, onPick, countFn){
+  box.innerHTML='';
+  [['all','ทั้งหมด'],...CATS].forEach(([id,l])=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip';
+    b.setAttribute('aria-pressed', id===sel);
+    b.innerHTML = esc(l)+'<span class="n">'+countFn(id)+'</span>';
+    b.onclick=()=>onPick(id); box.appendChild(b);
+  });
+}
+
+/* ---------- flashcards: spaced repetition (Anki-style) ---------- */
+const DAY=86400000, TZ=7*3600000, MIN=60000;
+const sod=t=>Math.floor((t+TZ)/DAY)*DAY-TZ;
+let srs={}, meta={day:0,newDone:0}, NEWLIM=20;
+try{ const r=JSON.parse(localStorage.getItem(D.markKey+'-srs')||'{}'); srs=r.s||{}; meta=r.m||meta; NEWLIM=r.lim||20; }catch(e){}
+const saveS=()=>{ try{ localStorage.setItem(D.markKey+'-srs',JSON.stringify({s:srs,m:meta,lim:NEWLIM})); }catch(e){} };
+const chkDay=()=>{ const d=sod(Date.now()); if(meta.day!==d){ meta.day=d; meta.newDone=0; } };
+const CARDS = D.cards.map((c,i)=>({id:i,cat:c[0],f:c[1],b:c[2],ref:c[3]||'',mid:c[4],tp:c[5],tb:c[6],ans:c[7]}));
+let fcat='all', dirBack=false, cur=null, shown=false;
+const LEARN=[1,10];
+const CAN_TYPE=!!D.typing; let TYPING=CAN_YES();
+function CAN_YES(){ if(!D.typing) return false; try{ return localStorage.getItem(D.markKey+'-typ')!=='0'; }catch(e){ return true; } }
+const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[\s'’\-]+/g,'').replace(/[0-9]/g,'').replace(/[.,!?;:。，！？；：、（）()"“”]/g,'');
+let checked=false, suggest=0;
+function sched(s,r){
+  const now=Date.now(); s=Object.assign({st:'learn',step:0,ease:2.5,ivl:0,lapses:0},s||{});
+  const grad=ivl=>{ s.st='rev'; s.ivl=ivl; s.due=sod(now)+ivl*DAY; delete s.rl; };
+  if(s.st==='learn'){
+    if(r===1){ s.step=0; s.due=now+LEARN[0]*MIN; }
+    else if(r===2){ s.due=now+(s.step===0?6:LEARN[1])*MIN; }
+    else if(r===3){ if(s.step+1<LEARN.length){ s.step++; s.due=now+LEARN[s.step]*MIN; } else grad(s.rl||1); }
+    else grad(s.rl?Math.max(s.rl+1,2):4);
+  } else {
+    if(r===1){ s.lapses++; s.ease=Math.max(1.3,s.ease-0.2); s.rl=Math.max(1,Math.round(s.ivl*0.5)); s.st='learn'; s.step=1; s.due=now+LEARN[1]*MIN; }
+    else if(r===2){ s.ease=Math.max(1.3,s.ease-0.15); grad(Math.max(s.ivl+1,Math.round(s.ivl*1.2))); }
+    else if(r===3){ grad(Math.max(s.ivl+1,Math.round(s.ivl*s.ease))); }
+    else { s.ease+=0.15; grad(Math.max(s.ivl+1,Math.round(s.ivl*s.ease*1.3))); }
+  }
+  s.last=r; return s;
+}
+function lbl(s){
+  if(s.st==='learn'){ const m=Math.max(1,Math.round((s.due-Date.now())/MIN)); return m<60?m+' นาที':Math.round(m/60)+' ชม.'; }
+  return s.ivl<30?s.ivl+' วัน':s.ivl<365?(s.ivl/30).toFixed(1).replace('.0','')+' เดือน':(s.ivl/365).toFixed(1).replace('.0','')+' ปี';
+}
+const inScope=c=>fcat==='all'||c.cat===fcat;
+function queues(cat){
+  chkDay(); const now=Date.now(); const L=[],R=[],N=[];
+  CARDS.forEach(c=>{ if(!(cat==='all'||c.cat===cat)) return; const s=srs[c.mid];
+    if(!s) N.push(c); else if(s.due<=now) (s.st==='learn'?L:R).push(c); });
+  L.sort((a,b)=>srs[a.mid].due-srs[b.mid].due); R.sort((a,b)=>srs[a.mid].due-srs[b.mid].due);
+  return {L,R,N:N.slice(0,Math.max(0,NEWLIM-meta.newDone))};
+}
+function cardsRow(){ chipRow($('#cats'), fcat, id=>{ fcat=id; $('#syncBtn').textContent='บันทึกผลลง Notion'; $('#syncMsg').textContent=''; cardsRow(); renderCard(); }, id=>{ const q=queues(id); return q.L.length+q.R.length+q.N.length; }); }
+function renderCard(){
+  const q=queues(fcat); cur=q.L[0]||q.R[0]||q.N[0]||null; shown=false;
+  $('#srsCounts').innerHTML='<span class="n"><b>'+q.N.length+'</b>ใหม่</span><span class="l"><b>'+q.L.length+'</b>เรียนซ้ำ</span><span class="d"><b>'+q.R.length+'</b>ครบกำหนด</span>';
+  const total=CARDS.filter(inScope).length, seen=CARDS.filter(c=>inScope(c)&&srs[c.mid]).length;
+  $('#count').textContent='เริ่มเรียนแล้ว '+seen+'/'+total+(extN?' · จาก Notion '+extN:'');
+  const st=$('#stage'), show=$('#showBtn'), rt=$('#rate4');
+  if(!cur){
+    const waits=CARDS.filter(c=>inScope(c)&&srs[c.mid]).map(c=>srs[c.mid].due).filter(d=>d>Date.now());
+    let nx=''; if(waits.length){ const d=Math.min(...waits)-Date.now(); nx=' · การ์ดถัดไปครบกำหนดอีก '+(d<3600000?Math.max(1,Math.round(d/MIN))+' นาที':d<DAY?Math.round(d/3600000)+' ชม.':Math.round(d/DAY)+' วัน'); }
+    st.innerHTML='<div class="empty"><b>วันนี้ทบทวนครบแล้ว</b><br>'+(q.N.length===0&&CARDS.some(c=>inScope(c)&&!srs[c.mid])?'ถึงโควตาการ์ดใหม่ของวันนี้แล้ว (เพิ่มได้ที่ปุ่ม “การ์ดใหม่/วัน”)':'ไม่มีการ์ดค้าง')+nx+'</div>';
+    show.hidden=true; rt.hidden=true; $('#typeBox').hidden=true; renderSync(); return;
+  }
+  show.hidden=false; show.textContent='แสดงคำตอบ'; rt.hidden=true;
+  const typ=TYPING&&cur.ans&&cur.ans.length; const front=typ?cur.tp:(dirBack?cur.b:cur.f), back=typ?cur.tb:(dirBack?cur.f:cur.b);
+  checked=false; suggest=0; $('#typeBox').hidden=!typ; $('#typeRes').textContent=''; $('#typeRes').className=''; $('#typeIn').value=''; $('#typeIn').disabled=false; $('#typeGo').disabled=false; document.querySelectorAll('#rate4 .btn').forEach(b=>b.classList.remove('sug'));
+  st.innerHTML='<div class="card" tabindex="0" role="button" aria-label="การ์ด แตะเพื่อพลิก">'+
+   '<div class="face"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="front-t'+(String(front).length<=6?' big':'')+'">'+rich(front)+'</div><span class="hint">แตะการ์ดเพื่อดูคำตอบ</span></div>'+
+   '<div class="face back"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="back-t">'+rich(back)+'</div>'+(cur.ref?'<span class="ref">'+esc(cur.ref)+'</span>':'')+'<span class="hint" style="bottom:28px">แตะการ์ดเพื่อดูคำถาม</span></div></div>';
+  st.querySelector('.card').onclick=reveal;
+  renderSync(); if(typ) setTimeout(()=>{ try{ $('#typeIn').focus({preventScroll:true}); }catch(e){} },0);
+}
+function reveal(){
+  if(!cur) return; const c=$('.card'); const f=c.classList.toggle('flipped');
+  $('#showBtn').textContent=f?'ดูคำถาม':'แสดงคำตอบ';
+  if(!shown){ shown=true; const rt=$('#rate4'); rt.hidden=false; const base=srs[cur.mid]||null;
+    rt.querySelectorAll('.btn').forEach(b=>{ b.querySelector('small').textContent=lbl(sched(base,+b.dataset.r)); }); }
+}
+function rate(r){
+  if(!cur||!shown) return; chkDay();
+  if(!srs[cur.mid]) meta.newDone++;
+  srs[cur.mid]=sched(srs[cur.mid]||null,r); saveS(); cardsRow(); renderCard();
+}
+$('#showBtn').onclick=reveal;
+$('#rate4').querySelectorAll('.btn').forEach(b=>b.onclick=()=>rate(+b.dataset.r));
+$('#dirBtn').onclick=e=>{ dirBack=!dirBack; e.target.setAttribute('aria-pressed',dirBack); e.target.textContent=dirBack?'ด้านหน้า: คำตอบ':'ด้านหน้า: หัวข้อ'; renderCard(); };
+$('#limBtn').onclick=e=>{ NEWLIM=NEWLIM>=40?5:NEWLIM===5?10:NEWLIM===10?20:40; saveS(); e.target.textContent='การ์ดใหม่/วัน: '+NEWLIM; cardsRow(); renderCard(); };
+$('#limBtn').textContent='การ์ดใหม่/วัน: '+NEWLIM;
+let rs=0; $('#resetSrs').onclick=e=>{ if(!rs){ rs=1; e.target.textContent='กดอีกครั้งเพื่อยืนยันล้างทั้งหมด'; setTimeout(()=>{rs=0;e.target.textContent='ล้างความคืบหน้า'},4000); return; } srs={}; meta={day:0,newDone:0}; saveS(); rs=0; e.target.textContent='ล้างความคืบหน้า'; cardsRow(); renderCard(); };
+function check(){
+  if(!cur||checked||!(TYPING&&cur.ans&&cur.ans.length)) return;
+  const v=$('#typeIn').value; if(!v.trim()) return;
+  checked=true; const ok=cur.ans.some(a=>norm(a)===norm(v)&&norm(a)!=='');
+  suggest=ok?3:1; const r=$('#typeRes');
+  r.className=ok?'okk':'nok'; r.textContent=ok?'✓ ถูกต้อง · กด Enter อีกครั้งเพื่อไปต่อ ("ปกติ")':'✗ ยังไม่ตรง · คำตอบ: '+cur.ans[0]+' · คุณพิมพ์: '+v+' · กด Enter อีกครั้งเพื่อไปต่อ ("ลืม")';
+  $('#typeIn').disabled=true; $('#typeGo').disabled=true;
+  if(!shown) reveal(); else $('.card').classList.add('flipped');
+  document.querySelectorAll('#rate4 .btn').forEach(b=>b.classList.toggle('sug',+b.dataset.r===suggest));
+  document.addEventListener('keydown',function once(ev){ if(ev.key==='Enter'&&checked&&suggest){ ev.preventDefault(); document.removeEventListener('keydown',once); rate(suggest); } else if(!checked) document.removeEventListener('keydown',once); });
+}
+$('#typeGo').onclick=check;
+$('#typeIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); check(); } });
+const tb=$('#typBtn'); if(CAN_TYPE){ tb.hidden=false; const syncT=()=>{ tb.textContent='พิมพ์ตอบ: '+(TYPING?'เปิด':'ปิด'); tb.setAttribute('aria-pressed',TYPING); $('#dirBtn').hidden=TYPING; };
+  syncT(); tb.onclick=()=>{ TYPING=!TYPING; try{ localStorage.setItem(D.markKey+'-typ',TYPING?'1':'0'); }catch(e){} syncT(); renderCard(); }; }
+document.addEventListener('keydown',e=>{
+  if($('#tab-cards').hidden) return;
+  if(e.target.tagName==='INPUT') return;
+  if(e.key===' '&&e.target.tagName!=='BUTTON'){ e.preventDefault(); reveal(); }
+  else if('1234'.includes(e.key)&&e.key) rate(+e.key);
+});
+
+/* ---------- summary ---------- */
+let scat='all';
+function renderSum(){
+  chipRow($('#sumCats'), scat, id=>{scat=id;renderSum()}, id=>id==='all'?D.sum.length:D.sum.filter(s=>s.cat===id).length);
+  $('#sumBody').innerHTML = D.sum.filter(s=>scat==='all'||s.cat===scat).map(s=>{
+    let h='<div class="sec"><h2><span class="chtag">'+esc(catLabel(s.cat))+'</span>'+esc(s.h)+'</h2>';
+    if(s.rows){ h+='<div class="tbl-wrap"><table>'+(s.head?'<tr><th>'+esc(s.head[0])+'</th><th>'+esc(s.head[1])+'</th></tr>':'')+s.rows.map(r=>'<tr><td>'+rich(r[0])+'</td><td>'+rich(r[1])+'</td></tr>').join('')+'</table></div>'; }
+    if(s.tip) h+='<div class="tip">'+rich(s.tip)+'</div>';
+    return h+'</div>';
+  }).join('');
+}
+
+/* ---------- practice ---------- */
+const QS = D.quiz.map((q,i)=>{ const o={id:i,cat:q[0],q:q[1],opts:q[2],exp:q[4]||''};
+  let s=(i+1)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
+  const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
+  o.order=idx; o.right=q[3]; return o; });
+let qcat='all', missedOnly=false, deck=[], qpos=0, qStat='', qStatErr=false;
+function buildDeck(){ deck=QS.filter(q=>(qcat==='all'||q.cat===qcat)&&(!missedOnly||(store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right))); qpos=0; }
+function renderQ(){
+  chipRow($('#qCats'), qcat, id=>{qcat=id;buildDeck();renderQ()}, id=>id==='all'?QS.length:QS.filter(q=>q.cat===id).length);
+  const box=$('#qBody');
+  const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
+  let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">ตอบถูก / ตอบแล้ว (ทั้งหมด '+QS.length+' ข้อ)</span></div>';
+  if(qStat) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
+  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">เฉพาะข้อที่ผิด</button><button class="chip" id="resetBtn" type="button">ล้างคำตอบ</button></div>';
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(missedOnly?'ยังไม่มีข้อที่ตอบผิดในหมวดนี้':'ไม่มีข้อสอบในหมวดนี้')+'</div>'; wireQ(); return; }
+  const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined;
+  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>ข้อ '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
+  h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
+  q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
+    h+='<button type="button" class="'+cls+'" data-oi="'+oi+'" '+(done?'disabled':'')+'><span class="k">'+'ABCD'[k]+'</span><span>'+rich(q.opts[oi])+'</span></button>'; });
+  h+='</div>';
+  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'ถูกต้อง':'ยังไม่ถูก ตอบข้อ '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+'</div>'; }
+  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>ก่อนหน้า</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>ถัดไป</button></div></div>';
+  h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="ข้อ '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
+  box.innerHTML=h;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; save(); renderQ(); });
+  box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
+  const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};
+  wireQ();
+}
+function wireQ(){
+  const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
+  const r=$('#resetBtn'); if(r) r.onclick=()=>{ store.ans={}; save(); buildDeck(); renderQ(); };
+}
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  ['cards','sum','prac'].forEach(t=>$('#tab-'+t).hidden = t!==b.dataset.tab);
+});
+
+/* ---------- Notion sync (via the viewer's Notion connector) ---------- */
+const STEPS=[1,3,7,14,30], PASS=0.8, NOTION="Notion";
+let mcp=null, syncing=false, owner=false;
+const todayBkk=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok"}).format(new Date());
+function scopeT(){ const sc=CARDS.filter(c=>c.cat===fcat); const seen=sc.filter(c=>srs[c.mid]); const g=seen.filter(c=>srs[c.mid].last>=3).length; return {g,b:seen.length-g,n:sc.length}; }
+function renderSync(){
+  const box=$('#sync'); const page=(D.pages||{})[fcat];
+  if(!box) return;
+  if(fcat==='all'||!page||!owner||!mcp){ box.hidden=true; return; }
+  const t=scopeT(); if(t.n===0||t.g+t.b<t.n){ box.hidden=true; return; }
+  box.hidden=false; const pass=t.g/t.n>=PASS, pct=Math.round(t.g/t.n*100);
+  $('#syncText').textContent=pass?'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ผ่านเกณฑ์ 80% → Review Step จะเพิ่ม 1 ขั้น':'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ต่ำกว่า 80% → Review Step จะกลับเป็น 0 (ทบทวนอีกครั้งพรุ่งนี้)';
+  if(!syncing) $('#syncBtn').disabled=false;
+}
+function errText(e,writing){
+  switch(e&&e.code){
+    case "server_not_connected": return "ยังไม่ได้เชื่อม Notion: เพิ่ม Notion ใน claude.ai Settings → Connectors แล้วลองใหม่";
+    case "needs_reauth": return "การเชื่อม Notion หมดอายุ: เชื่อมใหม่ใน claude.ai Settings → Connectors";
+    case "selection_required": return "มีบัญชี Notion มากกว่าหนึ่งบัญชี เลือกบัญชีที่หน้าต่างของ claude.ai แล้วกดอีกครั้ง";
+    case "approval_required": case "not_in_manifest": case "consent_required": return "หน้านี้ยังไม่ได้รับอนุญาตให้ใช้ Notion กดปุ่มอีกครั้งแล้วเลือกอนุญาต";
+    case "blocked_by_policy": return "องค์กรของคุณไม่อนุญาตให้ใช้ Notion จากหน้านี้";
+    case "tool_error": return "Notion ปฏิเสธการบันทึก: "+(e.message||"").slice(0,160);
+    case "server_unavailable": case "upstream_error": return writing?"Notion ไม่ตอบกลับ อาจบันทึกไปแล้ว เปิดหน้าบทใน Notion เพื่อตรวจก่อนกดอีกครั้ง":"ติดต่อ Notion ไม่ได้ชั่วคราว ลองกดอีกครั้งในอีกสักครู่";
+    default: return "บันทึกไม่สำเร็จ ("+((e&&e.code)||"unknown")+")";
+  }
+}
+async function syncNotion(){
+  const page=(D.pages||{})[fcat]; if(!mcp||!page||syncing) return;
+  const t=scopeT(), pass=t.g/t.n>=PASS;
+  syncing=true; $('#syncBtn').disabled=true;
+  const msg=$('#syncMsg'); msg.className=''; msg.textContent='กำลังอ่าน Review Step ปัจจุบันจาก Notion…';
+  let step=0;
+  try{
+    const r=await mcp.callTool(NOTION,"notion-fetch",{id:page},{cache:false});
+    const p=r.payload; const text=typeof p==="string"?p:(p&&typeof p.text==="string"?p.text:JSON.stringify(p));
+    const m=text.match(/\\?"Review Step\\?"\s*:\s*(\d+(?:\.\d+)?)/); if(m) step=Math.max(0,Math.round(Number(m[1])));
+  }catch(e){ msg.className='err'; msg.textContent=errText(e,false); syncing=false; $('#syncBtn').disabled=false; return; }
+  const next=pass?step+1:0, today=todayBkk();
+  msg.textContent='กำลังบันทึกลง Notion…';
+  try{
+    await mcp.callTool(NOTION,"notion-update-page",{page_id:page,command:"update_properties",properties:{"date:Last review:start":today,"date:Last review:is_datetime":0,"Review Step":next}});
+    msg.className='ok'; msg.textContent='บันทึกแล้ว · '+catLabel(fcat)+': Last review '+today+' · Review Step '+step+' → '+next+' · ทบทวนรอบหน้าในอีก '+STEPS[Math.min(next,STEPS.length-1)]+' วัน';
+    $('#syncBtn').textContent='บันทึกแล้ว ✓';
+  }catch(e){ msg.className='err'; msg.textContent=errText(e,true); $('#syncBtn').disabled=false; }
+  syncing=false;
+}
+$('#syncBtn').onclick=syncNotion;
+if(window.claude&&window.claude.use){
+  window.claude.use("user").then(u=>u?u.isOwner():false).then(v=>{owner=!!v;renderSync();}).catch(()=>{});
+  window.claude.use("mcp").then(m=>{mcp=m;renderSync();loadExt();loadExtQ();}).catch(()=>{loadStatic();});
+}else{ loadStatic(); }
+
+/* ---------- extra cards from the Notion "Flashcards" table ---------- */
+const SUBJ={acc:'Accounting',math:'Math for Life',eco:'Economics',eng:'English Vocab',zh:'Chinese'}[D.key];
+const EXT_DS='collection://7eb4091a-8830-43de-8185-cd26b65d5ce7', EXT_KEY=D.markKey+'-ext';
+let extN=0;
+function setExt(rows){
+  for(let i=CARDS.length-1;i>=0;i--) if(String(CARDS[i].mid).startsWith('n-')) CARDS.splice(i,1);
+  extN=0;
+  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Front) return;
+    const mid='n-'+String(r.url||r.Front).split('?')[0].split('/').pop();
+    if(CARDS.some(c=>c.mid===mid)) return;
+    CARDS.push({id:CARDS.length,cat:hit[0],f:r.Front,b:r.Back||'',ref:r.Ref||'',mid}); extN++; });
+}
+try{ setExt(JSON.parse(localStorage.getItem(EXT_KEY)||'[]')); }catch(e){}
+
+const FC_VIEW='https://app.notion.com/p/3156c08e298f410a9782144f64a3ae69?v=a0498df1-b75a-4f90-b6a0-00753d39bc96';
+const Q_VIEW='https://app.notion.com/p/776e2eeaf73e4154812ae8e4813f9be6?v=696b7bb301874367829744d89c404695';
+const unesc=s=>typeof s==='string'?s.replace(/\\([\\|$*_`~\[\]()<>#+\-.!&])/g,'$1'):s;
+async function fetchRows(view){
+  const out=[]; let cursor=null;
+  for(let i=0;i<8;i++){
+    const a={mode:'view',view_url:view,page_size:100}; if(cursor) a.start_cursor=cursor;
+    const r=await mcp.callTool(NOTION,"notion-query-data-sources",{data:a},{cache:false});
+    let p=r.payload; if(typeof p==="string"){ try{ p=JSON.parse(p); }catch(e){} }
+    if(p&&typeof p.text==="string"){ try{ p=JSON.parse(p.text); }catch(e){} }
+    if(!p||!Array.isArray(p.results)) throw new Error('bad payload');
+    p.results.forEach(x=>{ if(x.Subject===SUBJ){ const y={}; for(const k in x) y[k]=unesc(x[k]); out.push(y); } });
+    if(!p.has_more||!p.next_cursor) break; cursor=p.next_cursor;
+  }
+  return out;
+}
+async function loadExt(){
+  if(!mcp||!SUBJ) return;
+  try{
+    const rows=await fetchRows(FC_VIEW);
+    setExt(rows); try{ localStorage.setItem(EXT_KEY,JSON.stringify(rows)); }catch(e){}
+    cardsRow(); if(!shown) renderCard();
+  }catch(e){}
+}
+
+/* ---------- extra quiz questions from the Notion "Quiz" table ---------- */
+const QDS='collection://21fcc8d7-5e96-4061-a02f-d71fc5705812', QKEY=D.markKey+'-extq';
+function hashN(s){ let h=7; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%1000003; return h; }
+function setExtQ(rows){
+  for(let i=QS.length-1;i>=0;i--) if(String(QS[i].id).startsWith('n-')) QS.splice(i,1);
+  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Question||!r.Correct) return;
+    const opts=[r.Correct,r['Wrong 1'],r['Wrong 2'],r['Wrong 3']].filter(x=>x&&String(x).trim());
+    if(opts.length<2) return;
+    const id='n-'+String(r.url||r.Question).split('?')[0].split('/').pop();
+    let s=hashN(id)+49297; const rn=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
+    const idx=opts.map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(rn()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
+    QS.push({id,cat:hit[0],q:r.Question,opts,exp:r.Explanation||'',order:idx,right:0}); });
+}
+const EMBQ=[];
+try{ const _c=JSON.parse(localStorage.getItem(QKEY)||'[]'); const _m=new Map(); EMBQ.forEach(r=>_m.set(r.url,r)); _c.forEach(r=>_m.set(r.url,r)); setExtQ([..._m.values()]); buildDeck(); }catch(e){}
+async function loadExtQ(){
+  if(!SUBJ) return;
+  if(!mcp){ qStat='ไม่ได้เชื่อม Notion — ใช้ข้อสอบที่ฝังไว้ (ข้อมูล ณ 10 พ.ย. 2026)'; qStatErr=false; renderQ(); loadStatic(); return; }
+  qStat='กำลังโหลดข้อสอบจาก Notion…'; qStatErr=false; renderQ();
+  let lastErr=null;
+  for(let a=0;a<3;a++){
+    try{
+      const rows=await fetchRows(Q_VIEW);
+      try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
+      setExtQ(rows);
+      const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
+      qStat='โหลดจาก Notion สำเร็จ · เพิ่ม '+n+' ข้อ'; qStatErr=false;
+      if(qpos>=QS.length) qpos=0; buildDeck(); renderQ(); return;
+    }catch(e){ lastErr=e; await new Promise(r=>setTimeout(r,2500*(a+1))); }
+  }
+  const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
+  qStat='โหลดจาก Notion ไม่สำเร็จ ('+String((lastErr&&lastErr.message)||lastErr||'').slice(0,60)+') — ใช้ข้อมูลเก่าที่เก็บไว้ '+n+' ข้อ ลองปิดแล้วเปิดใหม่';
+  qStatErr=true; renderQ();
+}
+async function loadStatic(){
+  await 0;
+  if(!SUBJ) return;
+  try{
+    const [q,c]=await Promise.all([
+      fetch('data/quiz.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)),
+      fetch('data/cards.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);
+    const rows=(q.rows||[]).filter(x=>x.Subject===SUBJ);
+    setExtQ(rows); try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
+    if(c&&c.rows){ const cr=c.rows.filter(x=>x.Subject===SUBJ); setExt(cr); try{ localStorage.setItem(EXT_KEY,JSON.stringify(cr)); }catch(e){} cardsRow(); if(!shown) renderCard(); }
+    const n=QS.filter(x=>String(x.id).startsWith('n-')).length;
+    qStat='โหลดจากไฟล์ข้อมูลสำเร็จ · เพิ่ม '+n+' ข้อ · อัปเดต '+(q.updated||'-'); qStatErr=false;
+    if(qpos>=QS.length) qpos=0; buildDeck(); renderQ();
+  }catch(e){}
+}
+setInterval(()=>{ if(!cur&&!$('#tab-cards').hidden){ cardsRow(); renderCard(); } },20000);
+if(!D.sum.length) document.querySelectorAll('.tabs button').forEach(b=>{ if(b.dataset.tab!=='cards') b.hidden=true; });
+cardsRow(); renderCard(); renderSum(); buildDeck(); renderQ();
+</script>
+
+</html>

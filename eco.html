@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Economics</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: tabbed study sheet (cards / summary / practice) in one centred column. */
+:root{
+  --paper:#f6f3ec; --surface:#ffffff; --ink:#1a2320; --muted:#5b6a64; --line:#d3dcd7;
+  --accent:#b0602a; --accent-soft:#f2e1d2; --known:#e6f2d5; --ok:#1c7c4a; --ok-soft:#e2f3e9; --bad:#b3261e; --bad-soft:#fbe6e4;
+  --ui:"IBM Plex Sans Thai","Noto Sans Thai","Leelawadee UI",Tahoma,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12171a; --surface:#1b2226; --ink:#e7eeea; --muted:#9db0a8; --line:#2d3a40;
+  --accent:#e8a574; --accent-soft:#3b2a1d; --known:#26331c; --ok:#62d394; --ok-soft:#15301f; --bad:#ff8a80; --bad-soft:#3b1c1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12171a; --surface:#1b2226; --ink:#e7eeea; --muted:#9db0a8; --line:#2d3a40;
+  --accent:#e8a574; --accent-soft:#3b2a1d; --known:#26331c; --ok:#62d394; --ok-soft:#15301f; --bad:#ff8a80; --bad-soft:#3b1c1a; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16.5px;line-height:1.65}
+.wrap{max-width:800px;margin:0 auto;padding-block:26px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;align-items:baseline;gap:6px 16px;flex-wrap:wrap;margin-bottom:18px}
+header h1{font-size:clamp(26px,6vw,36px);line-height:1.15;margin:0;font-weight:700;text-wrap:balance}
+header span{color:var(--muted);font-size:15px}
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:20px;overflow-x:auto}
+.tabs button{font:inherit;font-weight:500;background:none;border:0;color:var(--muted);padding:10px 14px;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+button:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:inherit;font-size:14.5px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip .n{font-family:var(--mono);font-size:11.5px;opacity:.75;margin-left:5px}
+.controls{justify-content:space-between;margin:12px 0 16px}
+.count{color:var(--muted);font-size:14px;font-family:var(--mono)}
+.stage{perspective:1400px}
+.card{position:relative;width:100%;height:clamp(300px,64vw,380px);cursor:pointer;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);border-radius:10px}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);border:1.5px solid var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px 22px 30px;text-align:center;overflow:auto}
+.back{transform:rotateY(180deg)}
+.card.is-known .face{background:var(--known)}
+.cat-tag{position:absolute;top:10px;left:14px;font-size:12.5px;color:var(--muted)}
+.hint{position:absolute;bottom:10px;left:0;right:0;font-size:12.5px;color:var(--muted)}
+.front-t.big{font-size:clamp(40px,11vw,60px);line-height:1.2}
+.front-t{font-size:clamp(21px,5vw,28px);font-weight:700;line-height:1.4;text-wrap:balance}
+.back-t{font-size:clamp(17px,4vw,21px);line-height:1.7;max-width:34em}
+.back-t b{color:var(--accent)}
+.nav{justify-content:center;margin-top:16px;gap:10px}
+.btn{font:inherit;font-weight:500;border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 18px;cursor:pointer;min-width:46px}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.know[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.ref{position:absolute;bottom:10px;left:0;right:0;font:500 12px var(--mono);color:var(--accent)}
+.btn.no{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.btn.yes{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.sync{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:10px;background:var(--accent-soft);margin-top:16px}
+.sync p{margin:0;font-size:15px}.sync .ok{color:var(--ok)}.sync .err{color:var(--bad)}
+.srs{gap:14px;font:600 14px var(--mono);margin:4px 0 12px}
+.srs .n{color:#2f6fd0}.srs .l{color:var(--bad)}.srs .d{color:var(--ok)}
+.srs b{font-size:18px;margin-right:3px}
+.rate4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.rate4 .btn{display:flex;flex-direction:column;gap:2px;padding:9px 4px;min-width:0;font-size:15px}
+.rate4 .btn small{font:500 12px var(--mono);opacity:.85}
+.rate4 .r1{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.rate4 .r2{border-color:var(--line);color:var(--ink)}
+.rate4 .r3{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.rate4 .r4{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.show{display:none!important;width:100%;margin-top:16px;padding:13px}
+.typebox{margin-top:14px}.typebox input{flex:1;min-width:0;font:inherit;font-size:18px;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.typebox input:focus{outline:3px solid var(--accent);outline-offset:1px}
+.typebox p{margin:8px 0 0;font-size:16px;min-height:1.5em}.typebox .okk{color:var(--ok);font-weight:600}.typebox .nok{color:var(--bad);font-weight:600}
+.rate4 .btn.sug{box-shadow:0 0 0 3px var(--accent)}
+.keys{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
+.empty{padding:50px 20px;text-align:center;color:var(--muted)}
+/* summary */
+.sec{margin:0 0 26px}
+.sec h2{font-size:20px;margin:0 0 8px;padding-left:12px;border-left:4px solid var(--accent);line-height:1.4}
+.sec .chtag{font-family:var(--mono);font-size:12px;color:var(--accent);display:block}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;min-width:100%;background:var(--surface);font-size:15.5px}
+th,td{border:1px solid var(--line);padding:7px 11px;text-align:left;vertical-align:top;line-height:1.6}
+th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
+td:first-child{font-weight:500;min-width:7.5em}
+.tip{background:var(--accent-soft);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:15px}
+/* quiz */
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.qbar{height:4px;background:var(--line);border-radius:2px;margin-bottom:14px}
+.qbar i{display:block;height:100%;background:var(--accent);width:0;border-radius:2px;transition:width .25s}
+.qmeta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13.5px;color:var(--muted);margin-bottom:8px}
+.qmeta b{font-family:var(--mono);color:var(--ink)}
+.qtext{font-size:18px;font-weight:500;margin:0 0 14px;line-height:1.6}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:9px;padding:10px 13px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt .k{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--muted);min-width:16px;padding-top:2px}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.dim{opacity:.6}
+.explain{margin-top:14px;border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;font-size:15.5px}
+.explain.good{border-left-color:var(--ok)} .explain.bad{border-left-color:var(--bad)}
+.explain b.v{display:block;margin-bottom:2px}
+.qnav{display:flex;justify-content:space-between;gap:8px;margin-top:16px;align-items:center;flex-wrap:wrap}
+.score{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.score .big{font-family:var(--mono);font-size:30px;font-weight:600}
+.cells{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0}
+.cell{width:28px;height:28px;border:1px solid var(--line);background:var(--surface);border-radius:5px;font:500 11px var(--mono);color:var(--muted);cursor:pointer;padding:0}
+.cell.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.cell.no{background:var(--bad);border-color:var(--bad);color:#fff}
+.cell.cur{outline:2px solid var(--ink);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){.card,.qbar i{transition:none}}
+</style>
+<div class="wrap">
+  <header><h1>Economics</h1><span>สรุป · แฟลชการ์ด · แบบฝึก — Micro (002–003) + Macro</span></header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="cards">แฟลชการ์ด</button>
+    <button role="tab" aria-selected="false" data-tab="sum">สรุปบทเรียน</button>
+    <button role="tab" aria-selected="false" data-tab="prac">แบบฝึก</button>
+  </nav>
+  <section id="tab-cards">
+    <div class="row" id="cats"></div>
+    <div class="row controls">
+      <div class="row">
+        <button class="chip" id="dirBtn" aria-pressed="false" type="button">ด้านหน้า: หัวข้อ</button>
+        <button class="chip" id="typBtn" type="button" hidden>พิมพ์ตอบ: เปิด</button>
+        <button class="chip" id="limBtn" type="button">การ์ดใหม่/วัน: 20</button>
+        <button class="chip" id="resetSrs" type="button">ล้างความคืบหน้า</button>
+      </div>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="row srs" id="srsCounts"></div>
+    <div class="stage" id="stage"></div>
+    <div id="typeBox" class="typebox" hidden>
+      <div class="row"><input id="typeIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="พิมพ์คำตอบ แล้วกด Enter"><button class="btn primary" id="typeGo" type="button">ตรวจ</button></div>
+      <p id="typeRes" role="status"></p>
+    </div>
+    <button class="btn primary show" id="showBtn" type="button" hidden>แสดงคำตอบ</button>
+    <div class="rate4" id="rate4" hidden>
+      <button class="btn r1" data-r="1" type="button">ลืม<small></small></button>
+      <button class="btn r2" data-r="2" type="button">ยาก<small></small></button>
+      <button class="btn r3" data-r="3" type="button">ปกติ<small></small></button>
+      <button class="btn r4" data-r="4" type="button">ง่าย<small></small></button>
+    </div>
+    <p class="keys">แตะการ์ดหรือกด Space = พลิก · 1 ลืม · 2 ยาก · 3 ปกติ · 4 ง่าย</p>
+    <div class="sync" id="sync" hidden><p id="syncText"></p><button class="btn yes" id="syncBtn" type="button">บันทึกผลลง Notion</button><p id="syncMsg" role="status"></p></div>
+  </section>
+  <section id="tab-sum" hidden>
+    <div class="row" id="sumCats" style="margin-bottom:18px"></div>
+    <div id="sumBody"></div>
+  </section>
+  <section id="tab-prac" hidden>
+    <div class="row" id="qCats" style="margin-bottom:14px"></div>
+    <div id="qBody"></div>
+  </section>
+</div>
+<script>
+const D = {"key": "eco", "title": "Economics", "sub": "สรุป · แฟลชการ์ด · แบบฝึก — Micro (002–003) + Macro", "theme": {"paper": "#f6f3ec", "accent": "#b0602a", "soft": "#f2e1d2", "accentd": "#e8a574", "softd": "#3b2a1d"}, "cats": [["c2", "Micro · 002 Economic Way of Thinking"], ["c3", "Micro · 003 Demand & Supply"], ["g", "Macro · GDP"], ["i", "Macro · Inflation & CPI"], ["b", "Macro · Business Cycle"], ["a", "Macro · AD–AS"], ["d", "Macro · Growth & Development"]], "cards": [["c2", "Economics ศึกษาอะไร?", "การเลือกและจัดสรรทรัพยากรที่**จำกัด** เพื่อตอบสนองความต้องการที่**ไม่จำกัด**", "", "c2-1"], ["c2", "รากศัพท์ Economy", "กรีก **oikonomos** = ผู้จัดการบ้านเรือน (one who manages a household)", "", "c2-2"], ["c2", "บิดาแห่งเศรษฐศาสตร์สมัยใหม่", "**Adam Smith** · The Wealth of Nations (1776)", "", "c2-3"], ["c2", "Micro vs Macro", "**Micro** หน่วยย่อย: บุคคล ครัวเรือน บริษัท ตลาดเฉพาะ · **Macro** ภาพรวม: เงินเฟ้อ การว่างงาน การเติบโต", "", "c2-4"], ["c2", "Positive vs Normative", "**Positive** = what is · ตรวจสอบได้ (Descriptive) · **Normative** = what should be · ใช้ value judgment (Policy)", "", "c2-5"], ["c2", "'ถ้าอัตราภาษีเพิ่ม รายได้ภาษีเปลี่ยน' เป็นแบบใด?", "**Positive** — ตรวจสอบด้วยข้อมูลได้", "", "c2-6"], ["c2", "'รัฐบาลควรลดภาษีช่วยผู้มีรายได้น้อย' เป็นแบบใด?", "**Normative** — เป็นความเห็นว่า 'ควร'", "", "c2-7"], ["c2", "ปัญหาเศรษฐศาสตร์พื้นฐาน", "ตอบสนอง wants/needs ในโลกที่มี **Scarcity**", "", "c2-8"], ["c2", "Scarcity บังคับให้ทำอะไร?", "**ตัดสินใจเลือก** (trade-off)", "", "c2-9"], ["c2", "ปัจจัยการผลิต 4 อย่างและผลตอบแทน", "Land → Rent · Labor → Wage/Salary · Capital → Interest · Entrepreneurship → Profit", "", "c2-10"], ["c2", "ทำไมเงินไม่ใช่ Capital?", "Capital = สิ่งที่มนุษย์สร้างเพื่อผลิต (เครื่องจักร อาคาร) · เงินผลิตอะไรเองไม่ได้ เป็นเพียงสิทธิเรียกร้อง", "", "c2-11"], ["c2", "Circular Flow", "ครัวเรือนขายปัจจัยผลิต → ธุรกิจ · ธุรกิจขายสินค้า → ครัวเรือน · เงินไหลสวนทาง · 2 ตลาด: สินค้า/บริการ และปัจจัยผลิต", "", "c2-12"], ["c2", "คำถามเศรษฐกิจพื้นฐาน 3 ข้อ", "**What** ผลิตอะไร · **How** ผลิตอย่างไร · **For whom** ผลิตเพื่อใคร", "", "c2-13"], ["c2", "Opportunity cost", "มูลค่าของ**ทางเลือกที่ดีที่สุดที่สละไป** ไม่จำเป็นต้องเป็นเงิน", "", "c2-14"], ["c2", "Marginal analysis", "เทียบ **ประโยชน์ส่วนเพิ่ม (MB)** กับ **ต้นทุนส่วนเพิ่ม (MC)** ของการเปลี่ยนทีละหน่วย", "", "c2-15"], ["c2", "PPC คืออะไร?", "เส้นแสดงชุดผลผลิตสูงสุดของสินค้า 2 ชนิดภายใต้ทรัพยากรและเทคโนโลยีที่มี (เรียก PPF/PPB ก็ได้)", "", "c2-16"], ["c2", "สมมติฐาน PPC 3 ข้อ", "ทรัพยากรคงที่ · ใช้ทรัพยากรเต็มประสิทธิภาพ · เทคโนโลยีคงที่", "", "c2-17"], ["c2", "จุดบน / ใน / นอก PPC", "**บน** = มีประสิทธิภาพ · **ใน** = ใช้ไม่เต็มที่ · **นอก** = ทำไม่ได้", "", "c2-18"], ["c2", "Law of Increasing Opportunity Cost", "ผลิตสินค้าหนึ่งมากขึ้น ค่าเสียโอกาสต่อหน่วยยิ่งสูงขึ้น → PPC **โค้งเว้าออกจากจุดกำเนิด**", "", "c2-19"], ["c2", "ค่าเสียโอกาสคงที่ PPC เป็นอย่างไร?", "เส้นตรงเฉียงลง", "", "c2-20"], ["c2", "PPC เลื่อนขวา (เติบโต) เพราะอะไร?", "เทคโนโลยีใหม่ · ค้นพบทรัพยากร · แรงงานเพิ่ม · ทุนมนุษย์ · แบ่งงาน · ความเป็นผู้ประกอบการ · สะสมทุน", "", "c2-21"], ["c2", "PPC เลื่อนซ้าย เพราะอะไร?", "แรงงานย้ายออก · เครื่องจักรขาดการบำรุง · ภัยพิบัติ · โรคระบาด", "", "c2-22"], ["c2", "Investment ทางเศรษฐศาสตร์", "การสะสมทุน (โรงงาน เครื่องจักร สินค้าคงคลัง) · opportunity cost = สินค้าบริโภคที่สละ", "", "c2-23"], ["c2", "Ten Principles: ตัดสินใจรายบุคคล", "1) trade-offs 2) ต้นทุน = สิ่งที่ยอมเสีย 3) คิดที่ส่วนเพิ่ม 4) ตอบสนองสิ่งจูงใจ", "", "c2-24"], ["c2", "Ten Principles: ปฏิสัมพันธ์", "5) การค้าทำให้ดีขึ้นได้ 6) ตลาดมักจัดสรรได้ดี 7) รัฐแก้ market failure ได้", "", "c2-25"], ["c2", "Ten Principles: มหภาค", "8) มาตรฐานชีวิตขึ้นกับการผลิต 9) พิมพ์เงินมาก ราคาขึ้น 10) ระยะสั้น เงินเฟ้อ vs การว่างงาน", "", "c2-26"], ["c3", "Demand คืออะไร?", "ความปรารถนา + ความเต็มใจ + ความสามารถจ่าย ณ ราคาต่าง ๆ (ceteris paribus)", "", "c3-1"], ["c3", "Demand vs Quantity demanded", "**Demand** = ความสัมพันธ์ทั้งเส้น · **Qd** = ปริมาณ ณ ราคาหนึ่ง", "", "c3-2"], ["c3", "Law of Demand", "ปัจจัยอื่นคงที่ ราคา ↑ → Qd ↓ · ราคา ↓ → Qd ↑", "", "c3-3"], ["c3", "Movement vs Shift (Demand)", "ราคาสินค้าเองเปลี่ยน = **เคลื่อนบนเส้น** · ปัจจัยอื่นเปลี่ยน = **เลื่อนทั้งเส้น**", "", "c3-4"], ["c3", "ปัจจัยที่ทำให้ Demand เลื่อน", "จำนวนผู้ซื้อ · รสนิยม · รายได้ · ความคาดหวัง · ราคาสินค้าที่เกี่ยวข้อง", "", "c3-5"], ["c3", "Normal vs Inferior goods", "รายได้ ↑: Normal → Demand ↑ · Inferior → Demand ↓", "", "c3-6"], ["c3", "Substitutes vs Complements", "ราคา substitute ↑ → Demand สินค้าเรา ↑ · ราคา complement ↑ → Demand สินค้าเรา ↓", "", "c3-7"], ["c3", "Market demand", "รวม Qd ของผู้ซื้อทุกคน ณ ราคาเดียวกัน (รวมตามแนวนอน)", "", "c3-8"], ["c3", "Law of Supply", "ปัจจัยอื่นคงที่ ราคา ↑ → Qs ↑", "", "c3-9"], ["c3", "ปัจจัยที่ทำให้ Supply เลื่อน", "จำนวนผู้ขาย · เทคโนโลยี · ราคาปัจจัยผลิต · ภาษี/เงินอุดหนุน · ความคาดหวัง · ราคาสินค้าอื่น", "", "c3-10"], ["c3", "Supply เลื่อนขวา/ซ้าย", "ต้นทุนลด/เทคโนโลยีดี → ขวา · ต้นทุนสูง/ภาษีเพิ่ม → ซ้าย", "", "c3-11"], ["c3", "Equilibrium", "จุดที่ **Qd = Qs** ให้ราคาและปริมาณดุลยภาพ", "", "c3-12"], ["c3", "Demand ↑ (Supply คงที่)", "Equilibrium P ↑ และ Q ↑", "", "c3-13"], ["c3", "Supply ↑ (Demand คงที่)", "Equilibrium P ↓ และ Q ↑", "", "c3-14"], ["c3", "D และ S เปลี่ยนพร้อมกัน", "ต้องรู้ขนาดการเลื่อน ไม่งั้นสรุปได้ทิศเดียว (P หรือ Q) ไม่ทั้งคู่", "", "c3-15"], ["c3", "Surplus vs Shortage", "**Surplus**: Qs > Qd (ราคาสูงกว่าดุลยภาพ) · **Shortage**: Qd > Qs (ราคาต่ำกว่าดุลยภาพ)", "", "c3-16"], ["c3", "Price ceiling", "ราคาสูงสุดตามกฎหมาย · ต่ำกว่าดุลยภาพ → **Shortage** (= Qd − Qs)", "", "c3-17"], ["c3", "Price floor", "ราคาต่ำสุดตามกฎหมาย · สูงกว่าดุลยภาพ → **Surplus** (= Qs − Qd)", "", "c3-18"], ["g", "National income accounting คืออะไร?", "ระบบที่ใช้วัดรายได้และรายจ่ายรวมของประเทศ", "GDP", "m1-1"], ["g", "GDP คืออะไร?", "มูลค่าตลาดของสินค้าและบริการขั้นสุดท้ายทั้งหมดที่ผลิตในประเทศในช่วงเวลาหนึ่ง (ปกติ 1 ปี)", "GDP", "m1-2"], ["g", "ธุรกรรม 2 ประเภทที่ไม่นับใน GDP?", "1) Secondhand transactions (ขายรถมือสอง บ้านเก่า)\n2) Nonproductive financial transactions (ของขวัญส่วนตัว ซื้อขายหุ้น/พันธบัตร Transfer payments)", "GDP", "m1-3"], ["g", "Transfer payment คืออะไร?", "เงินที่รัฐจ่ายให้บุคคลโดยไม่ได้แลกกับสินค้าหรือบริการที่ผลิตในงวดนี้", "GDP", "m1-4"], ["g", "Final goods กับ Intermediate goods ต่างกันอย่างไร?", "Final = สินค้า/บริการสำเร็จรูปสำหรับผู้ใช้ปลายทาง\nIntermediate = ใช้เป็นปัจจัยผลิต Final goods", "GDP", "m1-5"], ["g", "ทำไมไม่นับ Intermediate goods?", "เพื่อเลี่ยง Double counting ที่ทำให้ GDP สูงเกินจริง", "GDP", "m1-6"], ["g", "Circular flow model คืออะไร?", "แผนภาพการแลกเปลี่ยนเงิน สินค้า และทรัพยากรระหว่างครัวเรือนกับธุรกิจ", "GDP", "m1-7"], ["g", "2 วิธีคำนวณ GDP?", "Expenditure approach = รวมรายจ่ายซื้อสินค้าขั้นสุดท้าย\nIncome approach = รวมรายได้ (ค่าตอบแทนแรงงาน ค่าเช่า ดอกเบี้ยสุทธิ กำไร)", "GDP", "m1-8"], ["g", "สูตร GDP แบบ Expenditure approach?", "GDP = C + I + G + (X − M)\nC ครัวเรือน · I ธุรกิจลงทุน · G รัฐ · X ส่งออก · M นำเข้า", "GDP", "m1-9"], ["g", "Personal consumption (C) แบ่งเป็นอะไร?", "Durable (ใช้ได้เกิน 3 ปี เช่น รถ) · Nondurable (หมดใน 3 ปี เช่น อาหาร น้ำมัน) · Services (ไม่มีตัวตน เช่น การศึกษา)\nสหรัฐฯ 2016 ≈ 69% ของ GDP", "GDP", "m1-10"], ["g", "Gross private domestic investment (I) หมายถึงอะไร?", "รายจ่ายลงทุน “ทั้งหมด” ของ “เอกชน” “ในประเทศ” ในสินทรัพย์ทุนที่คาดว่าจะทำกำไรในอนาคต", "GDP", "m1-11"], ["g", "Government spending (G) และ Net exports คืออะไร?", "G = มูลค่าสินค้าบริการที่รัฐทุกระดับซื้อ วัดตามต้นทุน\nNet exports = X − M", "GDP", "m1-12"], ["g", "GDP ไม่นับอะไรบ้าง (5 ข้อ)?", "Nonmarket transactions · การกระจาย ชนิด และคุณภาพสินค้า · Quality of life · Underground economy · Economic bads", "GDP", "m1-13"], ["g", "ทำไมไม่นับ Nonmarket transactions?", "1) ตีมูลค่างานที่ทำเองหรือทำให้ผู้อื่นโดยไม่รับค่าตอบแทนได้ไม่แม่นยำ 2) ตัดสินยากว่าจะนับกิจกรรมไหน", "GDP", "m1-14"], ["g", "สิ่งที่ไม่นับทำให้ GDP ต่ำหรือสูงกว่าจริง?", "Quality of life, Underground economy → GDP ต่ำกว่าจริง\nEconomic bads (มลพิษ) → GDP สูงกว่าจริง\nGDP เป็นตัววัดเชิงปริมาณ ไม่ใช่คุณภาพ", "GDP", "m1-15"], ["g", "ตัววัดทางเลือกแทน GDP?", "MEW · GPI · HDI · HPI", "GDP", "m1-16"], ["g", "Nominal GDP กับ Real GDP ต่างกันอย่างไร?", "Nominal = ใช้ราคาของปีที่ผลิต\nReal = ใช้ราคาของปีฐาน", "GDP", "m1-17"], ["g", "ปี 2017: Hot dog $2×150, Hamburger $3×100; ปีฐาน 2016 ราคา $1 และ $2 → Nominal กับ Real GDP?", "Nominal = 300 + 300 = 600\nReal = (1×150) + (2×100) = 350", "GDP slides", "m1-18"], ["g", "GDP chain price index (Deflator) และสูตร Real GDP?", "ดัชนีเทียบราคาสินค้าขั้นสุดท้ายทั้งหมดกับปีฐาน\nReal GDP = Nominal GDP ÷ GDP chain price index × 100", "GDP", "m1-19"], ["g", "GDP กับ GNP ต่างกันอย่างไร?", "GDP = ผลผลิตภายในประเทศ\nGNP = รายได้รวมของผู้อยู่อาศัยถาวรของประเทศ: รวมรายได้ที่พลเมืองหาได้ในต่างประเทศ ไม่รวมรายได้ที่คนต่างชาติหาได้ในประเทศ", "GDP", "m1-20"], ["i", "Inflation กับ Deflation คืออะไร?", "Inflation = ระดับราคาเฉลี่ยของสินค้าและบริการโดยรวมเพิ่มขึ้น\nDeflation = ระดับราคาเฉลี่ยลดลง", "Inflation", "m3-1"], ["i", "ราคาสินค้าชนิดเดียวขึ้น เป็น Inflation ไหม?", "ไม่ใช่ เป็น Relative price change\nถ้าราคาส่วนใหญ่ขึ้นจึงเป็น Inflation", "Inflation", "m3-2"], ["i", "CPI คืออะไร?", "ดัชนีวัดการเปลี่ยนแปลงราคาเฉลี่ยของสินค้าและบริการเพื่อการบริโภค (ตะกร้าของครอบครัวในเมืองทั่วไป)", "Inflation", "m3-3"], ["i", "CPI ต่างจาก GDP Deflator อย่างไร?", "CPI = เฉพาะสินค้าที่ผู้บริโภคซื้อ (ค่าครองชีพ)\nGDP Deflator = สินค้าและบริการทั้งหมดที่ผลิตในประเทศ รวมการลงทุนและรายจ่ายรัฐ", "Inflation", "m3-4"], ["i", "สูตร CPI?", "(ต้นทุนตะกร้า ณ ราคาปีปัจจุบัน ÷ ต้นทุนตะกร้าเดียวกัน ณ ราคาปีฐาน) × 100", "Inflation", "m3-5"], ["i", "ตะกร้าปีฐาน 245 ปี 2000 = 335 → CPI?", "335 ÷ 245 × 100 = 136.7", "Exhibit 2", "m3-6"], ["i", "ทำไม CPI ปีฐานเท่ากับ 100 เสมอ?", "เพราะตัวเศษและตัวส่วนเท่ากันในปีฐาน", "Inflation", "m3-7"], ["i", "อัตราเงินเฟ้อคำนวณอย่างไร?", "(CPI ปีนี้ − CPI ปีก่อน) ÷ CPI ปีก่อน × 100", "Inflation", "m3-8"], ["i", "ข้อวิจารณ์ CPI 3 ข้อ?", "1) ตะกร้าอาจไม่ตรงกับทุกกลุ่ม 2) ปรับตามคุณภาพสินค้ายาก 3) ไม่สะท้อนการเปลี่ยนความสำคัญของสินค้า (Substitution)", "Inflation", "m3-9"], ["i", "CPI อาจสูงหรือต่ำเกินจริงกับบางกลุ่มอย่างไร?", "สูงเกิน: นักศึกษาแทบไม่จ่ายค่ารักษา แต่ค่ารักษาขึ้นมาก\nต่ำเกิน: คนเช่าห้องในเมืองจ่ายค่าเช่าสัดส่วนสูง", "Inflation", "m3-10"], ["i", "ปัญหาคุณภาพสินค้าทำให้ CPI เป็นอย่างไร?", "มือถือ 10,000 → 15,000 แต่สเปกดีขึ้น CPI อาจนับเป็นราคาเพิ่มทั้งหมด → CPI สูงเกินจริง", "Inflation", "m3-11"], ["i", "Substitution problem คืออะไร?", "หมูแพงขึ้น คนเปลี่ยนไปกินไก่ แต่ CPI ตะกร้าคงที่ยังนับหมูเท่าเดิม → CPI สูงเกินจริง", "Inflation", "m3-12"], ["i", "Inflation กระทบมาตรฐานการครองชีพอย่างไร?", "กำลังซื้อของเงินลดลง — รายได้ 10,000 ข้าว 50 → ซื้อได้ 200 กก. ข้าวขึ้นเป็น 100 → ซื้อได้ 100 กก.", "Inflation", "m3-13"], ["i", "Nominal income กับ Real income ต่างกันอย่างไร?", "Nominal = จำนวนเงินที่ได้รับจริง\nReal = Nominal income ÷ (CPI/100)", "Inflation", "m3-14"], ["i", "รายได้ขึ้น 5% เงินเฟ้อ 3% กำลังซื้อเป็นอย่างไร?", "10,500 ÷ 10,300 ≈ 1.02 ตะกร้า → กำลังซื้อเพิ่ม\n(ถ้ารายได้ขึ้นช้ากว่าเงินเฟ้อ กำลังซื้อลด)", "Inflation", "m3-15"], ["i", "Inflation กระทบ Wealth อย่างไร?", "คนมีสินทรัพย์ (บ้าน ทอง ที่ดิน หุ้น) มักได้ประโยชน์\nคนไม่มีสินทรัพย์ซื้อได้ยากขึ้น เสียเปรียบ", "Inflation", "m3-16"], ["i", "Hyperinflation คืออะไร ตัวอย่าง?", "ระดับราคาเพิ่มเร็วมาก\nZimbabwe พ.ย. 2008: ราคาเพิ่มเท่าตัวทุก ~24.7 ชั่วโมง", "Inflation", "m3-17"], ["i", "ผลของ Hyperinflation 4 ข้อ?", "Inflation psychosis (รีบใช้เงิน) · ตลาดสินเชื่อล่ม · Speculation (ทองคำ เงินตราต่างประเทศ สินค้าเก็บได้) · Wage-price spiral", "Inflation", "m3-18"], ["i", "Wage-price spiral คืออะไร?", "ราคาขึ้น → แรงงานขอค่าจ้างเพิ่ม → ต้นทุนธุรกิจเพิ่ม → ขึ้นราคาอีก → วนซ้ำที่ระดับเงินเฟ้อสูงขึ้น", "Inflation", "m3-19"], ["i", "Demand-pull inflation คืออะไร เกิดเมื่อไร?", "รายจ่ายรวมมากเกินไปจนดันราคา\nเกิดที่หรือใกล้ Full employment (โรงงานผลิตเต็มกำลัง)", "Inflation", "m3-20"], ["i", "Cost-push inflation คืออะไร ตัวอย่าง?", "ต้นทุนการผลิตเพิ่ม (ค่าจ้าง น้ำมัน วัตถุดิบ) → ธุรกิจขึ้นราคา\nเช่น สงครามอิหร่านกระทบช่องแคบฮอร์มุซ → น้ำมันแพง", "Inflation", "m3-21"], ["i", "Expectations ทำให้เกิดเงินเฟ้อทั้ง 2 แบบอย่างไร?", "ผู้ซื้อคาดว่าราคาจะขึ้น → รีบซื้อ → Demand-pull\nบริษัทคาดว่าต้นทุนจะขึ้น → ขึ้นราคาล่วงหน้า → Cost-push", "Inflation", "m3-22"], ["b", "Business cycle คืออะไร?", "การสลับกันของช่วงเศรษฐกิจขยายตัวและหดตัว วัดจากการเปลี่ยนแปลงของ Real GDP", "Business Cycle", "m2-1"], ["b", "4 ช่วงของ Business cycle?", "Peak → Recession → Trough → Recovery (Expansion)", "Business Cycle", "m2-2"], ["b", "Peak กับ Trough คืออะไร?", "Peak = Real GDP สูงสุดหลังช่วงฟื้นตัว\nTrough = Real GDP ต่ำสุดหลังช่วงถดถอย", "Business Cycle", "m2-3"], ["b", "Recession คืออะไร และกฎทั่วไปคือ?", "ช่วงขาลง Real GDP ลด อัตราว่างงานเพิ่ม (Contraction)\nกฎทั่วไป: Real GDP ลดติดต่อกันอย่างน้อย 2 ไตรมาส (6 เดือน)", "Business Cycle", "m2-4"], ["b", "Expansion และ Economic growth คืออะไร?", "Expansion = ช่วงขาขึ้นที่ Real GDP เพิ่ม (Recovery)\nEconomic growth = % เพิ่มขึ้นต่อปีของ Real GDP", "Business Cycle", "m2-5"], ["b", "อะไรเป็นสาเหตุของ Business cycle?", "การเปลี่ยนแปลงของรายจ่ายรวม: Real GDP = C + I + G + (X − M)", "Business Cycle", "m2-6"], ["b", "ช่วงขยายตัว รายจ่ายรวมเปลี่ยนอย่างไร?", "C เพิ่ม · I ในโรงงาน/เครื่องจักรเพิ่ม · G เพิ่ม · X เพิ่ม หรือ M ลด\n(ช่วงถดถอยกลับทิศทั้งหมด)", "Business Cycle", "m2-7"], ["b", "Unemployment rate คืออะไร คำนวณอย่างไร?", "% ของ Civilian labor force ที่ไม่มีงานและกำลังหางาน\n= Unemployed ÷ Civilian labor force × 100", "Business Cycle", "m2-8"], ["b", "ใครนับเป็น Employed และ Unemployed?", "Employed: ทำงานได้ค่าจ้าง ≥ 1 ชม./สัปดาห์ หรือไม่ได้ค่าจ้างในธุรกิจครอบครัว ≥ 15 ชม./สัปดาห์\nUnemployed: ไม่มีงาน แต่หางานในเดือนที่ผ่านมา", "Business Cycle", "m2-9"], ["b", "Civilian labor force คืออะไร?", "คนอายุ 16+ ที่มีงานทำหรือกำลังหางาน\nไม่รวมทหาร แม่บ้าน Discouraged workers และคนนอกกำลังแรงงาน", "Business Cycle", "m2-10"], ["b", "ปี 2016: Labor force 159.1 ล้าน ว่างงาน 7.769 ล้าน → อัตราว่างงาน?", "7.769 ÷ 159.1 × 100 ≈ 4.9%", "Exhibit 6", "m2-11"], ["b", "ข้อวิจารณ์อัตราว่างงาน 4 ข้อ?", "ผู้ตอบแบบสำรวจอาจตอบเท็จว่าหางาน · ไม่นับ Discouraged workers · นับคน Part-time เป็นมีงานเต็ม · ไม่วัด Underemployment", "Business Cycle", "m2-12"], ["b", "Discouraged worker คือใคร?", "คนที่อยากทำงานแต่เลิกหางาน เพราะคิดว่าจะไม่มีใครรับ", "Business Cycle", "m2-13"], ["b", "Frictional unemployment คืออะไร สาเหตุ?", "ว่างงานชั่วคราวช่วงย้ายงาน/เข้า/กลับเข้าตลาดแรงงาน (คนมีทักษะ)\nสาเหตุ: เวลาเปลี่ยนงาน + ขาดข้อมูลจับคู่คนกับงาน", "Business Cycle", "m2-14"], ["b", "Structural unemployment คืออะไร สาเหตุ 4 ข้อ?", "ทักษะคนว่างงานไม่ตรงกับงานที่มี\nสาเหตุ: ขาดการศึกษา · ความต้องการผู้บริโภคเปลี่ยน · เทคโนโลยี · โลกาภิวัตน์", "Business Cycle", "m2-15"], ["b", "Outsourcing กับ Offshoring ต่างกันอย่างไร?", "Outsourcing = ให้บริษัทอื่นในต่างประเทศทำงาน\nOffshoring = ให้พนักงานของบริษัทเองที่อยู่ต่างประเทศทำ", "Business Cycle", "m2-16"], ["b", "Cyclical unemployment คืออะไร?", "ว่างงานเพราะขาดตำแหน่งงานในช่วง Recession", "Business Cycle", "m2-17"], ["b", "Full employment (Natural rate) คืออะไร เท่าไร?", "อัตราว่างงาน = Frictional + Structural\nฉันทามติ ≈ 5% (Frictional 3% + Structural 2%)", "Business Cycle", "m2-18"], ["b", "ผลกระทบที่ไม่ใช่ตัวเงินของการว่างงาน?", "รู้สึกไร้ค่า · ภาพลักษณ์ตนเองต่ำ · สิ้นหวัง · ครอบครัวแตกแยก · ความไม่สงบทางการเมือง", "Business Cycle", "m2-19"], ["a", "Aggregate demand curve (AD) คืออะไร?", "เส้นแสดงระดับ Real GDP ที่ครัวเรือน ธุรกิจ รัฐ และต่างประเทศซื้อ ณ ระดับราคาต่าง ๆ (ceteris paribus)", "AD–AS", "m4-1"], ["a", "แกนของแบบจำลอง AD–AS ต่างจาก Demand–Supply ตลาดอย่างไร?", "แกนนอน = มูลค่า Real GDP (ไม่ใช่หน่วยสินค้า)\nแกนตั้ง = ดัชนีระดับราคา (CPI) ไม่ใช่ราคาสินค้าชิ้นเดียว", "AD–AS", "m4-2"], ["a", "ระดับราคาลดลงส่งผลอย่างไรบน AD?", "Real GDP ที่ต้องการเพิ่มขึ้น (เคลื่อนที่ลงตามเส้น)\nAD ไม่ใช่แนวคิดเดียวกับ Demand ของสินค้าเดียว", "AD–AS", "m4-3"], ["a", "Nonprice-level determinants ของ AD?", "C · I · G · (X − M) — เปลี่ยนตัวใดตัวหนึ่ง AD เลื่อนทั้งเส้น", "AD–AS", "m4-4"], ["a", "Aggregate supply curve (AS) คืออะไร?", "เส้นแสดงระดับ Real GDP ที่ผลิต ณ ระดับราคาต่าง ๆ (ceteris paribus)", "AD–AS", "m4-5"], ["a", "มุมมอง Keynesian ต่อ AS?", "AS แนวนอน ราคาและค่าจ้างไม่ยืดหยุ่นช่วงถดถอย\nรัฐต้องเพิ่ม AD เพื่อกลับสู่ Full employment\n“Demand creates its own supply”", "AD–AS", "m4-6"], ["a", "มุมมอง Classical ต่อ AS?", "AS แนวตั้งที่ Full-employment GDP ราคาและค่าจ้างยืดหยุ่นเต็มที่ เศรษฐกิจฟื้นเอง\nAD เปลี่ยน → แค่ระดับราคาเปลี่ยน\n“Supply creates its own demand”", "AD–AS", "m4-7"], ["a", "ทำไม Keynesian ไม่ยอมรับ Classical ในช่วงถดถอย?", "เพราะช่วงถดถอยราคาและค่าจ้างไม่ปรับลดลงเพื่อดึงเศรษฐกิจกลับสู่ Full employment", "AD–AS", "m4-8"], ["a", "AS มี 3 ช่วงอะไร?", "Keynesian range (แนวนอน ถดถอยรุนแรง) · Intermediate range (ชันขึ้น ใกล้ Full employment) · Classical range (แนวตั้ง ที่ Full employment)", "AD–AS", "m4-9"], ["a", "AD เพิ่มในแต่ละช่วงของ AS ให้ผลอย่างไร?", "Keynesian: ราคาคงที่ Real GDP เพิ่ม\nIntermediate: ราคาและ Real GDP เพิ่มทั้งคู่\nClassical: เกิดแค่เงินเฟ้อ", "AD–AS", "m4-10"], ["a", "Macroeconomic equilibrium อยู่ที่ไหน?", "จุดตัดของ AD กับ AS", "AD–AS", "m4-11"], ["a", "Nonprice-level determinants ของ AS?", "Resource prices (ในประเทศ/นำเข้า) · Technological change · Taxes · Subsidies · Regulations — ทุกตัวกระทบต้นทุนการผลิต", "AD–AS", "m4-12"], ["a", "ต้นทุนการผลิตเปลี่ยน AS เลื่อนอย่างไร?", "ต้นทุนลด → AS เลื่อนขวา\nต้นทุนเพิ่ม → AS เลื่อนซ้าย", "AD–AS", "m4-13"], ["a", "ตัวอย่างที่ทำให้ AS เลื่อนขวา?", "น้ำมันถูกลง · ผู้ประกอบการมากขึ้น · ภาษีลด · กฎระเบียบน้อยลง", "AD–AS", "m4-14"], ["a", "ตัวอย่างที่ทำให้ AS เลื่อนซ้าย?", "ค่าจ้างขึ้นเกินคาด · ภาษีสิ่งแวดล้อมสูงขึ้น · กฎระเบียบมากขึ้น · เบี้ยประกันสุขภาพสูงขึ้น", "AD–AS", "m4-15"], ["a", "AD และ AS เพิ่มพร้อมกัน (Exhibit 12)?", "Real GDP เพิ่ม และในตัวอย่างสไลด์ระดับราคาเพิ่ม\n(โดยทั่วไปทิศทางราคาขึ้นกับว่าเส้นไหนเลื่อนมากกว่า)", "AD–AS", "m4-16"], ["a", "Cost-push กับ Demand-pull inflation ในแบบ AD–AS?", "Cost-push = AS เลื่อนซ้าย (เช่น น้ำมันแพง)\nDemand-pull = AD เลื่อนขวา (เช่น รัฐใช้จ่ายสงครามเวียดนาม)", "AD–AS", "m4-17"], ["a", "Stagflation คืออะไร?", "ว่างงานสูงและเงินเฟ้อสูงพร้อมกัน", "AD–AS", "m4-18"], ["a", "Business cycle สัมพันธ์กับการเลื่อน AD/AS อย่างไร?", "AD ซ้าย → Recession · AD ขวา → GDP และการจ้างงานเพิ่ม\nAS ซ้าย → ขาลง · AS ขวา → ขาขึ้น", "AD–AS", "m4-19"], ["d", "ตัววัดพื้นฐานของความกินดีอยู่ดีของประเทศคืออะไร?", "GDP per capita = GDP ÷ จำนวนประชากรทั้งหมด", "Growth", "m5-1"], ["d", "IACs คืออะไร ใครไม่นับรวม?", "ประเทศรายได้สูง เศรษฐกิจแบบตลาด มีทุนเทคโนโลยีสูงและแรงงานการศึกษาดี\nไม่รวมประเทศรายได้สูงที่ไม่ได้พัฒนาอุตสาหกรรม เช่น ประเทศอาหรับร่ำรวยน้ำมัน", "Growth", "m5-2"], ["d", "LDCs คืออะไร?", "ประเทศที่ไม่มีทุนเทคโนโลยีและแรงงานการศึกษาดีมาก เศรษฐกิจพึ่งเกษตร", "Growth", "m5-3"], ["d", "ปัญหาการใช้ GDP per capita เทียบประเทศ 3 ข้อ?", "1) ข้อมูล LDCs คลาดเคลื่อนมากกว่า 2) ไม่วัดการกระจายรายได้ 3) อัตราแลกเปลี่ยนผันผวนไม่สะท้อนมูลค่าสินค้าจริง", "Growth", "m5-4"], ["d", "ตัววัดคุณภาพชีวิตอื่น 5 ตัว?", "Life expectancy · Infant mortality · Literacy rate · Per capita electricity consumption · Economic freedom ranking\n(สัมพันธ์สูงกับ GDP per capita)", "Growth", "m5-5"], ["d", "Economic growth กับ Economic development ต่างกันอย่างไร?", "Growth = วัดเชิงปริมาณด้วย GDP per capita\nDevelopment = กว้างกว่า รวมเชิงคุณภาพ เช่น อายุคาดเฉลี่ย การรู้หนังสือ การใช้พลังงานต่อหัว", "Growth", "m5-6"], ["d", "5 ปัจจัยที่กำหนดการเติบโตและการพัฒนา?", "Natural resources · Human resources · Capital · Technological progress · Political environment", "Growth", "m5-7"], ["d", "ต้องมีทรัพยากรธรรมชาติมากถึงจะพัฒนาได้ไหม?", "ไม่จำเป็น — ฮ่องกง ญี่ปุ่น อิสราเอล แทบไม่มีแร่ ที่ดินอุดมน้อย ไม่มีพลังงาน แต่มาตรฐานชีวิตสูง", "Growth", "m5-8"], ["d", "Human resources สำคัญอย่างไร?", "ลงทุนทุนมนุษย์ → GDP per capita เพิ่ม\nประชากรเพิ่มเร็ว + ลงทุนทุนมนุษย์ต่ำ = เหตุที่หลายประเทศยังเป็น LDCs", "Growth", "m5-9"], ["d", "Alpha (ลงทุนต่ำ) กับ Beta (ลงทุนสูง) ต่างกันอย่างไร?", "Alpha: PPC ปี 2018 ไม่ขยับ\nBeta: ลงทุนสินค้าทุนมาก PPC ขยับออก → บริโภคได้มากขึ้นในอนาคต", "Growth", "m5-10"], ["d", "Vicious circle of poverty คืออะไร?", "จนเพราะออมและลงทุนไม่ได้ ออมและลงทุนไม่ได้เพราะจน\nรายได้ต่ำ → ออมต่ำ → ลงทุนต่ำ → ผลิตภาพต่ำ → รายได้ต่ำ", "Growth", "m5-11"], ["d", "Infrastructure คืออะไร?", "สินค้าทุนที่รัฐมักจัดหา เช่น ทางหลวง สะพาน ระบบน้ำ/ของเสีย สนามบิน", "Growth", "m5-12"], ["d", "เทคโนโลยีมีปัญหาอะไรกับ LDCs?", "เทคโนโลยีที่มีอยู่จำนวนมากไม่เหมาะกับ LDCs หลาย LDCs ยังโตช้าแม้ IACs มีเทคโนโลยีให้ใช้", "Growth", "m5-13"], ["d", "รัฐบาลและการค้ามีบทบาทอย่างไร?", "รัฐต้องสร้างกฎหมาย ความสงบ และ Infrastructure\nการตรึงค่าเงินและกำแพงการค้าทำให้การเติบโตต่ำลง", "Growth", "m5-14"], ["d", "มีกลยุทธ์เดียวสำหรับการพัฒนาไหม?", "ไม่มี — ไม่มีกลยุทธ์เดียวสำหรับการเติบโตและการพัฒนา", "Growth", "m5-15"]], "sum": [{"cat": "c2", "h": "แนวคิดหลัก", "head": ["หัวข้อ", "สรุป"], "rows": [["Economics", "จัดสรรทรัพยากรจำกัดเพื่อความต้องการไม่จำกัด"], ["Micro / Macro", "หน่วยย่อย / ภาพรวม"], ["Positive / Normative", "what is / what should be"], ["Opportunity cost", "ทางเลือกที่ดีที่สุดที่สละ"], ["MB vs MC", "ตัดสินใจที่ส่วนเพิ่ม"]]}, {"cat": "c2", "h": "ปัจจัยการผลิต", "head": ["หัวข้อ", "สรุป"], "rows": [["Land", "Rent"], ["Labor", "Wage / Salary"], ["Capital", "Interest (เงินไม่ใช่ capital)"], ["Entrepreneurship", "Profit"]]}, {"cat": "c2", "h": "PPC", "head": ["หัวข้อ", "สรุป"], "rows": [["บน", "มีประสิทธิภาพ"], ["ใน", "ใช้ทรัพยากรไม่เต็ม"], ["นอก", "ทำไม่ได้"], ["โค้งเว้าออก", "increasing opportunity cost"], ["เลื่อนขวา", "เติบโต: เทคโนโลยี ทุน แรงงาน"], ["เลื่อนซ้าย", "ภัยพิบัติ โรคระบาด แรงงานออก"]]}, {"cat": "c3", "h": "Demand & Supply", "head": ["หัวข้อ", "สรุป"], "rows": [["Law of Demand", "P↑ Qd↓"], ["Law of Supply", "P↑ Qs↑"], ["Equilibrium", "Qd = Qs"], ["Surplus", "Qs > Qd"], ["Shortage", "Qd > Qs"]]}, {"cat": "c3", "h": "ผลของการเลื่อนเส้น", "head": ["หัวข้อ", "สรุป"], "rows": [["D ↑, S คงที่", "P↑ Q↑"], ["D ↓, S คงที่", "P↓ Q↓"], ["S ↑, D คงที่", "P↓ Q↑"], ["S ↓, D คงที่", "P↑ Q↓"]], "tip": "D และ S เปลี่ยนพร้อมกัน: ต้องรู้ขนาด"}, {"cat": "c3", "h": "นโยบายราคา", "head": ["หัวข้อ", "สรุป"], "rows": [["Price ceiling", "ต่ำกว่าดุลยภาพ → Shortage"], ["Price floor", "สูงกว่าดุลยภาพ → Surplus"]]}, {"cat": "g", "h": "GDP", "head": ["หัวข้อ", "สรุป"], "rows": [["GDP", "C + I + G + (X − M)"], ["Real GDP", "ราคาปีฐาน"], ["Deflator", "Nominal ÷ Real × 100"], ["GDP vs GNP", "ในประเทศ vs ของพลเมือง"], ["ไม่นับ", "มือสอง transfer ขายหุ้น intermediate"]]}, {"cat": "i", "h": "Inflation & CPI", "head": ["หัวข้อ", "สรุป"], "rows": [["CPI", "ตะกร้าปีนี้ ÷ ตะกร้าปีฐาน × 100"], ["Inflation rate", "ΔCPI ÷ CPIก่อน × 100"], ["Real income", "Nominal ÷ (CPI/100)"], ["Demand-pull", "AD เลื่อนขวา"], ["Cost-push", "AS เลื่อนซ้าย"]]}, {"cat": "b", "h": "ว่างงาน", "head": ["หัวข้อ", "สรุป"], "rows": [["Frictional", "เปลี่ยนงาน"], ["Structural", "ทักษะไม่ตรง"], ["Cyclical", "recession"], ["Natural rate", "Frictional + Structural ≈ 5%"], ["Rate", "Unemployed ÷ Labor force"]]}, {"cat": "a", "h": "AD–AS", "head": ["หัวข้อ", "สรุป"], "rows": [["AD shifters", "C I G (X−M)"], ["AS shifters", "ราคาปัจจัย เทคโนโลยี ภาษี เงินอุดหนุน กฎระเบียบ"], ["AD ขวา", "GDP↑ ราคา↑"], ["AS ซ้าย", "GDP↓ ราคา↑ (stagflation)"], ["AS 3 ช่วง", "Keynesian · Intermediate · Classical"]]}, {"cat": "d", "h": "Growth & Development", "head": ["หัวข้อ", "สรุป"], "rows": [["GDP per capita", "GDP ÷ ประชากร"], ["5 ปัจจัย", "ทรัพยากร มนุษย์ ทุน เทคโนโลยี การเมือง"], ["Poverty trap", "รายได้ต่ำ → ออมต่ำ → ลงทุนต่ำ"]]}], "quiz": [["c2", "'The unemployment rate is 5%.' เป็น?", ["Positive", "Normative", "Macro เท่านั้น", "Micro เท่านั้น"], 0, "ตรวจสอบด้วยข้อมูลได้"], ["c2", "ผลตอบแทนของ Capital คือ?", ["Interest", "Rent", "Wage", "Profit"], 0, "Land=Rent, Labor=Wage, Entrepreneurship=Profit"], ["c2", "ข้อใดไม่ใช่ปัจจัยการผลิต?", ["เงิน", "ที่ดิน", "แรงงาน", "ผู้ประกอบการ"], 0, "เงินไม่ใช่ capital ในความหมายเศรษฐศาสตร์"], ["c2", "Opportunity cost คือ?", ["ทางเลือกที่ดีที่สุดที่สละ", "ต้นทุนเงินสดทั้งหมด", "ทางเลือกทั้งหมดที่สละ", "ราคาสินค้า"], 0, "เฉพาะทางเลือกที่ดีที่สุดรองลงมา"], ["c2", "จุดภายใน PPC หมายถึง?", ["ใช้ทรัพยากรไม่เต็มที่", "มีประสิทธิภาพสูงสุด", "ผลิตไม่ได้", "เติบโตแล้ว"], 0, "มีทรัพยากรว่างหรือใช้ไม่คุ้ม"], ["c2", "PPC โค้งเว้าออกเพราะ?", ["Increasing opportunity cost", "Constant opportunity cost", "เทคโนโลยีเปลี่ยน", "เงินเฟ้อ"], 0, "ทรัพยากรไม่ได้เหมาะกับการผลิตทุกอย่างเท่ากัน"], ["c2", "ข้อใดทำให้ PPC เลื่อนซ้าย?", ["โรคระบาด", "เทคโนโลยีใหม่", "ประชากรเพิ่ม", "การศึกษาดีขึ้น"], 0, "สูญเสียกำลังผลิต"], ["c2", "คำถามเศรษฐกิจพื้นฐานไม่รวมข้อใด?", ["ผลิตเมื่อไร", "ผลิตอะไร", "ผลิตอย่างไร", "ผลิตเพื่อใคร"], 0, "มีแค่ What / How / For whom"], ["c2", "Marginal analysis เปรียบเทียบอะไร?", ["MB กับ MC", "รายได้รวมกับต้นทุนรวม", "ราคากับปริมาณ", "Micro กับ Macro"], 0, "ทีละหน่วยที่เพิ่มหรือลด"], ["c2", "'รัฐบาลควรขึ้นค่าแรง' เป็น?", ["Normative", "Positive", "Descriptive", "ข้อเท็จจริง"], 0, "มี value judgment"], ["c3", "Demand ลดลงเมื่อรายได้เพิ่ม สินค้าคือ?", ["Inferior good", "Normal good", "Complement", "Substitute"], 0, "Inferior: รายได้ ↑ Demand ↓"], ["c3", "ราคาสินค้าเองเปลี่ยน ทำให้?", ["เคลื่อนบนเส้น Demand", "เส้น Demand เลื่อนขวา", "เส้น Demand เลื่อนซ้าย", "Supply เลื่อน"], 0, "Movement along the curve"], ["c3", "ราคา Substitute เพิ่ม Demand สินค้าเรา?", ["เพิ่ม", "ลด", "ไม่เปลี่ยน", "เป็นศูนย์"], 0, "ผู้ซื้อหันมาซื้อสินค้าเรา"], ["c3", "เทคโนโลยีดีขึ้น Supply?", ["เลื่อนขวา", "เลื่อนซ้าย", "เคลื่อนบนเส้น", "ไม่เปลี่ยน"], 0, "ต้นทุนลดเสนอขายเพิ่ม"], ["c3", "Demand เพิ่ม Supply คงที่ ผลคือ?", ["P↑ Q↑", "P↓ Q↑", "P↑ Q↓", "P↓ Q↓"], 0, "จุดดุลยภาพเลื่อนขึ้นขวา"], ["c3", "Supply เพิ่ม Demand คงที่ ผลคือ?", ["P↓ Q↑", "P↑ Q↑", "P↑ Q↓", "P↓ Q↓"], 0, "จุดดุลยภาพเลื่อนลงขวา"], ["c3", "Surplus เกิดเมื่อ?", ["Qs > Qd", "Qd > Qs", "Qd = Qs", "P = 0"], 0, "ราคาสูงกว่าดุลยภาพ"], ["c3", "Price ceiling ต่ำกว่าดุลยภาพ ทำให้?", ["Shortage", "Surplus", "ดุลยภาพใหม่", "ไม่มีผล"], 0, "Qd มากกว่า Qs"], ["c3", "Price floor สูงกว่าดุลยภาพ ทำให้?", ["Surplus", "Shortage", "ราคาลด", "ไม่มีผล"], 0, "Qs มากกว่า Qd"], ["c3", "ภาษีผู้ขายเพิ่ม มักทำให้?", ["Supply ลด", "Supply เพิ่ม", "Demand เพิ่ม", "Demand ลด"], 0, "ต้นทุนผู้ขายสูงขึ้น"], ["c3", "ณ ดุลยภาพ?", ["Qd = Qs", "Qd > Qs", "Qs > Qd", "P = 0"], 0, "ตลาดเคลียร์"], ["c3", "Demand ต่างจาก Qd อย่างไร?", ["Demand เป็นความสัมพันธ์ทั้งเส้น", "เหมือนกัน", "Qd คือทั้งเส้น", "Demand คือ Supply"], 0, "Qd = ปริมาณ ณ ราคาเดียว"], ["g", "GDP รวมอะไร?", ["สินค้าและบริการขั้นสุดท้ายที่ผลิตในประเทศ", "สินค้ามือสอง", "ธุรกรรมหุ้น", "Transfer payments"], 0, "มือสอง หุ้น transfer ไม่นับ"], ["g", "สูตร GDP แบบรายจ่าย?", ["C + I + G + (X − M)", "C + I + G − (X − M)", "C + G + X + M", "I + G + X"], 0, "Net exports = X − M"], ["g", "Double counting เกิดจากการนับอะไรซ้ำ?", ["Intermediate goods", "Final goods", "เงินเดือน", "ภาษี"], 0, "มูลค่ารวมอยู่ในสินค้าขั้นสุดท้ายแล้ว"], ["g", "GDP Deflator =", ["Nominal ÷ Real × 100", "Real ÷ Nominal × 100", "Nominal − Real", "Real × 100"], 0, "ดัชนีราคาทั้งเศรษฐกิจ"], ["g", "GNP ต่างจาก GDP อย่างไร?", ["GNP นับรายได้ของพลเมืองรวมในต่างประเทศ", "GNP นับเฉพาะในประเทศ", "เหมือนกัน", "GNP ไม่รวม C"], 0, "GDP ตามพื้นที่ · GNP ตามผู้อยู่อาศัยถาวร"], ["g", "รถยนต์ นับเป็น consumption ประเภทใด?", ["Durable goods", "Nondurable", "Services", "Intermediate"], 0, "ใช้เกิน 3 ปี"], ["g", "ไม่หักมลพิษ ทำให้ GDP?", ["สูงกว่าจริง", "ต่ำกว่าจริง", "เท่าจริง", "เป็นศูนย์"], 0, "overstate"], ["g", "เศรษฐกิจใต้ดินที่ไม่นับ ทำให้ GDP?", ["ต่ำกว่าจริง", "สูงกว่าจริง", "เท่าจริง", "ไม่เกี่ยว"], 0, "understate"], ["g", "ตัววัดทางเลือกแทน GDP ได้แก่?", ["HDI", "CPI", "GNP", "NNP"], 0, "HDI, GPI, MEW, HPI"], ["i", "CPI 100 → 105 inflation rate?", ["5%", "105%", "0.5%", "10%"], 0, "(105−100)/100"], ["i", "CPI ปีฐานเท่ากับ?", ["100", "0", "1", "1000"], 0, "ตัวเศษเท่ากับตัวส่วน"], ["i", "Substitution problem คือ?", ["CPI ไม่สะท้อนการเปลี่ยนไปซื้อสินค้าที่ถูกกว่า", "ราคาลดทุกอย่าง", "ว่างงานเพิ่ม", "ค่าเงินแข็ง"], 0, "ตะกร้าคงที่"], ["i", "Real income =", ["Nominal ÷ (CPI/100)", "Nominal × CPI", "Nominal − CPI", "CPI ÷ Nominal"], 0, "ปรับด้วย CPI"], ["i", "Cost-push inflation เกิดจาก?", ["ต้นทุนผลิตเพิ่ม", "รายจ่ายรวมเพิ่ม", "เงินออมเพิ่ม", "ภาษีลด"], 0, "AS เลื่อนซ้าย"], ["i", "Wage-price spiral คือ?", ["ค่าจ้างและราคาดันกันขึ้นเป็นวงจร", "ราคาลด ค่าจ้างลด", "ค่าจ้างคงที่", "ว่างงานลด"], 0, "วงจรต่อเนื่อง"], ["i", "Demand-pull มักเกิดเมื่อ?", ["ใกล้ full employment", "ถดถอยรุนแรง", "AS เลื่อนซ้าย", "ว่างงานสูง"], 0, "แย่งสินค้าที่มีจำกัด"], ["i", "CPI ต่างจาก GDP deflator อย่างไร?", ["CPI วัดเฉพาะที่ผู้บริโภคซื้อ", "Deflator วัดเฉพาะผู้บริโภค", "เหมือนกัน", "CPI รวมที่ผลิตทั้งหมด"], 0, "Deflator ครอบคลุมสินค้าที่ผลิตในประเทศทั้งหมด"], ["b", "ข้อใดไม่ใช่ช่วงของ business cycle?", ["Stagflation", "Peak", "Trough", "Recession"], 0, "มี Peak Recession Trough Recovery"], ["b", "กฎทั่วไปของ recession?", ["Real GDP ลดต่อเนื่อง ≥ 2 ไตรมาส", "GDP ลด 1 เดือน", "ว่างงาน 5%", "เงินเฟ้อ 10%"], 0, "6 เดือน"], ["b", "Unemployment rate =", ["Unemployed ÷ Labor force × 100", "Unemployed ÷ Population", "Employed ÷ Labor force", "Labor force ÷ Population"], 0, "ฐานคือกำลังแรงงาน"], ["b", "ผู้ว่างงานเพราะทักษะไม่ตรงงาน คือ?", ["Structural", "Frictional", "Cyclical", "Seasonal"], 0, "เทคโนโลยี โลกาภิวัตน์"], ["b", "ว่างงานจาก recession คือ?", ["Cyclical", "Frictional", "Structural", "Natural"], 0, "ตำแหน่งงานลด"], ["b", "Natural rate ≈ ?", ["Frictional + Structural", "Cyclical เท่านั้น", "0%", "10%"], 0, "ราว 5%"], ["b", "Discouraged worker?", ["ไม่นับเป็นว่างงาน", "นับเป็นว่างงาน", "มีงานทำ", "อยู่ในกำลังแรงงาน"], 0, "เลิกหางานแล้ว"], ["b", "Offshoring คือ?", ["พนักงานบริษัทเองในต่างประเทศทำงาน", "จ้างบริษัทอื่นในต่างประเทศ", "ปิดโรงงาน", "ลดจ้างงาน"], 0, "Outsourcing คือใช้บริษัทอื่น"], ["a", "AD ลาดลง เพราะ?", ["ระดับราคารวมลด Real GDP ที่ต้องการเพิ่ม", "ราคาสินค้ารายตัวลด", "ต้นทุนลด", "ภาษีลด"], 0, "AD ≠ demand ตลาดเดียว"], ["a", "ข้อใดทำให้ AD เลื่อนขวา?", ["G เพิ่ม", "ภาษีผู้ผลิตเพิ่ม", "ต้นทุนวัตถุดิบเพิ่ม", "กฎระเบียบเพิ่ม"], 0, "C I G (X−M) เพิ่ม"], ["a", "ต้นทุนวัตถุดิบเพิ่ม ทำให้?", ["AS เลื่อนซ้าย", "AS เลื่อนขวา", "AD เลื่อนขวา", "AD เลื่อนซ้าย"], 0, "ต้นทุนผลิตสูงขึ้น"], ["a", "Stagflation คือ?", ["เงินเฟ้อสูงและว่างงานสูง", "เงินเฟ้อต่ำและว่างงานต่ำ", "เงินฝืด", "GDP โตเร็ว"], 0, "AS เลื่อนซ้าย"], ["a", "Classical AS เป็นแบบใด?", ["แนวตั้งที่ full employment", "แนวนอน", "ลาดลง", "ชันเล็กน้อย"], 0, "AD เปลี่ยนกระทบแค่ราคา"], ["a", "Keynesian range เมื่อ AD เพิ่ม?", ["Real GDP เพิ่ม ราคาคงที่", "ราคาเพิ่มอย่างเดียว", "GDP ลด", "ว่างงานเพิ่ม"], 0, "ถดถอยหนัก"], ["a", "AD เลื่อนซ้าย นำไปสู่?", ["Recession", "Boom", "Stagflation", "Deflation เสมอ"], 0, "GDP และจ้างงานลด"], ["a", "ปัจจัยเลื่อน AS ไม่รวมข้อใด?", ["Consumption", "Technology", "Taxes", "Subsidies"], 0, "Consumption เป็นของ AD"], ["d", "GDP per capita =", ["GDP ÷ ประชากร", "GDP × ประชากร", "GDP ÷ GNP", "GNP − GDP"], 0, "ผลผลิตเฉลี่ยต่อคน"], ["d", "Economic development ต่างจาก growth?", ["รวมตัวชี้วัดเชิงคุณภาพ", "เหมือนกัน", "น้อยกว่า", "เฉพาะ GDP"], 0, "อายุขัย การรู้หนังสือ"], ["d", "ข้อใดไม่ใช่ปัจจัยหลักของการพัฒนา?", ["อัตราแลกเปลี่ยนคงที่", "ทรัพยากรมนุษย์", "ทุน", "เทคโนโลยี"], 0, "5 ปัจจัยตามสไลด์"], ["d", "Vicious cycle of poverty เริ่มจาก?", ["รายได้ต่ำ", "ลงทุนสูง", "ออมสูง", "ผลิตภาพสูง"], 0, "รายได้ต่ำ→ออมต่ำ→ลงทุนต่ำ"], ["d", "ประเทศที่ไม่มีทรัพยากรธรรมชาติ?", ["พัฒนาได้ เช่น ฮ่องกง ญี่ปุ่น", "พัฒนาไม่ได้", "ต้องเป็น LDC", "ต้องมีน้ำมัน"], 0, "ไม่จำเป็น"]], "pages": {"g": "40cf0298-4125-8170-b787-cbd3a138ed54", "b": "40cf0298-4125-819a-be3a-dc90bad92643", "i": "40cf0298-4125-814f-b25a-f69a0d56acdd", "a": "40cf0298-4125-81f3-a13b-c9f190f2863e", "d": "40cf0298-4125-8141-a938-f741b8320cec", "c2": "3eaf0298-4125-80ad-a489-df1ea82226f2", "c3": "3e5f0298-4125-808b-a9f3-f16903ba258c"}, "markKey": "econ-flashcards-v1"};
+const KEY = 'study-' + D.key;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+let store = {known:[], ans:{}};
+try{ const r = localStorage.getItem(KEY); if(r) store = Object.assign(store, JSON.parse(r)); }catch(e){}
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} };
+const CATS = D.cats; // [[id,label],...]
+const catLabel = id => (CATS.find(c=>c[0]===id)||[0,id])[1];
+
+function chipRow(box, sel, onPick, countFn){
+  box.innerHTML='';
+  [['all','ทั้งหมด'],...CATS].forEach(([id,l])=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip';
+    b.setAttribute('aria-pressed', id===sel);
+    b.innerHTML = esc(l)+'<span class="n">'+countFn(id)+'</span>';
+    b.onclick=()=>onPick(id); box.appendChild(b);
+  });
+}
+
+/* ---------- flashcards: spaced repetition (Anki-style) ---------- */
+const DAY=86400000, TZ=7*3600000, MIN=60000;
+const sod=t=>Math.floor((t+TZ)/DAY)*DAY-TZ;
+let srs={}, meta={day:0,newDone:0}, NEWLIM=20;
+try{ const r=JSON.parse(localStorage.getItem(D.markKey+'-srs')||'{}'); srs=r.s||{}; meta=r.m||meta; NEWLIM=r.lim||20; }catch(e){}
+const saveS=()=>{ try{ localStorage.setItem(D.markKey+'-srs',JSON.stringify({s:srs,m:meta,lim:NEWLIM})); }catch(e){} };
+const chkDay=()=>{ const d=sod(Date.now()); if(meta.day!==d){ meta.day=d; meta.newDone=0; } };
+const CARDS = D.cards.map((c,i)=>({id:i,cat:c[0],f:c[1],b:c[2],ref:c[3]||'',mid:c[4],tp:c[5],tb:c[6],ans:c[7]}));
+let fcat='all', dirBack=false, cur=null, shown=false;
+const LEARN=[1,10];
+const CAN_TYPE=!!D.typing; let TYPING=CAN_YES();
+function CAN_YES(){ if(!D.typing) return false; try{ return localStorage.getItem(D.markKey+'-typ')!=='0'; }catch(e){ return true; } }
+const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[\s'’\-]+/g,'').replace(/[0-9]/g,'').replace(/[.,!?;:。，！？；：、（）()"“”]/g,'');
+let checked=false, suggest=0;
+function sched(s,r){
+  const now=Date.now(); s=Object.assign({st:'learn',step:0,ease:2.5,ivl:0,lapses:0},s||{});
+  const grad=ivl=>{ s.st='rev'; s.ivl=ivl; s.due=sod(now)+ivl*DAY; delete s.rl; };
+  if(s.st==='learn'){
+    if(r===1){ s.step=0; s.due=now+LEARN[0]*MIN; }
+    else if(r===2){ s.due=now+(s.step===0?6:LEARN[1])*MIN; }
+    else if(r===3){ if(s.step+1<LEARN.length){ s.step++; s.due=now+LEARN[s.step]*MIN; } else grad(s.rl||1); }
+    else grad(s.rl?Math.max(s.rl+1,2):4);
+  } else {
+    if(r===1){ s.lapses++; s.ease=Math.max(1.3,s.ease-0.2); s.rl=Math.max(1,Math.round(s.ivl*0.5)); s.st='learn'; s.step=1; s.due=now+LEARN[1]*MIN; }
+    else if(r===2){ s.ease=Math.max(1.3,s.ease-0.15); grad(Math.max(s.ivl+1,Math.round(s.ivl*1.2))); }
+    else if(r===3){ grad(Math.max(s.ivl+1,Math.round(s.ivl*s.ease))); }
+    else { s.ease+=0.15; grad(Math.max(s.ivl+1,Math.round(s.ivl*s.ease*1.3))); }
+  }
+  s.last=r; return s;
+}
+function lbl(s){
+  if(s.st==='learn'){ const m=Math.max(1,Math.round((s.due-Date.now())/MIN)); return m<60?m+' นาที':Math.round(m/60)+' ชม.'; }
+  return s.ivl<30?s.ivl+' วัน':s.ivl<365?(s.ivl/30).toFixed(1).replace('.0','')+' เดือน':(s.ivl/365).toFixed(1).replace('.0','')+' ปี';
+}
+const inScope=c=>fcat==='all'||c.cat===fcat;
+function queues(cat){
+  chkDay(); const now=Date.now(); const L=[],R=[],N=[];
+  CARDS.forEach(c=>{ if(!(cat==='all'||c.cat===cat)) return; const s=srs[c.mid];
+    if(!s) N.push(c); else if(s.due<=now) (s.st==='learn'?L:R).push(c); });
+  L.sort((a,b)=>srs[a.mid].due-srs[b.mid].due); R.sort((a,b)=>srs[a.mid].due-srs[b.mid].due);
+  return {L,R,N:N.slice(0,Math.max(0,NEWLIM-meta.newDone))};
+}
+function cardsRow(){ chipRow($('#cats'), fcat, id=>{ fcat=id; $('#syncBtn').textContent='บันทึกผลลง Notion'; $('#syncMsg').textContent=''; cardsRow(); renderCard(); }, id=>{ const q=queues(id); return q.L.length+q.R.length+q.N.length; }); }
+function renderCard(){
+  const q=queues(fcat); cur=q.L[0]||q.R[0]||q.N[0]||null; shown=false;
+  $('#srsCounts').innerHTML='<span class="n"><b>'+q.N.length+'</b>ใหม่</span><span class="l"><b>'+q.L.length+'</b>เรียนซ้ำ</span><span class="d"><b>'+q.R.length+'</b>ครบกำหนด</span>';
+  const total=CARDS.filter(inScope).length, seen=CARDS.filter(c=>inScope(c)&&srs[c.mid]).length;
+  $('#count').textContent='เริ่มเรียนแล้ว '+seen+'/'+total+(extN?' · จาก Notion '+extN:'');
+  const st=$('#stage'), show=$('#showBtn'), rt=$('#rate4');
+  if(!cur){
+    const waits=CARDS.filter(c=>inScope(c)&&srs[c.mid]).map(c=>srs[c.mid].due).filter(d=>d>Date.now());
+    let nx=''; if(waits.length){ const d=Math.min(...waits)-Date.now(); nx=' · การ์ดถัดไปครบกำหนดอีก '+(d<3600000?Math.max(1,Math.round(d/MIN))+' นาที':d<DAY?Math.round(d/3600000)+' ชม.':Math.round(d/DAY)+' วัน'); }
+    st.innerHTML='<div class="empty"><b>วันนี้ทบทวนครบแล้ว</b><br>'+(q.N.length===0&&CARDS.some(c=>inScope(c)&&!srs[c.mid])?'ถึงโควตาการ์ดใหม่ของวันนี้แล้ว (เพิ่มได้ที่ปุ่ม “การ์ดใหม่/วัน”)':'ไม่มีการ์ดค้าง')+nx+'</div>';
+    show.hidden=true; rt.hidden=true; $('#typeBox').hidden=true; renderSync(); return;
+  }
+  show.hidden=false; show.textContent='แสดงคำตอบ'; rt.hidden=true;
+  const typ=TYPING&&cur.ans&&cur.ans.length; const front=typ?cur.tp:(dirBack?cur.b:cur.f), back=typ?cur.tb:(dirBack?cur.f:cur.b);
+  checked=false; suggest=0; $('#typeBox').hidden=!typ; $('#typeRes').textContent=''; $('#typeRes').className=''; $('#typeIn').value=''; $('#typeIn').disabled=false; $('#typeGo').disabled=false; document.querySelectorAll('#rate4 .btn').forEach(b=>b.classList.remove('sug'));
+  st.innerHTML='<div class="card" tabindex="0" role="button" aria-label="การ์ด แตะเพื่อพลิก">'+
+   '<div class="face"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="front-t'+(String(front).length<=6?' big':'')+'">'+rich(front)+'</div><span class="hint">แตะการ์ดเพื่อดูคำตอบ</span></div>'+
+   '<div class="face back"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="back-t">'+rich(back)+'</div>'+(cur.ref?'<span class="ref">'+esc(cur.ref)+'</span>':'')+'<span class="hint" style="bottom:28px">แตะการ์ดเพื่อดูคำถาม</span></div></div>';
+  st.querySelector('.card').onclick=reveal;
+  renderSync(); if(typ) setTimeout(()=>{ try{ $('#typeIn').focus({preventScroll:true}); }catch(e){} },0);
+}
+function reveal(){
+  if(!cur) return; const c=$('.card'); const f=c.classList.toggle('flipped');
+  $('#showBtn').textContent=f?'ดูคำถาม':'แสดงคำตอบ';
+  if(!shown){ shown=true; const rt=$('#rate4'); rt.hidden=false; const base=srs[cur.mid]||null;
+    rt.querySelectorAll('.btn').forEach(b=>{ b.querySelector('small').textContent=lbl(sched(base,+b.dataset.r)); }); }
+}
+function rate(r){
+  if(!cur||!shown) return; chkDay();
+  if(!srs[cur.mid]) meta.newDone++;
+  srs[cur.mid]=sched(srs[cur.mid]||null,r); saveS(); cardsRow(); renderCard();
+}
+$('#showBtn').onclick=reveal;
+$('#rate4').querySelectorAll('.btn').forEach(b=>b.onclick=()=>rate(+b.dataset.r));
+$('#dirBtn').onclick=e=>{ dirBack=!dirBack; e.target.setAttribute('aria-pressed',dirBack); e.target.textContent=dirBack?'ด้านหน้า: คำตอบ':'ด้านหน้า: หัวข้อ'; renderCard(); };
+$('#limBtn').onclick=e=>{ NEWLIM=NEWLIM>=40?5:NEWLIM===5?10:NEWLIM===10?20:40; saveS(); e.target.textContent='การ์ดใหม่/วัน: '+NEWLIM; cardsRow(); renderCard(); };
+$('#limBtn').textContent='การ์ดใหม่/วัน: '+NEWLIM;
+let rs=0; $('#resetSrs').onclick=e=>{ if(!rs){ rs=1; e.target.textContent='กดอีกครั้งเพื่อยืนยันล้างทั้งหมด'; setTimeout(()=>{rs=0;e.target.textContent='ล้างความคืบหน้า'},4000); return; } srs={}; meta={day:0,newDone:0}; saveS(); rs=0; e.target.textContent='ล้างความคืบหน้า'; cardsRow(); renderCard(); };
+function check(){
+  if(!cur||checked||!(TYPING&&cur.ans&&cur.ans.length)) return;
+  const v=$('#typeIn').value; if(!v.trim()) return;
+  checked=true; const ok=cur.ans.some(a=>norm(a)===norm(v)&&norm(a)!=='');
+  suggest=ok?3:1; const r=$('#typeRes');
+  r.className=ok?'okk':'nok'; r.textContent=ok?'✓ ถูกต้อง · กด Enter อีกครั้งเพื่อไปต่อ ("ปกติ")':'✗ ยังไม่ตรง · คำตอบ: '+cur.ans[0]+' · คุณพิมพ์: '+v+' · กด Enter อีกครั้งเพื่อไปต่อ ("ลืม")';
+  $('#typeIn').disabled=true; $('#typeGo').disabled=true;
+  if(!shown) reveal(); else $('.card').classList.add('flipped');
+  document.querySelectorAll('#rate4 .btn').forEach(b=>b.classList.toggle('sug',+b.dataset.r===suggest));
+  document.addEventListener('keydown',function once(ev){ if(ev.key==='Enter'&&checked&&suggest){ ev.preventDefault(); document.removeEventListener('keydown',once); rate(suggest); } else if(!checked) document.removeEventListener('keydown',once); });
+}
+$('#typeGo').onclick=check;
+$('#typeIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); check(); } });
+const tb=$('#typBtn'); if(CAN_TYPE){ tb.hidden=false; const syncT=()=>{ tb.textContent='พิมพ์ตอบ: '+(TYPING?'เปิด':'ปิด'); tb.setAttribute('aria-pressed',TYPING); $('#dirBtn').hidden=TYPING; };
+  syncT(); tb.onclick=()=>{ TYPING=!TYPING; try{ localStorage.setItem(D.markKey+'-typ',TYPING?'1':'0'); }catch(e){} syncT(); renderCard(); }; }
+document.addEventListener('keydown',e=>{
+  if($('#tab-cards').hidden) return;
+  if(e.target.tagName==='INPUT') return;
+  if(e.key===' '&&e.target.tagName!=='BUTTON'){ e.preventDefault(); reveal(); }
+  else if('1234'.includes(e.key)&&e.key) rate(+e.key);
+});
+
+/* ---------- summary ---------- */
+let scat='all';
+function renderSum(){
+  chipRow($('#sumCats'), scat, id=>{scat=id;renderSum()}, id=>id==='all'?D.sum.length:D.sum.filter(s=>s.cat===id).length);
+  $('#sumBody').innerHTML = D.sum.filter(s=>scat==='all'||s.cat===scat).map(s=>{
+    let h='<div class="sec"><h2><span class="chtag">'+esc(catLabel(s.cat))+'</span>'+esc(s.h)+'</h2>';
+    if(s.rows){ h+='<div class="tbl-wrap"><table>'+(s.head?'<tr><th>'+esc(s.head[0])+'</th><th>'+esc(s.head[1])+'</th></tr>':'')+s.rows.map(r=>'<tr><td>'+rich(r[0])+'</td><td>'+rich(r[1])+'</td></tr>').join('')+'</table></div>'; }
+    if(s.tip) h+='<div class="tip">'+rich(s.tip)+'</div>';
+    return h+'</div>';
+  }).join('');
+}
+
+/* ---------- practice ---------- */
+const QS = D.quiz.map((q,i)=>{ const o={id:i,cat:q[0],q:q[1],opts:q[2],exp:q[4]||''};
+  let s=(i+1)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
+  const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
+  o.order=idx; o.right=q[3]; return o; });
+let qcat='all', missedOnly=false, deck=[], qpos=0, qStat='', qStatErr=false;
+function buildDeck(){ deck=QS.filter(q=>(qcat==='all'||q.cat===qcat)&&(!missedOnly||(store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right))); qpos=0; }
+function renderQ(){
+  chipRow($('#qCats'), qcat, id=>{qcat=id;buildDeck();renderQ()}, id=>id==='all'?QS.length:QS.filter(q=>q.cat===id).length);
+  const box=$('#qBody');
+  const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
+  let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">ตอบถูก / ตอบแล้ว (ทั้งหมด '+QS.length+' ข้อ)</span></div>';
+  if(qStat) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
+  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">เฉพาะข้อที่ผิด</button><button class="chip" id="resetBtn" type="button">ล้างคำตอบ</button></div>';
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(missedOnly?'ยังไม่มีข้อที่ตอบผิดในหมวดนี้':'ไม่มีข้อสอบในหมวดนี้')+'</div>'; wireQ(); return; }
+  const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined;
+  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>ข้อ '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
+  h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
+  q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
+    h+='<button type="button" class="'+cls+'" data-oi="'+oi+'" '+(done?'disabled':'')+'><span class="k">'+'ABCD'[k]+'</span><span>'+rich(q.opts[oi])+'</span></button>'; });
+  h+='</div>';
+  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'ถูกต้อง':'ยังไม่ถูก ตอบข้อ '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+'</div>'; }
+  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>ก่อนหน้า</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>ถัดไป</button></div></div>';
+  h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="ข้อ '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
+  box.innerHTML=h;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; save(); renderQ(); });
+  box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
+  const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};
+  wireQ();
+}
+function wireQ(){
+  const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
+  const r=$('#resetBtn'); if(r) r.onclick=()=>{ store.ans={}; save(); buildDeck(); renderQ(); };
+}
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  ['cards','sum','prac'].forEach(t=>$('#tab-'+t).hidden = t!==b.dataset.tab);
+});
+
+/* ---------- Notion sync (via the viewer's Notion connector) ---------- */
+const STEPS=[1,3,7,14,30], PASS=0.8, NOTION="Notion";
+let mcp=null, syncing=false, owner=false;
+const todayBkk=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok"}).format(new Date());
+function scopeT(){ const sc=CARDS.filter(c=>c.cat===fcat); const seen=sc.filter(c=>srs[c.mid]); const g=seen.filter(c=>srs[c.mid].last>=3).length; return {g,b:seen.length-g,n:sc.length}; }
+function renderSync(){
+  const box=$('#sync'); const page=(D.pages||{})[fcat];
+  if(!box) return;
+  if(fcat==='all'||!page||!owner||!mcp){ box.hidden=true; return; }
+  const t=scopeT(); if(t.n===0||t.g+t.b<t.n){ box.hidden=true; return; }
+  box.hidden=false; const pass=t.g/t.n>=PASS, pct=Math.round(t.g/t.n*100);
+  $('#syncText').textContent=pass?'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ผ่านเกณฑ์ 80% → Review Step จะเพิ่ม 1 ขั้น':'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ต่ำกว่า 80% → Review Step จะกลับเป็น 0 (ทบทวนอีกครั้งพรุ่งนี้)';
+  if(!syncing) $('#syncBtn').disabled=false;
+}
+function errText(e,writing){
+  switch(e&&e.code){
+    case "server_not_connected": return "ยังไม่ได้เชื่อม Notion: เพิ่ม Notion ใน claude.ai Settings → Connectors แล้วลองใหม่";
+    case "needs_reauth": return "การเชื่อม Notion หมดอายุ: เชื่อมใหม่ใน claude.ai Settings → Connectors";
+    case "selection_required": return "มีบัญชี Notion มากกว่าหนึ่งบัญชี เลือกบัญชีที่หน้าต่างของ claude.ai แล้วกดอีกครั้ง";
+    case "approval_required": case "not_in_manifest": case "consent_required": return "หน้านี้ยังไม่ได้รับอนุญาตให้ใช้ Notion กดปุ่มอีกครั้งแล้วเลือกอนุญาต";
+    case "blocked_by_policy": return "องค์กรของคุณไม่อนุญาตให้ใช้ Notion จากหน้านี้";
+    case "tool_error": return "Notion ปฏิเสธการบันทึก: "+(e.message||"").slice(0,160);
+    case "server_unavailable": case "upstream_error": return writing?"Notion ไม่ตอบกลับ อาจบันทึกไปแล้ว เปิดหน้าบทใน Notion เพื่อตรวจก่อนกดอีกครั้ง":"ติดต่อ Notion ไม่ได้ชั่วคราว ลองกดอีกครั้งในอีกสักครู่";
+    default: return "บันทึกไม่สำเร็จ ("+((e&&e.code)||"unknown")+")";
+  }
+}
+async function syncNotion(){
+  const page=(D.pages||{})[fcat]; if(!mcp||!page||syncing) return;
+  const t=scopeT(), pass=t.g/t.n>=PASS;
+  syncing=true; $('#syncBtn').disabled=true;
+  const msg=$('#syncMsg'); msg.className=''; msg.textContent='กำลังอ่าน Review Step ปัจจุบันจาก Notion…';
+  let step=0;
+  try{
+    const r=await mcp.callTool(NOTION,"notion-fetch",{id:page},{cache:false});
+    const p=r.payload; const text=typeof p==="string"?p:(p&&typeof p.text==="string"?p.text:JSON.stringify(p));
+    const m=text.match(/\\?"Review Step\\?"\s*:\s*(\d+(?:\.\d+)?)/); if(m) step=Math.max(0,Math.round(Number(m[1])));
+  }catch(e){ msg.className='err'; msg.textContent=errText(e,false); syncing=false; $('#syncBtn').disabled=false; return; }
+  const next=pass?step+1:0, today=todayBkk();
+  msg.textContent='กำลังบันทึกลง Notion…';
+  try{
+    await mcp.callTool(NOTION,"notion-update-page",{page_id:page,command:"update_properties",properties:{"date:Last review:start":today,"date:Last review:is_datetime":0,"Review Step":next}});
+    msg.className='ok'; msg.textContent='บันทึกแล้ว · '+catLabel(fcat)+': Last review '+today+' · Review Step '+step+' → '+next+' · ทบทวนรอบหน้าในอีก '+STEPS[Math.min(next,STEPS.length-1)]+' วัน';
+    $('#syncBtn').textContent='บันทึกแล้ว ✓';
+  }catch(e){ msg.className='err'; msg.textContent=errText(e,true); $('#syncBtn').disabled=false; }
+  syncing=false;
+}
+$('#syncBtn').onclick=syncNotion;
+if(window.claude&&window.claude.use){
+  window.claude.use("user").then(u=>u?u.isOwner():false).then(v=>{owner=!!v;renderSync();}).catch(()=>{});
+  window.claude.use("mcp").then(m=>{mcp=m;renderSync();loadExt();loadExtQ();}).catch(()=>{loadStatic();});
+}else{ loadStatic(); }
+
+/* ---------- extra cards from the Notion "Flashcards" table ---------- */
+const SUBJ={acc:'Accounting',math:'Math for Life',eco:'Economics',eng:'English Vocab',zh:'Chinese'}[D.key];
+const EXT_DS='collection://7eb4091a-8830-43de-8185-cd26b65d5ce7', EXT_KEY=D.markKey+'-ext';
+let extN=0;
+function setExt(rows){
+  for(let i=CARDS.length-1;i>=0;i--) if(String(CARDS[i].mid).startsWith('n-')) CARDS.splice(i,1);
+  extN=0;
+  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Front) return;
+    const mid='n-'+String(r.url||r.Front).split('?')[0].split('/').pop();
+    if(CARDS.some(c=>c.mid===mid)) return;
+    CARDS.push({id:CARDS.length,cat:hit[0],f:r.Front,b:r.Back||'',ref:r.Ref||'',mid}); extN++; });
+}
+try{ setExt(JSON.parse(localStorage.getItem(EXT_KEY)||'[]')); }catch(e){}
+
+const FC_VIEW='https://app.notion.com/p/3156c08e298f410a9782144f64a3ae69?v=a0498df1-b75a-4f90-b6a0-00753d39bc96';
+const Q_VIEW='https://app.notion.com/p/776e2eeaf73e4154812ae8e4813f9be6?v=696b7bb301874367829744d89c404695';
+const unesc=s=>typeof s==='string'?s.replace(/\\([\\|$*_`~\[\]()<>#+\-.!&])/g,'$1'):s;
+async function fetchRows(view){
+  const out=[]; let cursor=null;
+  for(let i=0;i<8;i++){
+    const a={mode:'view',view_url:view,page_size:100}; if(cursor) a.start_cursor=cursor;
+    const r=await mcp.callTool(NOTION,"notion-query-data-sources",{data:a},{cache:false});
+    let p=r.payload; if(typeof p==="string"){ try{ p=JSON.parse(p); }catch(e){} }
+    if(p&&typeof p.text==="string"){ try{ p=JSON.parse(p.text); }catch(e){} }
+    if(!p||!Array.isArray(p.results)) throw new Error('bad payload');
+    p.results.forEach(x=>{ if(x.Subject===SUBJ){ const y={}; for(const k in x) y[k]=unesc(x[k]); out.push(y); } });
+    if(!p.has_more||!p.next_cursor) break; cursor=p.next_cursor;
+  }
+  return out;
+}
+async function loadExt(){
+  if(!mcp||!SUBJ) return;
+  try{
+    const rows=await fetchRows(FC_VIEW);
+    setExt(rows); try{ localStorage.setItem(EXT_KEY,JSON.stringify(rows)); }catch(e){}
+    cardsRow(); if(!shown) renderCard();
+  }catch(e){}
+}
+
+/* ---------- extra quiz questions from the Notion "Quiz" table ---------- */
+const QDS='collection://21fcc8d7-5e96-4061-a02f-d71fc5705812', QKEY=D.markKey+'-extq';
+function hashN(s){ let h=7; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%1000003; return h; }
+function setExtQ(rows){
+  for(let i=QS.length-1;i>=0;i--) if(String(QS[i].id).startsWith('n-')) QS.splice(i,1);
+  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Question||!r.Correct) return;
+    const opts=[r.Correct,r['Wrong 1'],r['Wrong 2'],r['Wrong 3']].filter(x=>x&&String(x).trim());
+    if(opts.length<2) return;
+    const id='n-'+String(r.url||r.Question).split('?')[0].split('/').pop();
+    let s=hashN(id)+49297; const rn=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
+    const idx=opts.map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(rn()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
+    QS.push({id,cat:hit[0],q:r.Question,opts,exp:r.Explanation||'',order:idx,right:0}); });
+}
+const EMBQ=[{"url": "https://app.notion.com/p/410f02984125810a97f7c93901e54c24", "Question": "นักเศรษฐศาสตร์สำนักคลาสสิกมองภาวะเศรษฐกิจถดถอยอย่างไร?", "Correct": "แก้ไขได้เอง เพราะราคาและค่าจ้างยืดหยุ่น รัฐไม่ต้องแทรกแซง", "Wrong 1": "รัฐต้องเพิ่มการใช้จ่ายเพื่อเพิ่ม AD เพราะราคาและค่าจ้างไม่ยืดหยุ่น", "Wrong 2": "เศรษฐกิจจะติดอยู่ในภาวะถดถอยถาวรเพราะ AS เป็นเส้นแนวนอน", "Wrong 3": "ค่าจ้างจะเพิ่มขึ้นจนเกิดการจ้างงานเต็มที่", "Explanation": "สำนักคลาสสิกเชื่อว่าราคาและค่าจ้างยืดหยุ่นสมบูรณ์ เมื่อเกิดการว่างงาน ค่าจ้างและราคาจะลดลงจนเศรษฐกิจกลับสู่ full employment เอง ส่วนการให้รัฐเพิ่ม AD เป็นแนวคิด Keynesian (สไลด์ Aggregate Demand and Aggregate Supply หัวข้อ What do the classical economists believe?)", "Chapter": "Macro · AD–AS", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f029841258110a116d5f4774348ef", "Question": "ข้อใดไม่ใช่ตัวชี้วัดคุณภาพชีวิต (quality-of-life measures) ที่สไลด์ยกมา?", "Correct": "อัตราเงินเฟ้อ", "Wrong 1": "อายุขัยเฉลี่ยเมื่อแรกเกิด", "Wrong 2": "อัตราการตายของทารก", "Wrong 3": "อัตราการรู้หนังสือ", "Explanation": "ตัวชี้วัดคุณภาพชีวิตที่สไลด์ยกมาคือ อายุขัยเมื่อแรกเกิด, อัตราการตายของทารก, อัตราการรู้หนังสือ, การใช้ไฟฟ้าต่อหัว และอันดับเสรีภาพทางเศรษฐกิจ ไม่มีอัตราเงินเฟ้อ (สไลด์ Growth and Development หัวข้อ other quality-of-life measures และ Exhibit 3)", "Chapter": "Macro · Growth & Development", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125811a9d47f481f26d58f0", "Question": "เหตุการณ์ใดทำให้เส้น AS เลื่อนไปทางขวา?", "Correct": "ราคาน้ำมันลดลง", "Wrong 1": "ค่าจ้างเพิ่มขึ้นมากกว่าที่คาด", "Wrong 2": "รัฐเพิ่มกฎระเบียบกับธุรกิจ", "Wrong 3": "เบี้ยประกันสุขภาพสูงขึ้น", "Explanation": "ต้นทุนการผลิตที่ลดลง เช่น ราคาน้ำมันลด ทำให้ AS เลื่อนขวา ส่วนค่าจ้างที่เพิ่มเกินคาด กฎระเบียบที่มากขึ้น และเบี้ยประกันสุขภาพที่สูงขึ้น ทำให้ AS เลื่อนซ้าย (สไลด์ Aggregate Demand and Aggregate Supply หัวข้อ conditions that shift AS rightward/leftward)", "Chapter": "Macro · AD–AS", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125813ea531e699051c8e83", "Question": "ประเทศ Beta เลือกผลิตสินค้าทุนมากขึ้นและยอมบริโภคน้อยลงในปัจจุบัน เมื่อเทียบกับประเทศ Alpha ที่ลงทุนน้อย สไลด์คาดว่า Beta จะเป็นอย่างไรในอนาคต?", "Correct": "เส้น PPC เลื่อนออกได้มากกว่า จึงเติบโตได้เร็วกว่า", "Wrong 1": "เส้น PPC เลื่อนเข้า เพราะบริโภคน้อยลง", "Wrong 2": "เส้น PPC เท่าเดิม เพราะทรัพยากรรวมไม่เปลี่ยน", "Wrong 3": "บริโภคได้มากกว่า Alpha ตั้งแต่ปัจจุบัน", "Explanation": "การลงทุนในสินค้าทุนมากขึ้นทำให้กำลังการผลิตในอนาคตเพิ่มขึ้น PPC ของ Beta ปี 2018 จึงเลื่อนออกจากปี 1990 มากกว่า Alpha ที่เส้นแทบไม่เปลี่ยน (สไลด์ Growth and Development หัวข้อ Exhibit 5 Alpha's and Beta's PPC)", "Chapter": "Macro · Growth & Development", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f029841258148a7e5f5d26ca4f20c", "Question": "แนวคิด \"demand creates its own supply\" เป็นของสำนักใด และเส้น AS ตามสำนักนั้นมีลักษณะอย่างไร?", "Correct": "Keynesian · AS เป็นเส้นแนวนอน", "Wrong 1": "Classical · AS เป็นเส้นแนวตั้ง", "Wrong 2": "Classical · AS เป็นเส้นแนวนอน", "Wrong 3": "Keynesian · AS เป็นเส้นแนวตั้ง", "Explanation": "Keynesian มองว่าราคาและค่าจ้างคงที่ AS จึงเป็นเส้นแนวนอน เมื่ออุปสงค์เพิ่ม ผู้ผลิตจะผลิตเพิ่ม (demand creates its own supply) ส่วนคลาสสิกใช้คำว่า supply creates its own demand และ AS เป็นเส้นแนวตั้ง (สไลด์ Aggregate Demand and Aggregate Supply หัวข้อ Keynesian view และ classical view)", "Chapter": "Macro · AD–AS", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f029841258149a1a9dd738318452e", "Question": "ในแบบจำลอง AD–AS แกนตั้งวัดอะไร?", "Correct": "ดัชนีระดับราคาโดยรวม เช่น CPI", "Wrong 1": "ราคาต่อหน่วยของสินค้าชนิดใดชนิดหนึ่ง", "Wrong 2": "มูลค่า Real GDP", "Wrong 3": "ปริมาณสินค้าเป็นหน่วยกายภาพ", "Explanation": "แกนตั้งของ AD–AS คือดัชนีระดับราคาโดยรวม (CPI) ไม่ใช่ราคาสินค้าชนิดเดียว ส่วนแกนนอนคือ Real GDP (สไลด์ Aggregate Demand and Aggregate Supply หัวข้อ vertical axis และ Exhibit 1)", "Chapter": "Macro · AD–AS", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125816180d1f21ee4568fe5", "Question": "ข้อใดเป็นข้อจำกัดของการเปรียบเทียบ GDP per capita ระหว่างประเทศร่ำรวยกับประเทศยากจน ตามสไลด์?", "Correct": "GDP per capita ไม่สะท้อนการกระจายรายได้", "Wrong 1": "ตัวเลข GDP ของ LDCs แม่นยำกว่าของประเทศร่ำรวย", "Wrong 2": "อัตราแลกเปลี่ยนสะท้อนมูลค่าสินค้าที่ผลิตได้จริงเสมอ", "Wrong 3": "GDP per capita รวมคุณภาพชีวิตไว้ครบถ้วนแล้ว", "Explanation": "สไลด์ระบุปัญหา 3 ข้อ: ตัวเลขของ LDCs มีความคลาดเคลื่อนมากกว่า, GDP per capita ไม่วัดการกระจายรายได้, และอัตราแลกเปลี่ยนไม่สะท้อนมูลค่าสินค้าที่แท้จริง (สไลด์ Growth and Development หัวข้อ problems associated with using GDP per capita)", "Chapter": "Macro · Growth & Development", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125816b8b0dcfb54aae1ac3", "Question": "ตามมุมมองคลาสสิก เศรษฐกิจอยู่ที่ full employment (Real GDP $16 ล้านล้าน ระดับราคา 300) ต่อมาครัวเรือนลดการบริโภคจน AD เลื่อนซ้าย หลังราคาและค่าจ้างปรับตัวเสร็จ เศรษฐกิจจะอยู่ที่ใด?", "Correct": "Real GDP $16 ล้านล้าน ระดับราคา 200", "Wrong 1": "Real GDP $12 ล้านล้าน ระดับราคา 300", "Wrong 2": "Real GDP $12 ล้านล้าน ระดับราคา 200", "Wrong 3": "Real GDP $20 ล้านล้าน ระดับราคา 300", "Explanation": "AS แบบคลาสสิกเป็นเส้นตั้งที่ full employment เมื่อ AD ลด สินค้าค้างสต็อกและการว่างงานทำให้ราคาและค่าจ้างลดจาก 300 เป็น 200 จนกลับสู่ full employment ที่ $16 ล้านล้าน การเปลี่ยน AD จึงกระทบแค่ระดับราคา (สไลด์ Aggregate Demand and Aggregate Supply หัวข้อ Exhibit 5 The Classical Vertical Aggregate Supply Curve)", "Chapter": "Macro · AD–AS", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125818b881bd8190f26290a", "Question": "ประเทศหนึ่งมี GDP $480 พันล้าน และประชากร 60 ล้านคน GDP per capita เท่ากับเท่าใด?", "Correct": "$8,000", "Wrong 1": "$800", "Wrong 2": "$80,000", "Wrong 3": "$125", "Explanation": "GDP per capita = GDP ÷ ประชากร = $480,000,000,000 ÷ 60,000,000 = $8,000 ต้องระวังหน่วยพันล้านกับล้าน (สไลด์ Growth and Development หัวข้อ What is GDP per capita?)", "Chapter": "Macro · Growth & Development", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f029841258195a292ccc921688580", "Question": "ประเทศส่งออกน้ำมันที่มีรายได้สูง แต่ไม่มีการพัฒนาอุตสาหกรรมอย่างกว้างขวาง ตามสไลด์จัดอยู่ในกลุ่ม IACs หรือไม่?", "Correct": "ไม่จัดเป็น IAC เพราะไม่มีการพัฒนาอุตสาหกรรมอย่างกว้างขวาง", "Wrong 1": "จัดเป็น IAC เพราะ GDP per capita สูง", "Wrong 2": "จัดเป็น IAC เพราะมีทรัพยากรธรรมชาติมาก", "Wrong 3": "จัดเป็น IAC เมื่อส่งออกน้ำมันเกินครึ่งของ GDP", "Explanation": "IACs คือประเทศรายได้สูงที่มีทุนเทคโนโลยีสูงและแรงงานการศึกษาดี ประเทศอาหรับที่ร่ำรวยจากน้ำมันแต่ไม่มีการพัฒนาอุตสาหกรรมอย่างกว้างขวางจึงไม่ถูกนับเป็น IAC (สไลด์ Growth and Development หัวข้อ What countries are excluded from IACs?)", "Chapter": "Macro · Growth & Development", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581cda919d9a243912631", "Question": "เมื่อ AD เพิ่มขึ้นในช่วง intermediate range ของเส้น AS จะเกิดอะไรขึ้น?", "Correct": "ทั้งระดับราคาและ Real GDP เพิ่มขึ้น", "Wrong 1": "เฉพาะระดับราคาเพิ่มขึ้น Real GDP คงที่", "Wrong 2": "เฉพาะ Real GDP เพิ่มขึ้น ระดับราคาคงที่", "Wrong 3": "ทั้งระดับราคาและ Real GDP ลดลง", "Explanation": "ช่วง intermediate range คือช่วงที่เศรษฐกิจใกล้ full employment การเพิ่ม AD ทำให้ทั้งราคาและ Real GDP เพิ่มขึ้น ต่างจาก Keynesian range (ราคาคงที่) และ classical range (เกิดเงินเฟ้ออย่างเดียว) (สไลด์ Aggregate Demand and Aggregate Supply หัวข้อ increase in AD in the intermediate range)", "Chapter": "Macro · AD–AS", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581da8b13e22926782191", "Question": "รัฐบาลเพิ่มการใช้จ่ายจำนวนมากเพื่อทำสงคราม (เช่น สงครามเวียดนาม) ขณะที่เศรษฐกิจใกล้ full employment ผลที่เกิดขึ้นตามสไลด์คืออะไร?", "Correct": "AD เลื่อนขวา เกิด demand-pull inflation", "Wrong 1": "AS เลื่อนซ้าย เกิด cost-push inflation", "Wrong 2": "AD เลื่อนซ้าย เกิดภาวะถดถอย", "Wrong 3": "AS เลื่อนขวา ระดับราคาลดลง", "Explanation": "การใช้จ่ายภาครัฐ (G) เป็นส่วนหนึ่งของ AD เมื่อ G เพิ่ม AD เลื่อนขวา และเมื่อเศรษฐกิจใกล้ full employment จะเกิด demand-pull inflation (สไลด์ Aggregate Demand and Aggregate Supply หัวข้อ Exhibit 13 Cost-Push and Demand-Pull Inflation)", "Chapter": "Macro · AD–AS", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581e0932bd1afac6c7099", "Question": "ข้อใดเป็นตัวอย่างของ infrastructure ตามนิยามในสไลด์?", "Correct": "ทางหลวง สะพาน และสนามบินที่รัฐจัดหาให้", "Wrong 1": "เครื่องจักรในโรงงานของเอกชน", "Wrong 2": "หุ้นและพันธบัตรที่บริษัทออกขาย", "Wrong 3": "สินค้าคงเหลือของร้านค้าปลีก", "Explanation": "Infrastructure คือสินค้าทุนที่รัฐมักเป็นผู้จัดหา เช่น ทางหลวง สะพาน ระบบน้ำและขยะ และสนามบิน (สไลด์ Growth and Development หัวข้อ What is infrastructure?)", "Chapter": "Macro · Growth & Development", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125815190f5c5f314bfbe13", "Question": "เมื่อเกิดเงินเฟ้อ กลุ่มใดมักได้ประโยชน์ตามสไลด์?", "Correct": "ผู้ที่ถือสินทรัพย์ เช่น เจ้าของบ้าน ที่ดิน หรือทอง", "Wrong 1": "ผู้ที่ยังไม่มีบ้านและกำลังเก็บเงินซื้อบ้าน", "Wrong 2": "ผู้ที่มีรายได้คงที่ไม่ปรับตามเงินเฟ้อ", "Wrong 3": "ผู้ที่เก็บเงินสดไว้ที่บ้านทั้งหมด", "Explanation": "เงินเฟ้อมักทำให้มูลค่าสินทรัพย์เพิ่มขึ้น ผู้ถือสินทรัพย์จึงมั่งคั่งขึ้น ส่วนผู้ไม่มีสินทรัพย์ซื้อสินทรัพย์ได้ยากขึ้น และผู้มีรายได้คงที่เสียอำนาจซื้อ (สไลด์ Inflation หัวข้อ How is wealth affected by inflation?)", "Chapter": "Macro · Inflation & CPI", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f029841258169b16fe3577b1d9164", "Question": "นาย A มีรายได้ตามตัวเงิน (nominal income) 30,000 บาท และ CPI เท่ากับ 125 รายได้ที่แท้จริง (real income) เท่ากับเท่าใด?", "Correct": "24,000 บาท", "Wrong 1": "37,500 บาท", "Wrong 2": "29,875 บาท", "Wrong 3": "240 บาท", "Explanation": "Real income = nominal income ÷ (CPI/100) = 30,000 ÷ 1.25 = 24,000 บาท (สไลด์ Inflation หัวข้อ formula for real income)", "Chapter": "Macro · Inflation & CPI", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125816aaee7fc5dbe52c787", "Question": "ประเทศหนึ่งมี C = 600, I = 150, G = 200, X = 120, M = 170 (พันล้านบาท) GDP ตามวิธีรายจ่ายเท่ากับเท่าใด?", "Correct": "900", "Wrong 1": "1,240", "Wrong 2": "950", "Wrong 3": "1,070", "Explanation": "GDP = C + I + G + (X − M) = 600 + 150 + 200 + (120 − 170) = 900 (สไลด์ Measuring a Nation's Output หัวข้อ GDP expressed algebraically)", "Chapter": "Macro · GDP", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125817383bffa940d197c3f", "Question": "ตะกร้าสินค้าเดียวกันมีมูลค่า 250 บาทตามราคาปีฐาน และ 300 บาทตามราคาปีปัจจุบัน CPI ปีปัจจุบันเท่ากับเท่าใด?", "Correct": "120", "Wrong 1": "83.3", "Wrong 2": "50", "Wrong 3": "20", "Explanation": "CPI = มูลค่าตะกร้าตามราคาปีปัจจุบัน ÷ มูลค่าตะกร้าตามราคาปีฐาน × 100 = 300 ÷ 250 × 100 = 120 (สไลด์ Inflation หัวข้อ How is the CPI calculated?)", "Chapter": "Macro · Inflation & CPI", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125817fa834d6d890ac7b69", "Question": "นักศึกษาอายุ 19 ปีทำงานพาร์ตไทม์รับค่าจ้างสัปดาห์ละ 5 ชั่วโมง ตามนิยามในสไลด์จะถูกจัดเป็นกลุ่มใด?", "Correct": "ผู้มีงานทำ (employed)", "Wrong 1": "ผู้ว่างงาน (unemployed)", "Wrong 2": "ไม่อยู่ในกำลังแรงงาน เพราะเป็นนักศึกษา", "Wrong 3": "Discouraged worker", "Explanation": "ผู้มีงานทำคือผู้ที่ทำงานรับค่าจ้างอย่างน้อย 1 ชั่วโมงต่อสัปดาห์ นักศึกษาคนนี้จึงนับเป็นผู้มีงานทำ แม้ทำงานพาร์ตไทม์ (สไลด์ Business Cycle and Unemployment หัวข้อ Who is classified as employed?)", "Chapter": "Macro · Business Cycle", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581898fb1e3b5865fb836", "Question": "ประเทศหนึ่งมีประชากรอายุ 16 ปีขึ้นไป 60 ล้านคน กำลังแรงงาน (civilian labor force) 40 ล้านคน และผู้ว่างงาน 2 ล้านคน อัตราว่างงานเท่ากับเท่าใด?", "Correct": "5.0%", "Wrong 1": "3.3%", "Wrong 2": "5.3%", "Wrong 3": "6.7%", "Explanation": "อัตราว่างงาน = ผู้ว่างงาน ÷ กำลังแรงงาน × 100 = 2 ÷ 40 × 100 = 5% ต้องหารด้วยกำลังแรงงาน ไม่ใช่ประชากรทั้งหมดหรือเฉพาะผู้มีงานทำ (สไลด์ Business Cycle and Unemployment หัวข้อ civilian unemployment rate computed)", "Chapter": "Macro · Business Cycle", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f029841258196a4dfe1e6e2e02557", "Question": "เศรษฐกิจผลิตฮอตดอกกับแฮมเบอร์เกอร์ ปี 2016 (ปีฐาน): ฮอตดอก $1 × 100 ชิ้น, แฮมเบอร์เกอร์ $2 × 50 ชิ้น · ปี 2017: ฮอตดอก $2 × 150 ชิ้น, แฮมเบอร์เกอร์ $3 × 100 ชิ้น Real GDP ปี 2017 เท่ากับเท่าใด?", "Correct": "$350", "Wrong 1": "$600", "Wrong 2": "$200", "Wrong 3": "$450", "Explanation": "Real GDP ใช้ราคาปีฐาน × ปริมาณปีนั้น = $1 × 150 + $2 × 100 = $350 ส่วน $600 คือ nominal GDP ปี 2017 (สไลด์ Measuring a Nation's Output ตาราง Calculating Real GDP)", "Chapter": "Macro · GDP", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f02984125819a98a8f831c9b9beec", "Question": "Nominal GDP เท่ากับ 18,000 พันล้านบาท และ GDP deflator เท่ากับ 120 Real GDP เท่ากับเท่าใด?", "Correct": "15,000 พันล้านบาท", "Wrong 1": "21,600 พันล้านบาท", "Wrong 2": "17,880 พันล้านบาท", "Wrong 3": "14,400 พันล้านบาท", "Explanation": "Real GDP = Nominal GDP ÷ GDP deflator × 100 = 18,000 ÷ 120 × 100 = 15,000 (สไลด์ Measuring a Nation's Output หัวข้อ formula for real GDP)", "Chapter": "Macro · GDP", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581a8880fc2857978927e", "Question": "สงครามทำให้การขนส่งน้ำมันผ่านช่องแคบฮอร์มุซสะดุด ราคาน้ำมันพุ่งขึ้น และบริษัทต่าง ๆ ขึ้นราคาสินค้าตามต้นทุนที่สูงขึ้น เงินเฟ้อแบบนี้เรียกว่าอะไร?", "Correct": "Cost-push inflation", "Wrong 1": "Demand-pull inflation", "Wrong 2": "Deflation", "Wrong 3": "Relative price change", "Explanation": "Cost-push inflation เกิดจากต้นทุนการผลิตสูงขึ้น เช่น ราคาน้ำมัน ทำให้บริษัทขึ้นราคาเพื่อรักษากำไร ส่วน demand-pull เกิดจากการใช้จ่ายรวมที่มากเกินไป (สไลด์ Inflation หัวข้อ Cost-Push Inflation: Iran War & Strait of Hormuz)", "Chapter": "Macro · Inflation & CPI", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581a9a5f9f83815bb762c", "Question": "รายการใดนับรวมใน GDP ของปีนี้?", "Correct": "ครัวเรือนซื้อรถยนต์คันใหม่ที่ผลิตในประเทศปีนี้", "Wrong 1": "การซื้อขายรถยนต์มือสอง", "Wrong 2": "การซื้อหุ้นของบริษัทในตลาดหลักทรัพย์", "Wrong 3": "เงินสวัสดิการที่รัฐจ่ายให้ผู้สูงอายุ (transfer payment)", "Explanation": "GDP นับเฉพาะสินค้าและบริการขั้นสุดท้ายที่ผลิตในงวดนั้น ไม่นับรายการมือสอง การซื้อขายหลักทรัพย์ และ transfer payment (สไลด์ Measuring a Nation's Output หัวข้อ transactions excluded from GDP)", "Chapter": "Macro · GDP", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581b0a15bfc08fdbf3add", "Question": "ตามนิยามในสไลด์ เสื้อผ้าที่ครัวเรือนซื้อจัดเป็นการบริโภคประเภทใด?", "Correct": "Nondurable goods", "Wrong 1": "Durable goods", "Wrong 2": "Services", "Wrong 3": "Gross private domestic investment", "Explanation": "Nondurable goods คือสิ่งที่ใช้หมดภายในไม่ถึง 3 ปี เช่น อาหาร เสื้อผ้า น้ำมัน ส่วน durable goods ใช้ได้เกิน 3 ปี เช่น รถยนต์ เครื่องใช้ไฟฟ้า เฟอร์นิเจอร์ (สไลด์ Measuring a Nation's Output หัวข้อ nondurable goods)", "Chapter": "Macro · GDP", "Subject": "Economics", "Status": "Verified"}, {"url": "https://app.notion.com/p/410f0298412581d9abdfcb1d2365d51d", "Question": "สมาร์ทโฟนรุ่นใหม่ราคาสูงกว่ารุ่นเก่า แต่มีกล้องดีกว่าและทำงานเร็วกว่า ถ้า CPI นับส่วนต่างราคาทั้งหมดเป็นการขึ้นราคา จะเกิดผลอย่างไร?", "Correct": "CPI อาจแสดงเงินเฟ้อสูงกว่าความเป็นจริง (overstate)", "Wrong 1": "CPI อาจแสดงเงินเฟ้อต่ำกว่าความเป็นจริง (understate)", "Wrong 2": "CPI ไม่ได้รับผลกระทบเพราะคุณภาพไม่เกี่ยวกับราคา", "Wrong 3": "CPI จะเท่ากับ 100 เสมอ", "Explanation": "CPI ปรับตามคุณภาพสินค้าที่ดีขึ้นได้ยาก ส่วนหนึ่งของราคาที่เพิ่มมาจากคุณภาพ ไม่ใช่เงินเฟ้อ จึงอาจทำให้ CPI แสดงเงินเฟ้อสูงเกินจริง (สไลด์ Inflation หัวข้อ Difficulty adjusting for quality changes)", "Chapter": "Macro · Inflation & CPI", "Subject": "Economics", "Status": "Verified"}];
+try{ const _c=JSON.parse(localStorage.getItem(QKEY)||'[]'); const _m=new Map(); EMBQ.forEach(r=>_m.set(r.url,r)); _c.forEach(r=>_m.set(r.url,r)); setExtQ([..._m.values()]); buildDeck(); }catch(e){}
+async function loadExtQ(){
+  if(!SUBJ) return;
+  if(!mcp){ qStat='ไม่ได้เชื่อม Notion — ใช้ข้อสอบที่ฝังไว้ (ข้อมูล ณ 10 พ.ย. 2026)'; qStatErr=false; renderQ(); loadStatic(); return; }
+  qStat='กำลังโหลดข้อสอบจาก Notion…'; qStatErr=false; renderQ();
+  let lastErr=null;
+  for(let a=0;a<3;a++){
+    try{
+      const rows=await fetchRows(Q_VIEW);
+      try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
+      setExtQ(rows);
+      const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
+      qStat='โหลดจาก Notion สำเร็จ · เพิ่ม '+n+' ข้อ'; qStatErr=false;
+      if(qpos>=QS.length) qpos=0; buildDeck(); renderQ(); return;
+    }catch(e){ lastErr=e; await new Promise(r=>setTimeout(r,2500*(a+1))); }
+  }
+  const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
+  qStat='โหลดจาก Notion ไม่สำเร็จ ('+String((lastErr&&lastErr.message)||lastErr||'').slice(0,60)+') — ใช้ข้อมูลเก่าที่เก็บไว้ '+n+' ข้อ ลองปิดแล้วเปิดใหม่';
+  qStatErr=true; renderQ();
+}
+async function loadStatic(){
+  await 0;
+  if(!SUBJ) return;
+  try{
+    const [q,c]=await Promise.all([
+      fetch('data/quiz.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)),
+      fetch('data/cards.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)]);
+    const rows=(q.rows||[]).filter(x=>x.Subject===SUBJ);
+    setExtQ(rows); try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
+    if(c&&c.rows){ const cr=c.rows.filter(x=>x.Subject===SUBJ); setExt(cr); try{ localStorage.setItem(EXT_KEY,JSON.stringify(cr)); }catch(e){} cardsRow(); if(!shown) renderCard(); }
+    const n=QS.filter(x=>String(x.id).startsWith('n-')).length;
+    qStat='โหลดจากไฟล์ข้อมูลสำเร็จ · เพิ่ม '+n+' ข้อ · อัปเดต '+(q.updated||'-'); qStatErr=false;
+    if(qpos>=QS.length) qpos=0; buildDeck(); renderQ();
+  }catch(e){}
+}
+setInterval(()=>{ if(!cur&&!$('#tab-cards').hidden){ cardsRow(); renderCard(); } },20000);
+if(!D.sum.length) document.querySelectorAll('.tabs button').forEach(b=>{ if(b.dataset.tab!=='cards') b.hidden=true; });
+cardsRow(); renderCard(); renderSum(); buildDeck(); renderQ();
+</script>
+
+</html>
