@@ -163,7 +163,7 @@ const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
 let store = {known:[], ans:{}};
 try{ const r = localStorage.getItem(KEY); if(r) store = Object.assign(store, JSON.parse(r)); }catch(e){}
-const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} };
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} window.__xs&&window.__xs.dirty(); };
 const CATS = D.cats; // [[id,label],...]
 const catLabel = id => (CATS.find(c=>c[0]===id)||[0,id])[1];
 
@@ -182,7 +182,7 @@ const DAY=86400000, TZ=7*3600000, MIN=60000;
 const sod=t=>Math.floor((t+TZ)/DAY)*DAY-TZ;
 let srs={}, meta={day:0,newDone:0}, NEWLIM=20;
 try{ const r=JSON.parse(localStorage.getItem(D.markKey+'-srs')||'{}'); srs=r.s||{}; meta=r.m||meta; NEWLIM=r.lim||20; }catch(e){}
-const saveS=()=>{ try{ localStorage.setItem(D.markKey+'-srs',JSON.stringify({s:srs,m:meta,lim:NEWLIM})); }catch(e){} };
+const saveS=()=>{ try{ localStorage.setItem(D.markKey+'-srs',JSON.stringify({s:srs,m:meta,lim:NEWLIM})); }catch(e){} window.__xs&&window.__xs.dirty(); };
 const chkDay=()=>{ const d=sod(Date.now()); if(meta.day!==d){ meta.day=d; meta.newDone=0; } };
 const CARDS = D.cards.map((c,i)=>({id:i,cat:c[0],f:c[1],b:c[2],ref:c[3]||'',mid:c[4],tp:c[5],tb:c[6],ans:c[7]}));
 let fcat='all', dirBack=false, cur=null, shown=false;
@@ -192,7 +192,7 @@ function CAN_YES(){ if(!D.typing) return false; try{ return localStorage.getItem
 const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[\s'’\-]+/g,'').replace(/[0-9]/g,'').replace(/[.,!?;:。，！？；：、（）()"“”]/g,'');
 let checked=false, suggest=0;
 function sched(s,r){
-  const now=Date.now(); s=Object.assign({st:'learn',step:0,ease:2.5,ivl:0,lapses:0},s||{});
+  const now=Date.now(); s=Object.assign({st:'learn',step:0,ease:2.5,ivl:0,lapses:0},s||{}); s.ts=now;
   const grad=ivl=>{ s.st='rev'; s.ivl=ivl; s.due=sod(now)+ivl*DAY; delete s.rl; };
   if(s.st==='learn'){
     if(r===1){ s.step=0; s.due=now+LEARN[0]*MIN; }
@@ -317,14 +317,14 @@ function renderQ(){
   h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>ก่อนหน้า</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>ถัดไป</button></div></div>';
   h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="ข้อ '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
   box.innerHTML=h;
-  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; save(); renderQ(); });
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); save(); renderQ(); });
   box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
   const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};
   wireQ();
 }
 function wireQ(){
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
-  const r=$('#resetBtn'); if(r) r.onclick=()=>{ store.ans={}; save(); buildDeck(); renderQ(); };
+  const r=$('#resetBtn'); if(r) r.onclick=()=>{ store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
 
 /* ---------- tabs ---------- */
@@ -341,7 +341,7 @@ function scopeT(){ const sc=CARDS.filter(c=>c.cat===fcat); const seen=sc.filter(
 function renderSync(){
   const box=$('#sync'); const page=(D.pages||{})[fcat];
   if(!box) return;
-  if(fcat==='all'||!page||!owner||!mcp){ box.hidden=true; return; }
+  if(fcat==='all'||!page||!((owner&&mcp)||(window.__xs&&window.__xs.ready()))){ box.hidden=true; return; }
   const t=scopeT(); if(t.n===0||t.g+t.b<t.n){ box.hidden=true; return; }
   box.hidden=false; const pass=t.g/t.n>=PASS, pct=Math.round(t.g/t.n*100);
   $('#syncText').textContent=pass?'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ผ่านเกณฑ์ 80% → Review Step จะเพิ่ม 1 ขั้น':'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ต่ำกว่า 80% → Review Step จะกลับเป็น 0 (ทบทวนอีกครั้งพรุ่งนี้)';
@@ -359,7 +359,23 @@ function errText(e,writing){
     default: return "บันทึกไม่สำเร็จ ("+((e&&e.code)||"unknown")+")";
   }
 }
+async function syncViaApi(){
+  const page=(D.pages||{})[fcat]; if(!page||syncing) return;
+  const t=scopeT(), pass=t.g/t.n>=PASS, msg=$('#syncMsg'); const X=window.__xs;
+  syncing=true; $('#syncBtn').disabled=true; msg.className=''; msg.textContent='กำลังบันทึกลง Notion…';
+  let done=false;
+  try{
+    const r=await fetch(X.api()+'/review',{method:'POST',headers:X.hdr(),body:JSON.stringify({page,pass})});
+    const j=await r.json().catch(()=>({}));
+    if(r.status===401){ msg.className='err'; msg.textContent='รหัสซิงก์ไม่ถูกต้อง กดปุ่ม ☁ มุมขวาล่างเพื่อตั้งรหัสใหม่'; }
+    else if(!r.ok||!j.ok){ msg.className='err'; msg.textContent='บันทึกไม่สำเร็จ ('+(j.error||r.status)+')'; }
+    else if(j.already){ msg.className='ok'; msg.textContent='วันนี้บันทึกไปแล้ว · Review Step = '+j.step; done=true; $('#syncBtn').textContent='บันทึกแล้ว ✓'; }
+    else{ msg.className='ok'; msg.textContent='บันทึกแล้ว · '+catLabel(fcat)+': Last review '+j.today+' · Review Step '+j.step+' → '+j.next+' · ทบทวนรอบหน้าในอีก '+STEPS[Math.min(j.next,STEPS.length-1)]+' วัน'; done=true; $('#syncBtn').textContent='บันทึกแล้ว ✓'; }
+  }catch(e){ msg.className='err'; msg.textContent='ติดต่อเซิร์ฟเวอร์ซิงก์ไม่ได้ ลองใหม่อีกครั้ง'; }
+  syncing=false; if(!done) $('#syncBtn').disabled=false;
+}
 async function syncNotion(){
+  if(!(owner&&mcp)&&window.__xs&&window.__xs.ready()) return syncViaApi();
   const page=(D.pages||{})[fcat]; if(!mcp||!page||syncing) return;
   const t=scopeT(), pass=t.g/t.n>=PASS;
   syncing=true; $('#syncBtn').disabled=true;
@@ -480,6 +496,83 @@ async function loadStatic(){
 setInterval(()=>{ if(!cur&&!$('#tab-cards').hidden){ cardsRow(); renderCard(); } },20000);
 if(!D.sum.length) document.querySelectorAll('.tabs button').forEach(b=>{ if(b.dataset.tab!=='cards') b.hidden=true; });
 cardsRow(); renderCard(); renderSum(); buildDeck(); renderQ();
+/* ---------- cross-device progress sync + Notion save via the Worker ---------- */
+window.__xs=(()=>{
+  const LSK='study-sync-key'; let api='', timer=null, busy=false, applying=false, box=null, msgEl=null, btnEl=null;
+  const key=()=>{ try{ return localStorage.getItem(LSK)||''; }catch(e){ return ''; } };
+  const hdr=()=>({'X-Sync-Key':key(),'Content-Type':'application/json'});
+  async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok) api=String((await c.json()).api||'').replace(/\/+$/,''); }catch(e){} return api; }
+  const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'#1d7a4a':'#b3261e'; } };
+  const hhmm=()=>new Intl.DateTimeFormat('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date());
+  function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[]}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
+  function merge(a,b){
+    const A=a.study||{}, B=b.study||{}, out={study:{ans:{},ats:{},rst:0,known:[]},srs:{s:{},m:{day:0,newDone:0}}};
+    const rst=Math.max(A.rst||0,B.rst||0); out.study.rst=rst;
+    const ids=new Set([...Object.keys(A.ans||{}),...Object.keys(B.ans||{})]);
+    ids.forEach(id=>{
+      const ha=A.ans&&A.ans[id]!==undefined, hb=B.ans&&B.ans[id]!==undefined;
+      const ta=(A.ats||{})[id]||0, tb=(B.ats||{})[id]||0;
+      const useA=ha&&(!hb||ta>=tb), v=useA?A.ans[id]:B.ans[id], t=useA?ta:tb;
+      if(!(ha||hb)) return; if(rst&&t<rst) return;
+      out.study.ans[id]=v; out.study.ats[id]=t;
+    });
+    out.study.known=[...new Set([...(A.known||[]),...(B.known||[])])];
+    const SA=(a.srs||{}).s||{}, SB=(b.srs||{}).s||{};
+    new Set([...Object.keys(SA),...Object.keys(SB)]).forEach(id=>{
+      const x=SA[id], y=SB[id]; if(!x){ out.srs.s[id]=y; return; } if(!y){ out.srs.s[id]=x; return; }
+      out.srs.s[id]=((x.ts||0)>=(y.ts||0))?x:y;
+    });
+    const MA=(a.srs||{}).m||{day:0,newDone:0}, MB=(b.srs||{}).m||{day:0,newDone:0};
+    out.srs.m = MA.day>MB.day?MA : MB.day>MA.day?MB : {day:MA.day,newDone:Math.max(MA.newDone||0,MB.newDone||0)};
+    return out;
+  }
+  function apply(m){
+    applying=true;
+    try{
+      store.ans=m.study.ans; store.ats=m.study.ats; store.rst=m.study.rst; store.known=m.study.known; save();
+      srs=m.srs.s; meta=m.srs.m; saveS();
+      try{ buildDeck(); renderQ(); cardsRow(); if(!shown) renderCard(); }catch(e){}
+    } finally { applying=false; }
+  }
+  async function sync(manual){
+    if(busy) return; const base=await cfg();
+    if(!key()){ if(manual) askKey(); return; }
+    if(!base) { if(manual) say('ยังไม่ได้ตั้งค่า api ใน data/config.json'); return; }
+    busy=true; say('กำลังซิงก์…',true);
+    try{
+      const url=base+'/progress/'+D.key;
+      const r=await fetch(url,{headers:hdr()});
+      if(r.status===401){ say('รหัสซิงก์ไม่ถูกต้อง กดปุ่มเพื่อตั้งใหม่'); try{ localStorage.removeItem(LSK); }catch(e){} busy=false; paint(); return; }
+      if(!r.ok) throw new Error('get '+r.status);
+      const remote=await r.json(); const merged=merge(local(), remote||{});
+      apply(merged);
+      const p=await fetch(url,{method:'PUT',headers:hdr(),body:JSON.stringify(merged)});
+      if(!p.ok) throw new Error('put '+p.status);
+      say('ซิงก์แล้ว '+hhmm(),true);
+    }catch(e){ say('ซิงก์ไม่สำเร็จ ลองใหม่อีกครั้ง'); }
+    busy=false; paint();
+  }
+  function askKey(){
+    let k=''; try{ k=window.prompt('ใส่รหัสซิงก์ (รหัสเดียวกับที่ตั้งไว้ใน Cloudflare ชื่อ SYNC_KEY)')||''; }catch(e){}
+    k=k.trim(); if(!k) return;
+    try{ localStorage.setItem(LSK,k); }catch(e){}
+    paint(); try{ renderSync(); }catch(e){} sync(false);
+  }
+  function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์':'☁ ตั้งรหัสซิงก์'; }
+  function mount(){
+    box=document.createElement('div');
+    box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:50;display:flex;gap:8px;align-items:center;background:var(--soft,#eef3f0);color:var(--ink,#1c1c1c);border:1px solid rgba(0,0,0,.15);border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12)';
+    msgEl=document.createElement('span'); msgEl.setAttribute('role','status');
+    btnEl=document.createElement('button'); btnEl.type='button'; btnEl.style.cssText='border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;font-weight:600;padding:2px 4px';
+    btnEl.onclick=()=>{ if(!key()) askKey(); else sync(true); };
+    box.append(msgEl,btnEl); document.body.appendChild(box); paint();
+  }
+  mount();
+  cfg().then(()=>{ try{ renderSync(); }catch(e){} });
+  setTimeout(()=>sync(false),1200);
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') sync(false); });
+  return { dirty(){ if(applying||!key()) return; clearTimeout(timer); timer=setTimeout(()=>sync(false),4000); }, ready(){ return !!(api&&key()); }, api:()=>api, hdr, sync };
+})();
 </script>
 
 </html>
