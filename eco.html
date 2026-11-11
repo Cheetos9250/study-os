@@ -502,7 +502,7 @@ window.__xs=(()=>{
   const key=()=>{ try{ return localStorage.getItem(LSK)||''; }catch(e){ return ''; } };
   const hdr=()=>({'X-Sync-Key':key(),'Content-Type':'application/json'});
   async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok) api=String((await c.json()).api||'').replace(/\/+$/,''); }catch(e){} return api; }
-  const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'#1d7a4a':'#b3261e'; } };
+  const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'var(--ok,#1d7a4a)':'var(--bad,#b3261e)'; } };
   const hhmm=()=>new Intl.DateTimeFormat('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date());
   function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[]}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
   function merge(a,b){
@@ -561,7 +561,7 @@ window.__xs=(()=>{
   function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์':'☁ ตั้งรหัสซิงก์'; }
   function mount(){
     box=document.createElement('div');
-    box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:50;display:flex;gap:8px;align-items:center;background:var(--soft,#eef3f0);color:var(--ink,#1c1c1c);border:1px solid rgba(0,0,0,.15);border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12)';
+    box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:50;display:flex;gap:8px;align-items:center;background:var(--surface,#fff);color:var(--ink,#1c1c1c);border:1px solid var(--line,#bbb);border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12)';
     msgEl=document.createElement('span'); msgEl.setAttribute('role','status');
     btnEl=document.createElement('button'); btnEl.type='button'; btnEl.style.cssText='border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;font-weight:600;padding:2px 4px';
     btnEl.onclick=()=>{ if(!key()) askKey(); else sync(true); };
