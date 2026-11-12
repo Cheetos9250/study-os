@@ -13,7 +13,7 @@ function fixture(){
  const el={addEventListener(){},disabled:false,files:[],textContent:''};
  const ctx={document:{getElementById:()=>el},TextEncoder,crypto:require('node:crypto').webcrypto,
   Blob,URL:{createObjectURL:()=>'',revokeObjectURL:()=>{}},setTimeout:()=>{}};
- const expose=script.replace(/\}\)\(\);\s*$/, 'globalThis.__unit={checkLocal,checkRemote,checkAdmin};})();');
+ const expose=script.replace(/\}\)\(\);\s*$/, 'globalThis.__unit={checkLocal,checkRemote,checkAdmin,prepareStagingPreview};})();');
  new vm.Script(expose,{filename:'migration-audit.html'}).runInNewContext(ctx);
  return ctx.__unit;
 }
@@ -153,4 +153,37 @@ test('Never compares invented or incomplete administrative manifests',()=>{
  assert.throws(()=>checkAdmin(unsafe,c),/รหัส/);
  const malformed=admin();malformed.entries['progress:acc']='{bad json';
  assert.throws(()=>checkAdmin(malformed,c),/JSON/);
+});
+
+test('Browser offline staging preview keeps original present KV state intact',()=>{
+ const {prepareStagingPreview}=fixture(),c=cloud(),a=admin();
+ const acc={study:{ans:{quizA:0},ats:{quizA:0},known:[],rst:0},
+  srs:{s:{},m:{day:0,newDone:0}},updated:123};
+ c.subjects.acc=acc;a.entries['progress:acc']=JSON.stringify(acc);
+ for(const key of ['eco','math','eng','zh'])c.subjects[key]={updated:0};
+ const p=prepareStagingPreview(c,a);
+ assert.equal(p.intendedDestination,'STAGING_ONLY_NO_PRODUCTION');
+ assert.equal(p.subjects.acc.study.ans.quizA,0);
+ assert.equal(p.subjects.acc.updated,123);
+ assert.equal(Object.keys(p.subjects.eco.study.ans).length,0);
+ assert.equal(Object.keys(p.subjects).length,5);
+ assert.equal(p.revisions.acc,null);
+});
+test('Browser preview fails closed on stale data and unverifiable KV source',()=>{
+ const {prepareStagingPreview}=fixture(),c=cloud(),a=admin();
+ for(const key of SUBJECTS)c.subjects[key]={updated:0};
+ a.entries['progress:acc']=JSON.stringify({study:{ans:{x:1}},updated:123});
+ assert.throws(()=>prepareStagingPreview(c,a),/Admin KV/);
+ a.entries['progress:acc']=null;
+ a.source='unverified-source';
+ assert.throws(()=>prepareStagingPreview(c,a),/Dashboard/);
+ a.source='owner-manual-dashboard-kv-pairs-read-only';
+ a.entries['progress:eco']='{"updated":0}';
+ assert.throws(()=>prepareStagingPreview(c,a),/Staging/);
+});
+test('Browser staging preview remains local and requires full verified input',()=>{
+ assert.match(html,/id="preview" disabled/);
+ assert.match(script,/stagePreview=prepareStagingPreview\(remote\.value,admin\.value\)/);
+ assert.match(html,/connect-src 'none'/);
+ assert.doesNotMatch(script,/\bfetch\s*\(|\bXMLHttpRequest\b|\bWebSocket\b|\bsendBeacon\b/);
 });

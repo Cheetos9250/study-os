@@ -61,3 +61,19 @@ The first-party `vocabloom/migration-audit.html` page can now accept three priva
 All comparison occurs within the browser and the page uses a CSP with `connect-src 'none'`, never connects to Cloudflare, and never uploads progress or keys. The report contains only format checks, per-subject statuses, file checksums and aggregate counts. It checks KV key absence versus present raw JSON, detects API mismatches, and refuses to mark a *stored* metadata-only payload as stageable. Even if all five KV entries match, the status stays `BLOCKED_FOR_PRODUCTION_MIGRATION` until writers are frozen, a server-side backup is independently verified, and the production migration + rollback procedure is approved.
 
 Cloudflare documents navigation via **Workers KV → target namespace → KV Pairs**. Never use Add entry, Edit, Delete or other mutation buttons while capturing these values. A manual five-key export is NOT an atomic/simultaneous snapshot and is NOT a substitute for a separate administrative namespace backup.
+
+
+## Phase 5 staging preview — private/offline, not a deployment
+
+The owner archived two backups in a private Google Drive folder: a VocaBLoom browser backup and a read-only Cloud API snapshot. A separately downloaded original production KV value for `progress:acc` was compared to its Cloud API snapshot and matched; a screenshot of the admin KV Pairs UI listed one key, but this **does not replace** independently marking all five keys as present/absent in a final administrative capture.
+
+A future staging preview requires a **manually verified** `vocabloom-production-kv-capture-v1` manifest containing the true bound Namespace ID and exact five key states from the production Cloudflare KV UI. The generated preview is refused unless the manifest and Cloud API snapshot agree on all five subjects. A source key marked absent can be translated to an empty staging schema **only if** (a) that absence was confirmed in the KV UI and (b) the API returned the exact synthetic `{"updated":0}` fallback. A present key with incomplete progress remains BLOCKED.
+
+Two equivalent **offline only** preparation options are available:
+
+- Open `vocabloom/migration-audit.html` in the browser, select Local Backup, Cloud Snapshot and Private KV Capture. Only after a complete match, the page enables **Download staging preview (private)**. The CSP blocks all network access; no credentials are requested, and no Worker writes are possible.
+- On a private machine with Node.js 22+, run `node experiments/study-sync-cas/prepare-staging-preview.mjs --cloud /private/cloud.json --kv-manifest /private/kv.json --output /private/staging-preview.json`. It rejects invalid/mismatched/incomplete values and refuses to write data inside the public repository. Output file creation is exclusive with private permissions. Its status `STAGING_PREVIEW_READY_NOT_DEPLOYED` does **not** authorize production cutover.
+
+The resulting artifact is shaped for the existing `import-staging.mjs` validation, but **do not run the import/apply operation** until isolated staging has been independently backed up, the original KV keys have been reconfirmed, and the owner has approved a specific staging-only import. The staging Worker has no Notion read/review endpoints; it is not a drop-in replacement for production `study-api`.
+
+No Cloudflare network request, Worker deploy or Production KV mutation occurs during the preview.

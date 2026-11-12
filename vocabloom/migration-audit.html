@@ -32,7 +32,7 @@ small,.muted{color:#58647b}#result{display:block;white-space:pre-wrap;overflow-w
 <label for="admin">3. Private KV capture จาก Cloudflare (เมื่อมีไฟล์)</label>
 <input id="admin" type="file" accept=".json,application/json">
 <small>สร้างจากหน้า Private KV Capture หลังตรวจ PROGRESS namespace ทั้ง 5 คีย์ ใช้เทียบข้อมูลต้นทางเท่านั้น ไม่ได้อนุญาตให้ย้ายระบบจริง</small>
-<div><button type="button" id="audit">ตรวจไฟล์แบบออฟไลน์</button><button type="button" id="export" disabled>ดาวน์โหลดรายงานสรุป (ไม่มีคำศัพท์/คะแนน)</button></div>
+<div><button type="button" id="audit">ตรวจไฟล์แบบออฟไลน์</button><button type="button" id="export" disabled>ดาวน์โหลดรายงานสรุป (ไม่มีคำศัพท์/คะแนน)</button><button type="button" id="preview" disabled>ดาวน์โหลดชุดข้อมูล Staging (เก็บส่วนตัว)</button></div>
 </section>
 <section class="card">
 <h2>ผลการตรวจสอบ</h2>
@@ -48,7 +48,7 @@ const SUBJECTS=['acc','eco','math','eng','zh'];
 const KEYS=['study-acc','acc-flashcards-v1-srs','study-eco','econ-flashcards-v1-srs',
  'study-math','math-flashcards-v1-srs','study-eng','eng-vocab-v1-srs','study-zh','zh-vocab-v1-srs'];
 const $=id=>document.getElementById(id);
-let lastReport=null;
+let lastReport=null,stagePreview=null;
 const record=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const fail=m=>{throw new Error(m)};
 const requireOk=(condition,message)=>{if(!condition)fail(message)};
@@ -180,9 +180,38 @@ function checkAdmin(manifest,cloud){
   note:'Read-only comparison only; production cutover remains BLOCKED.'
  };
 }
+
+function prepareStagingPreview(cloud,manifest){
+ const remote=checkRemote(cloud),admin=checkAdmin(manifest,cloud);
+ requireOk(admin.status==='MATCHED_INDEPENDENT_KV_EXPORT'&&admin.stagingPreviewReady,
+  'Admin KV ยังไม่ได้ยืนยันตรงกับ Cloud หรือโครงสร้างไม่พร้อมสำหรับ Staging');
+ requireOk(typeof cloud.capturedAt==='string'&&!Number.isNaN(Date.parse(cloud.capturedAt)),
+  'Cloud Snapshot ไม่มีวันที่บันทึกที่ใช้ตรวจสอบได้');
+ const subjects={},revisions={};
+ for(const key of SUBJECTS){
+  const raw=manifest.entries['progress:'+key];
+  const state=raw===null?
+   {study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}}:
+   JSON.parse(raw);
+  requireOk(record(state.study)&&record(state.srs)&&record(state.study.ans)&&
+   record(state.study.ats)&&record(state.srs.s)&&record(state.srs.m),
+   'KV '+key+' ไม่ครบสำหรับ Staging');
+  requireOk(byteLength(state)<=350000,'ข้อมูล KV '+key+' ใหญ่เกินข้อจำกัด Staging');
+  subjects[key]=state;
+  revisions[key]=null;
+ }
+ return {
+  format:'vocabloom-cloud-readonly-snapshot',version:1,
+  capturedAt:manifest.capturedAt,
+  sourceCapturedAt:cloud.capturedAt,
+  intendedDestination:'STAGING_ONLY_NO_PRODUCTION',
+  note:'Derived offline from independently verified original KV values; absent keys normalized only when the admin capture confirms absence. No Worker writes. Production migration remains BLOCKED.',
+  subjects,revisions
+ };
+}
 async function audit(){
  const out=$('result'),button=$('audit');
- lastReport=null;$('export').disabled=true;button.disabled=true;
+ lastReport=null;stagePreview=null;$('export').disabled=true;$('preview').disabled=true;button.disabled=true;
  out.textContent='กำลังตรวจรูปแบบและความครบถ้วนของข้อมูล...';
  try{
   const local=await readFile($('local').files[0],'Local');
@@ -197,6 +226,10 @@ async function audit(){
   if(adminFile&&!remote)throw Error('ต้องเลือก Cloud snapshot ก่อนเทียบ Admin KV');
   const admin=adminFile?await readFile(adminFile,'Admin KV'):null;
   const adminCheck=admin?checkAdmin(admin.value,remote.value):null;
+  if(adminCheck&&adminCheck.status==='MATCHED_INDEPENDENT_KV_EXPORT'&&adminCheck.stagingPreviewReady){
+   stagePreview=prepareStagingPreview(remote.value,admin.value);
+   $('preview').disabled=false;
+  }
   const notes=[
    'ยังไม่ได้ยืนยันว่ารุ่นโค้ด Worker ที่ตรวจตรงกับ Deployment จริง',
    'ยังไม่มีหลักฐานสำรองข้อมูลจากฝั่งเซิร์ฟเวอร์พร้อมวิธีกู้คืน',
@@ -263,6 +296,16 @@ function exportReport(){
  link.download='vocabloom-phase5-audit-summary.json';document.body.append(link);link.click();link.remove();
  setTimeout(()=>URL.revokeObjectURL(link.href),1000);
 }
+function downloadStagingPreview(){
+ if(!stagePreview)return;
+ const url=URL.createObjectURL(new Blob([JSON.stringify(stagePreview,null,2)],
+  {type:'application/json;charset=utf-8'}));
+ const link=document.createElement('a');link.href=url;
+ link.download='vocabloom-staging-preview-private.json';
+ document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$('preview').addEventListener('click',downloadStagingPreview);
 $('audit').addEventListener('click',audit);
 $('export').addEventListener('click',exportReport);
 })();
