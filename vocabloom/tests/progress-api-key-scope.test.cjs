@@ -10,6 +10,7 @@ const ORIGINAL='https://study-api.kasidit09022550.workers.dev';
 const FUTURE='https://example-progress-worker.invalid';
 const OLD_KEY='OLD_CONTENT_WORKER_SECRET_SHOULD_NOT_LEAK';
 const NEW_KEY='NEW_PROGRESS_WORKER_SECRET';
+const SCOPED_KEY=JSON.stringify({endpoint:FUTURE,key:NEW_KEY});
 const SUBJECTS=['acc.html','eco.html','math.html','eng.html','zh.html'];
 function config(progress_api){
  return progress_api===null?{api:ORIGINAL}:{api:ORIGINAL,progress_api};
@@ -58,7 +59,7 @@ test('Live default route keeps original key and all previous enabled state',asyn
  }
 });
 test('Explicitly different progress_api only accepts a separate progress key; old key stays intact',async()=>{
- const storage=fakeStorage({'study-sync-key':OLD_KEY,'study-sync-progress-key-v1':NEW_KEY,
+ const storage=fakeStorage({'study-sync-key':OLD_KEY,'study-sync-progress-key-v1':SCOPED_KEY,
   'vocabloom-auto-sync-v1':'1'});
  const v=unified(config(FUTURE),storage);
  assert.equal(await v.url(),FUTURE);
@@ -103,15 +104,44 @@ test('Same URL in optional progress_api uses original key and does not disable a
 });
 test('User-driven key changes/deletion route only to selected endpoint scope',()=>{
  const all=read('vocabloom/unified-progress.js');
- assert.match(all,/cSafeSet\(cCloudStorageKey\(\),k\.trim\(\)\)/);
+ assert.match(all,/cSafeSet\(cCloudStorageKey\(\),stored\)/);
  assert.match(all,/localStorage\.removeItem\(cCloudStorageKey\(\)\)/);
  assert.match(all,/const api=await cApiUrl\(\),key=cCloudKey\(\);/);
  assert.match(all,/if\(!key\)throw Error\(/);
  for(const file of SUBJECTS){
   const s=read(file);
-  assert.match(s,/localStorage\.setItem\(progressKeyName,k\)/,file);
+  assert.match(s,/localStorage\.setItem\(progressKeyName,scoped\)/,file);
   assert.match(s,/localStorage\.removeItem\(progressKeyName\)/,file);
   assert.match(s,/btnEl\.onclick=async\(\)=>\{ await cfg\(\);/,file);
   assert.match(s,/const base=await cfg\(\);[\s\S]{0,220}if\(!key\(\)\)/,file);
  }
+});
+
+test('An unbound plain Progress secret is invalid after endpoint hardening, on all six clients',async()=>{
+ const storage=fakeStorage({'study-sync-key':OLD_KEY,'study-sync-progress-key-v1':NEW_KEY});
+ const bridge=unified(config(FUTURE),storage);
+ assert.equal(await bridge.url(),FUTURE);
+ assert.equal(bridge.key(),'');
+ for(const file of SUBJECTS){
+  const page=legacy(file,config(FUTURE),storage);
+  await page.cfg();
+  assert.equal(page.key(),'',file);
+  assert.equal(page.hdr()['X-Sync-Key'],'',file);
+ }
+ assert.equal(storage.getItem('study-sync-progress-key-v1'),NEW_KEY,
+  'Old unbound value is not silently deleted or sent');
+});
+test('A secret scoped to one Progress URL must never be sent to another URL',async()=>{
+ const rotated='https://another-progress-worker.invalid';
+ const storage=fakeStorage({'study-sync-key':OLD_KEY,'study-sync-progress-key-v1':SCOPED_KEY});
+ const bridge=unified(config(rotated),storage);
+ assert.equal(await bridge.url(),rotated);
+ assert.equal(bridge.key(),'');
+ for(const file of SUBJECTS){
+  const page=legacy(file,config(rotated),storage);
+  await page.cfg();
+  assert.equal(page.hdr()['X-Sync-Key'],'',file);
+ }
+ assert.equal(storage.getItem('study-sync-progress-key-v1'),SCOPED_KEY,
+  'The old key remains bound to its original endpoint, not rotated automatically');
 });
