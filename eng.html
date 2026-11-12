@@ -535,26 +535,47 @@ window.__xs=(()=>{
     } finally { applying=false; }
   }
   async function sync(manual){
-    // Legacy Study OS: never write to Cloudflare from page-load, visibility or auto-save.
-    // Production Worker does not yet protect concurrent GET/PUT updates (SY-08).
+    // Deliberate manual click only; never run on page load, visibility or rating.
     if(!manual||busy) return;
     if(!key()){ askKey(); return; }
-    if(!window.confirm('Cloud Sync ยังไม่ผ่านการทดสอบการเขียนพร้อมกันหลายอุปกรณ์\n\nการซิงก์ครั้งนี้จะอ่านและเขียนข้อมูลวิชา '+D.key+' ขึ้น Cloudflare Worker โปรดสำรองคะแนนก่อน และอย่าเปิดซิงก์บนอีกอุปกรณ์พร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
+    if(!window.confirm('การซิงก์จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Cloudflare Worker\n\nหาก Worker ยังไม่รองรับ ETag/If-Match การซิงก์แบบเดิมอาจเขียนทับคะแนนเมื่อใช้อีกอุปกรณ์พร้อมกัน กรุณาสำรองคะแนนและหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
     const base=await cfg();
-    if(!base) { if(manual) say('ยังไม่ได้ตั้งค่า api ใน data/config.json'); return; }
-    busy=true; say('กำลังซิงก์…',true);
+    if(!base){ say('ยังไม่ได้ตั้งค่า api ใน data/config.json'); return; }
+    busy=true;say('กำลังตรวจเวอร์ชันและซิงก์…',true);
     try{
       const url=base+'/progress/'+D.key;
-      const r=await fetch(url,{headers:hdr()});
-      if(r.status===401){ say('รหัสซิงก์ไม่ถูกต้อง กดปุ่มเพื่อตั้งใหม่'); try{ localStorage.removeItem(LSK); }catch(e){} busy=false; paint(); return; }
-      if(!r.ok) throw new Error('get '+r.status);
-      const remote=await r.json(); const merged=merge(local(), remote||{});
-      const p=await fetch(url,{method:'PUT',headers:hdr(),body:JSON.stringify(merged)});
-      if(!p.ok) throw new Error('put '+p.status);
-      apply(merged);
+      let done=false;
+      for(let attempt=1;attempt<=6;attempt++){
+        const r=await fetch(url,{headers:hdr(),cache:'no-store'});
+        if(r.status===401){
+          say('รหัสซิงก์ไม่ถูกต้อง กดปุ่มเพื่อตั้งใหม่');
+          try{localStorage.removeItem(LSK);}catch(e){}
+          busy=false;paint();return;
+        }
+        if(!r.ok)throw Error('GET HTTP '+r.status);
+        const etag=r.headers?.get?.('ETag')||'';
+        const revision=/^"[0-9]+"$/.test(etag)?etag:'';
+        const remote=await r.json();
+        if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error))
+          throw Error('ข้อมูล Worker ไม่ถูกต้อง');
+        const snapshot=local(),baseline=JSON.stringify(snapshot);
+        const joined=merge(snapshot,remote||{});
+        const headers=revision?{...hdr(),'If-Match':revision}:hdr();
+        const p=await fetch(url,{method:'PUT',headers,body:JSON.stringify(joined)});
+        if(revision&&(p.status===409||p.status===412))continue;
+        if(p.status===428)throw Error('Worker ต้องการ If-Match แต่ไม่ส่ง ETag กลับมา');
+        if(!p.ok)throw Error('PUT HTTP '+p.status);
+        if(JSON.stringify(local())!==baseline){
+          if(revision)continue;
+          throw Error('คะแนนเปลี่ยนระหว่างซิงก์แบบเดิม ยังไม่เขียนทับคะแนนในเครื่อง');
+        }
+        apply(joined);
+        done=true;break;
+      }
+      if(!done)throw Error('ข้อมูลเปลี่ยนพร้อมกันเกิน 6 รอบ คะแนนบนเครื่องยังอยู่');
       say('ซิงก์แล้ว '+hhmm(),true);
-    }catch(e){ say('ซิงก์ไม่สำเร็จ ลองใหม่อีกครั้ง'); }
-    busy=false; paint();
+    }catch(e){say('ซิงก์ไม่สำเร็จ: '+String(e.message||e));}
+    busy=false;paint();
   }
   function askKey(){
     let k=''; try{ k=window.prompt('ใส่รหัส SYNC_KEY สำหรับ Cloudflare Worker\n\nหน้า Study OS รุ่นเก่าไม่ซิงก์อัตโนมัติอีกต่อไป เพื่อป้องกันความเสี่ยงข้อมูลถูกเขียนทับ การใส่รหัสจะขอยืนยันก่อนซิงก์เอง 1 ครั้ง')||''; }catch(e){}
