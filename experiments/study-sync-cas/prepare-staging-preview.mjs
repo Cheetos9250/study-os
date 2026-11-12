@@ -87,7 +87,7 @@ export function prepareStagingPreview(snapshot,manifest){
   capturedAt:manifest.capturedAt,
   sourceCapturedAt:snapshot.capturedAt,
   intendedDestination:'STAGING_ONLY_NO_PRODUCTION',
-  note:'Offline transformed preview; 4 possible missing KV values are normalized ONLY if independently confirmed absent by admin KV capture. Not a production migration approval.',
+  note:'Offline transformed preview; Missing KV values are normalized ONLY if independently confirmed absent by admin KV capture. Not a production migration approval.',
   subjects:normalized,
   revisions:Object.fromEntries(SUBJECTS.map(s=>[s,null]))
  };
