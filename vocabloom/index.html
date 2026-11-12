@@ -236,7 +236,9 @@ function parseNotionExport(payload){
   const example=(parts.length>2?parts.slice(2).join('|'):'').split(' = ')[0].trim();
   if(!en||!th||!example||en.length>85||!example.toLowerCase().includes(en.toLowerCase())||seen.has(en.toLowerCase()))continue;
   seen.add(en.toLowerCase());
-  words.push({id:'notion-'+String(row.url||en).replace(/[^a-zA-Z0-9]/g,'').slice(-40),en,th,example,emoji:'📰',category:'notion',level:'B1–B2'});
+  // Preserve historical VocaBloom word IDs exactly; only the public JSON stops exposing full URLs.
+  const legacyIdSource=/^[0-9a-f]{32}$/i.test(String(row.page_id||''))?'httpsappnotioncomp'+row.page_id:String(row.url||en);
+  words.push({id:'notion-'+legacyIdSource.replace(/[^a-zA-Z0-9]/g,'').slice(-40),en,th,example,emoji:'📰',category:'notion',level:'B1–B2'});
  }
  if(!words.length)throw Error('No usable Verified words');
  return {words,updated:String(payload.updated||'')};
