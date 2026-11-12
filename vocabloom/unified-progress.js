@@ -33,11 +33,16 @@ function cStudyRecord(correct){
  o.answered=(Number(o.answered)||0)+1;o.correct=(Number(o.correct)||0)+(correct?1:0);
  CLOCAL.studyDays[date]=o;cSafeSet(CLOUD_STUDY_DAYS,JSON.stringify(CLOCAL.studyDays));
 }
-function cOriginalCardFor(w){
+function cEnglishCardMap(){
  const d=typeof uDeck==='function'?uDeck('eng'):null;
- if(!d||typeof uCards!=='function')return null;
- const k=cWordKey(w.en);return uCards(d).find(c=>cWordKey(c.f)===k)||null;
+ if(!d||typeof uCards!=='function')return new Map();
+ if(CLOUD.cardCache&&CLOUD.cardCache.deck===d&&CLOUD.cardCache.rows===USTATE.rows)return CLOUD.cardCache.map;
+ const map=new Map();
+ for(const c of uCards(d)){const k=cWordKey(c.f);if(k&&!map.has(k))map.set(k,c);}
+ CLOUD.cardCache={deck:d,rows:USTATE.rows,map};
+ return map;
 }
+function cOriginalCardFor(w){return cEnglishCardMap().get(cWordKey(w.en))||null;}
 function cWordForCard(c){
  if(!c||typeof allWords!=='function')return null;
  const k=cWordKey(c.f);return allWords().find(w=>cWordKey(w.en)===k)||null;
@@ -70,7 +75,11 @@ function cBridgeExistingSrs(){
    const correct=Number(st.last||0)>=3;
    data.progress[w.id]={...p,seen:true,mastered:st.st==='rev'&&Number(st.ivl||0)>=7,streak:correct?Math.max(1,Number(p.streak||0)):0,interval:Math.max(1,Number(st.ivl||1)),due:localDate(new Date(Number(st.due||Date.now()))),last:localDate(new Date(Number(st.ts||Date.now()))),syncTs:Number(st.ts)};
    changed=true;
-  }else if(p.seen&&local>Number(st?.ts||0))cBridgeGameToCard(w.id,Number(p.streak||0)>0);
+  }else if(p.seen&&local>Number(st?.ts||0)){
+   const state=uReadSrs(d),due=Date.parse(String(p.due||cDate())+'T00:00:00+07:00');
+   state.s[c.mid]={...(st||{}),st:'rev',step:0,ease:Number(st?.ease)||2.5,ivl:Math.max(1,Number(p.interval)||1),lapses:Number(p.wrong)||0,due:Number.isFinite(due)?due:Date.now(),ts:local,last:Number(p.streak||0)>0?3:1};
+   cSafeSet(d.markKey+'-srs',JSON.stringify(state));
+  }
  }
  if(changed)store();
 }
