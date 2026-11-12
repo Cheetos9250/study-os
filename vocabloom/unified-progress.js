@@ -205,7 +205,9 @@ function cCloudKey(){return String(cSafeGet(CLOUD_KEY)||'').trim();}
  * Legacy KV is manual-confirmation-only. Never background-write an unversioned response. */
 const CLOUD_MAX_RETRIES=6;
 function cCloudRevision(response){
- const value=response?.headers?.get?.('ETag')||'';
+ // Prefer application-level CAS revision because Cloudflare compression can weaken ETag.
+ // A present but malformed custom revision must NOT silently fall back to ETag.
+ const value=response?.headers?.get?.('X-Sync-Revision')??response?.headers?.get?.('ETag')??'';
  return /^"[0-9]+"$/.test(value)?value:'';
 }
 async function cCloudSync(manual=false){
