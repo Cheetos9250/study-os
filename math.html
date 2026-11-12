@@ -409,7 +409,7 @@ function setExt(rows){
   for(let i=CARDS.length-1;i>=0;i--) if(String(CARDS[i].mid).startsWith('n-')) CARDS.splice(i,1);
   extN=0;
   (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Front) return;
-    const mid='n-'+String(r.url||r.Front).split('?')[0].split('/').pop();
+    const mid='n-'+String(r.page_id||r.url||r.Front).split('?')[0].split('/').pop();
     if(CARDS.some(c=>c.mid===mid)) return;
     CARDS.push({id:CARDS.length,cat:hit[0],f:r.Front,b:r.Back||'',ref:r.Ref||'',mid}); extN++; });
 }
@@ -448,7 +448,7 @@ function setExtQ(rows){
   (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Question||!r.Correct) return;
     const opts=[r.Correct,r['Wrong 1'],r['Wrong 2'],r['Wrong 3']].filter(x=>x&&String(x).trim());
     if(opts.length<2) return;
-    const id='n-'+String(r.url||r.Question).split('?')[0].split('/').pop();
+    const id='n-'+String(r.page_id||r.url||r.Question).split('?')[0].split('/').pop();
     let s=hashN(id)+49297; const rn=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
     const idx=opts.map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(rn()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
     QS.push({id,cat:hit[0],q:r.Question,opts,exp:r.Explanation||'',order:idx,right:0}); });
