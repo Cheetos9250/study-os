@@ -26,7 +26,7 @@ function unified(obj,storage){
  assert.ok(first>=0&&last>first);
  const cloud={api:'',progressSplit:false,enabled:true};
  const ctx={CLOUD:cloud,CLOUD_KEY:'study-sync-key',CLOUD_PROGRESS_KEY:'study-sync-progress-key-v1',
-  CLOUD_AUTO:'vocabloom-auto-sync-v1',cSafeGet:k=>storage.getItem(k),
+  CLOUD_AUTO:'vocabloom-auto-sync-v1',CLOUD_AUTO_ENDPOINT:'vocabloom-auto-sync-endpoint-v1',cSafeGet:k=>storage.getItem(k),
   cSafeSet:(k,v)=>{storage.setItem(k,v);return true},
   fetch:async()=>({ok:true,json:async()=>obj})};
  vm.runInNewContext(full.slice(first,last)+
