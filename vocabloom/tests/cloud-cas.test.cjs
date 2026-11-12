@@ -136,10 +136,13 @@ test('Six repeated conflict responses fail with local data intact',async()=>{
  assert.equal(f.requests.filter(x=>x.method==='PUT').length,6);
  assert.ok(f.status().includes('6 รอบ'));
 });
-test('Auto Sync button cannot trigger unsafe manual fallback',()=>{
+test('Auto Sync button delegates to endpoint-aware opt-in, never unsafe direct toggle',()=>{
  const first=src.indexOf("if(el.dataset.action==='cloud-auto')");
  assert.ok(first>=0);
- assert.ok(src.slice(first,first+230).includes('cCloudSync(false)'));
+ assert.ok(src.slice(first,first+110).includes('cToggleAuto()'));
+ assert.match(src,/async function cToggleAuto\(\)\{/);
+ assert.match(src,/cSafeSet\(CLOUD_AUTO_ENDPOINT,CLOUD\.api\)/);
+ assert.match(src,/cCloudSync\(false\)/);
 });
 
 test('Cloudflare weak ETag with valid custom revision remains CAS safe for five subjects',async()=>{
