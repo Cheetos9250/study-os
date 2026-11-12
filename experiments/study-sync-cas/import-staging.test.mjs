@@ -44,7 +44,9 @@ function fixture(){
  const fetchImpl=async(url,opts={})=>{
   requests.push({url:String(url),method:opts.method||'GET',
    hasRevision:!!opts.headers?.['If-Match']});
-  if(!String(url).startsWith('http://127.0.0.1:8787/progress/'))
+  const path=new URL(url).pathname;
+  if(!String(url).startsWith('http://127.0.0.1:8787/')||
+     (!path.startsWith('/progress/')&&path!=='/__staging/health'))
    throw Error('Unexpected non-test endpoint '+String(url));
   return worker.fetch(new Request(url,opts),env);
  };
@@ -103,7 +105,7 @@ test('Staging import preflights all five and checks exact readback hashes',async
  assert.equal(result.subjects.length,5);
  assert.ok(result.subjects.every(x=>x.status==='imported-and-verified'));
  assert.equal(f.requests.filter(x=>x.method==='PUT').length,5);
- assert.equal(f.requests.filter(x=>x.method==='GET').length,10);
+ assert.equal(f.requests.filter(x=>x.method==='GET').length,11);
  assert.ok(f.requests.filter(x=>x.method==='PUT').every(x=>x.hasRevision));
  for(const d of SUBJECTS){
   const res=await f.fetchImpl(f.baseUrl+'/progress/'+d,{headers:{'X-Sync-Key':KEY}});
@@ -152,7 +154,7 @@ test('Failed third write can be resumed without overwriting previously imported 
 
 test('Wrong test key aborts staging import with no writes',async()=>{
  const f=fixture(),s=snapshot();
- await assert.rejects(importIntoStaging(s,{...opts(f),key:'BAD_KEY'}),/Staging GET failed \(401\)/);
+ await assert.rejects(importIntoStaging(s,{...opts(f),key:'BAD_KEY'}),/Staging identity check failed \(401\)/);
  assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
 });
 
@@ -193,4 +195,21 @@ test('Canonical hash includes prototype-named keys without mutating prototypes',
 });
 test('Staging hostname rejects extra nested subdomain tricks',()=>{
  assert.throws(()=>ensureStagingUrl('https://study-api-cas-staging-only.fake.evil.workers.dev'),/Refusing non-staging/);
+});
+
+test('Importer rejects malformed or missing staging identity before any subject operations',async()=>{
+ for(const failure of ['missing','wrong-protocol','unauthorized']){
+  const f=fixture(),s=snapshot();
+  const fetchImpl=async(url,options={})=>{
+   if(new URL(url).pathname==='/__staging/health'){
+    if(failure==='unauthorized')return new Response(JSON.stringify({error:'no'}),{status:401});
+    if(failure==='missing')return new Response('not JSON',{status:200});
+    return new Response(JSON.stringify({staging:true,protocol:'unexpected',subjects:SUBJECTS}),{status:200});
+   }
+   return f.fetchImpl(url,options);
+  };
+  await assert.rejects(importIntoStaging(s,{...opts(f),fetchImpl}),/identity/i);
+  assert.equal(f.requests.filter(x=>new URL(x.url).pathname.startsWith('/progress/')).length,0);
+  assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
+ }
 });
