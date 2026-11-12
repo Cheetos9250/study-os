@@ -196,3 +196,40 @@ test('Dedicated binding absence returns controlled error without falling back to
  assert.equal(r.status,503);
  assert.equal(f.buckets.size,0);
 });
+
+
+test('Durable Object revision persists after a simulated isolate restart',async()=>{
+ const f=fixture({PROGRESS_WRITES_ENABLED:'true',PROGRESS_MIGRATION_VERIFIED:'true'});
+ const first=await f.req('PUT','/progress/zh',{
+  headers:{'If-Match':'"0"'},body:BLANK()
+ });
+ assert.equal(first.status,200);
+ const key='vocabloom:production-progress:v1:zh';
+ const stored=f.buckets.get(key);
+ assert.ok(stored instanceof Map);
+ const restarted=new ProductionProgressDO({storage:{kv:{
+  get:k=>stored.get(k),put:(k,v)=>stored.set(k,structuredClone(v))
+ }}});
+ const r=await restarted.fetch(new Request(HOST+'/progress/zh',{method:'GET'}));
+ assert.equal(r.headers.get('X-Sync-Revision'),'"1"');
+ assert.deepEqual(await r.json(),BLANK());
+});
+test('Synchronous CAS critical section cannot be interrupted by await between read and write',()=>{
+ const root=dirname(fileURLToPath(import.meta.url));
+ const text=readFileSync(resolve(root,'worker.mjs'),'utf8');
+ const start=text.indexOf("const current=this.ctx.storage.kv.get('record')");
+ const end=text.indexOf("this.ctx.storage.kv.put('record',next)",start);
+ assert.ok(start>=0&&end>start);
+ const between=text.slice(start,end);
+ assert.doesNotMatch(between,/\bawait\b/);
+ assert.match(between,/if\(expected!==/);
+});
+test('Offline candidate CI workflow has zero deployment steps and requests no secrets',()=>{
+ const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
+ const workflow=readFileSync(resolve(root,'.github/workflows/prod-progress-cas-tests.yml'),'utf8');
+ assert.match(workflow,/node --test experiments\/prod-progress-cas\/\*\.test\.mjs/);
+ assert.match(workflow,/contents: read/);
+ assert.doesNotMatch(workflow,/\bwrangler\s+(?:deploy|publish|secret)\b/);
+ assert.doesNotMatch(workflow,/\bsecrets\s*\./);
+ assert.doesNotMatch(workflow,/\bcloudflare\/wrangler-action\b/i);
+});
