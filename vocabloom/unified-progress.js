@@ -208,6 +208,50 @@ function cSetKey(){
  if(!k.trim()){cCloudNotice('ยังไม่ได้ตั้งรหัสซิงก์');return}
  cSafeSet(CLOUD_KEY,k.trim());CLOUD.enabled=true;cSafeSet(CLOUD_AUTO,'1');cCloudSync(true);render();
 }
+
+async function cFullRestore(file){
+ if(!file)return;
+ if(CLOUD.busy){cCloudNotice('กรุณารอให้ซิงก์เสร็จก่อนนำเข้าข้อมูล',true);return;}
+ let saved=null,oldData=null,oldDays=null,oldStudyDays=null;
+ try{
+  if(Number(file.size)>8*1024*1024)throw Error('ไฟล์ใหญ่เกิน 8 MB');
+  const payload=JSON.parse(await file.text());
+  if(payload?.type!=='vocabloom-unified-study-backup'||payload.version!==1)throw Error('ไม่ใช่ไฟล์ Full backup ของ VocaBloom');
+  const v=payload.vocabloom,subs=payload.subjects;
+  if(!v||!v.progress||!v.days||!Array.isArray(v.custom)||!v.settings||!subs||typeof subs!=='object')throw Error('โครงสร้างข้อมูลสำรองไม่ครบ');
+  const writes={};
+  for(const d of USTATE.decks){
+   const k1='study-'+d.key,k2=d.markKey+'-srs',a=subs[k1],b=subs[k2];
+   if(!a||!b||typeof a!=='object'||typeof b!=='object'||!a.ans||!b.s||!b.m)throw Error('ไม่มีข้อมูลวิชา '+d.key);
+   writes[k1]=JSON.stringify(a);writes[k2]=JSON.stringify(b);
+  }
+  writes[STORAGE_KEY]=JSON.stringify(v);
+  const otherDevice=!!payload.deviceId&&payload.deviceId!==CLOCAL.device;
+  const importedDays=!otherDevice&&payload.deviceDays&&typeof payload.deviceDays==='object'?payload.deviceDays:{};
+  const importedStudyDays=!otherDevice&&payload.studyDays&&typeof payload.studyDays==='object'?payload.studyDays:{};
+  writes[CLOUD_LOCAL_DAYS]=JSON.stringify(importedDays);
+  writes[CLOUD_STUDY_DAYS]=JSON.stringify(importedStudyDays);
+  if(!window.confirm('นำเข้า Full backup แล้วเขียนทับคะแนนในเบราว์เซอร์นี้ทั้ง 5 วิชาใช่หรือไม่? ควรดาวน์โหลด Full backup ปัจจุบันก่อน'))return;
+  saved=Object.fromEntries(Object.keys(writes).map(key=>[key,cSafeGet(key)]));
+  oldData=structuredClone(data);oldDays=structuredClone(CLOCAL.days);oldStudyDays=structuredClone(CLOCAL.studyDays);
+  for(const [key,value] of Object.entries(writes))if(!cSafeSet(key,value))throw Error('พื้นที่เก็บข้อมูลไม่เพียงพอ');
+  data=structuredClone(v);CLOCAL.days=structuredClone(importedDays);CLOCAL.studyDays=structuredClone(importedStudyDays);
+  CLOUD.studyMergedDays=null;CLOUD.remoteStatus='restored locally';
+  cCloudNotice('กู้คืนข้อมูลครบ 5 วิชาบนเครื่องนี้แล้ว · ยังไม่ได้ส่งข้อมูลขึ้น Cloudflare');
+  render();
+ }catch(e){
+  if(saved){
+   for(const [key,value] of Object.entries(saved)){
+    try{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}catch{}
+   }
+   if(oldData)data=oldData;
+   if(oldDays)CLOCAL.days=oldDays;
+   if(oldStudyDays)CLOCAL.studyDays=oldStudyDays;
+  }
+  cCloudNotice('นำเข้าไม่สำเร็จ: '+String(e.message||e),true);
+ }
+}
+
 function cForgetKey(){
  if(!cCloudKey())return;
  if(!window.confirm('ลบรหัส SYNC_KEY ออกจากเบราว์เซอร์นี้ใช่หรือไม่? จะไม่ลบคะแนนการเรียนที่บันทึกไว้'))return;
@@ -218,7 +262,7 @@ function cForgetKey(){
 }
 function cPanel(){
  const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'ยังไม่เคยยืนยันการซิงก์';
- return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก</p></div>';
+ return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
 }
 
 function cFullBackup(){
@@ -227,13 +271,14 @@ function cFullBackup(){
   subjectStorage['study-'+d.key]=cSafeJSON('study-'+d.key,{});
   subjectStorage[d.markKey+'-srs']=cSafeJSON(d.markKey+'-srs',{});
  }
- const payload={version:1,type:'vocabloom-unified-study-backup',createdAt:new Date().toISOString(),vocabloom:structuredClone(data),deviceDays:CLOCAL.days,studyDays:CLOCAL.studyDays,subjects:subjectStorage};
+ const payload={version:1,type:'vocabloom-unified-study-backup',createdAt:new Date().toISOString(),deviceId:CLOCAL.device,vocabloom:structuredClone(data),deviceDays:CLOCAL.days,studyDays:CLOCAL.studyDays,subjects:subjectStorage};
  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vocabloom-full-backup-'+cDate()+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
  cCloudNotice('ส่งออกสำรองทั้ง 5 วิชาแล้ว (ไม่รวม SYNC_KEY)');
 }
 
 function cPanelAction(el){
+ if(el.dataset.action==='cloud-restore'){document.getElementById('fullRestoreInput')?.click();return true;}
  if(el.dataset.action==='cloud-forget'){cForgetKey();return true;}
  if(el.dataset.action==='cloud-backup'){cFullBackup();return true;}
  if(el.dataset.action==='cloud-config'){cSetKey();return true;}
@@ -285,6 +330,7 @@ function cInstall(){
  progressHTML=function(){return oldProgress()+cDashboardExtra();};
  const oldHandle=handleAction;
  handleAction=function(el){if(cPanelAction(el))return;const action=el.dataset.action;if(action==='favorite'){const result=oldHandle(el);const p=data.progress[el.dataset.word];if(p){p.syncTs=Date.now();store();cCloudDebounce();}return result;}const result=oldHandle(el);if(action==='u-answer')cCloudDebounce();return result;};
+ document.addEventListener('change',e=>{if(e.target.id==='fullRestoreInput'){const file=e.target.files?.[0];e.target.value='';cFullRestore(file);}});
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cCloudKey()&&CLOUD.enabled&&Date.now()-CLOUD.last>60000)cCloudSync(false);});
  window.addEventListener('storage',e=>{if(e.key===CLOUD_KEY&&cCloudKey()&&CLOUD.enabled)cCloudDebounce();});
  setInterval(()=>{if(document.visibilityState==='visible'&&cCloudKey()&&CLOUD.enabled&&Date.now()-CLOUD.last>300000)cCloudSync(false);},300000);
