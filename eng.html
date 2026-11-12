@@ -341,7 +341,7 @@ function scopeT(){ const sc=CARDS.filter(c=>c.cat===fcat); const seen=sc.filter(
 function renderSync(){
   const box=$('#sync'); const page=(D.pages||{})[fcat];
   if(!box) return;
-  if(fcat==='all'||!page||!((owner&&mcp)||(window.__xs&&window.__xs.ready()))){ box.hidden=true; return; }
+  if(fcat==='all'||!page||!((owner&&mcp)||(window.__xs&&window.__xs.reviewReady()))){ box.hidden=true; return; }
   const t=scopeT(); if(t.n===0||t.g+t.b<t.n){ box.hidden=true; return; }
   box.hidden=false; const pass=t.g/t.n>=PASS, pct=Math.round(t.g/t.n*100);
   $('#syncText').textContent=pass?'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ผ่านเกณฑ์ 80% → Review Step จะเพิ่ม 1 ขั้น':'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ต่ำกว่า 80% → Review Step จะกลับเป็น 0 (ทบทวนอีกครั้งพรุ่งนี้)';
@@ -365,7 +365,9 @@ async function syncViaApi(){
   syncing=true; $('#syncBtn').disabled=true; msg.className=''; msg.textContent='กำลังบันทึกลง Notion…';
   let done=false;
   try{
-    const r=await fetch(X.api()+'/review',{method:'POST',headers:X.hdr(),body:JSON.stringify({page,pass})});
+    const reviewApi=await X.reviewApi();
+    if(!X.reviewReady())throw Error('Original Notion Worker credential is missing');
+    const r=await fetch(reviewApi+'/review',{method:'POST',headers:X.reviewHdr(),body:JSON.stringify({page,pass})});
     const j=await r.json().catch(()=>({}));
     if(r.status===401){ msg.className='err'; msg.textContent='รหัสซิงก์ไม่ถูกต้อง กดปุ่ม ☁ มุมขวาล่างเพื่อตั้งรหัสใหม่'; }
     else if(!r.ok||!j.ok){ msg.className='err'; msg.textContent='บันทึกไม่สำเร็จ ('+(j.error||r.status)+')'; }
@@ -499,10 +501,10 @@ cardsRow(); renderCard(); renderSum(); buildDeck(); renderQ();
 /* ---------- cross-device progress sync + Notion save via the Worker ---------- */
 window.__xs=(()=>{
   const LSK='study-sync-key', PROGRESS_LSK='study-sync-progress-key-v1';
-  let api='', progressKeyName=LSK, timer=null, busy=false, applying=false, box=null, msgEl=null, btnEl=null;
+  let api='', contentApi='', progressKeyName=LSK, timer=null, busy=false, applying=false, box=null, msgEl=null, btnEl=null;
   const key=()=>{ try{ return localStorage.getItem(progressKeyName)||''; }catch(e){ return ''; } };
   const hdr=()=>({'X-Sync-Key':key(),'Content-Type':'application/json'});
-  async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); const original=String(j.api||'').replace(/\/+$/,''); const next=String(j.progress_api||original).replace(/\/+$/,''); api=next; progressKeyName=next&&next!==original?PROGRESS_LSK:LSK; } }catch(e){} return api; }
+  async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); const original=String(j.api||'').replace(/\/+$/,''); const next=String(j.progress_api||original).replace(/\/+$/,''); contentApi=original; api=next; progressKeyName=next&&next!==original?PROGRESS_LSK:LSK; } }catch(e){} return api; }
   const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'var(--ok,#1d7a4a)':'var(--bad,#b3261e)'; } };
   const hhmm=()=>new Intl.DateTimeFormat('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date());
   function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[]}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
@@ -607,7 +609,11 @@ window.__xs=(()=>{
   // LocalStorage writes still happen immediately in save() and saveS().
   // Do not dispatch background GET/PUT even if the browser already has a SYNC_KEY.
   return { dirty(){ /* intentionally local-only until explicit opt-in/manual click */ },
-    ready(){ return !!(api&&key()); }, api:()=>api, hdr, sync };
+    ready(){ return !!(api&&key()); },
+    reviewReady(){try{return !!(contentApi&&localStorage.getItem(LSK))}catch(e){return false}},
+    reviewApi:async()=>{await cfg();return contentApi;},
+    reviewHdr:()=>({'X-Sync-Key':String((()=>{try{return localStorage.getItem(LSK)||''}catch(e){return ''}})()),'Content-Type':'application/json'}),
+    api:()=>api, hdr, sync };
 })();
 </script>
 
