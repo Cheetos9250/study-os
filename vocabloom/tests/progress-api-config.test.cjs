@@ -17,7 +17,7 @@ function vocabloomResolver(obj){
  const first=src.indexOf('async function cApiUrl(){');
  const last=src.indexOf('function cCloudKey()',first);
  assert.ok(first>=0&&last>first);
- const ctx={CLOUD:{api:''},fetch:async()=>response(obj)};
+ const ctx={CLOUD:{api:'',enabled:true,progressSplit:false},CLOUD_AUTO:'vocabloom-auto-sync-v1',cSafeSet:()=>true,fetch:async()=>response(obj)};
  vm.runInNewContext(src.slice(first,last)+'\nthis.cApiUrl=cApiUrl;',ctx,{timeout:1000});
  return ctx.cApiUrl;
 }
@@ -26,8 +26,8 @@ function legacyResolver(file,obj){
  const first=src.indexOf('async function cfg(){');
  const last=src.indexOf('  const say=',first);
  assert.ok(first>=0&&last>first,'Cannot extract sync cfg in '+file);
- const ctx={fetch:async()=>response(obj)};
- vm.runInNewContext("let api='';\n"+src.slice(first,last)+'\nthis.cfg=cfg;',ctx,{timeout:1000});
+ const ctx={fetch:async()=>response(obj),LSK:'study-sync-key',PROGRESS_LSK:'study-sync-progress-key-v1'};
+ vm.runInNewContext("let api='',progressKeyName=LSK;\n"+src.slice(first,last)+'\nthis.cfg=cfg;',ctx,{timeout:1000});
  return ctx.cfg;
 }
 test('Live data/config.json remains unchanged: original Notion + progress API is still selected',async()=>{
@@ -57,11 +57,11 @@ test('All five legacy Notion quiz/card loaders still read j.api, not progress_ap
   const preceding=src.slice(0,idx);
   assert.match(preceding,/if\(c\.ok\) api=String\(\(await c\.json\(\)\)\.api\|\|''\)/);
   assert.doesNotMatch(preceding,/progress_api/);
-  assert.match(src.slice(idx,idx+380),/j\.progress_api\|\|j\.api/);
+  assert.match(src.slice(idx,idx+380),/j\.progress_api\|\|original/);
  }
 });
 test('No Production/Notion endpoints, secrets or Cloudflare bindings are switched in config',()=>{
  assert.doesNotMatch(text('data/config.json'),/progress_api|staging|SYNC_KEY|token/i);
  assert.equal(text('data/config.json'),JSON.stringify(config)+'\n');
- assert.match(text('vocabloom/unified-progress.js'),/const url=String\(j\.progress_api\|\|j\.api\|\|''\)/);
+ assert.match(text('vocabloom/unified-progress.js'),/const url=String\(j\.progress_api\|\|original\)/);
 });
