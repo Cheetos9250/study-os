@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src https://study-api-cas-staging-only.kasidit09022550.workers.dev; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>VocaBLoom · Import Accounting to Staging Only</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,-apple-system,'Noto Sans Thai',sans-serif;color:#15223a;background:#f6f8fc}
+*{box-sizing:border-box}body{margin:0;padding:18px}main{max-width:790px;margin:25px auto}
+h1{font-size:clamp(1.5rem,4vw,2.1rem);margin:0}h2{font-size:1.12rem;margin:0 0 10px}
+p,li{line-height:1.65}.muted{color:#58677e}.card{margin:19px 0;padding:22px;border:1px solid #dae1ee;border-radius:14px;background:#fff}
+.notice{padding:13px 16px;border-left:4px solid #6b7fa5;border-radius:7px;background:#edf2f9}
+label{font-weight:620;display:block;margin:17px 0 7px}
+input[type=file],input[type=password]{width:100%;font:inherit;border:1px solid #95a4ba;padding:12px;border-radius:9px}
+input[type=checkbox]{width:20px;height:20px;margin:0;accent-color:#244489}
+.checkline{display:flex;align-items:flex-start;gap:12px;margin:16px 0;font-size:.95rem;line-height:1.55}
+button{font:inherit;font-weight:690;color:#fff;background:#2f4b90;padding:11px 16px;border:0;border-radius:9px;margin:9px 10px 0 0;cursor:pointer}
+button.secondary{color:#243e73;background:#e8eef8}
+button:disabled{opacity:.47;cursor:not-allowed}
+output{display:block;background:#111b2d;color:#e3eafa;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.7 ui-monospace,Consolas,monospace;padding:16px;border-radius:10px;min-height:150px}
+a{color:#1b4794}small{color:#54647c}
+</style>
+</head>
+<body><main>
+<h1>VocaBLoom · นำเข้า Accounting ไป Staging เท่านั้น</h1>
+<p class="muted">Phase 5 · สำรอง Staging ก่อนเขียน ตรวจข้อมูลทุกวิชาอีกครั้ง และบันทึกเฉพาะ Accounting พร้อมอ่านกลับ</p>
+<section class="card">
+<div class="notice">
+<strong>Staging แยกจาก Production:</strong> หน้านี้ติดต่อได้เฉพาะ Worker
+<strong>study-api-cas-staging-only</strong> ใช้เพียงรหัส Staging จาก Bitwarden
+ไม่รองรับรหัส Production ไม่มีการแก้ Production KV, Notion หรือคะแนนในระบบจริง
+ข้อมูลไฟล์ Preview จะส่งเฉพาะไปยัง Staging เมื่อคุณกดนำเข้าเท่านั้น
+</div>
+<label for="preview">1. เลือกไฟล์ Staging Preview ส่วนตัว</label>
+<input id="preview" type="file" accept=".json,application/json">
+<small>ไฟล์ vocabloom-staging-preview-private-2026-11-12.json จาก Google Drive → VocaBLoom → Backups → Staging Previews</small>
+<label for="secret">2. ใส่ Staging SYNC_KEY</label>
+<input id="secret" type="password" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="รหัสของ study-api-cas-staging-only จาก Bitwarden">
+<div><button id="check" type="button">ตรวจ Staging ทั้ง 5 วิชา</button>
+<button id="backup" type="button" class="secondary" disabled>ดาวน์โหลดสำเนา Staging ก่อนนำเข้า</button></div>
+<label class="checkline" for="agree"><input id="agree" type="checkbox"><span>ยืนยันว่าเก็บไฟล์สำรอง Staging ลงเครื่องแล้ว และอนุญาตให้เขียน <strong>เฉพาะ progress/acc บน Staging</strong> โดยจะไม่แก้ข้อมูลอีก 4 วิชาหรือระบบจริง</span></label>
+<div><button id="apply" type="button" disabled>นำเข้า Accounting ไป Staging และตรวจผล</button>
+<button id="report" type="button" class="secondary" disabled>ดาวน์โหลดรายงาน (ไม่มีคะแนนหรือรหัส)</button>
+<button id="clear" type="button" class="secondary">ล้างข้อมูลในหน้า</button></div>
+<p><small>ปุ่มนำเข้าจะเปิดได้หลังตรวจสอบครบ ดาวน์โหลดไฟล์สำรอง และเลือกยืนยันเท่านั้น ก่อนเขียนจะตรวจข้อมูลทั้ง 5 วิชาใหม่อีกครั้ง หากข้อมูลเปลี่ยนจะหยุดทันทีโดยไม่มีการเขียน</small></p>
+</section>
+<section class="card">
+<h2>ผลการดำเนินการ</h2>
+<output id="result" role="status" aria-live="polite">ยังไม่เริ่ม · 0 Worker Writes</output>
+<p class="muted"><small>หากพบ HTTP 409/428 หรือการอ่านกลับไม่ตรง ให้หยุดและตรวจ Staging อีกครั้ง ห้ามนำเข้าไฟล์ซ้ำโดยไม่ตรวจสภาพล่าสุด</small></p>
+</section>
+</main>
+<script>
+(()=>{
+'use strict';
+const BASE='https://study-api-cas-staging-only.kasidit09022550.workers.dev';
+const SUBJECTS=['acc','eco','math','eng','zh'];
+const PROTOCOL='vocabloom-cas-staging-v1';
+const MAX_FILE=5_000_000,MAX_SUBJECT=350_000;
+const $=id=>document.getElementById(id);
+const record=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const ensure=(test,message)=>{if(!test)throw new Error(message)};
+const bytes=x=>new TextEncoder().encode(JSON.stringify(x)).length;
+const blank=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
+const exactKeys=(obj,allowed)=>record(obj)&&JSON.stringify(Object.keys(obj).sort())===JSON.stringify([...allowed].sort());
+function canonical(x){
+ if(Array.isArray(x))return x.map(canonical);
+ if(!record(x))return x;
+ return Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])]));
+}
+const same=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
+function validateProgress(label,raw){
+ ensure(record(raw)&&record(raw.study)&&record(raw.srs)&&
+  record(raw.study.ans)&&record(raw.study.ats)&&record(raw.srs.s)&&record(raw.srs.m)&&
+  (raw.study.known===undefined||Array.isArray(raw.study.known)),
+  label+' มี Study/SRS ไม่ครบหรือผิดรูปแบบ');
+ ensure(bytes(raw)<=MAX_SUBJECT,label+' ใหญ่เกินขนาด Staging');
+ return raw;
+}
+function validatePreview(doc){
+ ensure(record(doc)&&doc.format==='vocabloom-cloud-readonly-snapshot'&&doc.version===1&&
+  doc.intendedDestination==='STAGING_ONLY_NO_PRODUCTION',
+  'กรุณาใช้ไฟล์ Staging Preview ที่ตรวจแล้วเท่านั้น');
+ ensure(exactKeys(doc.subjects,SUBJECTS)&&exactKeys(doc.revisions,SUBJECTS)&&
+  SUBJECTS.every(s=>doc.revisions[s]===null),'ไฟล์ Preview ต้องมี 5 วิชาและ revisions=null');
+ ensure(typeof doc.capturedAt==='string'&&!Number.isNaN(Date.parse(doc.capturedAt))&&
+  typeof doc.sourceCapturedAt==='string'&&!Number.isNaN(Date.parse(doc.sourceCapturedAt)),
+  'ไฟล์ Preview ไม่มีเวลาบันทึกแหล่งข้อมูล');
+ ensure(!Object.hasOwn(doc,'SYNC_KEY')&&!Object.hasOwn(doc,'NOTION_TOKEN')&&
+  !Object.hasOwn(doc,'headers'),'ไฟล์ Preview มีข้อมูลลักษณะ Secret');
+ for(const s of SUBJECTS)validateProgress('Preview '+s,doc.subjects[s]);
+ ensure(Object.keys(doc.subjects.acc.study.ans).length===1,
+  'ไฟล์นี้ไม่ใช่ชุดทดลอง Accounting 1 คำตอบที่ตรวจไว้');
+ for(const s of SUBJECTS.slice(1))
+  ensure(same(doc.subjects[s],blank()),'ไฟล์ Preview '+s+' ไม่ใช่ข้อมูลว่างที่ยืนยันไว้');
+ return doc;
+}
+async function loadPreview(file){
+ ensure(file&&file.name.toLowerCase().endsWith('.json')&&file.size>0&&file.size<=MAX_FILE,
+  'กรุณาเลือกไฟล์ Preview JSON จาก Drive');
+ const raw=await file.text();
+ ensure(new TextEncoder().encode(raw).length<=MAX_FILE,'ไฟล์ Preview ใหญ่เกินกำหนด');
+ let doc;try{doc=JSON.parse(raw)}catch{throw Error('ไฟล์ Preview JSON ไม่ถูกต้อง')}
+ return validatePreview(doc);
+}
+async function request(path,key,method='GET',data=null,revision=null){
+ ensure(/^\/(?:__staging\/health|progress\/(?:acc|eco|math|eng|zh))$/.test(path),
+  'ไม่อนุญาตเส้นทางอื่นนอก Staging');
+ ensure(method==='GET'||(method==='PUT'&&path==='/progress/acc'),
+  'อนุญาตให้เขียนเฉพาะ progress/acc ของ Staging');
+ if(method==='PUT'){
+  ensure(revision==='"0"','ยอมรับการเขียนเฉพาะ Accounting ที่ว่าง revision 0');
+  validateProgress('Accounting สำหรับนำเข้า',data);
+ }
+ const headers={'X-Sync-Key':key};
+ if(method==='PUT'){headers['Content-Type']='application/json';headers['If-Match']=revision;}
+ const res=await fetch(BASE+path,{
+  method,headers,body:method==='PUT'?JSON.stringify(data):undefined,
+  cache:'no-store',credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'
+ });
+ return res;
+}
+async function fetchJson(path,key){
+ const res=await request(path,key);
+ ensure(res.status===200,path+' GET HTTP '+res.status);
+ let body;try{body=await res.json()}catch{throw Error(path+' ไม่ได้ส่ง JSON ที่ถูกต้อง')}
+ const revision=res.headers.get('X-Sync-Revision')??res.headers.get('ETag');
+ if(path!=='/__staging/health')
+  ensure(/^"[0-9]+"$/.test(revision||''),path+' ไม่มี strong revision ที่ปลอดภัย');
+ return {body,revision};
+}
+async function checkIdentity(key){
+ const r=await fetchJson('/__staging/health',key);
+ ensure(r.body?.staging===true&&r.body?.protocol===PROTOCOL&&
+  JSON.stringify(r.body.subjects)===JSON.stringify(SUBJECTS),
+  'Worker ไม่ยืนยันตัวตนว่าเป็น Staging ที่ถูกต้อง');
+}
+async function readFive(key){
+ const entries={};
+ for(const s of SUBJECTS){
+  const r=await fetchJson('/progress/'+s,key);
+  validateProgress('Staging '+s,r.body);
+  entries[s]=r;
+ }
+ return entries;
+}
+function plan(preview,staging){
+ const states={};
+ for(const s of SUBJECTS){
+  const r=staging[s];
+  ensure(r&&/^"[0-9]+"$/.test(r.revision||''),'Revision '+s+' ไม่ปลอดภัย');
+  if(s==='acc'){
+   if(same(r.body,preview.subjects.acc))
+    states[s]='already-identical';
+   else if(r.revision==='"0"'&&same(r.body,blank()))
+    states[s]='ready-for-one-put';
+   else throw Error('BLOCKED: Accounting ใน Staging มีข้อมูลอื่น ห้ามเขียนทับ');
+  }else{
+   ensure(same(r.body,preview.subjects[s]),'BLOCKED: '+s+' มีข้อมูลไม่ตรงกับ Preview');
+   states[s]='already-identical';
+  }
+ }
+ return states;
+}
+function exactSameSnapshot(a,b){
+ return SUBJECTS.every(s=>a[s]?.revision===b[s]?.revision&&same(a[s]?.body,b[s]?.body));
+}
+function makeBeforeBackup(staging){
+ return {
+  format:'vocabloom-staging-before-import-backup',version:1,
+  capturedAt:new Date().toISOString(),stagingProtocol:PROTOCOL,
+  source:'study-api-cas-staging-only',notes:'Private backup of staging state before ONE possible Accounting PUT. Not a source KV backup.',
+  subjects:Object.fromEntries(SUBJECTS.map(s=>[s,staging[s].body])),
+  revisions:Object.fromEntries(SUBJECTS.map(s=>[s,staging[s].revision]))
+ };
+}
+function makeReport(action,subjects,writes){
+ return {
+  format:'vocabloom-staging-accounting-import-report',version:1,
+  completedAt:new Date().toISOString(),stagingProtocol:PROTOCOL,
+  status:action,productionMigration:'BLOCKED',workerWrites:writes,
+  subjectResults:subjects,
+  note:'No secrets, individual scores, raw progress or preview files. One staging-only Accounting write at most.'
+ };
+}
+function download(doc,name){
+ const url=URL.createObjectURL(new Blob([JSON.stringify(doc,null,2)],{type:'application/json;charset=utf-8'}));
+ const link=document.createElement('a');link.href=url;link.download=name;
+ document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+let active=null,backupDownloaded=false,busy=false,lastReport=null;
+function buttons(){
+ $('check').disabled=busy;$('backup').disabled=busy||!active;
+ $('agree').disabled=busy||!active;
+ $('apply').disabled=busy||!active||!backupDownloaded||!$('agree').checked;
+ $('report').disabled=busy||!lastReport;$('clear').disabled=busy;
+ $('preview').disabled=busy;$('secret').disabled=busy;
+}
+function reset(){
+ active=null;backupDownloaded=false;lastReport=null;
+ $('agree').checked=false;buttons();
+}
+function lines(items){$('result').textContent=items.join('\n');}
+function key(){
+ const secret=$('secret').value.trim();
+ ensure(secret.length>=8,'ใส่ Staging SYNC_KEY จาก Bitwarden เท่านั้น');
+ return secret;
+}
+async function preflight(){
+ if(busy)return;
+ reset();busy=true;buttons();lines(['กำลังตรวจ Staging ทั้ง 5 วิชาแบบอ่านอย่างเดียว ...']);
+ try{
+  const preview=await loadPreview($('preview').files[0]);
+  const secret=key();
+  await checkIdentity(secret);
+  const staging=await readFive(secret);
+  const states=plan(preview,staging);
+  active={preview,staging,states};
+  const status=states.acc==='ready-for-one-put'?'Accounting ยังว่าง revision 0':'Accounting ตรงกับ Preview แล้ว ไม่ต้องเขียนซ้ำ';
+  lines(['PASS · Staging identity ถูกต้อง',
+   'PASS · ตรวจรูปแบบ Preview และอ่าน Staging ครบ 5 วิชา',
+   'PASS · '+status,
+   'PASS · ECO, MATH, ENG, ZH ตรงกับ Preview (ไม่ต้องเขียน)',
+   'ขั้นต่อไป: ดาวน์โหลดสำเนา Staging ก่อนนำเข้า แล้วกดยืนยัน',
+   '0 PUT / 0 Worker Writes']);
+ }catch(e){
+  $('secret').value='';reset();
+  lines(['BLOCKED · '+String(e.message||e),'0 PUT / 0 Worker Writes']);
+ }finally{busy=false;buttons();}
+}
+function backup(){
+ if(busy||!active)return;
+ try{
+  download(makeBeforeBackup(active.staging),'vocabloom-staging-before-import-private.json');
+  backupDownloaded=true;
+  lines(['PASS · สั่งดาวน์โหลดสำเนา Staging ทั้ง 5 วิชาแล้ว',
+   'ตรวจว่าไฟล์ถูกบันทึกลงเครื่องก่อนเลือกยืนยันและกดนำเข้า',
+   '0 PUT / 0 Worker Writes']);
+ }catch(e){backupDownloaded=false;lines(['FAIL · ดาวน์โหลดสำเนาไม่สำเร็จ: '+e.message]);}
+ buttons();
+}
+async function apply(){
+ if(busy||!active||!backupDownloaded||!$('agree').checked)return;
+ busy=true;buttons();
+ let attempted=false;
+ try{
+  const secret=key();
+  const preview=active.preview;
+  await checkIdentity(secret);
+  const fresh=await readFive(secret);
+  ensure(exactSameSnapshot(fresh,active.staging),
+   'BLOCKED: Staging เปลี่ยนไปหลังดาวน์โหลดสำเนา ต้องตรวจและสำรองใหม่');
+  const statuses=plan(preview,fresh);
+  if(statuses.acc==='ready-for-one-put'){
+   // Only one request capable of writing anywhere in this page, and it is
+   // hard-coded to the isolated staging Accounting endpoint with CAS "0".
+   attempted=true;
+   const response=await request('/progress/acc',secret,'PUT',preview.subjects.acc,fresh.acc.revision);
+   ensure(response.status===200,
+    'Accounting PUT HTTP '+response.status+' — หยุดและตรวจสถานะใหม่ ห้ามกดซ้ำทันที');
+  }
+  const after=await readFive(secret);
+  ensure(same(after.acc.body,preview.subjects.acc),
+   'BLOCKED: อ่าน Accounting กลับมาไม่ตรงต้นฉบับ');
+  for(const s of SUBJECTS.slice(1)){
+   ensure(after[s].revision===fresh[s].revision&&same(after[s].body,fresh[s].body),
+    'BLOCKED: วิชา '+s+' เปลี่ยนระหว่างนำเข้า');
+  }
+  const writes=attempted?1:0;
+  lastReport=makeReport(writes?'STAGING_ACC_IMPORTED_AND_VERIFIED':'STAGING_ALREADY_IDENTICAL',
+   Object.fromEntries(SUBJECTS.map(s=>[s,{result:s==='acc'?(writes?'imported-and-verified':'already-identical'):'unchanged',
+    revision:after[s].revision}])),writes);
+  lines(['PASS · Accounting '+(writes?'นำเข้าและอ่านกลับตรงต้นฉบับ':'มีข้อมูลตรง Preview อยู่แล้ว'),
+   'PASS · อีก 4 วิชาไม่เปลี่ยนแปลง',
+   'PASS · STAGING ACCOUNTING VERIFIED',
+   'Staging Worker PUT = '+writes+' · Production Worker PUT = 0',
+   'รายงานแบบไม่มีคะแนนหรือรหัสพร้อมดาวน์โหลด']);
+ }catch(e){
+  lastReport=null;
+  lines(['BLOCKED · '+String(e.message||e),
+   attempted?'เคยส่งคำขอเขียน Staging แล้ว โปรดตรวจสถานะอีกครั้งก่อนทำต่อ':
+    'ยังไม่ได้ส่งคำขอ PUT',
+   'Worker Production ไม่ใช่เป้าหมายของหน้านี้']);
+ }finally{
+  $('secret').value='';
+  active=null;backupDownloaded=false;$('agree').checked=false;
+  busy=false;buttons();
+ }
+}
+$('check').addEventListener('click',preflight);
+$('backup').addEventListener('click',backup);
+$('apply').addEventListener('click',apply);
+$('report').addEventListener('click',()=>{if(lastReport)download(lastReport,'vocabloom-staging-accounting-import-report.json');});
+$('agree').addEventListener('change',buttons);
+$('clear').addEventListener('click',()=>{if(busy)return;
+ $('secret').value='';$('preview').value='';reset();lines(['ล้างข้อมูลในหน้าแล้ว']);});
+$('preview').addEventListener('change',reset);
+$('secret').addEventListener('input',reset);
+buttons();
+})();
+</script>
+</body>
+</html>
