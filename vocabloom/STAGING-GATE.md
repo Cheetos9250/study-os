@@ -4,7 +4,7 @@ Status: PREPARATION ONLY — no Cloudflare resources created or deployed.
 
 ## Isolation requirements
 - Use a separate Cloudflare Worker named `vocabloom-staging`, never the production Worker.
-- Use a separate D1 database named `vocabloom-staging-db`; do not bind production D1, KV, R2, or real Notion tokens.
+- Use a separate SQLite-backed Durable Object namespace/class migration using the existing `experiments/study-sync-cas/wrangler.jsonc` prototype; do not bind production Durable Objects, D1, KV, R2, or real Notion tokens.
 - Use a staging-only secret `SYNC_KEY`; never reuse a real user key.
 - Staging hostnames and route patterns must not overlap production.
 - Never place secrets in repository files, build logs, screenshots, or PR comments.
@@ -12,7 +12,7 @@ Status: PREPARATION ONLY — no Cloudflare resources created or deployed.
 ## Deployment gate
 1. Confirm actual Worker source, route configuration, and D1 schema before writing deployment automation.
 2. Create staging resources only after explicit approval.
-3. Apply migrations only to staging database IDs.
+3. Apply Durable Object class migrations only to the separately named staging Worker and namespace.
 4. Verify missing/invalid key => denied, test key => accepted, production key => denied.
 5. Test all five subjects, failed writes, retries, and concurrent updates using synthetic data.
 6. Verify no production or real Notion requests occurred.
