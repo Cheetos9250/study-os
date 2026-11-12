@@ -86,10 +86,13 @@ def build(rows, fields, need):
         if not all(r.get(k, "").strip() for k in need):
             continue
         r["Status"] = "Verified"
-        # keep ids identical to the ones the web pages already use (32 hex chars)
-        pid = (page.get("id") or "").replace("-", "")
-        r["url"] = ("https://app.notion.com/p/" + pid) if pid else (page.get("url") or "")
-        key = pid or r["url"]
+        # Keep the existing 32-hex stable card/quiz ID without exporting direct Notion URLs.
+        # A page ID can still be used to construct a URL; this is metadata reduction, NOT access control.
+        pid = (page.get("id") or "").replace("-", "").lower()
+        if len(pid) != 32 or any(c not in "0123456789abcdef" for c in pid):
+            raise SystemExit("Invalid Notion page ID encountered during verified export")
+        r["page_id"] = pid
+        key = pid
         if key in seen:
             continue
         seen.add(key)
