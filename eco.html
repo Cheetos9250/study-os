@@ -555,6 +555,12 @@ window.__xs=(()=>{
         if(!r.ok)throw Error('GET HTTP '+r.status);
         const etag=(r.headers?.get?.('X-Sync-Revision')??r.headers?.get?.('ETag'))||'';
         const revision=/^"[0-9]+"$/.test(etag)?etag:'';
+        const originalTag=r.headers?.get?.('ETag')||'';
+        const customRev=r.headers?.get?.('X-Sync-Revision');
+        // A weak tag or malformed application version indicates broken CAS.
+        // Never treat it as a safe legacy manual-sync fallback.
+        if(!revision&&(customRev!==null&&customRev!==undefined||/^W\//.test(originalTag)))
+          throw Error('Worker ส่งหมายเลขเวอร์ชันที่ไม่ปลอดภัย หยุดซิงก์เพื่อป้องกันข้อมูลสูญหาย');
         const remote=await r.json();
         if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error))
           throw Error('ข้อมูล Worker ไม่ถูกต้อง');
