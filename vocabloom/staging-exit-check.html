@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src https://study-api-cas-staging-only.kasidit09022550.workers.dev; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>VocaBLoom · Phase 5 Staging Exit Check</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,-apple-system,'Noto Sans Thai',sans-serif;background:#f6f8fc;color:#172640}
+*{box-sizing:border-box}body{margin:0;padding:18px}main{max-width:790px;margin:26px auto}
+h1{font-size:clamp(1.5rem,4vw,2rem);margin:0}h2{font-size:1.1rem}
+p{line-height:1.65}.muted{color:#596880}.card{background:white;border:1px solid #dce3ed;border-radius:14px;padding:20px;margin:19px 0}
+.notice{padding:13px;background:#eff3f9;border-left:4px solid #7487a4;border-radius:6px}
+label{font-weight:650;display:block;margin:16px 0 7px}
+input{font:inherit;width:100%;padding:12px;border:1px solid #94a4bd;border-radius:8px}
+button{font:inherit;font-weight:680;border:0;border-radius:8px;background:#2d498c;color:#fff;padding:11px 15px;cursor:pointer;margin:12px 10px 0 0}
+button.secondary{color:#294172;background:#eaf0fb}button:disabled{opacity:.47;cursor:not-allowed}
+output{display:block;white-space:pre-wrap;overflow-wrap:anywhere;padding:16px;min-height:130px;color:#e7ecf9;background:#0d172b;border-radius:9px;font:13px/1.65 ui-monospace,monospace}
+small{color:#596880}
+</style></head><body><main>
+<h1>VocaBLoom · ตรวจผลนำเข้า Staging อีกครั้ง</h1>
+<p class="muted">Phase 5 Exit Check — ยืนยันว่าข้อมูล Accounting ยังอยู่หลังการนำเข้าและอีก 4 วิชาไม่เปลี่ยนแปลง</p>
+<section class="card">
+<div class="notice">
+<strong>อ่านอย่างเดียว:</strong> หน้านี้ส่งเฉพาะ GET ไปยัง <strong>study-api-cas-staging-only</strong>
+ไม่สามารถเขียนข้อมูล ย้ายระบบจริง หรือ Deploy ได้ กรุณาใช้เฉพาะ Staging SYNC_KEY จาก Bitwarden
+รหัสไม่ถูกเก็บและไม่อยู่ในรายงานผล
+</div>
+<label for="preview">1. ไฟล์ Staging Preview ส่วนตัว (จาก Google Drive)</label>
+<input id="preview" type="file" accept=".json,application/json">
+<small>ใช้ไฟล์ vocabloom-staging-preview-private-2026-11-12.json ที่ตรวจแหล่งข้อมูลต้นทางแล้ว</small>
+<label for="secret">2. Staging SYNC_KEY</label>
+<input id="secret" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="รหัส Staging เท่านั้น">
+<div>
+<button id="check" type="button">ตรวจข้อมูลหลังนำเข้า (อ่านอย่างเดียว)</button>
+<button id="report" type="button" class="secondary" disabled>ดาวน์โหลดรายงานไม่มีคะแนน/รหัส</button>
+<button id="clear" type="button" class="secondary">ล้างข้อมูลในหน้า</button>
+</div>
+<p><small>ผล PASS ต้องพบ ACC ตรงกับ Preview และ revision อย่างน้อย 1 ส่วนอีก 4 วิชาต้องตรงกับ Preview และยังมี revision 0 การตรวจนี้ไม่ได้ให้สิทธิ์ย้าย Production</small></p>
+</section>
+<section class="card">
+<h2>ผลการตรวจ</h2>
+<output id="result" role="status" aria-live="polite">ยังไม่เริ่ม · 0 Upload / 0 PUT</output>
+<p><small>ถ้าพบ BLOCKED ห้ามใช้ผลนี้เป็นหลักฐานว่านำเข้าสำเร็จ และห้ามกด Import ซ้ำโดยไม่ตรวจสภาพล่าสุด</small></p>
+</section></main>
+<script>
+(()=>{
+'use strict';
+const BASE='https://study-api-cas-staging-only.kasidit09022550.workers.dev';
+const SUBJECTS=['acc','eco','math','eng','zh'];
+const PROTOCOL='vocabloom-cas-staging-v1';
+const MAX_FILE=5_000_000,MAX_SUBJECT=350_000;
+const $=id=>document.getElementById(id);
+const record=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const ensure=(ok,reason)=>{if(!ok)throw new Error(reason)};
+const bytes=x=>new TextEncoder().encode(JSON.stringify(x)).length;
+const blank=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
+const exact=(obj,expected)=>record(obj)&&JSON.stringify(Object.keys(obj).sort())===JSON.stringify([...expected].sort());
+function canonical(x){
+ if(Array.isArray(x))return x.map(canonical);
+ if(!record(x))return x;
+ return Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])]));
+}
+const same=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
+function validState(label,x){
+ ensure(record(x)&&record(x.study)&&record(x.srs)&&record(x.study.ans)&&
+  record(x.study.ats)&&record(x.srs.s)&&record(x.srs.m)&&
+  (x.study.known===undefined||Array.isArray(x.study.known)),
+  label+' ข้อมูล Study/SRS ไม่ถูกต้อง');
+ ensure(bytes(x)<=MAX_SUBJECT,label+' ใหญ่เกินขนาด');
+ return x;
+}
+function validatePreview(doc){
+ ensure(record(doc)&&doc.format==='vocabloom-cloud-readonly-snapshot'&&
+  doc.version===1&&doc.intendedDestination==='STAGING_ONLY_NO_PRODUCTION',
+  'ต้องเลือกไฟล์ Staging Preview ที่ตรวจแล้ว');
+ ensure(exact(doc.subjects,SUBJECTS)&&exact(doc.revisions,SUBJECTS)&&
+  SUBJECTS.every(s=>doc.revisions[s]===null),
+  'ไฟล์ Preview ต้องมี 5 วิชาและ revisions=null');
+ ensure(typeof doc.capturedAt==='string'&&!Number.isNaN(Date.parse(doc.capturedAt))&&
+  typeof doc.sourceCapturedAt==='string'&&!Number.isNaN(Date.parse(doc.sourceCapturedAt)),
+  'ไฟล์ Preview ไม่มีเวลาต้นทาง');
+ ensure(!Object.hasOwn(doc,'SYNC_KEY')&&!Object.hasOwn(doc,'NOTION_TOKEN')&&
+  !Object.hasOwn(doc,'headers'),'ไฟล์ Preview มีข้อมูลลักษณะรหัส');
+ for(const subject of SUBJECTS)validState(subject,doc.subjects[subject]);
+ ensure(Object.keys(doc.subjects.acc.study.ans).length===1,
+  'Preview ไม่มีคำตอบ Accounting 1 รายการที่คาดไว้');
+ for(const subject of SUBJECTS.slice(1))
+  ensure(same(doc.subjects[subject],blank()),
+   'Preview '+subject+' ไม่ใช่ข้อมูลว่างที่ยืนยันไว้');
+ return doc;
+}
+async function loadPreview(file){
+ ensure(file&&file.name.toLowerCase().endsWith('.json')&&file.size>0&&
+  file.size<=MAX_FILE,'กรุณาเลือก Staging Preview JSON');
+ const text=await file.text();
+ ensure(new TextEncoder().encode(text).length<=MAX_FILE,'ไฟล์ใหญ่เกินไป');
+ let value;
+ try{value=JSON.parse(text)}catch{throw Error('ไฟล์ Preview ไม่ใช่ JSON ที่ถูกต้อง')}
+ return validatePreview(value);
+}
+async function get(path,key){
+ ensure(/^\/(?:__staging\/health|progress\/(?:acc|eco|math|eng|zh))$/.test(path),
+  'ไม่อนุญาตเส้นทางนอก Staging');
+ const response=await fetch(BASE+path,{
+  method:'GET',headers:{'X-Sync-Key':key},cache:'no-store',
+  credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'
+ });
+ ensure(response.status===200,path+' GET HTTP '+response.status);
+ let value;
+ try{value=await response.json()}catch{throw Error(path+' ส่ง JSON ไม่ถูกต้อง')}
+ const revision=response.headers.get('X-Sync-Revision')??response.headers.get('ETag');
+ if(path!=='/__staging/health')ensure(/^"[0-9]+"$/.test(revision||''),
+  path+' ไม่มี strong revision');
+ return {value,revision};
+}
+function assess(preview,states){
+ const statuses={};
+ for(const subject of SUBJECTS){
+  const item=states[subject];
+  ensure(item&&/^"[0-9]+"$/.test(item.revision||''),
+   'Revision ของ '+subject+' ไม่ปลอดภัย');
+  validState('Staging '+subject,item.value);
+  const sameData=same(item.value,preview.subjects[subject]);
+  // ACC must actually have been stored, not merely echo a local draft.
+  const pass=subject==='acc'?
+   sameData&&BigInt(item.revision.slice(1,-1))>=1n:
+   sameData&&item.revision==='"0"';
+  statuses[subject]={
+   result:pass?'verified':'blocked',
+   revision:item.revision
+  };
+ }
+ return {passed:SUBJECTS.every(s=>statuses[s].result==='verified'),subjects:statuses};
+}
+function makeReport(result){
+ return {
+  format:'vocabloom-staging-post-import-readonly-report',version:1,
+  checkedAt:new Date().toISOString(),
+  stagingProtocol:PROTOCOL,mode:'GET_ONLY_NO_WRITES',
+  status:result.passed?'STAGING_ACCOUNTING_PERSISTENCE_VERIFIED':'BLOCKED_INCOMPLETE_VERIFICATION',
+  productionMigration:'BLOCKED',
+  subjects:Object.fromEntries(SUBJECTS.map(s=>[s,{
+   result:result.subjects[s].result,revision:result.subjects[s].revision
+  }])),
+  note:'Independent read-only check of current Staging values against a locally selected private Preview. No raw answers, secrets, user identifiers or score values. Does not authorize Production migration.'
+ };
+}
+let busy=false,lastReport=null;
+function controls(){
+ $('check').disabled=busy;$('report').disabled=busy||!lastReport;
+ $('clear').disabled=busy;$('preview').disabled=busy;$('secret').disabled=busy;
+}
+async function run(){
+ if(busy)return;
+ lastReport=null;controls();
+ const out=$('result');out.textContent='กำลังตรวจ Staging ใหม่...';
+ try{
+  const preview=await loadPreview($('preview').files[0]);
+  const key=$('secret').value.trim();
+  ensure(key.length>=8,'กรุณาใส่ Staging SYNC_KEY');
+  busy=true;controls();
+  const id=await get('/__staging/health',key);
+  ensure(id.value?.staging===true&&id.value?.protocol===PROTOCOL&&
+   JSON.stringify(id.value.subjects)===JSON.stringify(SUBJECTS),
+   'Worker ไม่ยืนยันตัวว่าเป็น Staging');
+  const states={};
+  for(const subject of SUBJECTS)states[subject]=await get('/progress/'+subject,key);
+  const result=assess(preview,states);
+  lastReport=makeReport(result);
+  const lines=['PASS · Staging identity ถูกต้อง',
+   'PASS · GET ครบ 5 วิชา, strong revision ถูกต้อง'];
+  for(const s of SUBJECTS)
+   lines.push((result.subjects[s].result==='verified'?'PASS':'BLOCKED')+
+    ' · '+s.toUpperCase()+' · '+result.subjects[s].result+
+    ' · revision '+result.subjects[s].revision);
+  lines.push(result.passed?
+   'PASS · STAGING POST-IMPORT PERSISTENCE VERIFIED':
+   'BLOCKED · Staging ไม่ตรงกับ Preview หรือ revision ผิดเงื่อนไข');
+  lines.push('0 Upload / 0 PUT / 0 Worker Writes · ดาวน์โหลดรายงานได้');
+  out.textContent=lines.join('\n');
+ }catch(e){
+  lastReport=null;
+  out.textContent='FAIL · '+String(e.message||e)+
+   '\n0 Upload / 0 PUT / 0 Worker Writes · รายงานไม่ถูกสร้าง';
+ }finally{$('secret').value='';busy=false;controls();}
+}
+function downloadReport(){
+ if(!lastReport)return;
+ const url=URL.createObjectURL(new Blob([JSON.stringify(lastReport,null,2)],
+  {type:'application/json'}));
+ const link=document.createElement('a');
+ link.href=url;link.download='vocabloom-staging-post-import-readonly-report.json';
+ document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$('check').addEventListener('click',run);
+$('report').addEventListener('click',downloadReport);
+$('clear').addEventListener('click',()=>{if(busy)return;
+ $('preview').value='';$('secret').value='';lastReport=null;
+ $('result').textContent='ล้างข้อมูลและรายงานแล้ว';controls();
+});
+controls();
+})();
+</script></body></html>
