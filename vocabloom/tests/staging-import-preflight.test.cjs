@@ -115,3 +115,46 @@ test('Local file chooser preserves preview contents and rejects unrelated files'
  await assert.rejects(filePreview({...file,size:6000000}),/Preview JSON/);
  await assert.rejects(filePreview({...file,text:async()=>'{broken'}),/JSON/);
 });
+
+
+function reportBuilder(){
+ const start=script.indexOf('function makeReport('),end=script.indexOf('function clearReport(');
+ assert.ok(start>=0&&end>start);
+ const ctx={SUBJECTS,PROTOCOL:'vocabloom-cas-staging-v1',
+  isRecord:x=>x!==null&&typeof x==='object'&&!Array.isArray(x),
+  ensure:(condition,message)=>{if(!condition)throw new Error(message)}};
+ vm.runInNewContext(script.slice(start,end)+'\nthis.buildReport=makeReport;',ctx,{timeout:1000});
+ return ctx.buildReport;
+}
+test('Metadata-only report lists all five subject statuses but excludes answers and secrets',()=>{
+ const rows=SUBJECTS.map(subject=>({subject,state:'empty-revision-0',revision:'"0"'}));
+ const report=reportBuilder()(rows,false);
+ assert.equal(report.format,'vocabloom-staging-readonly-preflight-report');
+ assert.equal(report.status,'READ_ONLY_PREFLIGHT_COMPLETE');
+ assert.equal(report.productionMigration,'BLOCKED');
+ assert.equal(report.mode,'GET_ONLY_NO_WRITES');
+ assert.equal(report.subjects.length,5);
+ assert.ok(!('study' in report)&&!('secret' in report)&&!('preview' in report));
+ const raw=JSON.stringify(report);
+ assert.doesNotMatch(raw,/FAKE_STAGING_KEY|SYNC_KEY|NOTION_TOKEN|study\.ans|quizAnswers|progress\/acc/);
+ assert.match(html,/id="report".*disabled/);
+ assert.match(script,/lastReport=makeReport\(subjectRows,blocked\)/);
+ assert.match(script,/function clearReport\(\)/);
+});
+test('Blocked staging preflight can export redacted BLOCKED report, not permission to import',()=>{
+ const rows=SUBJECTS.map(subject=>({subject,state:'already-identical',revision:'"1"'}));
+ rows[2].state='blocked-existing-different-data';
+ const report=reportBuilder()(rows,true);
+ assert.equal(report.status,'BLOCKED_EXISTING_STAGING_DATA');
+ assert.equal(report.productionMigration,'BLOCKED');
+ assert.equal(report.subjects[2].state,'blocked-existing-different-data');
+});
+test('Preflight report builder rejects missing subjects or non-strong revisions',()=>{
+ const build=reportBuilder();
+ const rows=SUBJECTS.map(subject=>({subject,state:'already-identical',revision:'"1"'}));
+ assert.throws(()=>build(rows.slice(1),false),/รายงานไม่ครบ/);
+ rows[0].revision='W/"1"';
+ assert.throws(()=>build(rows,false),/รายงานไม่ครบ/);
+ rows[0].revision='"1"';rows[1].state='imported';
+ assert.throws(()=>build(rows,false),/รายงานไม่ครบ/);
+});

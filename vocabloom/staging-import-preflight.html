@@ -37,8 +37,9 @@ small{color:#536079}a{color:#204aa0}
 <div>
 <button id="check" type="button">ตรวจ Staging แบบอ่านอย่างเดียว</button>
 <button id="clear" type="button" class="secondary">ล้างรหัสและผลตรวจ</button>
+<button id="report" type="button" class="secondary" disabled>ดาวน์โหลดรายงาน (ไม่มีคะแนน/รหัส)</button>
 </div>
-<p><small>ผลตรวจบอกได้เพียงว่าแต่ละวิชาตรงกับไฟล์ หรือว่างและเริ่มที่ revision 0 ณ เวลาที่ตรวจ ไม่ใช่การล็อกข้อมูลไว้สำหรับนำเข้าภายหลัง</small></p>
+<p><small>ผลตรวจบอกได้เพียงว่าแต่ละวิชาตรงกับไฟล์ หรือว่างและเริ่มที่ revision 0 ณ เวลาที่ตรวจ ไม่ใช่การล็อกข้อมูลไว้สำหรับนำเข้าภายหลัง รายงานดาวน์โหลดจะมีเฉพาะสถานะและ revision ไม่ใส่คำตอบ คะแนน หรือรหัส</small></p>
 </section>
 <section class="card">
 <h2>ผลการตรวจ</h2>
@@ -121,13 +122,42 @@ function classifyStaging(preview,remote,revision){
  if(revision==='"0"'&&same(remote,blank()))return 'empty-revision-0';
  return 'blocked-existing-different-data';
 }
-let busy=false;
+let busy=false;let lastReport=null;
+function makeReport(subjectRows,blocked){
+ ensure(Array.isArray(subjectRows)&&subjectRows.length===SUBJECTS.length&&
+  subjectRows.every((v,i)=>isRecord(v)&&v.subject===SUBJECTS[i]&&
+    ['already-identical','empty-revision-0','blocked-existing-different-data'].includes(v.state)&&
+    /^"[0-9]+"$/.test(v.revision||'')),
+  'รายงานไม่ครบ 5 วิชา');
+ return {
+  format:'vocabloom-staging-readonly-preflight-report',version:1,
+  checkedAt:new Date().toISOString(),
+  stagingProtocol:PROTOCOL,
+  mode:'GET_ONLY_NO_WRITES',
+  status:blocked?'BLOCKED_EXISTING_STAGING_DATA':'READ_ONLY_PREFLIGHT_COMPLETE',
+  productionMigration:'BLOCKED',
+  subjects:subjectRows.map(v=>({subject:v.subject,state:v.state,revision:v.revision})),
+  note:'Metadata-only report. It contains no credentials, preview contents, study answers or user identifiers. This check does not authorize an import and is not an atomic snapshot.'
+ };
+}
+function clearReport(){
+ lastReport=null;$('report').disabled=true;
+}
+function downloadReport(){
+ if(!lastReport)return;
+ const blob=new Blob([JSON.stringify(lastReport,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=url;link.download='vocabloom-staging-readonly-preflight-report.json';
+ document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 function setBusy(value){
  busy=value;$('check').disabled=value;$('clear').disabled=value;
  $('preview').disabled=value;$('secret').disabled=value;
 }
 async function run(){
  if(busy)return;
+ clearReport();
  const result=$('result');result.textContent='กำลังตรวจเฉพาะไฟล์ในเครื่องและ Staging GET ...';
  let ok=0;
  try{
@@ -143,10 +173,12 @@ async function run(){
   const lines=['PASS · Staging identity/protocol ถูกต้อง',
    'PASS · Preview JSON มีโครงสร้างครบ 5 วิชา'];
   let blocked=false;
+  const subjectRows=[];
   for(const s of SUBJECTS){
    const remote=await getJson('/progress/'+s,key);
    validateProgress('Staging '+s,remote.body);
    const state=classifyStaging(preview.subjects[s],remote.body,remote.revision);
+   subjectRows.push({subject:s,state,revision:remote.revision});
    if(state==='blocked-existing-different-data')blocked=true;
    else ok++;
    lines.push((state==='blocked-existing-different-data'?'BLOCKED':'PASS')+
@@ -156,6 +188,9 @@ async function run(){
    'BLOCKED · ห้ามนำเข้า ต้องตรวจข้อมูล Staging ที่ไม่ตรงก่อน':
    'PASS · READ-ONLY PREFLIGHT COMPLETE (ไม่ใช่การอนุมัตินำเข้าจริง)');
   lines.push('0 Upload / 0 PUT / 0 Worker Writes');
+  lastReport=makeReport(subjectRows,blocked);
+  $('report').disabled=false;
+  lines.push('รายงานแบบไม่มีคะแนน/รหัสพร้อมดาวน์โหลด');
   result.textContent=lines.join('\n');
  }catch(e){
   result.textContent='FAIL · '+String(e.message||e)+
@@ -169,8 +204,10 @@ $('check').addEventListener('click',run);
 $('clear').addEventListener('click',()=>{
  if(busy)return;
  $('secret').value='';$('preview').value='';
+ clearReport();
  $('result').textContent='ล้างรหัสและผลตรวจแล้ว';
 });
+$('report').addEventListener('click',downloadReport);
 })();
 </script>
 </body>
