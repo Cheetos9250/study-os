@@ -13,7 +13,7 @@ function fixture(){
  const el={addEventListener(){},disabled:false,files:[],textContent:''};
  const ctx={document:{getElementById:()=>el},TextEncoder,crypto:require('node:crypto').webcrypto,
   Blob,URL:{createObjectURL:()=>'',revokeObjectURL:()=>{}},setTimeout:()=>{}};
- const expose=script.replace(/\}\)\(\);\s*$/, 'globalThis.__unit={checkLocal,checkRemote};})();');
+ const expose=script.replace(/\}\)\(\);\s*$/, 'globalThis.__unit={checkLocal,checkRemote,checkAdmin};})();');
  new vm.Script(expose,{filename:'migration-audit.html'}).runInNewContext(ctx);
  return ctx.__unit;
 }
@@ -95,4 +95,62 @@ test('Audit rejects unsafe partial legacy metadata instead of guessing state',()
   const c=cloud();c.subjects.eco=bad;
   assert.throws(()=>checkRemote(c),/ไม่ครบ/);
  }
+});
+
+const admin=()=>({
+ format:'vocabloom-production-kv-capture-v1',version:1,
+ source:'owner-manual-dashboard-kv-pairs-read-only',
+ capturedAt:'2026-11-12T12:00:00Z',
+ namespaceId:'0123456789abcdef0123456789abcdef',
+ entries:Object.fromEntries(SUBJECTS.map(k=>['progress:'+k,null]))
+});
+const complete=()=>({study:{ans:{},ats:{},known:[],rst:0},
+ srs:{s:{},m:{day:0,newDone:0}},updated:123});
+test('Offline audit matches independently confirmed absent keys and populated source',()=>{
+ const {checkAdmin}=fixture();const c=cloud();const a=admin();
+ c.subjects.acc=complete();c.subjects.acc.study.ans['32']=0;
+ a.entries['progress:acc']=JSON.stringify(c.subjects.acc);
+ for(const k of ['eco','math','eng','zh'])c.subjects[k]={updated:0};
+ const result=checkAdmin(a,c);
+ assert.equal(result.status,'MATCHED_INDEPENDENT_KV_EXPORT');
+ assert.equal(result.stagingPreviewReady,true);
+ assert.equal(result.subjects.acc.source,'kv-present');
+ assert.equal(result.subjects.acc.apiMatch,true);
+ assert.equal(result.subjects.eco.source,'kv-confirmed-absent');
+ assert.equal(result.subjects.eco.stagingShapeReady,true);
+ assert.ok(!JSON.stringify(result).includes('"32"'));
+});
+test('KV source mismatch or stale snapshot is caught without exposing answers',()=>{
+ const {checkAdmin}=fixture();const c=cloud();const a=admin();
+ for(const k of SUBJECTS)c.subjects[k]={updated:0};
+ c.subjects.acc=complete();c.subjects.acc.study.ans['32']=0;
+ const changed=complete();changed.study.ans['32']=1;
+ a.entries['progress:acc']=JSON.stringify(changed);
+ const result=checkAdmin(a,c);
+ assert.equal(result.status,'MISMATCH_OR_STALE_SOURCE');
+ assert.equal(result.stagingPreviewReady,false);
+ assert.equal(result.subjects.acc.apiMatch,false);
+});
+test('An actually stored metadata-only KV record is not safely importable',()=>{
+ const {checkAdmin}=fixture();const c=cloud();const a=admin();
+ for(const k of SUBJECTS)c.subjects[k]={updated:0};
+ a.entries['progress:eco']='{"updated":0}';
+ const result=checkAdmin(a,c);
+ assert.equal(result.status,'MATCHED_INDEPENDENT_KV_EXPORT');
+ assert.equal(result.stagingPreviewReady,false);
+ assert.equal(result.subjects.eco.source,'kv-present');
+});
+test('Never compares invented or incomplete administrative manifests',()=>{
+ const {checkAdmin}=fixture();const c=cloud();
+ for(const k of SUBJECTS)c.subjects[k]={updated:0};
+ const missing=admin();delete missing.entries['progress:zh'];
+ assert.throws(()=>checkAdmin(missing,c),/5 คีย์/);
+ const extra=admin();extra.entries['progress:unknown']=null;
+ assert.throws(()=>checkAdmin(extra,c),/5 คีย์/);
+ const fake=admin();fake.source='manual-copy-from-app';
+ assert.throws(()=>checkAdmin(fake,c),/Dashboard/);
+ const unsafe=admin();unsafe.SYNC_KEY='sensitive';
+ assert.throws(()=>checkAdmin(unsafe,c),/รหัส/);
+ const malformed=admin();malformed.entries['progress:acc']='{bad json';
+ assert.throws(()=>checkAdmin(malformed,c),/JSON/);
 });

@@ -47,3 +47,17 @@ The Production Worker has no verified `X-Sync-Revision` or strong `ETag` on any 
 The supplied Worker source confirms that progress GET reads `PROGRESS.get("progress:"+subject)`, falling back to `{"updated":0}` when the returned KV value is null; PUT is an unconditional `PROGRESS.put` and lacks any CAS validator. The existing `/quiz`, `/cards` and Notion-mutating `/review` endpoints must be preserved in a future combined Worker. Source-level review alone does not prove which KV namespace ID is bound to the currently deployed Worker.
 
 Use the **read-only**, offline `experiments/study-sync-cas/inspect-legacy-kv.mjs` gate for a comparison against a separately captured administrative KV manifest. Do not normalize metadata-only placeholders into empty progress objects. A verified server-side backup and explicit cutover approval are still required.
+
+
+## Offline comparison of Cloud snapshot and administrative KV capture
+
+The owner now has a private capture page at `vocabloom/private-kv-capture.html`. It guides a read-only check of the `PROGRESS` KV namespace's exact `progress:acc`, `progress:eco`, `progress:math`, `progress:eng`, `progress:zh` keys in the Cloudflare Dashboard. An independent administrative lookup is essential: the production Worker synthetically returns `{"updated":0}` when a KV lookup is null.
+
+The first-party `vocabloom/migration-audit.html` page can now accept three private local files:
+1. Local full backup from the learner's browser.
+2. Read-only Cloud snapshot with the five API GET responses.
+3. Optional private administrative KV capture manifest produced from the actual bound KV namespace, not from the API fallback.
+
+All comparison occurs within the browser and the page uses a CSP with `connect-src 'none'`, never connects to Cloudflare, and never uploads progress or keys. The report contains only format checks, per-subject statuses, file checksums and aggregate counts. It checks KV key absence versus present raw JSON, detects API mismatches, and refuses to mark a *stored* metadata-only payload as stageable. Even if all five KV entries match, the status stays `BLOCKED_FOR_PRODUCTION_MIGRATION` until writers are frozen, a server-side backup is independently verified, and the production migration + rollback procedure is approved.
+
+Cloudflare documents navigation via **Workers KV → target namespace → KV Pairs**. Never use Add entry, Edit, Delete or other mutation buttons while capturing these values. A manual five-key export is NOT an atomic/simultaneous snapshot and is NOT a substitute for a separate administrative namespace backup.

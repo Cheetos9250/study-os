@@ -20,7 +20,7 @@ small,.muted{color:#58647b}#result{display:block;white-space:pre-wrap;overflow-w
 </head>
 <body><main>
 <h1>VocaBLoom · ตรวจไฟล์สำรองก่อนย้ายระบบ</h1>
-<p class="muted">Phase 5 · ตรวจสองไฟล์ในเบราว์เซอร์ของคุณโดยตรง ไม่มีการเชื่อมต่อ Cloudflare, ไม่มีการอัปโหลดข้อมูล และไม่มีการเขียนคะแนน</p>
+<p class="muted">Phase 5 · ตรวจไฟล์สำรองและข้อมูล KV ต้นทางในเบราว์เซอร์ของคุณโดยตรง ไม่มีการเชื่อมต่อ Cloudflare, ไม่มีการอัปโหลดข้อมูล และไม่มีการเขียนคะแนน</p>
 <section class="card">
 <div class="notice"><strong>ความเป็นส่วนตัว:</strong> ไฟล์จะถูกอ่านเฉพาะในเบราว์เซอร์นี้ ไม่ถูกส่งไป GitHub หรือเว็บไซต์อื่น เครื่องมือนี้ไม่ขอ SYNC_KEY และไม่มีปุ่ม Restore, Import หรือ Deploy</div>
 <label for="local">1. Local backup (.json)</label>
@@ -29,6 +29,9 @@ small,.muted{color:#58647b}#result{display:block;white-space:pre-wrap;overflow-w
 <label for="remote">2. Cloud snapshot แบบอ่านอย่างเดียว (.json)</label>
 <input id="remote" type="file" accept=".json,application/json">
 <small>ดาวน์โหลดจาก VocaBLoom → Settings → Unified Learning Sync → Cloud snapshot (read-only) ด้วยรหัสของระบบจริงเท่านั้น อย่าใช้ Staging KEY และอย่ากด Sync now</small>
+<label for="admin">3. Private KV capture จาก Cloudflare (เมื่อมีไฟล์)</label>
+<input id="admin" type="file" accept=".json,application/json">
+<small>สร้างจากหน้า Private KV Capture หลังตรวจ PROGRESS namespace ทั้ง 5 คีย์ ใช้เทียบข้อมูลต้นทางเท่านั้น ไม่ได้อนุญาตให้ย้ายระบบจริง</small>
 <div><button type="button" id="audit">ตรวจไฟล์แบบออฟไลน์</button><button type="button" id="export" disabled>ดาวน์โหลดรายงานสรุป (ไม่มีคำศัพท์/คะแนน)</button></div>
 </section>
 <section class="card">
@@ -122,6 +125,61 @@ function checkRemote(doc){
  return {capturedAt:typeof doc.capturedAt==='string'?doc.capturedAt:null,
   subjects:counts,revisionStatus:rev};
 }
+
+function canonical(x){
+ if(Array.isArray(x))return x.map(canonical);
+ if(!record(x))return x;
+ return Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])]));
+}
+function checkAdmin(manifest,cloud){
+ requireOk(record(manifest)&&manifest.format==='vocabloom-production-kv-capture-v1'&&
+  manifest.version===1,'ไฟล์ Admin KV capture ไม่ตรงชนิดหรือเวอร์ชัน');
+ requireOk(manifest.source==='owner-manual-dashboard-kv-pairs-read-only',
+  'Admin KV capture ไม่ได้ระบุว่าอ่านจาก Dashboard โดยตรง');
+ requireOk(typeof manifest.namespaceId==='string'&&/^[a-f0-9]{32}$/i.test(manifest.namespaceId),
+  'Namespace ID ไม่ครบหรือผิดรูปแบบ');
+ requireOk(typeof manifest.capturedAt==='string'&&!Number.isNaN(Date.parse(manifest.capturedAt)),
+  'Admin KV capture ไม่มีเวลาบันทึกที่ตรวจสอบได้');
+ requireOk(!Object.hasOwn(manifest,'SYNC_KEY')&&!Object.hasOwn(manifest,'NOTION_TOKEN')&&
+  !Object.hasOwn(manifest,'headers'),'ไฟล์ Admin KV capture มีข้อมูลลักษณะรหัส');
+ requireOk(record(cloud)&&record(cloud.subjects),'ต้องมี Cloud snapshot ที่ถูกต้องก่อนเทียบ KV');
+ const expected=SUBJECTS.map(k=>'progress:'+k).sort();
+ requireOk(record(manifest.entries)&&
+  JSON.stringify(Object.keys(manifest.entries).sort())===JSON.stringify(expected),
+  'Admin KV capture ต้องมีสถานะครบทั้ง 5 คีย์เท่านั้น');
+ const entries={};
+ for(const k of SUBJECTS){
+  const raw=manifest.entries['progress:'+k];
+  if(raw===null){
+   // A Worker GET fallback is NOT proof of absence. This only matches when
+   // an independently checked admin KV capture declares the key absent.
+   const v=cloud.subjects[k];
+   const match=record(v)&&Object.keys(v).length===1&&v.updated===0;
+   entries[k]={source:'kv-confirmed-absent',apiMatch:match,stagingShapeReady:match};
+  }else{
+   requireOk(typeof raw==='string'&&new TextEncoder().encode(raw).length<=900*1024,
+    'ค่า KV '+k+' ต้องเป็น Raw JSON string ขนาดปลอดภัย');
+   let value;
+   try{value=JSON.parse(raw)}catch{fail('ค่า KV '+k+' ไม่ใช่ JSON ที่ถูกต้อง')}
+   requireOk(record(value),'ค่า KV '+k+' ไม่ใช่ JSON object');
+   const match=JSON.stringify(canonical(value))===
+    JSON.stringify(canonical(cloud.subjects[k]));
+   const ready=match&&record(value.study)&&record(value.srs)&&record(value.study.ans)&&
+    record(value.study.ats)&&record(value.srs.s)&&record(value.srs.m)&&
+    (value.study.known===undefined||Array.isArray(value.study.known))&&
+    byteLength(value)<=350000;
+   entries[k]={source:'kv-present',apiMatch:match,stagingShapeReady:!!ready};
+  }
+ }
+ return {
+  status:Object.values(entries).every(e=>e.apiMatch)?'MATCHED_INDEPENDENT_KV_EXPORT':'MISMATCH_OR_STALE_SOURCE',
+  stagingPreviewReady:Object.values(entries).every(e=>e.stagingShapeReady),
+  subjects:entries,
+  adminCapturedAt:manifest.capturedAt,
+  // Independent Dashboard lookup does not mean data is frozen or atomic.
+  note:'Read-only comparison only; production cutover remains BLOCKED.'
+ };
+}
 async function audit(){
  const out=$('result'),button=$('audit');
  lastReport=null;$('export').disabled=true;button.disabled=true;
@@ -135,12 +193,21 @@ async function audit(){
    remote=await readFile(cloudFile,'Cloud');
    remoteInfo=checkRemote(remote.value);
   }
+  const adminFile=$('admin').files[0];
+  if(adminFile&&!remote)throw Error('ต้องเลือก Cloud snapshot ก่อนเทียบ Admin KV');
+  const admin=adminFile?await readFile(adminFile,'Admin KV'):null;
+  const adminCheck=admin?checkAdmin(admin.value,remote.value):null;
   const notes=[
-   'ยังไม่มีการตรวจโค้ด Worker study-api ตัวจริงใน GitHub',
+   'ยังไม่ได้ยืนยันว่ารุ่นโค้ด Worker ที่ตรวจตรงกับ Deployment จริง',
    'ยังไม่มีหลักฐานสำรองข้อมูลจากฝั่งเซิร์ฟเวอร์พร้อมวิธีกู้คืน',
    'ยังไม่มีแผน freeze/copy/verify/cutover/rollback ที่ยืนยันแล้ว'
   ];
   if(!remote)notes.unshift('ยังไม่มี Cloud snapshot ทั้ง 5 วิชา');
+  if(!adminCheck)notes.push('ยังไม่มี Admin KV capture เพื่อยืนยันสถานะคีย์ต้นทาง');
+  if(adminCheck&&adminCheck.status!=='MATCHED_INDEPENDENT_KV_EXPORT')
+   notes.push('Admin KV ไม่ตรงกับ Cloud snapshot หรือ Cloud GET ยังเป็นข้อมูลเก่า');
+  if(adminCheck&&!adminCheck.stagingPreviewReady)
+   notes.push('ข้อมูล KV บางวิชามีรูปแบบไม่ครบสำหรับ Staging หรือ API mismatch');
   if(remoteInfo&&Object.values(remoteInfo.revisionStatus).some(x=>x==='legacy-or-unversioned'))
    notes.push('มีอย่างน้อยหนึ่งวิชาที่ไม่แสดง CAS revision');
   if(remoteInfo&&Object.values(remoteInfo.subjects).some(x=>x.shape!=='complete-progress'))
@@ -153,6 +220,9 @@ async function audit(){
    status:'BLOCKED_FOR_PRODUCTION_MIGRATION',
    local:{sha256:local.sha256,bytes:local.bytes,...localInfo},
    cloud:remote?{sha256:remote.sha256,bytes:remote.bytes,...remoteInfo}:null,
+   admin:admin?{sha256:admin.sha256,bytes:admin.bytes,
+    status:adminCheck.status,stagingPreviewReady:adminCheck.stagingPreviewReady,
+    subjects:adminCheck.subjects,adminCapturedAt:adminCheck.adminCapturedAt}:null,
    blockingReasons:notes,
    networkRequests:0,serverWrites:0,
    contentPolicy:'summary only, no keys, no vocabulary, no individual answers, no device ID'
@@ -171,6 +241,15 @@ async function audit(){
      ', revision '+remoteInfo.revisionStatus[key]);
    }
   }else lines.push('PENDING · ยังไม่มี Cloud snapshot จาก Worker จริง');
+  if(adminCheck){
+   lines.push((adminCheck.status==='MATCHED_INDEPENDENT_KV_EXPORT'?'PASS':'FAIL')+
+    ' · Admin KV comparison: '+adminCheck.status);
+   for(const k of SUBJECTS){
+    const e=adminCheck.subjects[k];
+    lines.push((e.apiMatch?'READ':'WARN')+' · '+k.toUpperCase()+
+     ' KV '+e.source+', API match='+e.apiMatch+', stageable='+e.stagingShapeReady);
+   }
+  }else lines.push('PENDING · ยังไม่มี Administrative KV export สำหรับตรวจเทียบ');
   lines.push('BLOCKED · ยังไม่อนุญาตย้าย Production');
   lines.push('ผลตรวจ 0 Network Requests / 0 Server Writes');
   out.textContent=lines.join('\n');
