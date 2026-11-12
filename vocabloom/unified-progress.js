@@ -253,6 +253,7 @@ async function cFullRestore(file){
 }
 
 function cForgetKey(){
+ if(CLOUD.busy){cCloudNotice('กำลังซิงก์อยู่ รอให้การทำงานเสร็จก่อนลบรหัส',true);return;}
  if(!cCloudKey())return;
  if(!window.confirm('ลบรหัส SYNC_KEY ออกจากเบราว์เซอร์นี้ใช่หรือไม่? จะไม่ลบคะแนนการเรียนที่บันทึกไว้'))return;
  try{localStorage.removeItem(CLOUD_KEY);}catch{}
