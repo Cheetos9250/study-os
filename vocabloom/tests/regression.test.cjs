@@ -78,3 +78,34 @@ test('SRS supports all four review ratings and preserves previous state',()=>{
  assert.equal(easy.st,'rev');
  assert.ok(easy.ivl>base.ivl);
 });
+
+
+test('Full restore safely restores all five subject slots and rejects invalid JSON',async()=>{
+ const restoreCode=extract(cloud,'async function cFullRestore(file){','function cForgetKey(){');
+ const code=[
+ 'const memory=new Map(), structuredClone=x=>JSON.parse(JSON.stringify(x));',
+ 'let failKey=null, data={progress:{original:{seen:true}},days:{},custom:[],settings:{goal:10}};',
+ 'const localStorage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>{if(k===failKey)throw Error("Storage full");memory.set(k,String(v))},removeItem:k=>memory.delete(k)};',
+ 'const STORAGE_KEY="vocabloom_mvp_v1",CLOUD_LOCAL_DAYS="device-days",CLOUD_STUDY_DAYS="study-days";',
+ 'const USTATE={decks:bundle.decks},CLOCAL={device:"device-A",days:{},studyDays:{}},CLOUD={busy:false,remoteStatus:"not connected"};',
+ 'const cSafeGet=k=>localStorage.getItem(k),cSafeSet=(k,v)=>{try{localStorage.setItem(k,v);return true}catch{return false}};',
+ 'const window={confirm:()=>true};let status="";const cCloudNotice=s=>status=s,render=()=>{};',
+ restoreCode,
+ 'return async()=>{',
+ ' const payload={version:1,type:"vocabloom-unified-study-backup",deviceId:"device-A",vocabloom:{progress:{restored:{seen:true}},days:{},custom:[],settings:{goal:10}},deviceDays:{today:{answered:2,correct:1}},studyDays:{},subjects:{}};',
+ ' for(const d of bundle.decks){payload.subjects["study-"+d.key]={ans:{0:2},ats:{0:100}};payload.subjects[d.markKey+"-srs"]={s:{},m:{day:0,newDone:0}}}',
+ ' const file={size:300,text:async()=>JSON.stringify(payload)};',
+ ' failKey=bundle.decks[2].markKey+"-srs";await cFullRestore(file);',
+ ' const rollback=data.progress.original.seen&&!memory.has("study-acc");',
+ ' failKey=null;await cFullRestore(file);',
+ ' const restored=data.progress.restored.seen&&JSON.parse(memory.get("study-acc")).ans[0]===2;',
+ ' await cFullRestore({size:12,text:async()=>"{broken"});',
+ ' return {rollback,restored,invalidPreserved:data.progress.restored.seen};',
+ '};'
+ ].join('\n');
+ const fixture=new Function('bundle',code)(decks);
+ const result=await fixture();
+ assert.equal(result.rollback,true,'Expected rollback after storage failure');
+ assert.equal(result.restored,true,'Expected complete subject restore');
+ assert.equal(result.invalidPreserved,true,'Bad JSON must not overwrite restored data');
+});
