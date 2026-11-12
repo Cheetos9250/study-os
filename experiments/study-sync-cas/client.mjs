@@ -49,9 +49,16 @@ export async function syncOneSubject({baseUrl,subject,syncKey,loadLocal,saveLoca
   if(!/^"[0-9]+"$/.test(etag||''))throw new CloudSyncError('Server did not expose an ETag revision',0);
   const remote=await got.json(),local=await loadLocal();
   const merged=mergeProgress(local,remote);
+  // Snapshot the live local record before the network write. A quiz answer or SRS
+  // rating made during the PUT must not be replaced by this older merged state.
+  const localSnapshot=JSON.stringify(local);
   const submitted=await fetchImpl(url,{method:'PUT',headers:{...headers,'If-Match':etag},body:JSON.stringify(merged)});
   if(submitted.status===409||submitted.status===412)continue;
   if(submitted.status!==200)throw new CloudSyncError('Cloud PUT failed: '+submitted.status,submitted.status);
+  // A successful server write does not mean the local snapshot is still current.
+  // Retry against the new server revision using the newer local state. If retries
+  // run out, the local record remains untouched and the caller sees an error.
+  if(JSON.stringify(await loadLocal())!==localSnapshot)continue;
   await saveLocal(merged);
   return {subject,attempts:attempt,revision:submitted.headers.get('ETag'),state:merged};
  }
