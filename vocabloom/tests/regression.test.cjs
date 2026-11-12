@@ -200,7 +200,7 @@ test('P2: existing Auto Sync opt-in is cleared once without clearing scores or k
   'const CLOUD_LOCAL_DAYS="day-local",CLOUD_STUDY_DAYS="study-days",CLOUD_LAST="last-sync",CLOUD_AUTO="vocabloom-auto-sync-v1",CLOUD_AUTOSYNC_MIGRATION="vocabloom-autosync-safety-v2";',
   'const CLOCAL={days:{},studyDays:{},device:""},CLOUD={last:0,enabled:true,message:""};',
   'const data={progress:{},days:{},custom:[]};const structuredClone=x=>JSON.parse(JSON.stringify(x));const store=()=>{};',
-  initCode,
+  code,
   'cInitLocal();',
   'const first={enabled:CLOUD.enabled,flag:map.get(CLOUD_AUTO),migration:map.get(CLOUD_AUTOSYNC_MIGRATION),key:map.get("study-sync-key"),score:map.get("study-acc")};',
   'map.set(CLOUD_AUTO,"1");cInitLocal();',
