@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src https://study-api-cas-staging-only.kasidit09022550.workers.dev; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>VocaBLoom · Staging Import Preflight (read-only)</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,-apple-system,'Noto Sans Thai',sans-serif;background:#f6f8fc;color:#162238}
+*{box-sizing:border-box}body{margin:0;padding:20px}main{max-width:800px;margin:32px auto}
+h1{font-size:clamp(1.45rem,4vw,2.1rem);margin:0}h2{font-size:1.12rem;margin:0 0 8px}
+p{line-height:1.65}.muted{color:#536079}.card{padding:22px;background:#fff;border:1px solid #d9e0eb;border-radius:14px;margin:20px 0}
+.notice{background:#eff3f9;border-left:4px solid #60749a;border-radius:6px;padding:14px;line-height:1.6}
+label{font-weight:650;display:block;margin:18px 0 8px}
+input{width:100%;padding:12px;border-radius:8px;border:1px solid #8596b1;font:inherit}
+button{font:inherit;font-weight:700;border:0;background:#304b8f;color:#fff;padding:12px 18px;border-radius:9px;cursor:pointer;margin:14px 12px 0 0}
+button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#e8edf6;color:#1d335b}
+output{display:block;white-space:pre-wrap;overflow-wrap:anywhere;background:#0c1629;color:#e7edf9;padding:16px;border-radius:9px;font:13px/1.7 ui-monospace,Consolas,monospace;min-height:140px}
+small{color:#536079}a{color:#204aa0}
+</style>
+</head>
+<body><main>
+<h1>VocaBLoom · ตรวจ Staging ก่อนนำเข้า</h1>
+<p class="muted">Preflight แบบอ่านอย่างเดียว · ตรวจไฟล์ Preview เทียบกับ Durable Objects ทั้ง 5 วิชา โดยไม่แก้คะแนน</p>
+<section class="card">
+<div class="notice">
+<strong>ปลอดภัยต่อข้อมูลจริง:</strong> หน้านี้ส่งเฉพาะคำขอ GET ไปยัง <strong>study-api-cas-staging-only</strong> เท่านั้น
+ไม่มีคำสั่ง PUT, Restore, Import, Deploy หรือการอัปโหลดไฟล์ Preview
+ใช้เฉพาะ <strong>Staging SYNC_KEY</strong> ใน Bitwarden ห้ามใส่ Production SYNC_KEY
+</div>
+<label for="preview">1. เลือกไฟล์ Staging Preview ที่เก็บใน Google Drive</label>
+<input id="preview" type="file" accept=".json,application/json">
+<small>ชื่อไฟล์ vocabloom-staging-preview-private-2026-11-12.json (ดาวน์โหลดจาก Drive ลง Files ก่อนถ้าจำเป็น)</small>
+<label for="secret">2. Staging SYNC_KEY</label>
+<input id="secret" type="password" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="วางรหัสของ staging-only จาก Bitwarden">
+<div>
+<button id="check" type="button">ตรวจ Staging แบบอ่านอย่างเดียว</button>
+<button id="clear" type="button" class="secondary">ล้างรหัสและผลตรวจ</button>
+</div>
+<p><small>ผลตรวจบอกได้เพียงว่าแต่ละวิชาตรงกับไฟล์ หรือว่างและเริ่มที่ revision 0 ณ เวลาที่ตรวจ ไม่ใช่การล็อกข้อมูลไว้สำหรับนำเข้าภายหลัง</small></p>
+</section>
+<section class="card">
+<h2>ผลการตรวจ</h2>
+<output id="result" role="status" aria-live="polite">ยังไม่เริ่มตรวจ · ยังไม่มีการเขียนข้อมูลไปยัง Worker</output>
+<p class="muted"><small>หากมีวิชาใดมีข้อมูลที่ไม่ตรงกับ Preview ระบบจะแสดง BLOCKED และห้ามนำเข้าทับข้อมูลนั้น คะแนนจริงบน Production ไม่ได้รับผลกระทบจากการตรวจ</small></p>
+</section>
+</main>
+<script>
+(()=>{
+'use strict';
+const BASE='https://study-api-cas-staging-only.kasidit09022550.workers.dev';
+const SUBJECTS=['acc','eco','math','eng','zh'];
+const PROTOCOL='vocabloom-cas-staging-v1';
+const MAX_FILE=5_000_000,MAX_SUBJECT=350_000;
+const $=id=>document.getElementById(id);
+const isRecord=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const bytes=x=>new TextEncoder().encode(JSON.stringify(x)).length;
+const fail=s=>{throw new Error(s)};
+const ensure=(condition,message)=>{if(!condition)fail(message)};
+const blank=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
+const exactKeys=(obj,expected)=>isRecord(obj)&&
+ JSON.stringify(Object.keys(obj).sort())===JSON.stringify([...expected].sort());
+function canonical(x){
+ if(Array.isArray(x))return x.map(canonical);
+ if(!isRecord(x))return x;
+ return Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])]));
+}
+const same=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
+function validateProgress(s,raw){
+ ensure(isRecord(raw)&&isRecord(raw.study)&&isRecord(raw.srs)&&
+  isRecord(raw.study.ans)&&isRecord(raw.study.ats)&&
+  isRecord(raw.srs.s)&&isRecord(raw.srs.m)&&
+  (raw.study.known===undefined||Array.isArray(raw.study.known)),
+  'ข้อมูล '+s+' ไม่ใช่รูปแบบ Study/SRS ที่รองรับ');
+ ensure(bytes(raw)<=MAX_SUBJECT,'ข้อมูล '+s+' ใหญ่เกินขนาดที่ Staging รองรับ');
+ return raw;
+}
+function validatePreview(doc){
+ ensure(isRecord(doc)&&doc.format==='vocabloom-cloud-readonly-snapshot'&&doc.version===1&&
+  doc.intendedDestination==='STAGING_ONLY_NO_PRODUCTION',
+  'ไฟล์ต้องเป็น Staging Preview ที่ตรวจแล้ว ไม่ใช่ Cloud Snapshot เดิม');
+ ensure(exactKeys(doc.subjects,SUBJECTS),'ไฟล์ Preview ต้องมีข้อมูลครบ 5 วิชาเท่านั้น');
+ ensure(isRecord(doc.revisions)&&exactKeys(doc.revisions,SUBJECTS)&&
+  SUBJECTS.every(s=>doc.revisions[s]===null),'ไฟล์ Preview มีรูปแบบ revisions ไม่ตรง');
+ ensure(typeof doc.capturedAt==='string'&&!Number.isNaN(Date.parse(doc.capturedAt))&&
+  typeof doc.sourceCapturedAt==='string'&&!Number.isNaN(Date.parse(doc.sourceCapturedAt)),
+  'ไฟล์ Preview ไม่มีเวลา Source/Capture ที่ถูกต้อง');
+ ensure(!Object.hasOwn(doc,'SYNC_KEY')&&!Object.hasOwn(doc,'NOTION_TOKEN')&&
+  !Object.hasOwn(doc,'headers'),'ไม่อนุญาตไฟล์ที่มีรหัสหรือ Headers');
+ for(const s of SUBJECTS)validateProgress(s,doc.subjects[s]);
+ return doc;
+}
+async function filePreview(file){
+ ensure(file&&file.name.toLowerCase().endsWith('.json')&&
+  file.size>0&&file.size<=MAX_FILE,'กรุณาเลือกไฟล์ Preview JSON ที่ถูกต้อง');
+ const raw=await file.text();
+ ensure(new TextEncoder().encode(raw).length<=MAX_FILE,'ไฟล์ Preview ใหญ่เกินกำหนด');
+ let parsed;
+ try{parsed=JSON.parse(raw)}catch{fail('ไฟล์ Preview ไม่ใช่ JSON ที่ถูกต้อง')}
+ return validatePreview(parsed);
+}
+async function getJson(path,key){
+ ensure(/^\/(?:__staging\/health|progress\/(?:acc|eco|math|eng|zh))$/.test(path),
+  'เส้นทาง Staging ไม่อยู่ในรายการที่อนุญาต');
+ const res=await fetch(BASE+path,{
+  method:'GET',headers:{'X-Sync-Key':key},cache:'no-store',
+  credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'
+ });
+ ensure(res.status===200,path+' ตอบ HTTP '+res.status+' (หยุดตรวจ)');
+ let body;
+ try{body=await res.json()}catch{fail(path+' ส่ง JSON ผิดรูปแบบ')}
+ const revision=res.headers.get('X-Sync-Revision')??res.headers.get('ETag');
+ if(path!=='/__staging/health')
+  ensure(/^"[0-9]+"$/.test(revision||''),path+' ไม่มีหมายเลข revision ที่ปลอดภัย');
+ return {body,revision};
+}
+function classifyStaging(preview,remote,revision){
+ ensure(/^"[0-9]+"$/.test(revision||''),'Revision ไม่ใช่ตัวเลขที่ปลอดภัย');
+ if(same(preview,remote))return 'already-identical';
+ if(revision==='"0"'&&same(remote,blank()))return 'empty-revision-0';
+ return 'blocked-existing-different-data';
+}
+let busy=false;
+function setBusy(value){
+ busy=value;$('check').disabled=value;$('clear').disabled=value;
+ $('preview').disabled=value;$('secret').disabled=value;
+}
+async function run(){
+ if(busy)return;
+ const result=$('result');result.textContent='กำลังตรวจเฉพาะไฟล์ในเครื่องและ Staging GET ...';
+ let ok=0;
+ try{
+  const file=$('preview').files[0];
+  const preview=await filePreview(file);
+  const key=$('secret').value.trim();
+  ensure(key.length>=8,'กรุณาใส่ Staging SYNC_KEY ไม่ใช่รหัส Production');
+  setBusy(true);
+  const health=await getJson('/__staging/health',key);
+  ensure(health.body?.staging===true&&health.body?.protocol===PROTOCOL&&
+   JSON.stringify(health.body?.subjects)===JSON.stringify(SUBJECTS),
+   'Worker ไม่ยืนยันตัวว่าเป็น Staging ที่อนุญาต');
+  const lines=['PASS · Staging identity/protocol ถูกต้อง',
+   'PASS · Preview JSON มีโครงสร้างครบ 5 วิชา'];
+  let blocked=false;
+  for(const s of SUBJECTS){
+   const remote=await getJson('/progress/'+s,key);
+   validateProgress('Staging '+s,remote.body);
+   const state=classifyStaging(preview.subjects[s],remote.body,remote.revision);
+   if(state==='blocked-existing-different-data')blocked=true;
+   else ok++;
+   lines.push((state==='blocked-existing-different-data'?'BLOCKED':'PASS')+
+    ' · '+s.toUpperCase()+' · '+state+' · revision '+remote.revision);
+  }
+  lines.push(blocked?
+   'BLOCKED · ห้ามนำเข้า ต้องตรวจข้อมูล Staging ที่ไม่ตรงก่อน':
+   'PASS · READ-ONLY PREFLIGHT COMPLETE (ไม่ใช่การอนุมัตินำเข้าจริง)');
+  lines.push('0 Upload / 0 PUT / 0 Worker Writes');
+  result.textContent=lines.join('\n');
+ }catch(e){
+  result.textContent='FAIL · '+String(e.message||e)+
+    '\nอ่านผ่าน '+ok+' วิชา · 0 Upload / 0 PUT / 0 Worker Writes';
+ }finally{
+  $('secret').value='';
+  setBusy(false);
+ }
+}
+$('check').addEventListener('click',run);
+$('clear').addEventListener('click',()=>{
+ if(busy)return;
+ $('secret').value='';$('preview').value='';
+ $('result').textContent='ล้างรหัสและผลตรวจแล้ว';
+});
+})();
+</script>
+</body>
+</html>
