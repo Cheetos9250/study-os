@@ -205,7 +205,9 @@ function cCloudKey(){return String(cSafeGet(CLOUD_KEY)||'').trim();}
  * Legacy KV is manual-confirmation-only. Never background-write an unversioned response. */
 const CLOUD_MAX_RETRIES=6;
 function cCloudRevision(response){
- const value=response?.headers?.get?.('ETag')||'';
+ // Prefer application-level CAS revision because Cloudflare compression can weaken ETag.
+ // A present but malformed custom revision must NOT silently fall back to ETag.
+ const value=response?.headers?.get?.('X-Sync-Revision')??response?.headers?.get?.('ETag')??'';
  return /^"[0-9]+"$/.test(value)?value:'';
 }
 async function cCloudSync(manual=false){
@@ -223,6 +225,12 @@ async function cCloudSync(manual=false){
     if(resp.status===404||resp.status===405)throw Error('Worker ไม่รองรับเส้นทางซิงก์ '+d.key);
     if(!resp.ok)throw Error('Cloudflare GET '+d.key+' HTTP '+resp.status);
     const revision=cCloudRevision(resp);
+    const customRev=resp.headers?.get?.('X-Sync-Revision');
+    const httpTag=resp.headers?.get?.('ETag')||'';
+    // An advertised but broken revision, or a weak HTTP validator, is NOT
+    // equivalent to an unversioned legacy backend; refuse even manual PUT.
+    if(!revision&&(customRev!==null&&customRev!==undefined||/^W\//.test(httpTag)))
+     throw Error('Worker ส่งหมายเลขเวอร์ชันที่ไม่ปลอดภัย (Weak ETag หรือ X-Sync-Revision ผิดรูปแบบ) จึงไม่เขียนข้อมูล');
     if(revision&&CLOUD.mode!=='legacy')CLOUD.mode='cas';
     if(!revision){
      CLOUD.mode='legacy';

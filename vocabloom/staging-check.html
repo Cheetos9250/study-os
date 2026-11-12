@@ -88,6 +88,9 @@ async function fetchJson(path,key){
  return {
   value,
   etag:response.headers.get('ETag'),
+  // Prefer the application revision. A weak ETag must never become If-Match.
+  revision:response.headers.get('X-Sync-Revision')??response.headers.get('ETag'),
+  appRevision:response.headers.get('X-Sync-Revision'),
   // Diagnostic metadata only; never include the request key or progress body.
   visibleHeaders:[...response.headers.keys()].filter(name=>
    /^(etag|x-sync-revision|content-type|cache-control)$/i.test(name)).join(',')||'(none)',
@@ -108,16 +111,17 @@ async function runRead(){
   await health(key);
   writeLine('PASS · ยืนยันตัวตน Staging สำเร็จ');
   for(const subject of SUBJECTS){
-   const {value,etag,visibleHeaders,responseType}=await fetchJson('/progress/'+subject,key);
+   const {value,etag,revision,appRevision,visibleHeaders,responseType}=await fetchJson('/progress/'+subject,key);
    check(isState(value),'รูปแบบข้อมูลวิชา '+subject+' ไม่ถูกต้อง');
-   if(!/^"[0-9]+"$/.test(etag||'')){
+   if(!/^"[0-9]+"$/.test(revision||'')){
     writeLine('DIAGNOSTIC · '+subject.toUpperCase()+
      ' · raw ETag='+JSON.stringify(etag)+
+     ' · X-Sync-Revision='+JSON.stringify(appRevision)+
      ' · visible headers='+visibleHeaders+
      ' · response.type='+responseType);
-    throw new Error('ETag ไม่ใช่รูปแบบเวอร์ชันที่ปลอดภัยสำหรับ '+subject);
+    throw new Error('ไม่มีหมายเลขเวอร์ชันที่ปลอดภัยสำหรับ '+subject+' · ตรวจว่า Worker ถูกอัปเดตแล้ว');
    }
-   writeLine('PASS · '+subject.toUpperCase()+' อ่านข้อมูลได้ (revision '+etag+')');
+   writeLine('PASS · '+subject.toUpperCase()+' อ่านข้อมูลได้ (revision '+revision+')');
   }
   readPassed=true;writeLine('PASS · ตรวจข้อมูล 5 วิชาแบบอ่านอย่างเดียวครบแล้ว');
   writeLine('เลือกขั้นตอน 2 เพื่อทดสอบการบันทึกเฉพาะข้อมูลจำลอง');
@@ -135,31 +139,31 @@ async function runProbe(){
   await health(key);
   const id=newId(),path='/__staging/probe/'+id;
   const first=await fetchJson(path,key);
-  check(first.etag==='"0"'&&JSON.stringify(first.value)===JSON.stringify(empty()),
+  check(first.revision==='"0"'&&JSON.stringify(first.value)===JSON.stringify(empty()),
    'พื้นที่ทดสอบไม่ว่าง หรือไม่ได้เริ่มที่ revision 0');
   writeLine('PASS · สร้างพื้นที่ข้อมูลจำลองแยกเฉพาะครั้งนี้');
   const a=empty(),b=empty();
   a.srs.s['test-device-a']={ts:101,due:1001};
   b.srs.s['test-device-b']={ts:102,due:1002};
-  const two=await Promise.all([request(path,key,'PUT',a,first.etag),request(path,key,'PUT',b,first.etag)]);
+  const two=await Promise.all([request(path,key,'PUT',a,first.revision),request(path,key,'PUT',b,first.revision)]);
   check(two.map(x=>x.status).sort((x,y)=>x-y).join(',')==='200,409',
    'การเขียนพร้อมกันไม่ตอบ 200/409 ตามที่คาด: '+two.map(x=>x.status).join('/'));
   writeLine('PASS · การเขียนพร้อมกันได้รับ 200 และ 409');
   const winner=await fetchJson(path,key);
-  check(winner.etag==='"1"','revision ไม่เพิ่มเป็น 1');
+  check(winner.revision==='"1"','revision ไม่เพิ่มเป็น 1');
   const losing=two[0].status===409?a:b;
   const merged=empty();
   merged.srs.s={...winner.value.srs.s,...losing.srs.s};
-  const retry=await request(path,key,'PUT',merged,winner.etag);
+  const retry=await request(path,key,'PUT',merged,winner.revision);
   check(retry.status===200,'การลองใหม่ล้มเหลว HTTP '+retry.status);
   const final=await fetchJson(path,key);
-  check(final.etag==='"2"'&&final.value.srs.s['test-device-a']&&final.value.srs.s['test-device-b'],
+  check(final.revision==='"2"'&&final.value.srs.s['test-device-a']&&final.value.srs.s['test-device-b'],
    'ข้อมูลจากทั้งสองอุปกรณ์ไม่ครบ');
   writeLine('PASS · ลองใหม่สำเร็จ ข้อมูลจำลองจากทั้งสองอุปกรณ์ครบ');
   const legacy=await request(path,key,'PUT',empty(),null);
   check(legacy.status===428,'Legacy PUT ที่ไม่มี If-Match ไม่ถูกปฏิเสธ (HTTP '+legacy.status+')');
   const unchanged=await fetchJson(path,key);
-  check(unchanged.etag===final.etag&&JSON.stringify(unchanged.value)===JSON.stringify(final.value),
+  check(unchanged.revision===final.revision&&JSON.stringify(unchanged.value)===JSON.stringify(final.value),
    'Legacy PUT ทำให้ข้อมูลเปลี่ยน');
   writeLine('PASS · ปฏิเสธการเขียนแบบเก่า และข้อมูลจำลองไม่เปลี่ยน');
   writeLine('PASS · STAGING SYNC TEST COMPLETE');

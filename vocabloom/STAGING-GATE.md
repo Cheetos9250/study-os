@@ -27,3 +27,12 @@ Status: PREPARATION ONLY — no Cloudflare resources created or deployed.
 ## Rollback
 - Stop staging deploy/traffic; retain staging data for diagnosis.
 - Do not modify production bindings, credentials, or scores.
+
+## Latest staging observation and fix
+
+- Browser confirmed valid staging authentication and returned `ETag: W/"0"` for Accounting. This is a weak HTTP ETag that cannot safely be used for `If-Match`.
+- Updated Worker source exposes a dedicated `X-Sync-Revision` (quoted numeric) header and browser CORS exposure; clients prefer it, fall back only to **strong** legacy ETag, and fail closed if neither is present.
+- **Re-deploy the staging Worker separately after this commit** using the staging-only Wrangler config. A GitHub merge does not itself prove the Cloudflare Worker was updated.
+- Run browser read-only staging verification before pressing the isolated synthetic-probe test button. Do not enable Production Sync or send any real production key.
+- In a browser's Save Password popup, use Not now if the staging key is already stored in Bitwarden.
+

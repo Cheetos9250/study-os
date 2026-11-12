@@ -12,7 +12,7 @@ function iife(src){
  assert.ok(start>=0&&finish>start,'Legacy sync module was not found');
  return src.slice(start,finish+5);
 }
-function fixture(html,{hasKey=true,allow=true,putOK=true,versioned=false,conflicts=0,editDuringWrite=false}={}){
+function fixture(html,{hasKey=true,allow=true,putOK=true,versioned=false,etagMode='strong',conflicts=0,editDuringWrite=false}={}){
  const calls=[],storage=new Map();
  if(hasKey)storage.set('study-sync-key','QA_TEST_KEY');
  let confirmations=0,saveCount=0,promptCount=0,timerCount=0,visibilityHandlers=0,button=null,revision=0,remainingConflicts=conflicts,edited=false;
@@ -42,7 +42,15 @@ function fixture(html,{hasKey=true,allow=true,putOK=true,versioned=false,conflic
    const method=opt.method||'GET';calls.push({url:String(url),method,headers:opt.headers||{}});
    if(url==='data/config.json')return {ok:true,status:200,json:async()=>({api:'https://worker-staging.invalid'})};
    if(!String(url).includes('/progress/'))throw Error('Unexpected URL '+url);
-   if(method==='GET')return {ok:true,status:200,headers:{get:k=>versioned&&k.toLowerCase()==='etag'?'"'+revision+'"':null},json:async()=>JSON.parse(JSON.stringify(cloudState))};
+   if(method==='GET')return {ok:true,status:200,headers:{get:k=>{
+    const name=k.toLowerCase();
+    if(name==='x-sync-revision')
+     return versioned&&etagMode==='weak+custom'?'"'+revision+'"':
+      versioned&&etagMode==='invalid-custom'?'broken':null;
+    if(name==='etag')
+     return versioned?(etagMode==='strong'||etagMode==='invalid-custom'?'"'+revision+'"':'W/"'+revision+'"'):null;
+    return null;
+   }},json:async()=>JSON.parse(JSON.stringify(cloudState))};
    if(!putOK)return {ok:false,status:409};
    if(versioned){
     if(remainingConflicts>0){
@@ -131,5 +139,29 @@ for(const filename of pages){
   assert.ok(f.remote().srs.s['during-write']);
   assert.ok(f.context.srs['during-write']);
   assert.equal(f.calls.filter(x=>x.method==='PUT').length,2);
+ });
+}
+
+for(const filename of pages){
+ const content=fs.readFileSync(path.join(root,filename),'utf8');
+ test(filename+' syncs with compression-safe application revision even when ETag is weak',async()=>{
+  const f=fixture(content,{versioned:true,etagMode:'weak+custom'});
+  await f.flush();await f.context.window.__xs.sync(true);
+  const puts=f.calls.filter(x=>x.method==='PUT');
+  assert.equal(puts.length,1);
+  assert.equal(puts[0].headers['If-Match'],'"0"');
+  assert.equal(f.saveCount,2);
+ });
+ test(filename+' refuses weak-only ETag instead of manual unversioned PUT',async()=>{
+  const f=fixture(content,{versioned:true,etagMode:'weak-only'});
+  await f.flush();await f.context.window.__xs.sync(true);
+  assert.equal(f.calls.filter(x=>x.method==='PUT').length,0);
+  assert.equal(f.saveCount,0);
+ });
+ test(filename+' refuses malformed application CAS version',async()=>{
+  const f=fixture(content,{versioned:true,etagMode:'invalid-custom'});
+  await f.flush();await f.context.window.__xs.sync(true);
+  assert.equal(f.calls.filter(x=>x.method==='PUT').length,0);
+  assert.equal(f.saveCount,0);
  });
 }
