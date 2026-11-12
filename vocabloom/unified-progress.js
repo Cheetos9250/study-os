@@ -5,6 +5,7 @@ const CLOUD_KEY='study-sync-key', CLOUD_DEVICE_KEY='vocabloom-device-v1';
 const CLOUD_LOCAL_DAYS='vocabloom-device-days-v1', CLOUD_STUDY_DAYS='vocabloom-device-study-days-v1';
 const CLOUD_LAST='vocabloom-last-sync-v1', CLOUD_AUTO='vocabloom-auto-sync-v1';
 const CLOUD_PREFIX='vb/v1/';
+const CLOUD_AUTOSYNC_MIGRATION='vocabloom-autosync-safety-v2';
 const CLOUD={busy:false,error:'',message:'',last:0,timer:null,api:'',enabled:false,remoteStatus:'not verified'};
 function cSafeGet(k){try{return localStorage.getItem(k)}catch{return null}}
 function cSafeSet(k,v){try{localStorage.setItem(k,v);return true}catch{return false}}
@@ -23,6 +24,15 @@ function cInitLocal(){
  for(const w of data.custom||[]){if(w?.id&&w?.en&&!Number(w.syncTs)){w.syncTs=Date.now();changed=true;}}
  if(changed)store();
  const n=Number(cSafeGet(CLOUD_LAST)||0);CLOUD.last=Number.isFinite(n)?n:0;
+ // One-time safety migration: old versions could silently enable Auto Sync when a key was entered.
+ // Preserve all scores and the key, but require an explicit new opt-in for background writes.
+ if(!cSafeGet(CLOUD_AUTOSYNC_MIGRATION)){
+  if(cSafeGet(CLOUD_AUTO)==='1'){
+   cSafeSet(CLOUD_AUTO,'0');
+   CLOUD.message='Auto Sync เดิมถูกปิดเพื่อความปลอดภัย กรุณาเปิดอีกครั้งด้วยตนเองหากต้องการ';
+  }
+  cSafeSet(CLOUD_AUTOSYNC_MIGRATION,'1');
+ }
  CLOUD.enabled=cSafeGet(CLOUD_AUTO)==='1';
 }
 function cLocalRecord(wordId,correct){
@@ -223,7 +233,7 @@ async function cCloudSync(manual=false){
 }
 function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;clearTimeout(CLOUD.timer);CLOUD.timer=setTimeout(()=>cCloudSync(false),3500);}
 function cSetKey(){
- const k=window.prompt('ใส่ SYNC_KEY ที่ตั้งไว้ใน Cloudflare Worker study-api (ใช้รหัสเดียวกับหน้า Study OS เดิม)',cCloudKey()?'':'');
+ const k=window.prompt('ใส่ SYNC_KEY ของ Cloudflare Worker study-api (รหัสเดียวกับ Study OS เดิม)\n\nเมื่อใส่รหัส ระบบจะซิงก์ทันที 1 รอบ: อ่านและเขียนข้อมูลทั้ง 5 วิชาขึ้น Worker โปรดทำ Full backup ก่อน และอย่าใช้งานสองเครื่องพร้อมกันจนกว่าระบบจะผ่าน QA',cCloudKey()?'':'');
  if(k===null)return;
  if(!k.trim()){cCloudNotice('ยังไม่ได้ตั้งรหัสซิงก์');return}
  cSafeSet(CLOUD_KEY,k.trim());
