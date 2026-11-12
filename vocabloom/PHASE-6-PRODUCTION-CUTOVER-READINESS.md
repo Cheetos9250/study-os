@@ -131,3 +131,14 @@ This correction is **dormant safety preparation** while `data/config.json` remai
 `vocabloom/PHASE-6-WRITER-INVENTORY.md` now records the six production-progress-capable public clients (VocaBLoom and five legacy course pages), the five **separate** Notion `/review` routes, the two isolated Staging test/import writers, and the published read-only interfaces. An automated static gate in `vocabloom/tests/client-writer-inventory.test.cjs` fails if recognized network-mutation signatures appear outside those reviewed files or change unexpectedly.
 
 This gate supplements, **not replaces**, runtime traffic inspection and a final freeze of all old/cached clients and external systems. The live Worker source and cloud schedules remain separate verification items; the CI inventory cannot prove that those external writers have stopped.
+
+
+## Endpoint-specific Auto Sync consent survives reloads without inheritance
+
+The original `progress_api` split guard disabled inherited Auto Sync on every page load whenever the Progress API used a distinct hostname. That was safe against accidental old consent but also prevented users from ever retaining a **new, consciously approved** opt-in across reloads.
+
+A separate local `vocabloom-auto-sync-endpoint-v1` setting now records the **exact new Progress API URL**, only after the user explicitly enables Auto Sync for that URL, has a separate Progress key, and accepts a warning about backing up and writing all five subjects. Until that happens, the old `vocabloom-auto-sync-v1` preference is reset to `0` on first detection of a different endpoint. Reloading the **same explicitly approved URL** preserves its new opt-in. Changing to any other URL refuses to inherit authorization and disables Auto Sync again.
+
+Turning Auto Sync off keeps only the nonsecret endpoint identity so the same host can be approved again without conflating it with a different host. Failed storage writes, cancelled confirmation and missing Progress key all fail closed with no new sync. Existing live `config.api` users retain their original toggle behavior, and `data/config.json` is unchanged.
+
+This remains forward-looking code preparation: no new Progress Worker endpoint is active, no data migration has been authorized, and a manually requested sync still requires its own credential and CAS safeguards. This preference binds **background write consent**, not the credential itself; credential-to-endpoint hardening is a separate audit concern.
