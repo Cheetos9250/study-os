@@ -1,6 +1,6 @@
 # Study OS sync CAS prototype — SY-08
 
-**Status: staging Worker prototype only. NOT deployed. The VocaBloom and legacy pages already have CAS-aware client code, but no live CAS Worker has been deployed.**
+**Status: separately named staging Worker has been created and deployed by the user. The Cloudflare runtime still needs the updated X-Sync-Revision Worker code deployed and verified. No production Worker migration or deployment has occurred.**
 
 This is an isolated example addressing the lost-update race found by independent Claude QA when two browsers perform concurrent GET → PUT with no revision check. It is deliberately in `experiments/`, with **no GitHub Actions deploy step**, no real user data and no production credentials.
 
