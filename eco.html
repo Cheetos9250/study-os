@@ -553,7 +553,7 @@ window.__xs=(()=>{
           busy=false;paint();return;
         }
         if(!r.ok)throw Error('GET HTTP '+r.status);
-        const etag=r.headers?.get?.('ETag')||'';
+        const etag=(r.headers?.get?.('X-Sync-Revision')??r.headers?.get?.('ETag'))||'';
         const revision=/^"[0-9]+"$/.test(etag)?etag:'';
         const remote=await r.json();
         if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error))
