@@ -158,7 +158,7 @@ test('UP-02/UP-04: reloading must not rewrite either existing SRS or vocabulary 
   'const cSafeSet=(k,v)=>{localStorage.setItem(k,v);return true};',
   'const localDate=d=>d.toISOString().slice(0,10),cDate=()=> "2026-11-12";',
   'const store=()=>memory.set("vocabloom_mvp_v1",JSON.stringify(data));',
-  bridgeCode,
+  migration,
   'const original={s:{"n-test":{st:"rev",step:1,ease:2.65,ivl:10,due:1795280400000,ts:1000,last:4}},m:{day:0,newDone:0}};',
   'memory.set("eng-vocab-v1-srs",JSON.stringify(original));store();',
   'const beforeSrs=memory.get("eng-vocab-v1-srs"),beforeWord=memory.get("vocabloom_mvp_v1");',
