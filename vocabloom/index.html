@@ -23,6 +23,9 @@ body.dark{--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b
 @media(max-width:1000px){.app-shell{background:linear-gradient(to right,var(--white) 0 211px,var(--bg) 211px)}}
 @media(max-width:760px){.app-shell{background:var(--bg)}}
 
+/* QA P2: inline navigation links must meet WCAG AA text contrast in dark mode. */
+body.dark .text-link { color:#c4baff; }
+body.dark .text-link:hover,body.dark .text-link:focus-visible { color:#efeaff;text-decoration:underline; }
 /* QA UI-06: Accessible foregrounds for dark mode button-cards and progress labels. */
 body.dark .path-card,body.dark .game-card,
 body.dark .path-card h3,body.dark .game-card h3,
