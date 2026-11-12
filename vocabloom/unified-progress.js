@@ -344,7 +344,51 @@ function cForgetKey(){
 function cPanel(){
  const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'ยังไม่เคยยืนยันการซิงก์';
  const engine=CLOUD.mode==='cas'?'Safe Sync (ETag / If-Match)':CLOUD.mode==='legacy'?'Legacy Worker (ไม่มี ETag)':'ยังไม่ได้ตรวจความสามารถ Worker';
- return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p style="color:#ae6741;font-weight:700">Cloud Sync ยังอยู่ระหว่าง QA: Worker จริงยังไม่ได้รับการยืนยันว่ารองรับการเขียนข้อมูลพร้อมกันอย่างปลอดภัย · Auto Sync จะปิดตัวเองหากไม่พบ ETag · การซิงก์แบบเดิมต้องยืนยันความเสี่ยงทุกครั้ง โปรดทำ Full backup ก่อนใช้งาน</p><p>โหมดเซิร์ฟเวอร์: <strong>'+h(engine)+'</strong></p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
+ return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p style="color:#ae6741;font-weight:700">Cloud Sync ยังอยู่ระหว่าง QA: Worker จริงยังไม่ได้รับการยืนยันว่ารองรับการเขียนข้อมูลพร้อมกันอย่างปลอดภัย · Auto Sync จะปิดตัวเองหากไม่พบ ETag · การซิงก์แบบเดิมต้องยืนยันความเสี่ยงทุกครั้ง โปรดทำ Full backup ก่อนใช้งาน</p><p>โหมดเซิร์ฟเวอร์: <strong>'+h(engine)+'</strong></p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Local backup</button><button class="btn btn-outline" data-action="cloud-remote-backup" '+(!active||CLOUD.busy?'disabled':'')+'>↓ Cloud snapshot (read-only)</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Cloud snapshot ใช้แค่ GET ไม่เปลี่ยนข้อมูลบน Worker หรือคะแนนในเครื่อง และไฟล์มีข้อมูลการเรียนส่วนตัว · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
+}
+
+/* Read-only remote snapshot for migration planning. Never POST/PUT or mutate local progress. */
+async function cRemoteSnapshot(){
+ if(CLOUD.busy){cCloudNotice('มีการซิงก์อื่นทำงานอยู่ กรุณาลองใหม่หลังจบ',true);return;}
+ if(!cCloudKey()||!USTATE.ready){cCloudNotice('ยังไม่มีรหัสซิงก์หรือข้อมูลวิชาไม่พร้อม',true);return;}
+ if(!window.confirm('สำรองคะแนนจาก Cloudflare แบบอ่านอย่างเดียวทั้ง 5 วิชาใช่หรือไม่?\n\nไฟล์ JSON นี้มีรายละเอียดคะแนนการเรียนและควรเก็บเป็นส่วนตัว ถ้าใช้คอมพิวเตอร์สาธารณะควรย้ายไฟล์ไปพื้นที่ส่วนตัวแล้วลบไฟล์ที่ดาวน์โหลดออกจากเครื่อง'))return;
+ CLOUD.busy=true;cCloudNotice('กำลังอ่านข้อมูล Cloudflare เพื่อสำรอง (ไม่ส่งคำสั่ง PUT)...');
+ try{
+  const api=await cApiUrl();
+  const headers={'X-Sync-Key':cCloudKey()};
+  const subjects={},revisions={};
+  for(const d of USTATE.decks){
+   const response=await fetch(api+'/progress/'+encodeURIComponent(d.key),{headers,cache:'no-store'});
+   if(response.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง');
+   if(!response.ok)throw Error('อ่านข้อมูลวิชา '+d.key+' ไม่สำเร็จ HTTP '+response.status);
+   const body=await response.text();
+   if(new TextEncoder().encode(body).byteLength>500000)throw Error('ข้อมูลวิชา '+d.key+' ใหญ่เกินขนาดปลอดภัย');
+   const value=JSON.parse(body);
+   if(!value||typeof value!=='object'||Array.isArray(value)||value.error)throw Error('ข้อมูลวิชา '+d.key+' มีรูปแบบผิดปกติ');
+   subjects[d.key]=value;
+   revisions[d.key]=cCloudRevision(response)||null;
+  }
+  const snapshot={
+   format:'vocabloom-cloud-readonly-snapshot',version:1,
+   capturedAt:new Date().toISOString(),subjects,revisions,
+   note:'Read-only snapshot. No Worker or local study data was modified. ETag=null means no atomic versioning guarantee.'
+  };
+  const payload=JSON.stringify(snapshot,null,2);
+  // Never serialize SYNC_KEY, request headers or Cloudflare API credentials into downloaded data.
+  if(payload.includes(cCloudKey()))throw Error('ไม่สามารถสร้างไฟล์สำรองได้อย่างปลอดภัย');
+  const blob=new Blob([payload],{type:'application/json;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='vocabloom-cloud-snapshot-'+cDate()+'.json';
+  document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  cCloudNotice('อ่านและดาวน์โหลดสำรองข้อมูล Cloudflare ครบ 5 วิชาแล้ว · 5 GET / 0 PUT');
+ }catch(e){
+  cCloudNotice('ดาวน์โหลดสำรองข้อมูล Cloudflare ไม่สำเร็จ: '+String(e.message||e),true);
+ }finally{
+  CLOUD.busy=false;
+  if(ui.page==='settings')render();
+ }
 }
 
 function cFullBackup(){
@@ -362,6 +406,7 @@ function cFullBackup(){
 function cPanelAction(el){
  if(el.dataset.action==='cloud-restore'){document.getElementById('fullRestoreInput')?.click();return true;}
  if(el.dataset.action==='cloud-forget'){cForgetKey();return true;}
+ if(el.dataset.action==='cloud-remote-backup'){cRemoteSnapshot();return true;}
  if(el.dataset.action==='cloud-backup'){cFullBackup();return true;}
  if(el.dataset.action==='cloud-config'){cSetKey();return true;}
  if(el.dataset.action==='cloud-sync'){cCloudSync(true);return true;}

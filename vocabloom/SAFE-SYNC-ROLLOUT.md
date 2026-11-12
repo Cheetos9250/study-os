@@ -12,6 +12,12 @@ The existing VocaBloom app and all five legacy Study OS pages have been made com
 - **Backup/Restore**: Full backup remains local JSON, never includes the SYNC_KEY. SRS IDs and the stable Notion `page_id` export remain unchanged. LocalStorage remains the immediate persistence layer.
 - **Secrets**: `SYNC_KEY` is in request headers/localStorage only; do not include in URLs, logs, screenshots, snapshots or Git commits.
 
+## Read-only remote snapshot in Settings
+
+VocaBloom provides **Cloud snapshot (read-only)** when a SYNC_KEY is configured. The learner must actively click and confirm. It performs five sequential GETs (`/progress/acc`, `eco`, `math`, `eng`, `zh`) and **zero PUTs**. The downloaded JSON contains remote `study` and `srs` data and any exposed ETag revisions, **not** the SYNC_KEY. If any subject fails or returns malformed/oversized data, the app aborts without downloading an incomplete file.
+
+This is separate from **Local backup**: the remote snapshot does not export the browser's unsynced changes or game-only progress. It is **not** an automatic restore mechanism and must not be uploaded wholesale without validation against the actual Worker data contract. Without ETag support the five GETs are not one atomic cross-subject snapshot. Do not save the file on a shared university computer.
+
 ## Checks that pass in GitHub Actions
 
 `node --test vocabloom/tests/*.test.cjs` covers safe CAS GET/PUT, 409 conflicts, in-flight edits, legacy auto-disable, explicit legacy consent, server errors, repeat conflicts, all five legacy pages and preexisting progress/backup behavior.
