@@ -45,8 +45,8 @@ export async function syncOneSubject({baseUrl,subject,syncKey,loadLocal,saveLoca
  for(let attempt=1;attempt<=maxAttempts;attempt++){
   const got=await fetchImpl(url,{method:'GET',headers,cache:'no-store'});
   if(got.status!==200)throw new CloudSyncError('Cloud GET failed: '+got.status,got.status);
-  const etag=got.headers.get('ETag');
-  if(!/^"[0-9]+"$/.test(etag||''))throw new CloudSyncError('Server did not expose an ETag revision',0);
+  const etag=got.headers.get('X-Sync-Revision')??got.headers.get('ETag');
+  if(!/^"[0-9]+"$/.test(etag||''))throw new CloudSyncError('Server did not expose a strong CAS revision',0);
   const remote=await got.json(),local=await loadLocal();
   const merged=mergeProgress(local,remote);
   // Snapshot the live local record before the network write. A quiz answer or SRS
@@ -60,7 +60,7 @@ export async function syncOneSubject({baseUrl,subject,syncKey,loadLocal,saveLoca
   // run out, the local record remains untouched and the caller sees an error.
   if(JSON.stringify(await loadLocal())!==localSnapshot)continue;
   await saveLocal(merged);
-  return {subject,attempts:attempt,revision:submitted.headers.get('ETag'),state:merged};
+  return {subject,attempts:attempt,revision:submitted.headers.get('X-Sync-Revision')??submitted.headers.get('ETag'),state:merged};
  }
  throw new CloudSyncError('Conflict retry limit exceeded: local data remains unchanged',409);
 }
