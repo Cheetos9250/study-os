@@ -111,3 +111,18 @@ For each of `acc`, `eco`, `math`, `eng`, and `zh`, the preflight classifies the 
 After a *complete five-subject read*, the owner can download `vocabloom-staging-readonly-preflight-report.json`. This sanitized report contains only the timestamp, protocol, read-only mode, per-subject classification and revision. It never includes the Staging SYNC_KEY, subject bodies, individual scores, vocabulary, user identifiers, or the private preview file. Error/incomplete runs do not enable report export. Downloading the report does not authorize any data import; both production cutover and staging apply remain separate explicit decision gates.
 
 No source of secrets, Production Worker, or KV key is modified by this page.
+
+
+## Staging-only Accounting import — guarded browser workflow
+
+The public code in `vocabloom/staging-accounting-import.html` creates a **user-operated** browser workflow; the user's private Study/SRS records and secret never enter GitHub. The page is pinned by CSP and JS to `study-api-cas-staging-only.kasidit09022550.workers.dev`.
+
+The owner first selects the existing private Staging Preview saved in Drive and enters **only the staging secret** from Bitwarden. A no-write preflight validates exactly five subjects, requires the single known Accounting answer and the other four expected empty progress stores, checks the identity marker, and fetches five Staging Durable Objects with strong revisions. Any other existing Staging data blocks the operation.
+
+Before any write can be enabled, the owner must download a private `vocabloom-staging-before-import-private.json` containing all five Staging states + revisions and check the explicit Staging-only checkbox. This is a backup of **Staging** only, not Production KV. Do not publish it. A fresh authenticated five-subject GET is then compared to that saved snapshot, including revisions; if anything has changed, **zero PUT** and manual rechecking is required.
+
+The only possible write is `PUT /progress/acc` to the fixed staging hostname with `If-Match: "0"`. It is only issued when ACC still has exactly the pristine empty Study/SRS value at revision zero. `eco`, `math`, `eng`, and `zh` are never written. A 409/428/network failure stops without an automatic retry. Successful replies are followed by a fresh readback of Accounting and the other four subjects, with value equality checks and unchanged-state checks on the other four. Re-running with already-identical Accounting makes **zero writes**.
+
+After verified success, the owner can download a redacted `vocabloom-staging-accounting-import-report.json` containing only statuses, per-subject revision metadata and write count, never the credential or answers. The password field is cleared. Saving the backup and report in a private Drive folder is recommended.
+
+**Deployment boundary:** This page and its tests are GitHub Pages/static frontend changes only. They do not authorize Production migration, do not deploy Worker source, do not change Notion, and do not touch Production KV. The staged import requires the owner to click through the guarded form with their Staging secret. The production cutover remains BLOCKED pending a combined Worker design, rollback, new final source capture, freeze and verification.
