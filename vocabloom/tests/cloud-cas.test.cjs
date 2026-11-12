@@ -11,7 +11,7 @@ function selected(){
  assert.ok(a>0&&b>a,'CAS routine not found');
  return src.slice(a,b);
 }
-function fixture({mode='cas',allowLegacy=true,conflicts=0,editDuringWrite=false,serverFailure=0}={}){
+function fixture({mode='cas',allowLegacy=true,conflicts=0,editDuringWrite=false,serverFailure=0,disableOnApiResolve=false,disableAfterGet=false,disableAfterPut=false}={}){
  const decks=['acc','eco','math','eng','zh'].map(key=>({key}));
  const USTATE={ready:true,decks},CLOUD={busy:false,enabled:true,last:0,pending:false,remoteStatus:'unknown',error:''};
  const ui={page:'home'},updates=new Map(),remote=new Map(),requests=[],settings=new Map();
@@ -28,7 +28,7 @@ function fixture({mode='cas',allowLegacy=true,conflicts=0,editDuringWrite=false,
   CLOUD_AUTO:'vocabloom-auto-sync-v1',CLOUD_LAST:'vocabloom-last-sync-v1',CLOUD_PREFIX:'vb/v1/',
   TextEncoder,cCloudKey:()=> 'TEST_KEY',
   cSafeSet:(key,value)=>{settings.set(key,value);return true},
-  cApiUrl:async()=> 'https://fake-staging.invalid',
+  cApiUrl:async()=>{if(disableOnApiResolve)CLOUD.enabled=false;return 'https://fake-staging.invalid';},
   window:{confirm:()=>{confirmCount++;return allowLegacy}},
   render:()=>{},cCloudNotice:(message,error)=>{notice=message;CLOUD.error=error?message:''},
   cCloudDebounce:()=>{debounceCount++},
@@ -45,6 +45,7 @@ function fixture({mode='cas',allowLegacy=true,conflicts=0,editDuringWrite=false,
    if(!remote.has(subject))return {ok:false,status:404};
    const record=remote.get(subject);
    if(method==='GET'){
+    if(disableAfterGet)CLOUD.enabled=false;
     return {ok:true,status:200,headers:{get:key=>{
      const name=key.toLowerCase();
      if(name==='x-sync-revision')
@@ -65,6 +66,7 @@ function fixture({mode='cas',allowLegacy=true,conflicts=0,editDuringWrite=false,
     if(opts.headers['If-Match']!=='"'+record.revision+'"')return {ok:false,status:409};
    }else if(opts.headers['If-Match'])throw Error('Old backend must not receive If-Match');
    record.data=JSON.parse(opts.body);record.revision++;
+   if(disableAfterPut)CLOUD.enabled=false;
    if(editDuringWrite&&!edited&&subject==='acc'){
     edited=true;
     updates.get(subject).srs.s['during-write']={ts:99,due:3000};
@@ -157,4 +159,39 @@ test('Malformed custom CAS revision fails closed even if the ETag is strong',asy
  assert.equal(f.CLOUD.remoteStatus,'error');
  assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
  assert.equal(f.confirmations(),0);
+});
+
+test('Background sync rechecks permission after async API resolution disables inherited Auto Sync',async()=>{
+ const f=fixture({disableOnApiResolve:true});
+ const before=[...f.remote.values()].map(x=>x.revision);
+ await f.run(false);
+ assert.equal(f.CLOUD.enabled,false);
+ assert.equal(f.CLOUD.remoteStatus,'error');
+ assert.equal(f.requests.length,0,'Must not send even a credentialed GET after disable');
+ assert.deepEqual([...f.remote.values()].map(x=>x.revision),before);
+ assert.match(f.status(),/Auto Sync ปิดอยู่/);
+});
+test('Auto Sync OFF during an in-flight GET blocks all subsequent PUT requests',async()=>{
+ const f=fixture({disableAfterGet:true});
+ await f.run(false);
+ assert.equal(f.CLOUD.remoteStatus,'error');
+ assert.equal(f.requests.filter(x=>x.method==='GET').length,1);
+ assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
+ assert.ok(f.updates.get('acc').srs.s['local-acc']);
+});
+test('Auto Sync OFF after an acknowledged PUT stops remaining subject writes',async()=>{
+ const f=fixture({disableAfterPut:true});
+ await f.run(false);
+ assert.equal(f.CLOUD.remoteStatus,'error');
+ assert.equal(f.requests.filter(x=>x.method==='PUT').length,1);
+ assert.equal(f.remote.get('acc').revision,1);
+ assert.equal(f.remote.get('eco').revision,0);
+ assert.equal(f.remote.get('zh').revision,0);
+ assert.match(f.status(),/1\/5 วิชา/);
+});
+test('An explicitly requested manual sync is not silently mistaken for background consent',async()=>{
+ const f=fixture({disableOnApiResolve:true});
+ await f.run(true);
+ assert.equal(f.CLOUD.remoteStatus,'saved');
+ assert.equal(f.requests.filter(x=>x.method==='PUT').length,5);
 });
