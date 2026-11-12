@@ -124,3 +124,10 @@ A second part of the old `/review` dispatch logic was found after the separate A
 All five pages now dispatch the original API `/review` only when `window.__xs.reviewReady()` is true. Their separate direct Notion connector branch retains priority when available. Tests exercise the **real `syncNotion()` function** in all five pages: original Notion credential present/new Progress credential absent, the inverse combination, and direct Notion connector preference.
 
 This correction is **dormant safety preparation** while `data/config.json` remains unchanged. It does not authorize Production cutover, write to Notion, or modify scores. A real browser test of both types of Review Step update remains a release gate.
+
+
+## Audited published write-surface inventory
+
+`vocabloom/PHASE-6-WRITER-INVENTORY.md` now records the six production-progress-capable public clients (VocaBLoom and five legacy course pages), the five **separate** Notion `/review` routes, the two isolated Staging test/import writers, and the published read-only interfaces. An automated static gate in `vocabloom/tests/client-writer-inventory.test.cjs` fails if recognized network-mutation signatures appear outside those reviewed files or change unexpectedly.
+
+This gate supplements, **not replaces**, runtime traffic inspection and a final freeze of all old/cached clients and external systems. The live Worker source and cloud schedules remain separate verification items; the CI inventory cannot prove that those external writers have stopped.
