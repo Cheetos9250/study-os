@@ -88,3 +88,15 @@ To minimize manual JSON copying, `vocabloom/private-kv-capture.html` accepts an 
 The remaining four subjects are **not** silently filled in: the user must select `confirmed absent` for each after reading the `KV Pairs` list for the correct bound namespace. The user must copy the 32-character namespace **ID** from the Cloudflare namespace Settings page (this is an identifier, not a secret). Until that evidence and all five selections are present, the form refuses to produce a capture manifest. The old Dashboard screenshot is a historical read and does not make the export atomic. The last direct admin check and freeze still remain before any staging import.
 
 No production data, Worker, KV namespace, or secret values were modified by this file-picker enhancement.
+
+## Phase 5 — Staging read-only import preflight
+
+The private Staging Preview file is stored in Google Drive in the VocaBLoom / Backups / Staging Previews folder. The offline dry-run report is stored in VocaBLoom / Reports. Neither generated a Worker write.
+
+The page vocabloom/staging-import-preflight.html reads the locally selected preview and sends only authenticated GET requests to the isolated study-api-cas-staging-only Worker. It checks the exact staging protocol, reads the current Durable Object state and strong X-Sync-Revision (with strong ETag fallback) for acc, eco, math, eng and zh, and labels every subject as already-identical, empty-revision-0, or blocked-existing-different-data.
+
+The file must contain the explicit STAGING_ONLY_NO_PRODUCTION marker and five valid subject stores. The browser never uploads the file, saves the Staging key, or sends PUT/POST. After the run, the Staging-only secret field is cleared. This page has no functionality for a production Worker.
+
+Any unexpected existing staging data blocks an import. A passing read-only check is NOT a data lock or permission for writes: new data might be added between checking and importing. If a staging import is subsequently approved, the importer must repeat its all-five preflight immediately before writing and verify each readback.
+
+Before any staging import, independently preserve the currently existing staging records; re-confirm the source KV backup and capture freshness; and obtain explicit approval for an isolated Staging-only import. Never apply to Production.
