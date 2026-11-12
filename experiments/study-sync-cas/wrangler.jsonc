@@ -1,0 +1,24 @@
+{
+  "name": "study-api-cas-staging-only",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-12",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PROGRESS_DO",
+        "class_name": "StudyProgressDO"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "StudyProgressDO"
+      ]
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://cheetos9250.github.io"
+  }
+}
