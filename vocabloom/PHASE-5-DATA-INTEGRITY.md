@@ -126,3 +126,20 @@ The only possible write is `PUT /progress/acc` to the fixed staging hostname wit
 After verified success, the owner can download a redacted `vocabloom-staging-accounting-import-report.json` containing only statuses, per-subject revision metadata and write count, never the credential or answers. The password field is cleared. Saving the backup and report in a private Drive folder is recommended.
 
 **Deployment boundary:** This page and its tests are GitHub Pages/static frontend changes only. They do not authorize Production migration, do not deploy Worker source, do not change Notion, and do not touch Production KV. The staged import requires the owner to click through the guarded form with their Staging secret. The production cutover remains BLOCKED pending a combined Worker design, rollback, new final source capture, freeze and verification.
+
+
+## Post-import Staging persistence exit check (no-write)
+
+Following a guarded user-operated Staging-only Accounting import, the user can independently verify persistence after a page refresh with the new static `vocabloom/staging-exit-check.html` page. This page does **not** import again. It accepts the same private Staging Preview and requires only the separate Staging credential from Bitwarden in the browser.
+
+It authenticates to the fixed `study-api-cas-staging-only` Worker, checks its protocol identity, and reads all five Durable Objects using only HTTP GET (no POST, PUT, auto sync, storage or upload). The required pass conditions are:
+
+- `acc`: the whole Study/SRS payload matches the private Preview and has a strong numeric revision **at least 1**, proving a server-side write has occurred rather than only an unsaved local draft.
+- `eco`, `math`, `eng`, `zh`: the whole payload exactly matches the private Preview and revision remains **0**, detecting any unintended write even when its value looks the same.
+- All subjects have the validated Study/SRS schema and the correct explicit Staging identity. Any failed GET, missing revision, weak-only ETag, partial schema, altered value or unexpected revision blocks the exit check.
+
+The page produces `vocabloom-staging-post-import-readonly-report.json`, a **redacted** report with only timestamp, pass/blocked status and per-subject revision. The filename is distinct from the application-generated `vocabloom-staging-accounting-import-report.json`; do not misrepresent one as the other. The user may keep these reports in their private Google Drive `VocaBLoom / Reports / Phase 5 Staging Import`.
+
+**Evidence distinction:** the import UI screenshot supplied by the owner indicates one Staging PUT succeeded and immediate readback verified Accounting, without writes to the other four subjects. An independent later GET by a fresh page/session is still needed to confirm persistence. A copied screenshot, an offline pre-import backup, or a previously generated preview cannot substitute for that current GET.
+
+Even a green exit check closes only the Staging import experiment, **not** the Production migration. Production cutover remains blocked pending a new source backup, robust no-loss migration and rollback, explicit user consent, and preservation of the original Notion `/quiz`, `/cards` and `/review` routes.
