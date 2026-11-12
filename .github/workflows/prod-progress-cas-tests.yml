@@ -1,0 +1,27 @@
+name: Production CAS candidate OFFLINE tests (NO DEPLOY)
+
+on:
+  push:
+    paths:
+      - "experiments/prod-progress-cas/**"
+      - ".github/workflows/prod-progress-cas-tests.yml"
+  pull_request:
+    paths:
+      - "experiments/prod-progress-cas/**"
+      - ".github/workflows/prod-progress-cas-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Simulate isolated CAS Durable Objects (no cloud requests, no deployment)
+        run: node --test experiments/prod-progress-cas/*.test.mjs
