@@ -159,5 +159,5 @@ test('Authenticated health marker identifies staging protocol, without data writ
  assert.deepEqual(await withKey.json(),{
   staging:true,protocol:'vocabloom-cas-staging-v1',subjects:['acc','eco','math','eng','zh']
  });
- assert.equal(f.buckets.size,1,'Only preceding GET initializes a bucket; health route never creates a DO');
+ assert.equal(f.buckets.size,0,'Health route must not initialize any Durable Object');
 });
