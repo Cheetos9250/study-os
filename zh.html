@@ -503,6 +503,7 @@ window.__xs=(()=>{
   const LSK='study-sync-key', PROGRESS_LSK='study-sync-progress-key-v1';
   let api='', contentApi='', progressKeyName=LSK, timer=null, busy=false, applying=false, box=null, msgEl=null, btnEl=null;
   const key=()=>{ try{ return localStorage.getItem(progressKeyName)||''; }catch(e){ return ''; } };
+  const contentKey=()=>{ try{ return localStorage.getItem(LSK)||''; }catch(e){ return ''; } };
   const hdr=()=>({'X-Sync-Key':key(),'Content-Type':'application/json'});
   async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); const original=String(j.api||'').replace(/\/+$/,''); const next=String(j.progress_api||original).replace(/\/+$/,''); contentApi=original; api=next; progressKeyName=next&&next!==original?PROGRESS_LSK:LSK; } }catch(e){} return api; }
   const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'var(--ok,#1d7a4a)':'var(--bad,#b3261e)'; } };
@@ -610,9 +611,9 @@ window.__xs=(()=>{
   // Do not dispatch background GET/PUT even if the browser already has a SYNC_KEY.
   return { dirty(){ /* intentionally local-only until explicit opt-in/manual click */ },
     ready(){ return !!(api&&key()); },
-    reviewReady(){try{return !!(contentApi&&localStorage.getItem(LSK))}catch(e){return false}},
+    reviewReady(){return !!(contentApi&&contentKey())},
     reviewApi:async()=>{await cfg();return contentApi;},
-    reviewHdr:()=>({'X-Sync-Key':String((()=>{try{return localStorage.getItem(LSK)||''}catch(e){return ''}})()),'Content-Type':'application/json'}),
+    reviewHdr:()=>({'X-Sync-Key':contentKey(),'Content-Type':'application/json'}),
     api:()=>api, hdr, sync };
 })();
 </script>
