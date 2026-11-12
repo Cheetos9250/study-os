@@ -54,7 +54,7 @@ test('Accepts complete cloud export with legacy empty subjects but not incomplet
  const {checkRemote}=fixture();
  const result=checkRemote(cloud());
  assert.equal(Object.keys(result.subjects).length,5);
- assert.equal(result.subjects.acc.emptyLegacy,true);
+ assert.equal(result.subjects.acc.shape,'empty-object');
  const partial=cloud();
  partial.subjects.acc={study:{ans:{}}};
  assert.throws(()=>checkRemote(partial),/ไม่ครบ/);
@@ -73,4 +73,26 @@ test('Count summary only, never serializes raw data or identifiers into report',
  assert.match(script,/cloud:remote\?\{sha256:remote.sha256,bytes:remote.bytes,\.\.\.remoteInfo\}:null/);
  assert.doesNotMatch(script,/lastReport\s*=\s*(?:remote\.value|local\.value|cloudFile|local\.value)/);
  assert.match(script,/no keys, no vocabulary, no individual answers, no device ID/);
+});
+
+test('Legacy updated=0 records are preserved as metadata-only, never assumed empty progress',()=>{
+ const {checkRemote}=fixture();
+ const c=cloud();
+ for(const subject of ['eco','math','eng','zh'])c.subjects[subject]={updated:0};
+ c.subjects.acc={study:{ans:{'32':0},ats:{'32':0},known:[],rst:0},
+  srs:{s:{},m:{day:1,newDone:0}},updated:1234};
+ const report=checkRemote(c);
+ assert.equal(report.subjects.acc.shape,'complete-progress');
+ assert.equal(report.subjects.acc.quizAnswers,1);
+ for(const subject of ['eco','math','eng','zh']){
+  assert.equal(report.subjects[subject].shape,'legacy-metadata-only');
+  assert.equal(report.subjects[subject].quizAnswers,null);
+ }
+});
+test('Audit rejects unsafe partial legacy metadata instead of guessing state',()=>{
+ const {checkRemote}=fixture();
+ for(const bad of [{updated:123}, {updated:0,ans:{}}, {updated:'0'}, {study:{},updated:0}]){
+  const c=cloud();c.subjects.eco=bad;
+  assert.throws(()=>checkRemote(c),/ไม่ครบ/);
+ }
 });

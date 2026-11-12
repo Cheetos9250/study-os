@@ -31,3 +31,12 @@ Updated: 2026-11-12. **Production cutover is BLOCKED. Do not change the live Wor
 
 ## One required authorized action for the real Cloud snapshot
 Open VocaBLoom **Settings → Unified Learning Sync → Cloud snapshot (read-only)** and download its JSON using the **production** SYNC_KEY only. Do not click Sync now or Full restore. Save the downloaded file privately, then compare it with the local backup using the offline audit page. A production snapshot cannot be retrieved automatically from GitHub credentials; it requires authorized read access to the live Cloudflare Worker.
+
+
+## Legacy production Cloud snapshot compatibility
+
+Read-only snapshots captured from a legacy Worker can contain an exact object of the form `{"updated":0}` for a subject that has not been populated through the API. This is **metadata-only**, not an explicitly verified blank Study/SRS record. The browser's local backup may be empty while an individual cloud subject contains answers; both originals must be retained.
+
+The offline audit page labels `{"updated":0}` as `legacy-metadata-only`, shows counts as **unknown** rather than zero, and keeps the production cutover gate **BLOCKED**. The strict staging importer still rejects incomplete source records; no automatic normalization or import is approved. Source schema and administrative server-side backup must be reviewed first. Never overwrite a populated subject with local defaults solely because a different device reports zero entries.
+
+The Production Worker has no verified `X-Sync-Revision` or strong `ETag` on any of the five subjects in the latest read-only snapshot. Continuing to press manual Legacy Sync can overwrite remote data; do not enable it during migration preparation.
