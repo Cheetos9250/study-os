@@ -45,10 +45,17 @@ function fixture({mode='cas',allowLegacy=true,conflicts=0,editDuringWrite=false,
    if(!remote.has(subject))return {ok:false,status:404};
    const record=remote.get(subject);
    if(method==='GET'){
-    return {ok:true,status:200,headers:{get:key=>key.toLowerCase()==='etag'&&mode==='cas'?'"'+record.revision+'"':null},json:async()=>clone(record.data)};
+    return {ok:true,status:200,headers:{get:key=>{
+     const name=key.toLowerCase();
+     if(name==='x-sync-revision')
+      return mode==='weak'?'"'+record.revision+'"':mode==='broken-custom'?'invalid':null;
+     if(name==='etag')
+      return mode==='legacy'?null:mode==='weak'||mode==='weak-only'?'W/"'+record.revision+'"':'"'+record.revision+'"';
+     return null;
+    }},json:async()=>clone(record.data)};
    }
    if(serverFailure)return {ok:false,status:serverFailure};
-   if(mode==='cas'){
+   if(mode!=='legacy'){
     if(remaining>0){
      remaining--;
      record.revision++;
@@ -131,4 +138,23 @@ test('Auto Sync button cannot trigger unsafe manual fallback',()=>{
  const first=src.indexOf("if(el.dataset.action==='cloud-auto')");
  assert.ok(first>=0);
  assert.ok(src.slice(first,first+230).includes('cCloudSync(false)'));
+});
+
+test('Cloudflare weak ETag with valid custom revision remains CAS safe for five subjects',async()=>{
+ const f=fixture({mode:'weak'});await f.run(false);
+ assert.equal(f.CLOUD.remoteStatus,'saved',f.status());
+ assert.equal(f.requests.filter(x=>x.method==='PUT').length,5);
+ assert.ok(f.requests.filter(x=>x.method==='PUT').every(x=>x.headers['If-Match']==='"0"'));
+});
+test('Weak-only ETag fails closed before manual PUT, without unsafe fallback',async()=>{
+ const f=fixture({mode:'weak-only'});await f.run(true);
+ assert.equal(f.CLOUD.remoteStatus,'error');
+ assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
+ assert.equal(f.confirmations(),0);
+});
+test('Malformed custom CAS revision fails closed even if the ETag is strong',async()=>{
+ const f=fixture({mode:'broken-custom'});await f.run(true);
+ assert.equal(f.CLOUD.remoteStatus,'error');
+ assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
+ assert.equal(f.confirmations(),0);
 });
