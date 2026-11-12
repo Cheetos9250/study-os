@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>VocaBLoom · Phase 5 Backup Audit</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,-apple-system,'Noto Sans Thai',sans-serif;color:#17243a;background:#f7f8fc}
+*{box-sizing:border-box}body{margin:0;padding:20px}main{max-width:820px;margin:34px auto}
+h1{margin:0;font-size:clamp(1.55rem,4vw,2.15rem)}p,li{line-height:1.7}
+.card{border:1px solid #dce1eb;background:#fff;border-radius:14px;padding:22px;margin:18px 0}
+label{font-weight:650;display:block;margin:18px 0 8px}input{display:block;width:100%;padding:12px;border:1px solid #8c98b2;border-radius:8px}
+button{border:0;background:#304990;color:white;font:inherit;font-weight:600;padding:12px 19px;border-radius:9px;cursor:pointer;margin:10px 10px 10px 0}
+button:disabled{opacity:.55;cursor:not-allowed}a{color:#18449d}
+small,.muted{color:#58647b}#result{display:block;white-space:pre-wrap;overflow-wrap:anywhere;background:#101827;color:#e5edf9;padding:17px;border-radius:10px;font:13px/1.7 ui-monospace,Consolas,monospace;min-height:125px}
+.notice{border-left:4px solid #64748b;background:#eff3fa;padding:14px;border-radius:7px}
+</style>
+</head>
+<body><main>
+<h1>VocaBLoom · ตรวจไฟล์สำรองก่อนย้ายระบบ</h1>
+<p class="muted">Phase 5 · ตรวจสองไฟล์ในเบราว์เซอร์ของคุณโดยตรง ไม่มีการเชื่อมต่อ Cloudflare, ไม่มีการอัปโหลดข้อมูล และไม่มีการเขียนคะแนน</p>
+<section class="card">
+<div class="notice"><strong>ความเป็นส่วนตัว:</strong> ไฟล์จะถูกอ่านเฉพาะในเบราว์เซอร์นี้ ไม่ถูกส่งไป GitHub หรือเว็บไซต์อื่น เครื่องมือนี้ไม่ขอ SYNC_KEY และไม่มีปุ่ม Restore, Import หรือ Deploy</div>
+<label for="local">1. Local backup (.json)</label>
+<input id="local" type="file" accept=".json,application/json">
+<small>ไฟล์ที่บันทึกไว้แล้วชื่อ vocabloom-full-backup-2026-11-12.json</small>
+<label for="remote">2. Cloud snapshot แบบอ่านอย่างเดียว (.json)</label>
+<input id="remote" type="file" accept=".json,application/json">
+<small>ดาวน์โหลดจาก VocaBLoom → Settings → Unified Learning Sync → Cloud snapshot (read-only) ด้วยรหัสของระบบจริงเท่านั้น อย่าใช้ Staging KEY และอย่ากด Sync now</small>
+<div><button type="button" id="audit">ตรวจไฟล์แบบออฟไลน์</button><button type="button" id="export" disabled>ดาวน์โหลดรายงานสรุป (ไม่มีคำศัพท์/คะแนน)</button></div>
+</section>
+<section class="card">
+<h2>ผลการตรวจสอบ</h2>
+<output id="result" role="status" aria-live="polite" tabindex="0">ยังไม่เริ่มตรวจสอบ</output>
+<p class="muted">หมายเหตุ: แม้ไฟล์ทั้งสองจะผ่าน ก็ยังไม่อนุญาตให้ย้าย Production จนกว่าจะตรวจโค้ด Worker ตัวจริง สำรองข้อมูลฝั่งเซิร์ฟเวอร์ และจัดขั้นตอน freeze/rollback</p>
+</section>
+</main>
+<script>
+(()=>{
+'use strict';
+const MAX=6_000_000;
+const SUBJECTS=['acc','eco','math','eng','zh'];
+const KEYS=['study-acc','acc-flashcards-v1-srs','study-eco','econ-flashcards-v1-srs',
+ 'study-math','math-flashcards-v1-srs','study-eng','eng-vocab-v1-srs','study-zh','zh-vocab-v1-srs'];
+const $=id=>document.getElementById(id);
+let lastReport=null;
+const record=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const fail=m=>{throw new Error(m)};
+const requireOk=(condition,message)=>{if(!condition)fail(message)};
+const count=x=>record(x)?Object.keys(x).length:0;
+function byteLength(x){return new TextEncoder().encode(JSON.stringify(x)).length}
+async function sha256(s){
+ const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+ return Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
+}
+async function readFile(file,kind){
+ requireOk(!!file,'ยังไม่ได้เลือกไฟล์ '+kind);
+ requireOk(file.name.toLowerCase().endsWith('.json'),'ไฟล์ '+kind+' ต้องเป็น .json');
+ requireOk(file.size>0&&file.size<=MAX,'ไฟล์ '+kind+' ใหญ่เกินกำหนดหรือว่าง');
+ const text=await file.text();
+ requireOk(new TextEncoder().encode(text).length<=MAX,'ไฟล์ '+kind+' ใหญ่เกินกำหนด');
+ let value;
+ try{value=JSON.parse(text)}catch{fail('ไฟล์ '+kind+' ไม่ใช่ JSON ที่ถูกต้อง')}
+ return {value,sha256:await sha256(text),bytes:file.size};
+}
+function checkLocal(doc){
+ requireOk(record(doc)&&doc.version===1&&doc.type==='vocabloom-unified-study-backup','Local backup ไม่ตรงชนิดหรือเวอร์ชัน');
+ requireOk(record(doc.vocabloom)&&record(doc.subjects),'Local backup ไม่มี vocabloom/subjects');
+ requireOk(Array.isArray(doc.vocabloom.notion)&&record(doc.vocabloom.progress)&&record(doc.vocabloom.days),
+  'Local backup ขาดคลังคำศัพท์หรือความก้าวหน้า');
+ requireOk(KEYS.every(k=>record(doc.subjects[k])),'Local backup ไม่มีข้อมูล 5 วิชาครบ 10 ช่อง');
+ requireOk(Object.keys(doc.subjects).length===KEYS.length,'Local backup มีชื่อช่องวิชาที่ไม่คาดไว้');
+ const ids=doc.vocabloom.notion.map(x=>x&&x.id);
+ requireOk(ids.every(x=>typeof x==='string'&&x.length>0),'มีรายการคำศัพท์ไม่มี ID');
+ requireOk(new Set(ids).size===ids.length,'Local backup มี ID คำศัพท์ซ้ำ');
+ return {
+  createdAt:typeof doc.createdAt==='string'?doc.createdAt:null,
+  notionVocabulary:ids.length,notionDuplicateIds:0,
+  vocabProgress:count(doc.vocabloom.progress),
+  vocabDays:count(doc.vocabloom.days),
+  subjectStorage:Object.fromEntries(KEYS.map(k=>[k,count(doc.subjects[k])]))
+ };
+}
+function checkRemote(doc){
+ requireOk(record(doc)&&doc.format==='vocabloom-cloud-readonly-snapshot'&&doc.version===1,
+  'Cloud snapshot ไม่ตรงชนิดหรือเวอร์ชัน');
+ requireOk(record(doc.subjects),'Cloud snapshot ไม่พบ subjects');
+ requireOk(JSON.stringify(Object.keys(doc.subjects).sort())===JSON.stringify([...SUBJECTS].sort()),
+  'Cloud snapshot ต้องมีวิชาครบทั้ง 5 วิชา');
+ requireOk(!Object.hasOwn(doc,'SYNC_KEY')&&!Object.hasOwn(doc,'syncKey')&&!Object.hasOwn(doc,'headers'),
+  'Cloud snapshot มีฟิลด์รหัสหรือ Headers ไม่ควรใช้ไฟล์นี้');
+ const counts={},rev={};
+ for(const subject of SUBJECTS){
+  const raw=doc.subjects[subject];
+  requireOk(record(raw),'Cloud snapshot '+subject+' ไม่ใช่ Object');
+  requireOk(byteLength(raw)<=350_000,'Cloud snapshot '+subject+' เกินขนาดที่รองรับ');
+  if(Object.keys(raw).length===0){
+   counts[subject]={emptyLegacy:true,quizAnswers:0,srsCards:0,activityShadows:0};
+  }else{
+   requireOk(record(raw.study)&&record(raw.srs)&&record(raw.study.ans)&&record(raw.study.ats)&&
+    record(raw.srs.s)&&record(raw.srs.m),'Cloud snapshot '+subject+' ข้อมูล study/SRS ไม่ครบ');
+   requireOk(raw.study.known===undefined||Array.isArray(raw.study.known),
+    'Cloud snapshot '+subject+' known ไม่ใช่ Array');
+   const cards=Object.keys(raw.srs.s);
+   counts[subject]={emptyLegacy:false,quizAnswers:count(raw.study.ans),
+    srsCards:cards.filter(k=>!k.startsWith('vb/v1/')).length,
+    activityShadows:cards.filter(k=>k.startsWith('vb/v1/')).length};
+  }
+  const r=doc.revisions?.[subject]??null;
+  requireOk(r===null||/^"[0-9]+"$/.test(r),'Cloud snapshot '+subject+' revision ผิดรูปแบบ');
+  rev[subject]=r===null?'legacy-or-unversioned':'strong-revision';
+ }
+ return {capturedAt:typeof doc.capturedAt==='string'?doc.capturedAt:null,
+  subjects:counts,revisionStatus:rev};
+}
+async function audit(){
+ const out=$('result'),button=$('audit');
+ lastReport=null;$('export').disabled=true;button.disabled=true;
+ out.textContent='กำลังตรวจรูปแบบและความครบถ้วนของข้อมูล...';
+ try{
+  const local=await readFile($('local').files[0],'Local');
+  const localInfo=checkLocal(local.value);
+  const cloudFile=$('remote').files[0];
+  let remote=null,remoteInfo=null;
+  if(cloudFile){
+   remote=await readFile(cloudFile,'Cloud');
+   remoteInfo=checkRemote(remote.value);
+  }
+  const notes=[
+   'ยังไม่มีการตรวจโค้ด Worker study-api ตัวจริงใน GitHub',
+   'ยังไม่มีหลักฐานสำรองข้อมูลจากฝั่งเซิร์ฟเวอร์พร้อมวิธีกู้คืน',
+   'ยังไม่มีแผน freeze/copy/verify/cutover/rollback ที่ยืนยันแล้ว'
+  ];
+  if(!remote)notes.unshift('ยังไม่มี Cloud snapshot ทั้ง 5 วิชา');
+  if(remoteInfo&&Object.values(remoteInfo.revisionStatus).some(x=>x==='legacy-or-unversioned'))
+   notes.push('มีอย่างน้อยหนึ่งวิชาที่ไม่แสดง CAS revision');
+  const report={
+   product:'VocaBLoom',auditVersion:1,
+   status:'BLOCKED_FOR_PRODUCTION_MIGRATION',
+   local:{sha256:local.sha256,bytes:local.bytes,...localInfo},
+   cloud:remote?{sha256:remote.sha256,bytes:remote.bytes,...remoteInfo}:null,
+   blockingReasons:notes,
+   networkRequests:0,serverWrites:0,
+   contentPolicy:'summary only, no keys, no vocabulary, no individual answers, no device ID'
+  };
+  // Do not include a single raw source record in this report.
+  lastReport=report;$('export').disabled=false;
+  const lines=['PASS · Local backup: ชนิด JSON และ 5 วิชาครบ',
+   'PASS · Notion vocabulary '+localInfo.notionVocabulary+' คำ ไม่มี ID ซ้ำ'];
+  if(remoteInfo){
+   lines.push('PASS · Cloud snapshot: พบข้อมูลครบ 5 วิชา');
+   for(const key of SUBJECTS){
+    const x=remoteInfo.subjects[key];
+    lines.push('READ · '+key.toUpperCase()+': quiz '+x.quizAnswers+
+     ', cards '+x.srsCards+', shadows '+x.activityShadows+
+     ', revision '+remoteInfo.revisionStatus[key]);
+   }
+  }else lines.push('PENDING · ยังไม่มี Cloud snapshot จาก Worker จริง');
+  lines.push('BLOCKED · ยังไม่อนุญาตย้าย Production');
+  lines.push('ผลตรวจ 0 Network Requests / 0 Server Writes');
+  out.textContent=lines.join('\n');
+ }catch(e){out.textContent='FAIL · '+String(e.message||e)+'\nไม่มีการเขียนข้อมูลใด ๆ';}
+ finally{button.disabled=false;}
+}
+function exportReport(){
+ if(!lastReport)return;
+ const json=JSON.stringify(lastReport,null,2);
+ const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+ link.download='vocabloom-phase5-audit-summary.json';document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+}
+$('audit').addEventListener('click',audit);
+$('export').addEventListener('click',exportReport);
+})();
+</script>
+</body>
+</html>
