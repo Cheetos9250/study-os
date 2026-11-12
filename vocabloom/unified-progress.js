@@ -196,7 +196,7 @@ async function cCloudSync(manual=false){
   cCloudNotice('ซิงก์สำเร็จทั้ง '+count+' วิชา · '+new Date(CLOUD.last).toLocaleTimeString('th-TH'));if(['home','studymerge','review','progress','settings'].includes(ui.page))render();
  }catch(e){
   CLOUD.remoteStatus='error';cCloudNotice('ซิงก์ยังไม่ครบ ('+count+'/'+USTATE.decks.length+' วิชา): '+String(e.message||e),true);
- }finally{CLOUD.busy=false;}
+ }finally{CLOUD.busy=false;if(ui.page==='settings')render();}
 }
 function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;clearTimeout(CLOUD.timer);CLOUD.timer=setTimeout(()=>cCloudSync(false),3500);}
 function cSetKey(){
