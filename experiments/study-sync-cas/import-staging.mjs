@@ -91,9 +91,9 @@ function isEmptyRemote(value){
  return fingerprint(validateProgress('existing staging',value))===fingerprint(empty());
 }
 function resolveRevision(response){
- const etag=response.headers?.get?.('ETag');
+ const etag=response.headers?.get?.('X-Sync-Revision')??response.headers?.get?.('ETag');
  if(!REVISION.test(etag||''))
-   throw Error('Staging Worker missing quoted numeric ETag; refusing to write');
+   throw Error('Staging Worker missing quoted numeric ETag / X-Sync-Revision; refusing to write');
  return etag;
 }
 async function readRemote(fetchImpl,url,key){
