@@ -5,6 +5,8 @@
  */
 const SUBJECTS=new Set(['acc','eco','math','eng','zh']);
 const MAX_BYTES=350_000;
+const STAGING_PROTOCOL='vocabloom-cas-staging-v1';
+const STAGING_HOST=/^study-api-cas-staging-only\.[a-z0-9-]+\.workers\.dev$/i;
 const JSON_HEADERS={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'};
 const isObject=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const defaultState=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
@@ -64,6 +66,12 @@ export default {
   const origin=request.headers.get('Origin');
   const allowed=String(env.ALLOWED_ORIGIN||'');
   const cors=(r)=>withCors(r,origin,allowed);
+  const parsed=new URL(request.url);
+  // Fail closed if accidentally deployed without the explicit staging flag,
+  // or routed to a production/custom domain. localhost is for wrangler dev.
+  const localHost=['localhost','127.0.0.1'].includes(parsed.hostname);
+  if(String(env.STAGING_ONLY)!=='true'||(!localHost&&!STAGING_HOST.test(parsed.hostname)))
+   return cors(response({error:'Staging deployment guard denied this host/configuration'},503));
   // A browser's origin must be explicitly trusted; the secret alone is still required.
   if(origin&&origin!==allowed)return response({error:'Origin not allowed'},403);
   if(request.method==='OPTIONS'){
@@ -72,7 +80,8 @@ export default {
   }
   if(!env.SYNC_KEY||request.headers.get('X-Sync-Key')!==env.SYNC_KEY)
    return cors(response({error:'Unauthorized'},401));
-  const parsed=new URL(request.url);
+  if(parsed.pathname==='/__staging/health'&&request.method==='GET')
+   return cors(response({staging:true,protocol:STAGING_PROTOCOL,subjects:[...SUBJECTS]},200));
   const match=parsed.pathname.match(/^\/progress\/([a-z]+)$/);
   if(!match||!SUBJECTS.has(match[1]))return cors(response({error:'Unknown progress subject'},404));
   if(request.method!=='GET'&&request.method!=='PUT')
