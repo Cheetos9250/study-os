@@ -65,7 +65,7 @@ def text(prop):
 
 
 def fetch_verified(ds_id):
-    rows, cursor = [], None
+    rows, cursor, seen = [], None, set()
     while True:
         body = {"page_size": 100,
                 "filter": {"property": "Status", "select": {"equals": "Verified"}}}
@@ -75,13 +75,19 @@ def fetch_verified(ds_id):
         rows.extend(data.get("results", []))
         if not data.get("has_more"):
             return rows
-        cursor = data.get("next_cursor")
+        next_cursor = data.get("next_cursor")
+        if not isinstance(next_cursor, str) or not next_cursor.strip() or next_cursor in seen:
+            raise SystemExit("Invalid Notion pagination cursor")
+        seen.add(next_cursor)
+        cursor = next_cursor
 
 
 def build(rows, fields, need):
     out, seen = [], set()
     for page in rows:
         props = page.get("properties", {})
+        if text(props.get("Status")) != "Verified":
+            continue
         r = {f: text(props.get(f)) for f in fields}
         if not all(r.get(k, "").strip() for k in need):
             continue
