@@ -377,7 +377,7 @@ async function syncViaApi(){
   syncing=false; if(!done) $('#syncBtn').disabled=false;
 }
 async function syncNotion(){
-  if(!(owner&&mcp)&&window.__xs&&window.__xs.ready()) return syncViaApi();
+  if(!(owner&&mcp)&&window.__xs&&window.__xs.reviewReady()) return syncViaApi();
   const page=(D.pages||{})[fcat]; if(!mcp||!page||syncing) return;
   const t=scopeT(), pass=t.g/t.n>=PASS;
   syncing=true; $('#syncBtn').disabled=true;
