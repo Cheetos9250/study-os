@@ -82,6 +82,15 @@ export default {
    return cors(response({error:'Unauthorized'},401));
   if(parsed.pathname==='/__staging/health'&&request.method==='GET')
    return cors(response({staging:true,protocol:STAGING_PROTOCOL,subjects:[...SUBJECTS]},200));
+  // Probe IDs use a separate synthetic Durable Object. Live smoke tests
+  // never write to any of the five subject progress objects.
+  const probe=parsed.pathname.match(/^\/__staging\/probe\/([a-f0-9]{24})$/);
+  if(probe){
+   if(request.method!=='GET'&&request.method!=='PUT')
+    return cors(response({error:'Method not allowed'},405));
+   const id=env.PROGRESS_DO.idFromName('study-os-staging:probe:'+probe[1]);
+   return cors(await env.PROGRESS_DO.get(id).fetch(request));
+  }
   const match=parsed.pathname.match(/^\/progress\/([a-z]+)$/);
   if(!match||!SUBJECTS.has(match[1]))return cors(response({error:'Unknown progress subject'},404));
   if(request.method!=='GET'&&request.method!=='PUT')
