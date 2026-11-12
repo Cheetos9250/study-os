@@ -17,7 +17,7 @@ function vocabloomResolver(obj){
  const first=src.indexOf('async function cApiUrl(){');
  const last=src.indexOf('function cCloudKey()',first);
  assert.ok(first>=0&&last>first);
- const ctx={CLOUD:{api:'',enabled:true,progressSplit:false},CLOUD_AUTO:'vocabloom-auto-sync-v1',cSafeSet:()=>true,fetch:async()=>response(obj)};
+ const ctx={CLOUD:{api:'',enabled:true,progressSplit:false},CLOUD_AUTO:'vocabloom-auto-sync-v1',CLOUD_AUTO_ENDPOINT:'vocabloom-auto-sync-endpoint-v1',cSafeGet:()=>null,cSafeSet:()=>true,fetch:async()=>response(obj)};
  vm.runInNewContext(src.slice(first,last)+'\nthis.cApiUrl=cApiUrl;',ctx,{timeout:1000});
  return ctx.cApiUrl;
 }
