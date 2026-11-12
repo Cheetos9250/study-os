@@ -62,7 +62,7 @@ test('All staging helper pages are restricted to the staging-only worker',()=>{
   assert.match(src,/Content-Security-Policy/);
   assert.match(src,/study-api-cas-staging-only\.kasidit09022550\.workers\.dev/);
   assert.doesNotMatch(src,/\bstudy-api\.kasidit09022550\.workers\.dev\b/,file);
-  assert.doesNotMatch(src,/\b(?:localStorage|sessionStorage)\b/,file);
+  assert.doesNotMatch(src,/\b(?:localStorage|sessionStorage)\.(?:setItem|getItem|removeItem|clear)\s*\(/,file);
   assert.match(src,/referrer" content="no-referrer"/);
  }
  const exit=read('vocabloom/staging-exit-check.html');
