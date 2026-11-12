@@ -28,3 +28,12 @@ test('browser staging checker uses read-only subject routes and isolated probe w
  assert.match(html,/secret\.value='';readPassed=false/);
  assert.match(html,/credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'/);
 });
+
+test('ETag diagnostics reveal only safe response metadata, never keys or progress',()=>{
+ assert.match(html,/DIAGNOSTIC · /);
+ assert.match(html,/raw ETag=/);
+ assert.match(html,/visible headers=/);
+ assert.match(html,/response\.type=/);
+ assert.match(html,/JSON\.stringify\(etag\)/);
+ assert.doesNotMatch(html,/JSON\.stringify\(key\)|writeLine\(key\)|writeLine\(secret\.value\)/);
+});
