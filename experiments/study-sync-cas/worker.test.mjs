@@ -9,7 +9,7 @@ function fixture(){
  const buckets=new Map();
  const objects=new Map();
  let revisionConflicts=0;
- const env={SYNC_KEY:STAGING_KEY,ALLOWED_ORIGIN:ORIGIN,
+ const env={SYNC_KEY:STAGING_KEY,ALLOWED_ORIGIN:ORIGIN,STAGING_ONLY:'true',
   PROGRESS_DO:{
    idFromName:name=>name,
    get(id){
@@ -22,7 +22,7 @@ function fixture(){
    }
   }
  };
- const url=subject=>'https://staging.example/progress/'+subject;
+ const url=subject=>'https://study-api-cas-staging-only.local-test.workers.dev/progress/'+subject;
  async function request(method,subject,{body,etag,key=STAGING_KEY,origin=ORIGIN}={}){
   const headers={'X-Sync-Key':key,'Origin':origin};
   if(method==='PUT'){headers['Content-Type']='application/json';if(etag)headers['If-Match']=etag}
@@ -90,7 +90,7 @@ test('CAS allows only one writer for the same revision; no silent overwrite',asy
 test('100 concurrent A/B client sync rounds preserve both device updates',async()=>{
  const f=fixture();
  let clientA=empty(),clientB=empty();
- const opts=(local,saveLocal)=>({baseUrl:'https://staging.example',subject:'eng',syncKey:STAGING_KEY,
+ const opts=(local,saveLocal)=>({baseUrl:'https://study-api-cas-staging-only.local-test.workers.dev',subject:'eng',syncKey:STAGING_KEY,
   loadLocal:()=>local(),saveLocal,fetchImpl:f.mockFetch,maxAttempts:10});
  for(let i=0;i<100;i++){
   clientA.srs.s['A-'+i]={ts:1000+i,due:2000+i};
@@ -112,7 +112,7 @@ test('Client retains local progress on outage and bounded conflicts',async()=>{
  const f=fixture();
  const local=empty();local.srs.s['my-note']={ts:555,due:999};
  let saved=0;
- const opts={baseUrl:'https://staging.example',subject:'math',syncKey:STAGING_KEY,
+ const opts={baseUrl:'https://study-api-cas-staging-only.local-test.workers.dev',subject:'math',syncKey:STAGING_KEY,
   loadLocal:()=>local,saveLocal:()=>saved++,
   fetchImpl:async(url,init)=>init.method==='GET'?
      new Response(JSON.stringify(empty()),{status:200,headers:{ETag:'"0"'}}):
@@ -134,4 +134,30 @@ test('Revisions persist across Durable Object restart with shared storage',async
  const restarted=new StudyProgressDO(ctx);
  const response=await restarted.fetch(new Request(f.url('zh'),{method:'GET'}));
  assert.equal(response.headers.get('ETag'),'"1"');
+});
+
+test('Staging deployment guard blocks wrong hostname and missing explicit flag',async()=>{
+ const f=fixture();
+ const valid=await f.request('GET','eng');
+ assert.equal(valid.status,200);
+ const withoutFlag=await entry.fetch(new Request(f.url('eng'),{headers:{'X-Sync-Key':STAGING_KEY}}),
+  {...f.env,STAGING_ONLY:'false'});
+ assert.equal(withoutFlag.status,503);
+ const nonStaging=await entry.fetch(new Request('https://study-api.kasidit09022550.workers.dev/progress/eng',
+  {headers:{'X-Sync-Key':STAGING_KEY}}),f.env);
+ assert.equal(nonStaging.status,503);
+});
+
+test('Authenticated health marker identifies staging protocol, without data writes',async()=>{
+ const f=fixture();
+ const url='https://study-api-cas-staging-only.local-test.workers.dev/__staging/health';
+ const withoutKey=await entry.fetch(new Request(url),f.env);
+ assert.equal(withoutKey.status,401);
+ const withKey=await entry.fetch(new Request(url,{headers:{'X-Sync-Key':STAGING_KEY,Origin:ORIGIN}}),f.env);
+ assert.equal(withKey.status,200);
+ assert.equal(withKey.headers.get('Access-Control-Allow-Origin'),ORIGIN);
+ assert.deepEqual(await withKey.json(),{
+  staging:true,protocol:'vocabloom-cas-staging-v1',subjects:['acc','eco','math','eng','zh']
+ });
+ assert.equal(f.buckets.size,0,'Health route must not initialize any Durable Object');
 });

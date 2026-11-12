@@ -18,7 +18,9 @@
       ]
     }
   ],
+  "workers_dev": true,
   "vars": {
-    "ALLOWED_ORIGIN": "https://cheetos9250.github.io"
+    "ALLOWED_ORIGIN": "https://cheetos9250.github.io",
+    "STAGING_ONLY": "true"
   }
 }

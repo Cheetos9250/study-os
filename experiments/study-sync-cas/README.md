@@ -1,10 +1,12 @@
 # Study OS sync CAS prototype — SY-08
 
-**Status: code prototype only. NOT deployed. NOT wired into VocaBloom or the legacy subject pages.**
+**Status: staging Worker prototype only. NOT deployed. The VocaBloom and legacy pages already have CAS-aware client code, but no live CAS Worker has been deployed.**
 
 This is an isolated example addressing the lost-update race found by independent Claude QA when two browsers perform concurrent GET → PUT with no revision check. It is deliberately in `experiments/`, with **no GitHub Actions deploy step**, no real user data and no production credentials.
 
 ## Files
+- `smoke-staging.mjs`: default no-network CLI; optional authenticated staging checks with a fresh synthetic probe object, leaving all 5 subjects read-only.
+- `smoke-staging.test.mjs`: fake-Worker regression for staging-only host, health marker, CAS conflicts, and no subject writes.
 - `worker.mjs`: Worker router + one SQLite-backed Durable Object per Study OS subject, validates `X-Sync-Key`, limits the schema/body, exposes `ETag`, requires conditional `If-Match`, returns HTTP 409 on stale PUT.
 - `client.mjs`: separate prototype GET → merge → conditional PUT + bounded 409 retry client. Not connected to the current site.
 - `worker.test.mjs`: Node.js simulation using in-memory Durable Object storage, including 100 concurrent A/B rounds.
@@ -31,6 +33,30 @@ Official references:
 5. Client rereads, merges again and retries up to a bounded limit, then leaves local data unchanged and reports failure.
 
 Legacy unconditional PUT fails with HTTP **428 Precondition Required** in this prototype. This is intentional to prevent silent lost updates, but is incompatible with old clients.
+
+
+## Safe staging verification (no production deployment)
+
+**All default commands below are local-only and make no requests to Cloudflare:**
+
+```sh
+node --test experiments/study-sync-cas/*.test.mjs
+node experiments/study-sync-cas/smoke-staging.mjs
+```
+
+After a separately authorized staging Worker deployment, set only a **staging-only** `SYNC_KEY` secret (never the production key) and the dedicated Wrangler configuration `experiments/study-sync-cas/wrangler.jsonc`. This configuration has the fixed script name `study-api-cas-staging-only`, SQLite-backed Durable Objects and `STAGING_ONLY=true`. It has no deployment CI workflow.
+
+To execute the **optional** live smoke test, set `STAGING_BASE_URL` to `https://study-api-cas-staging-only.<account>.workers.dev`, set `STAGING_SYNC_KEY` to the separate test secret through a secure environment, then run:
+
+```sh
+node experiments/study-sync-cas/smoke-staging.mjs --execute --acknowledge-staging-only
+```
+
+The checker requires a valid authenticated `GET /__staging/health` marker, tests 401/403/OPTIONS CORS, performs **GET-only** on `acc`, `eco`, `math`, `eng`, `zh`, and writes only to a brand-new `/__staging/probe/<24-hex-id>` Durable Object. It tests 200/409 concurrency, successful merge, and 428 rejection of old unconditional PUT. It refuses all non-staging domains or an existing probe. No real progress records are modified.
+
+The separate `import-staging.mjs` tool is **not** part of smoke testing. It can write actual snapshot contents into a staging subject namespace only with explicit import flags; it now also requires the authenticated staging identity marker before attempting any subject requests.
+
+**Deployment/production gate:** The current production Worker source, server-side backups, migration freeze and rollback, and real browser/device validation are still outstanding. Never deploy this prototype over `study-api` or attach it to production bindings.
 
 ## Prerequisites before any live rollout
 1. **First find and inspect the deployed `study-api` Worker source** and preserve existing auth, CORS, query paths, and KV data contract. It is not in the `study-os` repo.

@@ -110,6 +110,17 @@ export async function importIntoStaging(snapshot,{baseUrl,key,fetchImpl=fetch}={
  const target=ensureStagingUrl(baseUrl);
  if(typeof key!=='string'||!key.trim())throw Error('Missing staging-only sync key');
  const {normalized,audit}=inspectSnapshot(snapshot);
+ // Never import even into an appropriately named host until the authenticated
+ // Worker explicitly proves it is running the staging-only protocol.
+ const health=await fetchImpl(target+'/__staging/health',{
+  method:'GET',headers:{'X-Sync-Key':key},cache:'no-store',redirect:'error'
+ });
+ if(health.status!==200)throw Error('Staging identity check failed ('+health.status+'); no writes performed');
+ let marker;
+ try{marker=await health.json()}catch{throw Error('Staging identity response was not JSON; no writes performed');}
+ if(marker?.staging!==true||marker?.protocol!=='vocabloom-cas-staging-v1'||
+    JSON.stringify(marker.subjects)!==JSON.stringify(SUBJECTS))
+  throw Error('Staging identity marker mismatch; no writes performed');
  const headers={'X-Sync-Key':key,'Content-Type':'application/json'};
  const plan=[];
  // Preflight *ALL FIVE* before writing any subject to avoid overwriting an
