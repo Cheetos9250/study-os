@@ -26,7 +26,7 @@ function snapshot(){
 function fixture(){
  const buckets=new Map(),stubs=new Map(),requests=[];
  const env={
-  SYNC_KEY:KEY,ALLOWED_ORIGIN:'https://cheetos9250.github.io',
+  SYNC_KEY:KEY,ALLOWED_ORIGIN:'https://cheetos9250.github.io',STAGING_ONLY:'true',
   PROGRESS_DO:{
    idFromName:name=>name,
    get(id){
