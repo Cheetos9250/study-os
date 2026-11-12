@@ -25,7 +25,7 @@ function fixture({mode='cas',allowLegacy=true,conflicts=0,editDuringWrite=false,
  let confirmCount=0,debounceCount=0,notice='',remaining=conflicts,edited=false;
  const context={
   USTATE,CLOUD,ui,
-  CLOUD_AUTO:'vocabloom-auto-sync-v1',CLOUD_PREFIX:'vb/v1/',
+  CLOUD_AUTO:'vocabloom-auto-sync-v1',CLOUD_LAST:'vocabloom-last-sync-v1',CLOUD_PREFIX:'vb/v1/',
   TextEncoder,cCloudKey:()=> 'TEST_KEY',
   cSafeSet:(key,value)=>{settings.set(key,value);return true},
   cApiUrl:async()=> 'https://fake-staging.invalid',
