@@ -186,7 +186,7 @@ async function cCloudSync(manual=false){
   CLOUD.last=Date.now();cSafeSet(CLOUD_LAST,String(CLOUD.last));CLOUD.remoteStatus='saved';
   cCloudNotice('ซิงก์สำเร็จทั้ง '+count+' วิชา · '+new Date(CLOUD.last).toLocaleTimeString('th-TH'));if(['home','studymerge','review','progress','settings'].includes(ui.page))render();
  }catch(e){
-  CLOUD.remoteStatus='error';cCloudNotice('ซิงก์ไม่สำเร็จ: '+String(e.message||e),true);
+  CLOUD.remoteStatus='error';cCloudNotice('ซิงก์ยังไม่ครบ ('+count+'/'+USTATE.decks.length+' วิชา): '+String(e.message||e),true);
  }finally{CLOUD.busy=false;}
 }
 function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;clearTimeout(CLOUD.timer);CLOUD.timer=setTimeout(()=>cCloudSync(false),3500);}
@@ -198,9 +198,23 @@ function cSetKey(){
 }
 function cPanel(){
  const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'ยังไม่เคยยืนยันการซิงก์';
- return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button></div><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ และจะหยุดการเขียนหากตรวจสอบ Worker ไม่ผ่าน</p></div>';
+ return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button></div><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ และจะหยุดการเขียนหากตรวจสอบ Worker ไม่ผ่าน</p></div>';
 }
+
+function cFullBackup(){
+ const subjectStorage={};
+ for(const d of USTATE.decks){
+  subjectStorage['study-'+d.key]=cSafeJSON('study-'+d.key,{});
+  subjectStorage[d.markKey+'-srs']=cSafeJSON(d.markKey+'-srs',{});
+ }
+ const payload={version:1,type:'vocabloom-unified-study-backup',createdAt:new Date().toISOString(),vocabloom:structuredClone(data),deviceDays:CLOCAL.days,studyDays:CLOCAL.studyDays,subjects:subjectStorage};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vocabloom-full-backup-'+cDate()+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+ cCloudNotice('ส่งออกสำรองทั้ง 5 วิชาแล้ว (ไม่รวม SYNC_KEY)');
+}
+
 function cPanelAction(el){
+ if(el.dataset.action==='cloud-backup'){cFullBackup();return true;}
  if(el.dataset.action==='cloud-config'){cSetKey();return true;}
  if(el.dataset.action==='cloud-sync'){cCloudSync(true);return true;}
  if(el.dataset.action==='cloud-auto'){CLOUD.enabled=!CLOUD.enabled;cSafeSet(CLOUD_AUTO,CLOUD.enabled?'1':'0');render();if(CLOUD.enabled)cCloudSync(true);return true;}
