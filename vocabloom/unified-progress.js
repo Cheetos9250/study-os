@@ -19,8 +19,11 @@ function cInitLocal(){
  CLOCAL.days=oldDays||structuredClone(data.days||{});
  if(!oldDays)cSafeSet(CLOUD_LOCAL_DAYS,JSON.stringify(CLOCAL.days));
  CLOCAL.studyDays=cSafeJSON(CLOUD_STUDY_DAYS,{});
+ let changed=false;
+ for(const w of data.custom||[]){if(w?.id&&w?.en&&!Number(w.syncTs)){w.syncTs=Date.now();changed=true;}}
+ if(changed)store();
  const n=Number(cSafeGet(CLOUD_LAST)||0);CLOUD.last=Number.isFinite(n)?n:0;
- CLOUD.enabled=cSafeGet(CLOUD_AUTO)!=='0';
+ CLOUD.enabled=cSafeGet(CLOUD_AUTO)==='1';
 }
 function cLocalRecord(wordId,correct){
  const date=cDate(),o=CLOCAL.days[date]||{answered:0,correct:0,ids:[]};
@@ -205,9 +208,17 @@ function cSetKey(){
  if(!k.trim()){cCloudNotice('ยังไม่ได้ตั้งรหัสซิงก์');return}
  cSafeSet(CLOUD_KEY,k.trim());CLOUD.enabled=true;cSafeSet(CLOUD_AUTO,'1');cCloudSync(true);render();
 }
+function cForgetKey(){
+ if(!cCloudKey())return;
+ if(!window.confirm('ลบรหัส SYNC_KEY ออกจากเบราว์เซอร์นี้ใช่หรือไม่? จะไม่ลบคะแนนการเรียนที่บันทึกไว้'))return;
+ try{localStorage.removeItem(CLOUD_KEY);}catch{}
+ CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');clearTimeout(CLOUD.timer);
+ CLOUD.remoteStatus='disconnected';cCloudNotice('ลบรหัสซิงก์จากเบราว์เซอร์นี้แล้ว');
+ render();
+}
 function cPanel(){
  const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'ยังไม่เคยยืนยันการซิงก์';
- return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button></div><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ และจะหยุดการเขียนหากตรวจสอบ Worker ไม่ผ่าน</p></div>';
+ return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก</p></div>';
 }
 
 function cFullBackup(){
@@ -223,6 +234,7 @@ function cFullBackup(){
 }
 
 function cPanelAction(el){
+ if(el.dataset.action==='cloud-forget'){cForgetKey();return true;}
  if(el.dataset.action==='cloud-backup'){cFullBackup();return true;}
  if(el.dataset.action==='cloud-config'){cSetKey();return true;}
  if(el.dataset.action==='cloud-sync'){cCloudSync(true);return true;}
