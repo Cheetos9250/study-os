@@ -78,7 +78,7 @@ function cShadow(name,val,ts=Date.now()){return {kind:name,value:val,ts:Number(t
 function cSetShadow(dict,key,item){const v=dict[key];if(!v||Number(v.ts||0)<=Number(item.ts||0))dict[key]=item;}
 function cShadowFromLocal(srs){
  for(const [id,p] of Object.entries(data.progress||{})){
-  if(!p||!p.seen)continue;
+  if(!p||(!p.seen&&!p.favorite))continue;
   const t=Number(p.syncTs||0)||(Date.parse(String(p.last||'')+'T12:00:00+07:00')||1);
   const item={...p};delete item.syncTs;
   cSetShadow(srs,CLOUD_PREFIX+'word/'+encodeURIComponent(id),cShadow('word',item,t));
@@ -172,7 +172,7 @@ async function cCloudSync(manual=false){
    if(resp.status===404||resp.status===405)throw Error('Worker ไม่รองรับเส้นทางซิงก์ '+d.key);
    if(!resp.ok)throw Error('Cloudflare GET '+d.key+' HTTP '+resp.status);
    const remote=await resp.json();
-   if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error))throw Error('รูปแบบข้อมูล Worker ไม่ถูกต้อง');
+   if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error||(Object.keys(remote).length>0&&!remote.study&&!remote.srs)))throw Error('รูปแบบข้อมูล Worker ไม่ถูกต้อง');
    const local=cLocalSubject(d);
    if(d.key==='eng')cShadowFromLocal(local.srs.s);
    const joined=cMergeState(local,remote||{});
@@ -241,11 +241,18 @@ function cInstall(){
  homeHTML=function(){return oldHome()+cDashboardExtra();};
  progressHTML=function(){return oldProgress()+cDashboardExtra();};
  const oldHandle=handleAction;
- handleAction=function(el){if(cPanelAction(el))return;const action=el.dataset.action;if(action==='favorite'){const result=oldHandle(el);const p=data.progress[el.dataset.word];if(p){p.syncTs=Date.now();store();cCloudDebounce();}return result;}return oldHandle(el);};
+ handleAction=function(el){if(cPanelAction(el))return;const action=el.dataset.action;if(action==='favorite'){const result=oldHandle(el);const p=data.progress[el.dataset.word];if(p){p.syncTs=Date.now();store();cCloudDebounce();}return result;}const result=oldHandle(el);if(action==='u-answer')cCloudDebounce();return result;};
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cCloudKey()&&CLOUD.enabled&&Date.now()-CLOUD.last>60000)cCloudSync(false);});
  window.addEventListener('storage',e=>{if(e.key===CLOUD_KEY&&cCloudKey()&&CLOUD.enabled)cCloudDebounce();});
  setInterval(()=>{if(document.visibilityState==='visible'&&cCloudKey()&&CLOUD.enabled&&Date.now()-CLOUD.last>300000)cCloudSync(false);},300000);
- if(USTATE.ready)cBridgeExistingSrs();
+ const oldDue=dueWords;
+ dueWords=function(){
+  if(!USTATE.ready)return oldDue();
+  const fallback=new Set(oldDue().map(w=>w.id)),d=uDeck('eng'),state=d?uReadSrs(d).s:{};
+  return allWords().filter(w=>{const c=cOriginalCardFor(w),s=c&&state[c.mid];return s?Number(s.due||0)<=Date.now():fallback.has(w.id);});
+ };
+ if(USTATE.ready){cBridgeExistingSrs();}
+ else{let retries=0;const id=setInterval(()=>{retries++;if(USTATE.ready){clearInterval(id);cBridgeExistingSrs();if(['home','review','progress','studymerge'].includes(ui.page))render();if(cCloudKey()&&CLOUD.enabled)cCloudDebounce();}else if(retries>=30)clearInterval(id);},500);}
  if(cCloudKey()&&CLOUD.enabled)setTimeout(()=>{if(USTATE.ready)cCloudSync(false);},2500);
  if(['home','settings','progress'].includes(ui.page))render();
 }
