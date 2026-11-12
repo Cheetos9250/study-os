@@ -201,37 +201,76 @@ async function cApiUrl(){
  try{const r=await fetch('../data/config.json',{cache:'no-store'});if(!r.ok)throw Error('config HTTP '+r.status);const j=await r.json();const url=String(j.api||'').replace(/\/+$/,'');if(!/^https:\/\//.test(url))throw Error('Missing HTTPS API');CLOUD.api=url;return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
 }
 function cCloudKey(){return String(cSafeGet(CLOUD_KEY)||'').trim();}
+/* ETag/If-Match protects concurrent clients when the backend supports atomic revisions.
+ * Legacy KV is manual-confirmation-only. Never background-write an unversioned response. */
+const CLOUD_MAX_RETRIES=6;
+function cCloudRevision(response){
+ const value=response?.headers?.get?.('ETag')||'';
+ return /^"[0-9]+"$/.test(value)?value:'';
+}
 async function cCloudSync(manual=false){
  if(CLOUD.busy||(!manual&&!CLOUD.enabled)||!cCloudKey()||!USTATE.ready)return;
- CLOUD.busy=true;cCloudNotice('กำลังซิงก์ข้อมูล...');let count=0;
+ CLOUD.busy=true;cCloudNotice('กำลังตรวจเวอร์ชันและซิงก์ข้อมูล...');let count=0,legacyConsent=false;
  try{
   const api=await cApiUrl(),key=cCloudKey();
   const hds={'X-Sync-Key':key,'Content-Type':'application/json'};
   for(const d of USTATE.decks){
    const url=api+'/progress/'+encodeURIComponent(d.key);
-   const resp=await fetch(url,{headers:hds,cache:'no-store'});
-   if(resp.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง — ตั้งรหัสใหม่ได้ใน Settings');
-   if(resp.status===404||resp.status===405)throw Error('Worker ไม่รองรับเส้นทางซิงก์ '+d.key);
-   if(!resp.ok)throw Error('Cloudflare GET '+d.key+' HTTP '+resp.status);
-   const remote=await resp.json();
-   if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error||(Object.keys(remote).length>0&&!remote.study&&!remote.srs)))throw Error('รูปแบบข้อมูล Worker ไม่ถูกต้อง');
-   const local=cLocalSubject(d);
-   if(d.key==='eng')cShadowFromLocal(local.srs.s);
-   const joined=cMergeState(local,remote||{});
-   const body=JSON.stringify(joined);
-   if(body.length>350000)throw Error('ข้อมูลซิงก์มากเกินขนาดที่ปลอดภัย กรุณาส่งออก Backup ก่อน');
-   const saved=await fetch(url,{method:'PUT',headers:hds,body});
-   if(saved.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง');
-   if(!saved.ok)throw Error('Cloudflare PUT '+d.key+' HTTP '+saved.status);
-   cApplySubject(d,joined);count++;
+   let complete=false;
+   for(let attempt=1;attempt<=CLOUD_MAX_RETRIES;attempt++){
+    const resp=await fetch(url,{headers:hds,cache:'no-store'});
+    if(resp.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง — ตั้งรหัสใหม่ได้ใน Settings');
+    if(resp.status===404||resp.status===405)throw Error('Worker ไม่รองรับเส้นทางซิงก์ '+d.key);
+    if(!resp.ok)throw Error('Cloudflare GET '+d.key+' HTTP '+resp.status);
+    const revision=cCloudRevision(resp);
+    if(!revision){
+     if(!manual){
+      CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');
+      throw Error('Worker ยังไม่รองรับ Safe Sync (ไม่มี ETag) จึงปิด Auto Sync เพื่อป้องกันคะแนนถูกเขียนทับ · คะแนนในเครื่องไม่ถูกแก้ไข');
+     }
+     if(!legacyConsent){
+      if(!window.confirm('Worker ปัจจุบันยังไม่รองรับ ETag / If-Match จึงป้องกันการเขียนทับคะแนนจากหลายอุปกรณ์ไม่ได้\n\nซิงก์แบบเดิมนี้จะอ่านและเขียนข้อมูลจริงทั้ง 5 วิชา กรุณาสำรอง Full backup ก่อน และห้ามเปิดซิงก์พร้อมกันสองเครื่อง\n\nต้องการดำเนินการแบบ Legacy Sync ด้วยตนเองหรือไม่?'))
+       throw Error('ยกเลิก Legacy Sync — ยังไม่ได้เขียนข้อมูลไปยัง Worker');
+      legacyConsent=true;
+     }
+    }
+    const remote=await resp.json();
+    if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error||(Object.keys(remote).length>0&&!remote.study&&!remote.srs)))
+     throw Error('รูปแบบข้อมูล Worker ไม่ถูกต้อง');
+    const local=cLocalSubject(d);
+    if(d.key==='eng')cShadowFromLocal(local.srs.s);
+    const joined=cMergeState(local,remote||{});
+    const body=JSON.stringify(joined);
+    if(new TextEncoder().encode(body).byteLength>350000)throw Error('ข้อมูลซิงก์มากเกินขนาดที่ปลอดภัย กรุณาส่งออก Backup ก่อน');
+    const headers=revision?{...hds,'If-Match':revision}:hds;
+    const saved=await fetch(url,{method:'PUT',headers,body});
+    if(saved.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง');
+    if(revision&&(saved.status===409||saved.status===412))continue;
+    if(saved.status===428)throw Error('Worker ต้องการ If-Match แต่ไม่ส่ง ETag กลับมา — ยังไม่ได้เปลี่ยนคะแนนในเครื่อง');
+    if(!saved.ok)throw Error('Cloudflare PUT '+d.key+' HTTP '+saved.status);
+    // A user might answer another card while the PUT is in flight.
+    // Never overwrite those newer local answers with the older merged snapshot.
+    if(JSON.stringify(cLocalSubject(d))!==JSON.stringify({study:local.study,srs:{s:d.key==='eng'?Object.fromEntries(Object.entries(local.srs.s).filter(([k])=>!k.startsWith(CLOUD_PREFIX))):local.srs.s,m:local.srs.m}})){
+     if(revision)continue;
+     throw Error('คะแนนในเครื่องเปลี่ยนระหว่าง Legacy Sync: ยกเลิกการนำเข้าข้อมูลเก่า กรุณาซิงก์ใหม่');
+    }
+    cApplySubject(d,joined);count++;complete=true;break;
+   }
+   if(!complete)throw Error('เวอร์ชันข้อมูล '+d.key+' เปลี่ยนพร้อมกันหลายครั้งเกินกำหนด ('+CLOUD_MAX_RETRIES+' รอบ) เก็บข้อมูลในเครื่องไว้ครบ');
   }
   CLOUD.last=Date.now();cSafeSet(CLOUD_LAST,String(CLOUD.last));CLOUD.remoteStatus='saved';
-  cCloudNotice('ซิงก์สำเร็จทั้ง '+count+' วิชา · '+new Date(CLOUD.last).toLocaleTimeString('th-TH'));if(['home','studymerge','review','progress','settings'].includes(ui.page))render();
+  cCloudNotice('ซิงก์สำเร็จทั้ง '+count+' วิชา · '+new Date(CLOUD.last).toLocaleTimeString('th-TH'));
+  if(['home','studymerge','review','progress','settings'].includes(ui.page))render();
  }catch(e){
-  CLOUD.remoteStatus='error';cCloudNotice('ซิงก์ยังไม่ครบ ('+count+'/'+USTATE.decks.length+' วิชา): '+String(e.message||e),true);
- }finally{CLOUD.busy=false;if(ui.page==='settings')render();}
+  CLOUD.remoteStatus='error';
+  cCloudNotice('ซิงก์ยังไม่ครบ ('+count+'/'+USTATE.decks.length+' วิชา): '+String(e.message||e),true);
+ }finally{
+  CLOUD.busy=false;
+  if(ui.page==='settings')render();
+  if(CLOUD.pending){CLOUD.pending=false;cCloudDebounce();}
+ }
 }
-function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;clearTimeout(CLOUD.timer);CLOUD.timer=setTimeout(()=>cCloudSync(false),3500);}
+function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;if(CLOUD.busy){CLOUD.pending=true;return;}clearTimeout(CLOUD.timer);CLOUD.timer=setTimeout(()=>cCloudSync(false),3500);}
 function cSetKey(){
  const k=window.prompt('ใส่ SYNC_KEY ของ Cloudflare Worker study-api (รหัสเดียวกับ Study OS เดิม)\n\nเมื่อใส่รหัส ระบบจะซิงก์ทันที 1 รอบ: อ่านและเขียนข้อมูลทั้ง 5 วิชาขึ้น Worker โปรดทำ Full backup ก่อน และอย่าใช้งานสองเครื่องพร้อมกันจนกว่าระบบจะผ่าน QA',cCloudKey()?'':'');
  if(k===null)return;
@@ -322,7 +361,7 @@ function cPanelAction(el){
  if(el.dataset.action==='cloud-backup'){cFullBackup();return true;}
  if(el.dataset.action==='cloud-config'){cSetKey();return true;}
  if(el.dataset.action==='cloud-sync'){cCloudSync(true);return true;}
- if(el.dataset.action==='cloud-auto'){CLOUD.enabled=!CLOUD.enabled;cSafeSet(CLOUD_AUTO,CLOUD.enabled?'1':'0');render();if(CLOUD.enabled)cCloudSync(true);return true;}
+ if(el.dataset.action==='cloud-auto'){CLOUD.enabled=!CLOUD.enabled;cSafeSet(CLOUD_AUTO,CLOUD.enabled?'1':'0');render();if(CLOUD.enabled)cCloudSync(false);return true;}
  return false;
 }
 function cDashboardExtra(){
