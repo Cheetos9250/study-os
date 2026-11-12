@@ -213,3 +213,16 @@ test('Importer rejects malformed or missing staging identity before any subject 
   assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
  }
 });
+
+test('Importer accepts custom strong revision when HTTP ETag was rewritten weak',async()=>{
+ const f=fixture(),s=snapshot();
+ const weakNetwork=async(url,opts={})=>{
+  const response=await f.fetchImpl(url,opts);
+  if((opts.method||'GET')!=='GET'||!new URL(url).pathname.startsWith('/progress/'))return response;
+  const headers=new Headers(response.headers);headers.set('ETag','W/"0"');
+  return new Response(await response.text(),{status:response.status,headers});
+ };
+ const result=await importIntoStaging(s,{...opts(f),fetchImpl:weakNetwork});
+ assert.equal(result.subjects.length,5);
+ assert.equal(f.requests.filter(x=>x.method==='PUT').length,5);
+});
