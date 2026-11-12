@@ -55,3 +55,17 @@ This split makes rollback possible without replacing the Notion Worker or overwr
 - Repo-local `vocabloom/PHASE-5-DATA-INTEGRITY.md` and `vocabloom/SAFE-SYNC-ROLLOUT.md`
 
 **At this commit:** only optional routing support and tests are changed. No change to Production Worker, Notion integration, KV keys, the active `api` value, Auto Sync, or learner scores.
+
+
+## Continuous integration NO-GO guard (development only)
+
+The regression suite includes `vocabloom/tests/production-cutover-no-go.test.cjs` as an explicit safety gate against accidental production cutover. It is intended to **fail the GitHub checks** if a subsequent commit:
+- changes the current `data/config.json` production Notion API URL, adds `progress_api` without changing the reviewed test, or points a live configuration to Staging;
+- renames the isolated `study-api-cas-staging-only` Wrangler configuration, drops its `STAGING_ONLY=true` guard, alters its Durable Object binding or adds secrets into public configuration;
+- removes Staging Worker host/origin/secret guards;
+- unexpectedly changes the five legacy course pages' Notion quiz/card data loading to use the new progress route;
+- causes Staging-only helper pages to reference the original Production hostname or begin persisting keys into browser storage.
+
+This CI test is not a production authorization system. Repository maintainers could alter or disable a test, and a passing build cannot prove which Worker deployment is running, what happens to independent writers, or whether current KV data is unchanged. Production activation still requires a separately reviewed release decision, fresh authoritative backup, verified new Worker, rollback plan and explicit owner approval. The safety gate's intentionally hardcoded current `data/config.json` configuration must be changed **only in the same separately authorized PR as an actual production cutover**, after all other no-go conditions are cleared.
+
+The test makes no network calls, does not read private Drive data, and is safe for GitHub Actions.
