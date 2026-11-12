@@ -198,7 +198,7 @@ function cApplySubject(d,merged){
 function cCloudNotice(msg,error=false){CLOUD.message=msg;CLOUD.error=error?msg:'';const el=document.getElementById('cloudSyncState');if(el)el.textContent=msg;}
 async function cApiUrl(){
  if(CLOUD.api)return CLOUD.api;
- try{const r=await fetch('../data/config.json',{cache:'no-store'});if(!r.ok)throw Error('config HTTP '+r.status);const j=await r.json();const original=String(j.api||'').replace(/\/+$/,'');const url=String(j.progress_api||original).replace(/\/+$/,'');if(!/^https:\/\//.test(url))throw Error('Missing HTTPS API');CLOUD.progressSplit=!!original&&url!==original;CLOUD.api=url;if(CLOUD.progressSplit){CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');}return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
+ try{const r=await fetch('../data/config.json',{cache:'no-store'});if(!r.ok)throw Error('config HTTP '+r.status);const j=await r.json();const original=String(j.api||'').replace(/\/+$/,'');const url=String(j.progress_api||original).replace(/\/+$/,'');if(!/^https:\/\//.test(url))throw Error('Missing HTTPS API');CLOUD.progressSplit=url!==original;CLOUD.api=url;if(CLOUD.progressSplit){CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');}return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
 }
 function cCloudStorageKey(){return CLOUD.progressSplit?CLOUD_PROGRESS_KEY:CLOUD_KEY;}
 function cCloudKey(){return String(cSafeGet(cCloudStorageKey())||'').trim();}
