@@ -81,7 +81,7 @@ test('SRS supports all four review ratings and preserves previous state',()=>{
 
 
 test('Full restore safely restores all five subject slots and rejects invalid JSON',async()=>{
- const restoreCode=extract(cloud,'async function cFullRestore(file){','function cForgetKey(){');
+ const restoreCode=extract(cloud,'async function cFullRestore(file){','async function cForgetKey(){');
  const code=[
  'const memory=new Map(), structuredClone=x=>JSON.parse(JSON.stringify(x));',
  'let failKey=null, data={progress:{original:{seen:true}},days:{},custom:[],settings:{goal:10}};',
@@ -113,7 +113,7 @@ test('Full restore safely restores all five subject slots and rejects invalid JS
 
 test('BR-08: actual Full backup round-trips on clean profile with empty English/Chinese study slots',async()=>{
  const saveCode=extract(cloud,'function cFullBackup(){','function cPanelAction(el){');
- const restoreCode=extract(cloud,'async function cFullRestore(file){','function cForgetKey(){');
+ const restoreCode=extract(cloud,'async function cFullRestore(file){','async function cForgetKey(){');
  const fixture=new Function('bundle',[
   'const memory=new Map(), structuredClone=x=>JSON.parse(JSON.stringify(x));',
   'let data={progress:{apple:{seen:true,correct:3}},days:{today:{answered:3,correct:2}},custom:[],settings:{goal:10}};',

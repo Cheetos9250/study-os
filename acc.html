@@ -498,10 +498,11 @@ if(!D.sum.length) document.querySelectorAll('.tabs button').forEach(b=>{ if(b.da
 cardsRow(); renderCard(); renderSum(); buildDeck(); renderQ();
 /* ---------- cross-device progress sync + Notion save via the Worker ---------- */
 window.__xs=(()=>{
-  const LSK='study-sync-key'; let api='', timer=null, busy=false, applying=false, box=null, msgEl=null, btnEl=null;
-  const key=()=>{ try{ return localStorage.getItem(LSK)||''; }catch(e){ return ''; } };
+  const LSK='study-sync-key', PROGRESS_LSK='study-sync-progress-key-v1';
+  let api='', progressKeyName=LSK, timer=null, busy=false, applying=false, box=null, msgEl=null, btnEl=null;
+  const key=()=>{ try{ return localStorage.getItem(progressKeyName)||''; }catch(e){ return ''; } };
   const hdr=()=>({'X-Sync-Key':key(),'Content-Type':'application/json'});
-  async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); api=String(j.progress_api||j.api||'').replace(/\/+$/,''); } }catch(e){} return api; }
+  async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); const original=String(j.api||'').replace(/\/+$/,''); const next=String(j.progress_api||original).replace(/\/+$/,''); api=next; progressKeyName=next&&next!==original?PROGRESS_LSK:LSK; } }catch(e){} return api; }
   const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'var(--ok,#1d7a4a)':'var(--bad,#b3261e)'; } };
   const hhmm=()=>new Intl.DateTimeFormat('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date());
   function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[]}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
@@ -537,10 +538,10 @@ window.__xs=(()=>{
   async function sync(manual){
     // Deliberate manual click only; never run on page load, visibility or rating.
     if(!manual||busy) return;
-    if(!key()){ askKey(); return; }
-    if(!window.confirm('การซิงก์จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Cloudflare Worker\n\nหาก Worker ยังไม่รองรับ ETag/If-Match การซิงก์แบบเดิมอาจเขียนทับคะแนนเมื่อใช้อีกอุปกรณ์พร้อมกัน กรุณาสำรองคะแนนและหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
     const base=await cfg();
     if(!base){ say('ยังไม่ได้ตั้งค่า api ใน data/config.json'); return; }
+    if(!key()){ askKey(); return; }
+    if(!window.confirm('การซิงก์จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Cloudflare Worker\n\nหาก Worker ยังไม่รองรับ ETag/If-Match การซิงก์แบบเดิมอาจเขียนทับคะแนนเมื่อใช้อีกอุปกรณ์พร้อมกัน กรุณาสำรองคะแนนและหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
     busy=true;say('กำลังตรวจเวอร์ชันและซิงก์…',true);
     try{
       const url=base+'/progress/'+D.key;
@@ -549,7 +550,7 @@ window.__xs=(()=>{
         const r=await fetch(url,{headers:hdr(),cache:'no-store'});
         if(r.status===401){
           say('รหัสซิงก์ไม่ถูกต้อง กดปุ่มเพื่อตั้งใหม่');
-          try{localStorage.removeItem(LSK);}catch(e){}
+          try{localStorage.removeItem(progressKeyName);}catch(e){}
           busy=false;paint();return;
         }
         if(!r.ok)throw Error('GET HTTP '+r.status);
@@ -584,9 +585,11 @@ window.__xs=(()=>{
     busy=false;paint();
   }
   function askKey(){
-    let k=''; try{ k=window.prompt('ใส่รหัส SYNC_KEY สำหรับ Cloudflare Worker\n\nหน้า Study OS รุ่นเก่าไม่ซิงก์อัตโนมัติอีกต่อไป เพื่อป้องกันความเสี่ยงข้อมูลถูกเขียนทับ การใส่รหัสจะขอยืนยันก่อนซิงก์เอง 1 ครั้ง')||''; }catch(e){}
+    let k=''; try{ k=window.prompt(progressKeyName===LSK?
+     'ใส่รหัส SYNC_KEY สำหรับ Cloudflare Worker เดิม\n\nหน้า Study OS รุ่นเก่าไม่ซิงก์อัตโนมัติอีกต่อไป การใส่รหัสจะขอยืนยันก่อนซิงก์เอง 1 ครั้ง':
+     'ใส่รหัสใหม่สำหรับ Progress Worker แยกต่างหาก\n\nห้ามใช้รหัส Worker เดิมหรือ Staging รหัสนี้ใช้เฉพาะปลายทาง Progress ใหม่เท่านั้น')||''; }catch(e){}
     k=k.trim(); if(!k) return;
-    try{ localStorage.setItem(LSK,k); }catch(e){}
+    try{ localStorage.setItem(progressKeyName,k); }catch(e){}
     paint(); try{ renderSync(); }catch(e){} sync(true);
   }
   function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์ด้วยตนเอง':'☁ ตั้งรหัสซิงก์'; }
@@ -595,7 +598,7 @@ window.__xs=(()=>{
     box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:50;display:flex;gap:8px;align-items:center;background:var(--surface,#fff);color:var(--ink,#1c1c1c);border:1px solid var(--line,#bbb);border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12)';
     msgEl=document.createElement('span'); msgEl.setAttribute('role','status');
     btnEl=document.createElement('button'); btnEl.type='button'; btnEl.style.cssText='border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;font-weight:600;padding:2px 4px';
-    btnEl.onclick=()=>{ if(!key()) askKey(); else sync(true); };
+    btnEl.onclick=async()=>{ await cfg(); if(!key()) askKey(); else sync(true); };
     box.append(msgEl,btnEl); document.body.appendChild(box); paint();
   }
   mount();

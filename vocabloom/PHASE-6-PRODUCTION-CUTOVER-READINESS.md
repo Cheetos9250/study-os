@@ -69,3 +69,14 @@ The regression suite includes `vocabloom/tests/production-cutover-no-go.test.cjs
 This CI test is not a production authorization system. Repository maintainers could alter or disable a test, and a passing build cannot prove which Worker deployment is running, what happens to independent writers, or whether current KV data is unchanged. Production activation still requires a separately reviewed release decision, fresh authoritative backup, verified new Worker, rollback plan and explicit owner approval. The safety gate's intentionally hardcoded current `data/config.json` configuration must be changed **only in the same separately authorized PR as an actual production cutover**, after all other no-go conditions are cleared.
 
 The test makes no network calls, does not read private Drive data, and is safe for GitHub Actions.
+
+
+## Separate Progress Worker credentials (client-side compatibility gate)
+
+The optional `progress_api` resolver now also isolates its browser credential. When `progress_api` is **absent or resolves to the exact existing** `api` URL, VocaBLoom and the five Study OS pages continue to read the original `study-sync-key` and the live routing is unchanged.
+
+When `progress_api` explicitly points at a **different URL**, clients instead read/write `study-sync-progress-key-v1`. They **never fall back to the old Production `study-sync-key`**; a missing new key requires the learner to enter a separate token before any progress request. The previous token is retained under the original key and must not be automatically sent to the new endpoint. VocaBLoom also disables inherited Auto Sync and clears the auto-sync opt-in on first resolution of the newly split URL, requiring a new conscious activation later.
+
+This is a guard against accidental credential cross-use, **not** an authorization to enable any endpoint. The production CAS Worker and its new credential still do not exist in the public configuration. Do not place either secret in `data/config.json`, code, query strings, test fixtures containing real values, screenshots or Drive links with public sharing. On shared/university computers, remove credentials from the browser when finished.
+
+Future production rollout must explicitly specify how owner credentials are rotated and how old devices holding the original secret are handled. An old, cached client can still point at the legacy Worker, so a configuration change alone does **not** freeze all writers. Independently verify every client version and credential scope before cutover.

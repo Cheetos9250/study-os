@@ -47,10 +47,10 @@ test('Production Notion quiz/cards loading is separate from optional progress ro
   assert.match(before,/if\(c\.ok\) api=String\(\(await c\.json\(\)\)\.api\|\|''\)/);
   assert.doesNotMatch(before,/progress_api/);
   const block=src.slice(src.indexOf('async function cfg(){'),src.indexOf('  const say=',src.indexOf('async function cfg(){')));
-  assert.match(block,/j\.progress_api\|\|j\.api/);
+  assert.match(block,/j\.progress_api\|\|original/);
  }
  const unified=read('vocabloom/unified-progress.js');
- assert.match(unified,/j\.progress_api\|\|j\.api/);
+ assert.match(unified,/j\.progress_api\|\|original/);
 });
 test('All staging helper pages are restricted to the staging-only worker',()=>{
  const pages=[

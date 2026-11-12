@@ -1,12 +1,12 @@
 
 /* VocaBloom unified progress bridge, additive to Study OS; does not delete original data. */
 'use strict';
-const CLOUD_KEY='study-sync-key', CLOUD_DEVICE_KEY='vocabloom-device-v1';
+const CLOUD_KEY='study-sync-key', CLOUD_PROGRESS_KEY='study-sync-progress-key-v1', CLOUD_DEVICE_KEY='vocabloom-device-v1';
 const CLOUD_LOCAL_DAYS='vocabloom-device-days-v1', CLOUD_STUDY_DAYS='vocabloom-device-study-days-v1';
 const CLOUD_LAST='vocabloom-last-sync-v1', CLOUD_AUTO='vocabloom-auto-sync-v1';
 const CLOUD_PREFIX='vb/v1/';
 const CLOUD_AUTOSYNC_MIGRATION='vocabloom-autosync-safety-v2';
-const CLOUD={busy:false,error:'',message:'',last:0,timer:null,api:'',enabled:false,remoteStatus:'not verified'};
+const CLOUD={busy:false,error:'',message:'',last:0,timer:null,api:'',progressSplit:false,enabled:false,remoteStatus:'not verified'};
 function cSafeGet(k){try{return localStorage.getItem(k)}catch{return null}}
 function cSafeSet(k,v){try{localStorage.setItem(k,v);return true}catch{return false}}
 function cSafeJSON(k,fallback){try{const o=JSON.parse(cSafeGet(k)||'null');return o&&typeof o==='object'?o:fallback}catch{return fallback}}
@@ -198,9 +198,10 @@ function cApplySubject(d,merged){
 function cCloudNotice(msg,error=false){CLOUD.message=msg;CLOUD.error=error?msg:'';const el=document.getElementById('cloudSyncState');if(el)el.textContent=msg;}
 async function cApiUrl(){
  if(CLOUD.api)return CLOUD.api;
- try{const r=await fetch('../data/config.json',{cache:'no-store'});if(!r.ok)throw Error('config HTTP '+r.status);const j=await r.json();const url=String(j.progress_api||j.api||'').replace(/\/+$/,'');if(!/^https:\/\//.test(url))throw Error('Missing HTTPS API');CLOUD.api=url;return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
+ try{const r=await fetch('../data/config.json',{cache:'no-store'});if(!r.ok)throw Error('config HTTP '+r.status);const j=await r.json();const original=String(j.api||'').replace(/\/+$/,'');const url=String(j.progress_api||original).replace(/\/+$/,'');if(!/^https:\/\//.test(url))throw Error('Missing HTTPS API');CLOUD.progressSplit=url!==original;CLOUD.api=url;if(CLOUD.progressSplit){CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');}return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
 }
-function cCloudKey(){return String(cSafeGet(CLOUD_KEY)||'').trim();}
+function cCloudStorageKey(){return CLOUD.progressSplit?CLOUD_PROGRESS_KEY:CLOUD_KEY;}
+function cCloudKey(){return String(cSafeGet(cCloudStorageKey())||'').trim();}
 /* ETag/If-Match protects concurrent clients when the backend supports atomic revisions.
  * Legacy KV is manual-confirmation-only. Never background-write an unversioned response. */
 const CLOUD_MAX_RETRIES=6;
@@ -211,10 +212,11 @@ function cCloudRevision(response){
  return /^"[0-9]+"$/.test(value)?value:'';
 }
 async function cCloudSync(manual=false){
- if(CLOUD.busy||(!manual&&!CLOUD.enabled)||!cCloudKey()||!USTATE.ready)return;
+ if(CLOUD.busy||(!manual&&!CLOUD.enabled)||!USTATE.ready)return;
  CLOUD.busy=true;CLOUD.mode='unknown';cCloudNotice('กำลังตรวจเวอร์ชันและซิงก์ข้อมูล...');let count=0,legacyConsent=false;
  try{
   const api=await cApiUrl(),key=cCloudKey();
+  if(!key)throw Error('ปลายทาง Progress ยังไม่มีรหัสเฉพาะ กรุณาตั้งรหัสใหม่ก่อนซิงก์');
   const hds={'X-Sync-Key':key,'Content-Type':'application/json'};
   for(const d of USTATE.decks){
    const url=api+'/progress/'+encodeURIComponent(d.key);
@@ -282,11 +284,15 @@ async function cCloudSync(manual=false){
  }
 }
 function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;if(CLOUD.busy){CLOUD.pending=true;return;}clearTimeout(CLOUD.timer);CLOUD.timer=setTimeout(()=>cCloudSync(false),3500);}
-function cSetKey(){
- const k=window.prompt('ใส่ SYNC_KEY ของ Cloudflare Worker study-api (รหัสเดียวกับ Study OS เดิม)\n\nเมื่อใส่รหัส ระบบจะซิงก์ทันที 1 รอบ: อ่านและเขียนข้อมูลทั้ง 5 วิชาขึ้น Worker โปรดทำ Full backup ก่อน และอย่าใช้งานสองเครื่องพร้อมกันจนกว่าระบบจะผ่าน QA',cCloudKey()?'':'');
+async function cSetKey(){
+ try{await cApiUrl();}catch(e){cCloudNotice(String(e.message||e),true);return;}
+ const promptText=CLOUD.progressSplit?
+  'ใส่รหัสของ Progress Worker ใหม่เท่านั้น\n\nห้ามใช้รหัส Worker เดิมหรือ Staging กรุณาสำรอง Full backup ก่อนซิงก์ครั้งแรก':
+  'ใส่ SYNC_KEY ของ Cloudflare Worker study-api (รหัสเดียวกับ Study OS เดิม)\n\nเมื่อใส่รหัส ระบบจะซิงก์ทันที 1 รอบ: อ่านและเขียนข้อมูลทั้ง 5 วิชาขึ้น Worker โปรดทำ Full backup ก่อน และอย่าใช้งานสองเครื่องพร้อมกันจนกว่าระบบจะผ่าน QA';
+ const k=window.prompt(promptText,cCloudKey()?'':'');
  if(k===null)return;
  if(!k.trim()){cCloudNotice('ยังไม่ได้ตั้งรหัสซิงก์');return}
- cSafeSet(CLOUD_KEY,k.trim());
+ cSafeSet(cCloudStorageKey(),k.trim());
  // One manual sync is requested by entering the key. Auto Sync remains opt-in.
  cCloudSync(true);render();
 }
@@ -340,11 +346,12 @@ async function cFullRestore(file){
  }
 }
 
-function cForgetKey(){
+async function cForgetKey(){
+ try{await cApiUrl();}catch(e){cCloudNotice(String(e.message||e),true);return;}
  if(CLOUD.busy){cCloudNotice('กำลังซิงก์อยู่ รอให้การทำงานเสร็จก่อนลบรหัส',true);return;}
  if(!cCloudKey())return;
  if(!window.confirm('ลบรหัส SYNC_KEY ออกจากเบราว์เซอร์นี้ใช่หรือไม่? จะไม่ลบคะแนนการเรียนที่บันทึกไว้'))return;
- try{localStorage.removeItem(CLOUD_KEY);}catch{}
+ try{localStorage.removeItem(cCloudStorageKey());}catch{}
  CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');clearTimeout(CLOUD.timer);
  CLOUD.remoteStatus='disconnected';cCloudNotice('ลบรหัสซิงก์จากเบราว์เซอร์นี้แล้ว');
  render();
@@ -358,6 +365,7 @@ function cPanel(){
 /* Read-only remote snapshot for migration planning. Never POST/PUT or mutate local progress. */
 async function cRemoteSnapshot(){
  if(CLOUD.busy){cCloudNotice('มีการซิงก์อื่นทำงานอยู่ กรุณาลองใหม่หลังจบ',true);return;}
+ try{await cApiUrl();}catch(e){cCloudNotice(String(e.message||e),true);return;}
  if(!cCloudKey()||!USTATE.ready){cCloudNotice('ยังไม่มีรหัสซิงก์หรือข้อมูลวิชาไม่พร้อม',true);return;}
  if(!window.confirm('สำรองคะแนนจาก Cloudflare แบบอ่านอย่างเดียวทั้ง 5 วิชาใช่หรือไม่?\n\nไฟล์ JSON นี้มีรายละเอียดคะแนนการเรียนและควรเก็บเป็นส่วนตัว ถ้าใช้คอมพิวเตอร์สาธารณะควรย้ายไฟล์ไปพื้นที่ส่วนตัวแล้วลบไฟล์ที่ดาวน์โหลดออกจากเครื่อง'))return;
  CLOUD.busy=true;cCloudNotice('กำลังอ่านข้อมูล Cloudflare เพื่อสำรอง (ไม่ส่งคำสั่ง PUT)...');
@@ -470,7 +478,7 @@ function cInstall(){
  handleAction=function(el){if(cPanelAction(el))return;const action=el.dataset.action;if(action==='favorite'){const result=oldHandle(el);const p=data.progress[el.dataset.word];if(p){p.syncTs=Date.now();store();cCloudDebounce();}return result;}const result=oldHandle(el);if(action==='u-answer')cCloudDebounce();return result;};
  document.addEventListener('change',e=>{if(e.target.id==='fullRestoreInput'){const file=e.target.files?.[0];e.target.value='';cFullRestore(file);}});
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cCloudKey()&&CLOUD.enabled&&Date.now()-CLOUD.last>60000)cCloudSync(false);});
- window.addEventListener('storage',e=>{if(e.key===CLOUD_KEY&&cCloudKey()&&CLOUD.enabled)cCloudDebounce();});
+ window.addEventListener('storage',e=>{if(e.key===cCloudStorageKey()&&cCloudKey()&&CLOUD.enabled)cCloudDebounce();});
  setInterval(()=>{if(document.visibilityState==='visible'&&cCloudKey()&&CLOUD.enabled&&Date.now()-CLOUD.last>300000)cCloudSync(false);},300000);
  const oldDue=dueWords;
  dueWords=function(){
