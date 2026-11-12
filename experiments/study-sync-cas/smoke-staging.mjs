@@ -29,7 +29,7 @@ async function json(response,label){
 async function get(fetchImpl,url,key,origin){
  const res=await fetchImpl(url,{method:'GET',headers:headers(key,origin?{Origin:origin}:{}),cache:'no-store',redirect:'error'});
  const doc=await json(res,'GET '+new URL(url).pathname);
- const etag=res.headers.get('ETag');
+ const etag=res.headers.get('X-Sync-Revision')??res.headers.get('ETag');
  return {doc,etag,status:res.status,response:res};
 }
 async function put(fetchImpl,url,key,etag,body){
@@ -66,8 +66,8 @@ export async function smokeStaging({
  check(preflight.headers.get('Access-Control-Allow-Origin')===origin,'preflight origin mismatch');
  check((preflight.headers.get('Access-Control-Allow-Headers')||'').toLowerCase().includes('if-match'),
   'preflight does not allow If-Match');
- check((preflight.headers.get('Access-Control-Expose-Headers')||'').toLowerCase().includes('etag'),
-  'ETag not exposed to browser JavaScript');
+ check((preflight.headers.get('Access-Control-Expose-Headers')||'').toLowerCase().includes('x-sync-revision'),
+  'X-Sync-Revision not exposed to browser JavaScript');
 
  // Read all five subjects but NEVER write to these real subject namespaces.
  const subjectRevisions={};
