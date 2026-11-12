@@ -238,6 +238,7 @@ async function cCloudSync(manual=false){
     if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error||(Object.keys(remote).length>0&&!remote.study&&!remote.srs)))
      throw Error('รูปแบบข้อมูล Worker ไม่ถูกต้อง');
     const local=cLocalSubject(d);
+    const baseline=JSON.stringify(local);
     if(d.key==='eng')cShadowFromLocal(local.srs.s);
     const joined=cMergeState(local,remote||{});
     const body=JSON.stringify(joined);
@@ -250,7 +251,7 @@ async function cCloudSync(manual=false){
     if(!saved.ok)throw Error('Cloudflare PUT '+d.key+' HTTP '+saved.status);
     // A user might answer another card while the PUT is in flight.
     // Never overwrite those newer local answers with the older merged snapshot.
-    if(JSON.stringify(cLocalSubject(d))!==JSON.stringify({study:local.study,srs:{s:d.key==='eng'?Object.fromEntries(Object.entries(local.srs.s).filter(([k])=>!k.startsWith(CLOUD_PREFIX))):local.srs.s,m:local.srs.m}})){
+    if(JSON.stringify(cLocalSubject(d))!==baseline){
      if(revision)continue;
      throw Error('คะแนนในเครื่องเปลี่ยนระหว่าง Legacy Sync: ยกเลิกการนำเข้าข้อมูลเก่า กรุณาซิงก์ใหม่');
     }
