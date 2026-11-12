@@ -85,3 +85,20 @@ test('Never overwrites existing probe data',async()=>{
  assert.equal(f.counts.PUT,before);
  assert.deepEqual(f.buckets.get('study-os-staging:probe:'+PROBE).get('record').value,content);
 });
+
+test('Smoke check accepts custom revision with weak HTTP ETags and keeps subjects read-only',async()=>{
+ const f=fixture();
+ const weakNetwork=async(uri,opts={})=>{
+  const response=await f.fetchImpl(uri,opts);
+  if((opts.method||'GET')!=='GET'||!new URL(uri).pathname.startsWith('/progress/')&&
+     !new URL(uri).pathname.startsWith('/__staging/probe/'))return response;
+  const headers=new Headers(response.headers);
+  if(headers.has('ETag'))headers.set('ETag','W/'+headers.get('ETag'));
+  return new Response(await response.text(),{status:response.status,headers});
+ };
+ const result=await smokeStaging({baseUrl:HOST,key:KEY,fetchImpl:weakNetwork,probeId:PROBE});
+ assert.equal(result.status,'PASS');
+ assert.equal(result.isolatedProbe,true);
+ for(const subject of ['acc','eco','math','eng','zh'])
+  assert.equal(f.buckets.get('study-os-staging:'+subject)?.has('record'),false);
+});
