@@ -180,3 +180,17 @@ test('Server missing ETag or changing revision cannot be silently overwritten',a
  assert.ok(remote.srs.s.other);
  assert.equal(remote.srs.s['legacy-card-acc'],undefined);
 });
+
+
+test('Canonical hash includes prototype-named keys without mutating prototypes',()=>{
+ const dangerous=JSON.parse('{"__proto__":{"card":"should remain a key"},"constructor":{"x":1}}');
+ const prior=Object.getPrototypeOf({});
+ const hash=fingerprint(dangerous);
+ assert.match(hash,/^[a-f0-9]{64}$/);
+ assert.notEqual(hash,fingerprint({}));
+ assert.equal(Object.getPrototypeOf({}),prior);
+ assert.equal(Object.hasOwn(dangerous,'__proto__'),true);
+});
+test('Staging hostname rejects extra nested subdomain tricks',()=>{
+ assert.throws(()=>ensureStagingUrl('https://study-api-cas-staging-only.fake.evil.workers.dev'),/Refusing non-staging/);
+});
