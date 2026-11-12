@@ -142,3 +142,14 @@ A separate local `vocabloom-auto-sync-endpoint-v1` setting now records the **exa
 Turning Auto Sync off keeps only the nonsecret endpoint identity so the same host can be approved again without conflating it with a different host. Failed storage writes, cancelled confirmation and missing Progress key all fail closed with no new sync. Existing live `config.api` users retain their original toggle behavior, and `data/config.json` is unchanged.
 
 This remains forward-looking code preparation: no new Progress Worker endpoint is active, no data migration has been authorized, and a manually requested sync still requires its own credential and CAS safeguards. This preference binds **background write consent**, not the credential itself; credential-to-endpoint hardening is a separate audit concern.
+
+
+## Progress credential bound atomically to one Worker URL
+
+An additional future-cutover risk was identified: the browser used a single `study-sync-progress-key-v1` string for **any** URL selected by a later `progress_api` change. Even when Auto Sync was disabled, a user-triggered manual sync or remote snapshot could have sent the earlier Progress token to an unrelated Worker hostname.
+
+All six clients now interpret the Progress-only credential as a single atomic localStorage JSON record, `{"endpoint":"https://...","key":"..."}`, which is accepted **only when its exact stored endpoint equals the current configured Progress URL**. Old unbound plain-string Progress tokens are never automatically used or migrated. The owner must re-enter a token through the client for a new Progress URL, which saves the URL and token together in one write. Rotation to a different URL leaves the original record untouched but refuses to transmit its key to the newly selected host. If localStorage write fails, the client does not attempt to sync.
+
+The original `study-sync-key` remains a plain string used by the **unchanged** legacy `config.api` Notion Worker, including `/review`. No original key is deleted or copied to the new Progress record. This change applies only when a separate `progress_api` is configured; the live `data/config.json` has no `progress_api` and remains unchanged. The new record is **still a secret in localStorage**; use only private devices and never include it in GitHub, exported status reports, query strings, or screenshots.
+
+These client-side checks reduce accidental key reuse but do not replace Cloudflare-side Worker authentication, revocation, migration approval, an independent current source snapshot, or a final old-client write freeze. No Production cutover was performed by this preparation.
