@@ -103,7 +103,7 @@ async function simulateDispatch(path,{reviewReady=false,progressReady=false,owne
   syncViaApi:async()=>{apiCalls++;return 'api-review'},
   D:{pages:{chapter:'synthetic-notion-page'}},
   fcat:'chapter',syncing:false,scopeT:()=>({g:9,n:10}),PASS:0.8,
-  $:id=>outputs[id]||{},
+  $:id=>outputs[id.replace(/^#/,'')]||{},
   STEPS:[1,3,7,14,30],
   NOTION:'Notion',
   todayBkk:()=> '2026-11-12',catLabel:()=> 'Chapter',
