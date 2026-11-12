@@ -77,3 +77,14 @@ Two equivalent **offline only** preparation options are available:
 The resulting artifact is shaped for the existing `import-staging.mjs` validation, but **do not run the import/apply operation** until isolated staging has been independently backed up, the original KV keys have been reconfirmed, and the owner has approved a specific staging-only import. The staging Worker has no Notion read/review endpoints; it is not a drop-in replacement for production `study-api`.
 
 No Cloudflare network request, Worker deploy or Production KV mutation occurs during the preview.
+
+
+## iPad/browser workflow for downloaded KV original
+
+The owner already downloaded the raw `progress:acc` object from the Cloudflare `study-progress` namespace and stored the original privately in Google Drive under `VocaBLoom / Backups / Cloudflare KV Originals`.
+
+To minimize manual JSON copying, `vocabloom/private-kv-capture.html` accepts an **on-device file selection** for each verified-present subject. The page does **not** access Google Drive accounts itself; the user opens/downloads the file through their device Files/Drive picker. An original Cloudflare file named `progress_acc` (no extension) or a renamed `progress-acc-kv-original-YYYY-MM-DD.json` is accepted for subject `acc`. Wrong-subject file names, malformed JSON, over-limit values and files containing credential fields are rejected. The original bytes of the JSON text remain unchanged inside the private output manifest. The page has no network connections or remote-write controls.
+
+The remaining four subjects are **not** silently filled in: the user must select `confirmed absent` for each after reading the `KV Pairs` list for the correct bound namespace. The user must copy the 32-character namespace **ID** from the Cloudflare namespace Settings page (this is an identifier, not a secret). Until that evidence and all five selections are present, the form refuses to produce a capture manifest. The old Dashboard screenshot is a historical read and does not make the export atomic. The last direct admin check and freeze still remain before any staging import.
+
+No production data, Worker, KV namespace, or secret values were modified by this file-picker enhancement.
