@@ -12,7 +12,7 @@
 h1{font-size:clamp(1.5rem,4vw,2rem);margin:0}h2{font-size:1.07rem;margin:0}
 p,li{line-height:1.65}small,.muted{color:#5b667b}
 .card{background:white;border:1px solid #dce2ec;border-radius:13px;padding:22px;margin:18px 0}
-label{font-weight:600;display:block;margin:12px 0 6px}
+label{font-weight:600;display:block;margin:12px 0 6px} .file-note{display:block;color:#5b667b;font-size:.86rem;margin-top:5px}
 input,select,textarea{font:inherit;width:100%;border:1px solid #96a2b5;padding:11px;border-radius:8px;background:#fff;color:#182536}
 textarea{resize:vertical;min-height:74px;font-size:.88rem}textarea:disabled{background:#edf0f4}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -29,7 +29,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <p class="muted">สำหรับตรวจข้อมูลต้นทางก่อนย้ายระบบ · ใช้กับ Worker <strong>study-api</strong> เท่านั้น</p>
 <section class="card">
 <div class="notice">
-<strong>ไม่มีการเข้าถึง Cloudflare ผ่านหน้านี้</strong> — คุณเปิดค่าจริงจาก Cloudflare Dashboard เอง แล้ววางข้อความลงในช่อง หน้านี้ถูกกำหนดให้เชื่อมต่อเครือข่ายไม่ได้ และไม่มีระบบเก็บข้อมูลหรือรหัส<br>
+<strong>ไม่มีการเข้าถึง Cloudflare ผ่านหน้านี้</strong> — คุณเปิดค่าจริงจาก Cloudflare Dashboard เอง แล้วเลือกไฟล์ที่ดาวน์โหลดลงในช่องของวิชานั้น หรือวางข้อความ JSON โดยตรง หน้านี้ถูกกำหนดให้เชื่อมต่อเครือข่ายไม่ได้ และไม่มีระบบเก็บข้อมูลหรือรหัส<br>
 <strong>ห้ามใช้ข้อมูลจากหน้า VocaBLoom Cloud snapshot มาแทนค่า KV จริง</strong> เพราะ `{"updated":0}` อาจเป็นคำตอบที่ Worker สร้างขึ้น ไม่ใช่ค่าที่เก็บอยู่ใน KV
 </div>
 <p>เปิด Cloudflare → Workers &amp; Pages → <strong>study-api</strong> → Settings → Bindings → <strong>PROGRESS</strong> แล้วเปิด KV Namespace ที่เชื่อมอยู่ จากนั้นตรวจแต่ละคีย์ใน KV Pairs แบบอ่านอย่างเดียว</p>
@@ -58,11 +58,58 @@ for(const key of SUBJECTS){
  for(const [value,text] of [['unknown','ยังไม่ได้ตรวจ'],['present','พบคีย์และอ่านค่าได้'],['absent','ยืนยันแล้วว่าไม่มีคีย์']]){
   const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);
  }
+ const fileLabel=document.createElement('label');fileLabel.textContent='ไฟล์ต้นฉบับจาก Cloudflare KV (เช่น progress_'+key+')';
+ const fileInput=document.createElement('input');fileInput.type='file';
+ fileInput.setAttribute('aria-label','เลือกไฟล์ต้นฉบับ KV '+key);
+ const fileNote=document.createElement('small');fileNote.className='file-note';
+ fileNote.textContent='เลือกไฟล์ที่ดาวน์โหลดจาก KV Pairs โดยตรง (ไฟล์ .json, .txt หรือไม่มีนามสกุลก็ได้) ข้อมูลอยู่ในเบราว์เซอร์เท่านั้น';
  const valueLabel=document.createElement('label');valueLabel.textContent='Raw JSON value (ไม่ใช่ JSON จากหน้าแอป)';
  const textarea=document.createElement('textarea');textarea.disabled=true;
- textarea.setAttribute('aria-label','ค่า KV '+key);textarea.placeholder='วางค่า Raw JSON จาก Cloudflare Dashboard';
- select.addEventListener('change',()=>{textarea.disabled=select.value!=='present';if(select.value!=='present')textarea.value='';});
- item.append(heading,label,select,valueLabel,textarea);rows.append(item);
+ textarea.setAttribute('aria-label','ค่า KV '+key);textarea.placeholder='เลือกไฟล์ด้านบน หรือวางค่า Raw JSON จาก Cloudflare Dashboard';
+ select.addEventListener('change',()=>{
+  textarea.disabled=select.value!=='present';
+  if(select.value!=='present'){textarea.value='';fileInput.value='';}
+ });
+ fileInput.addEventListener('change',async()=>{
+  const file=fileInput.files?.[0];if(!file)return;
+  try{
+   const raw=await readOriginalKvFile(file,key);
+   if(fileInput.files?.[0]!==file)return;
+   textarea.value=raw;textarea.disabled=false;select.value='present';
+   status.textContent='PASS · โหลดไฟล์ progress:'+key+' ในเบราว์เซอร์แล้ว ('+
+    new TextEncoder().encode(raw).length+' bytes)\\nยังไม่ได้ส่งข้อมูลหรือเขียน KV';
+  }catch(e){
+   textarea.value='';textarea.disabled=true;select.value='unknown';fileInput.value='';
+   status.textContent='FAIL · '+String(e.message||e)+'\\nไฟล์ไม่ได้ถูกอัปโหลดไปที่ใด';
+  }
+ });
+ item.append(heading,label,select,fileLabel,fileInput,fileNote,valueLabel,textarea);rows.append(item);
+}
+function verifyRawKvValue(raw,key){
+ if(typeof raw!=='string'||!raw.trim())throw Error('ไฟล์หรือค่า progress:'+key+' ว่าง');
+ if(new TextEncoder().encode(raw).length>MAX)throw Error('ข้อมูล progress:'+key+' เกินขนาดปลอดภัย');
+ let parsed;
+ try{parsed=JSON.parse(raw)}catch{throw Error('ค่า progress:'+key+' ไม่ใช่ JSON ที่ถูกต้อง')}
+ if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))
+  throw Error('ค่า progress:'+key+' ต้องเป็น JSON object');
+ if(Object.hasOwn(parsed,'SYNC_KEY')||Object.hasOwn(parsed,'NOTION_TOKEN')||
+  Object.hasOwn(parsed,'syncKey')||Object.hasOwn(parsed,'notionToken'))
+  throw Error('พบฟิลด์ลักษณะ Secret ในค่า progress:'+key);
+ if(Object.hasOwn(parsed,'subjects')||parsed.format==='vocabloom-cloud-readonly-snapshot')
+  throw Error('ไฟล์นี้เป็น Cloud Snapshot ไม่ใช่ค่า KV ต้นฉบับ');
+ return raw;
+}
+async function readOriginalKvFile(file,key){
+ if(!file||typeof file.name!=='string'||typeof file.text!=='function'||
+  !Number.isFinite(file.size)||file.size<=0||file.size>MAX)
+  throw Error('ไฟล์ progress:'+key+' ไม่ถูกต้องหรือใหญ่เกินกำหนด');
+ // Avoid accidentally importing progress from the wrong subject. The original
+ // Cloudflare download is named progress_acc (no extension).
+ const match=file.name.toLowerCase().match(/(?:^|[^a-z0-9])progress[-_:]?(acc|eco|math|eng|zh)(?:[^a-z0-9]|$)/);
+ if(!match||match[1]!==key)
+  throw Error('ชื่อไฟล์ต้องระบุ progress:'+key+' ไม่ใช่วิชาอื่น');
+ const raw=await file.text();
+ return verifyRawKvValue(raw,key);
 }
 function validate(){
  const id=el('namespace').value.trim().toLowerCase();
@@ -74,15 +121,8 @@ function validate(){
   if(select.value==='absent'){entries['progress:'+subject]=null;continue;}
   const raw=area.value;
   if(!raw.trim())throw Error('ยังไม่ใส่ Raw JSON สำหรับ progress:'+subject);
-  if(new TextEncoder().encode(raw).length>MAX)throw Error('ค่า progress:'+subject+' เกินขนาดปลอดภัย');
-  let parsed;
-  try{parsed=JSON.parse(raw)}catch{throw Error('ค่า progress:'+subject+' ไม่ใช่ JSON ที่ถูกต้อง')}
-  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))
-   throw Error('ค่า progress:'+subject+' ต้องเป็น JSON object');
-  if(Object.hasOwn(parsed,'SYNC_KEY')||Object.hasOwn(parsed,'NOTION_TOKEN'))
-   throw Error('พบชื่อฟิลด์คล้าย Secret ในค่า progress:'+subject+' ตรวจแหล่งข้อมูล');
-  // Raw string must be preserved byte-for-byte (no stringify/normalize).
-  entries['progress:'+subject]=raw;
+  // Raw string is preserved byte-for-byte (no stringify/normalize).
+  entries['progress:'+subject]=verifyRawKvValue(raw,subject);
  }
  return {format:'vocabloom-production-kv-capture-v1',version:1,
   capturedAt:new Date().toISOString(),namespaceId:id,
