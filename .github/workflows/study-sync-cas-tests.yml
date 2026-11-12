@@ -24,4 +24,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test simulated Durable Object and optimistic concurrency
-        run: node --test experiments/study-sync-cas/worker.test.mjs
+        run: node --test experiments/study-sync-cas/*.test.mjs

@@ -50,3 +50,35 @@ Legacy unconditional PUT fails with HTTP **428 Precondition Required** in this p
 - SQLite Durable Objects are priced/limited differently from existing KV. Check official plan quotas before rollout.
 
 **Release status: BLOCKED** until real staging Worker tests and safe migration are verified.
+
+
+## Safe dry-run snapshot validation and staging import
+
+A separate \`import-staging.mjs\` utility now supports moving a **read-only VocaBloom Cloud snapshot** into a newly created *test-only* Durable Object Worker. It does **not** read production Cloudflare by itself, deploy Workers, or use a real secret. The user must first deliberately download \`Cloud snapshot (read-only)\` from VocaBloom Settings and safeguard the downloaded file.
+
+\`\`\`bash
+# 1. Offline dry run; scans file only, prints counts and SHA-256 checksums.
+node experiments/study-sync-cas/import-staging.mjs --file ./vocabloom-cloud-snapshot-YYYY-MM-DD.json
+
+# 2. OPTIONAL staging import only after creating a separate test Worker
+# and configuring a test-only SYNC_KEY outside GitHub.
+STAGING_SYNC_KEY="$YOUR_STAGING_ONLY_KEY" \
+ node experiments/study-sync-cas/import-staging.mjs \
+ --file ./vocabloom-cloud-snapshot-YYYY-MM-DD.json \
+ --staging-url https://study-api-cas-staging-only.YOUR_SUBDOMAIN.workers.dev \
+ --apply --acknowledge-staging-only
+\`\`\`
+
+**Safety and validation:**
+- No \`--apply\` → **zero network requests and zero writes**, even if a staging URL is supplied.
+- Staging URL must match \`study-api-cas-staging-only.*.workers.dev\` or localhost; production \`study-api.kasidit09022550.workers.dev\`, other hosts, credentials in URLs and non-HTTPS external addresses are refused.
+- Exactly 5 subjects are required; a partial, malformed or oversized snapshot aborts before contacting staging.
+- Before any write, all five remote staging subjects must either be truly empty at revision \`"0"\`, or **byte-equivalent after canonical JSON ordering** to the source snapshot. Unexpected data aborts without writing anything.
+- Every new write uses \`If-Match\` and verifies the full subject SHA-256 via an immediate GET. A failed third subject may leave the first two imported; retrying with the *same unchanged* source snapshot resumes without overwriting the existing data.
+- Only a dedicated staging key may be supplied via the \`STAGING_SYNC_KEY\` environment variable. The CLI does not print secrets, answers or flashcard text.
+- The five-subject transfer is **not globally atomic**; no claim of cross-subject transactional consistency is made. Do not use this utility as a production migration or rollback.
+- Do **not** commit cloud snapshot JSON files to a public repository; they contain private learning history.
+- Never delete the source snapshot until destination checks and rollback procedures have been completed and verified.
+
+New tests: \`node --test experiments/study-sync-cas/*.test.mjs\`, 15 isolated tests total, including resume, conflict, malformed file and production-host refusal.
+
