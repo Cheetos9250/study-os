@@ -216,12 +216,17 @@ async function cCloudSync(manual=false){
  CLOUD.busy=true;CLOUD.mode='unknown';cCloudNotice('กำลังตรวจเวอร์ชันและซิงก์ข้อมูล...');let count=0,legacyConsent=false;
  try{
   const api=await cApiUrl(),key=cCloudKey();
+  // Resolving progress_api can deactivate inherited Auto Sync. Recheck after
+  // the await, before issuing any network requests with a progress credential.
+  if(!manual&&!CLOUD.enabled)throw Error('Auto Sync ปิดอยู่หรือเพิ่งปิดหลังเปลี่ยนปลายทาง Progress — ยังไม่ได้เขียนข้อมูล');
   if(!key)throw Error('ปลายทาง Progress ยังไม่มีรหัสเฉพาะ กรุณาตั้งรหัสใหม่ก่อนซิงก์');
   const hds={'X-Sync-Key':key,'Content-Type':'application/json'};
   for(const d of USTATE.decks){
    const url=api+'/progress/'+encodeURIComponent(d.key);
    let complete=false;
    for(let attempt=1;attempt<=CLOUD_MAX_RETRIES;attempt++){
+    // Do not continue an in-flight background sync after the user turns it off.
+    if(!manual&&!CLOUD.enabled)throw Error('Auto Sync ถูกปิดระหว่างดำเนินการ — หยุดก่อนส่งคำขอถัดไป');
     const resp=await fetch(url,{headers:hds,cache:'no-store'});
     if(resp.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง — ตั้งรหัสใหม่ได้ใน Settings');
     if(resp.status===404||resp.status===405)throw Error('Worker ไม่รองรับเส้นทางซิงก์ '+d.key);
@@ -255,6 +260,8 @@ async function cCloudSync(manual=false){
     const joined=cMergeState(local,remote||{});
     const body=JSON.stringify(joined);
     if(new TextEncoder().encode(body).byteLength>350000)throw Error('ข้อมูลซิงก์มากเกินขนาดที่ปลอดภัย กรุณาส่งออก Backup ก่อน');
+    // GET may have completed after Auto Sync was disabled. No new write.
+    if(!manual&&!CLOUD.enabled)throw Error('Auto Sync ถูกปิดระหว่างตรวจข้อมูล — ไม่ส่งคำขอเขียนคะแนน');
     const headers=revision?{...hds,'If-Match':revision}:hds;
     const saved=await fetch(url,{method:'PUT',headers,body});
     if(saved.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง');
