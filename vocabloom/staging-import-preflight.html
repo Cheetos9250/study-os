@@ -137,7 +137,7 @@ function makeReport(subjectRows,blocked){
   status:blocked?'BLOCKED_EXISTING_STAGING_DATA':'READ_ONLY_PREFLIGHT_COMPLETE',
   productionMigration:'BLOCKED',
   subjects:subjectRows.map(v=>({subject:v.subject,state:v.state,revision:v.revision})),
-  note:'Metadata-only report. It contains no SYNC_KEY, preview contents, study answers or user identifiers. This check does not authorize an import and is not an atomic snapshot.'
+  note:'Metadata-only report. It contains no credentials, preview contents, study answers or user identifiers. This check does not authorize an import and is not an atomic snapshot.'
  };
 }
 function clearReport(){
