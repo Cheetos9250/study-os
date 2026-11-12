@@ -87,13 +87,8 @@ export function ensureStagingUrl(baseUrl){
  return url.origin;
 }
 function isEmptyRemote(value){
- const state=validateProgress('existing staging',value);
- return Object.keys(state.study.ans).length===0 &&
-  Object.keys(state.study.ats).length===0 &&
-  (state.study.known||[]).length===0 &&
-  Number(state.study.rst||0)===0 &&
-  Object.keys(state.srs.s).length===0 &&
-  Number(state.srs.m?.newDone||0)===0;
+ // Exact match: refuse any unknown metadata, SRS counters or partial records.
+ return fingerprint(validateProgress('existing staging',value))===fingerprint(empty());
 }
 function resolveRevision(response){
  const etag=response.headers?.get?.('ETag');
