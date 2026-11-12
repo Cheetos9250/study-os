@@ -108,3 +108,12 @@ STAGING_SYNC_KEY="$YOUR_STAGING_ONLY_KEY" \
 
 New tests: \`node --test experiments/study-sync-cas/*.test.mjs\`, 15 isolated tests total, including resume, conflict, malformed file and production-host refusal.
 
+
+## Cloudflare weak ETag compatibility
+
+The real staging browser check showed a response `ETag: W/"0"` after Cloudflare's compression layer rewrote the previously strong validator. **Do not strip `W/` or send a weak validator as `If-Match`**; `If-Match` requires a strong comparison.
+
+The Worker now returns both `ETag: "revision"` (which Cloudflare may weaken in transit) and a separate `X-Sync-Revision: "revision"` header, exposed to browsers via `Access-Control-Expose-Headers`. Clients prefer `X-Sync-Revision`, and only fall back to an already-strong ETag for compatibility with older versioned Workers. If the custom header exists but is invalid, clients fail closed. On writes, they send the quoted strong revision as `If-Match`, which the Durable Object checks atomically.
+
+This update is **repository code only**. The deployed staging Worker remains on the previous version until explicitly redeployed using the dedicated `experiments/study-sync-cas/wrangler.jsonc`. The production `study-api` Worker must never be changed during these tests. When redeployed, check `X-Sync-Revision` appears in a GET response, then run the read-only browser check again before any synthetic probe writes. The new header is independent of HTTP compression.
+
