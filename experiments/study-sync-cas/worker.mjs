@@ -1,5 +1,5 @@
 /**
- * ISOLATED PROTOTYPE — NOT DEPLOYED.
+ * ISOLATED STAGING PROTOTYPE — NEVER DEPLOY OVER THE LIVE study-api WORKER.
  * Atomic, versioned Study OS progress storage backed by one SQLite Durable Object
  * per subject. No production KV migration, users, or credentials.
  */
