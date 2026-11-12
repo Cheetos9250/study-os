@@ -80,3 +80,16 @@ When `progress_api` explicitly points at a **different URL**, clients instead re
 This is a guard against accidental credential cross-use, **not** an authorization to enable any endpoint. The production CAS Worker and its new credential still do not exist in the public configuration. Do not place either secret in `data/config.json`, code, query strings, test fixtures containing real values, screenshots or Drive links with public sharing. On shared/university computers, remove credentials from the browser when finished.
 
 Future production rollout must explicitly specify how owner credentials are rotated and how old devices holding the original secret are handled. An old, cached client can still point at the legacy Worker, so a configuration change alone does **not** freeze all writers. Independently verify every client version and credential scope before cutover.
+
+
+## Review endpoint cross-routing audit (five legacy pages)
+
+During Phase 6 preparation we found that all five legacy Study OS pages used `window.__xs.api()` and `window.__xs.hdr()` for authenticated `POST /review`, **not only** for progress GET/PUT. Before correction, a future explicit `progress_api` switch would inadvertently redirect Notion review writes to the separate CAS-only progress service, with the wrong credential. This was dormant with the unchanged current `data/config.json`, but would break Review Step updates at cutover.
+
+The five pages now keep two independent targets in memory:
+- **Content/Notion review:** `contentApi` sourced only from `config.api`, `reviewApi()` and `reviewHdr()` using the original `study-sync-key`.
+- **Progress CAS:** `api` sourced from optional `config.progress_api` or old fallback, and `hdr()` using the endpoint-scoped progress credential when split.
+
+`renderSync()` now checks `reviewReady()`, independent of whether a newly introduced CAS progress key has been set. `syncViaApi()` uses only `reviewApi()` and `reviewHdr()` to contact `/review`. The original quiz/cards loader continues to use `config.api`. The independent tests `vocabloom/tests/notion-review-split.test.cjs` exercise all five flows and intentionally supply **different fake secrets and hostnames** so accidental cross-use fails. They also check that missing original content credentials cause zero Notion requests rather than falling back to the CAS key.
+
+This remains a **code-side preparation only**: the live split endpoint is not activated, the original Worker and Notion database remain unchanged, and Production migration is still blocked. A future endpoint switch must additionally verify Notion review from a fresh browser session using a real *original* credential, and cannot rely on simulated tests alone.
