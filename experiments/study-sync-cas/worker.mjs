@@ -12,7 +12,14 @@ const isObject=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const defaultState=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
 function response(payload,status=200,revision){
  const headers=new Headers(JSON_HEADERS);
- if(revision!==undefined)headers.set('ETag','"'+String(revision)+'"');
+ if(revision!==undefined){
+  // Cloudflare may transform a strong HTTP ETag into W/"n" when compressing.
+  // The dedicated application revision header is not an HTTP entity validator
+  // and can be safely used to construct a strong If-Match for CAS writes.
+  const rev='"'+String(revision)+'"';
+  headers.set('ETag',rev);
+  headers.set('X-Sync-Revision',rev);
+ }
  return new Response(JSON.stringify(payload),{status,headers});
 }
 function isValidState(x){
@@ -56,7 +63,7 @@ function withCors(responseObj,origin,allowedOrigin){
   r.headers.set('Access-Control-Allow-Origin',origin);
   r.headers.set('Access-Control-Allow-Methods','GET, PUT, OPTIONS');
   r.headers.set('Access-Control-Allow-Headers','X-Sync-Key, Content-Type, If-Match');
-  r.headers.set('Access-Control-Expose-Headers','ETag');
+  r.headers.set('Access-Control-Expose-Headers','ETag, X-Sync-Revision');
   r.headers.set('Vary','Origin');
  }
  return r;
