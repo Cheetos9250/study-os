@@ -6,7 +6,7 @@ const vm=require('node:vm');
 const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','private-kv-capture.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
-const source=script?.slice(script.indexOf('function validate(){'),script.indexOf("\nel('download').addEventListener"));
+const source=script?.slice(script.indexOf('function verifyRawKvValue('),script.indexOf("\nel('download').addEventListener"));
 const subjects=['acc','eco','math','eng','zh'];
 const namespace='0123456789abcdef0123456789abcdef';
 function fixture(config={}){
@@ -18,7 +18,7 @@ function fixture(config={}){
  const ctx={rows:{children:rows},TextEncoder,
   el:(name)=>name==='namespace'?{value:config.namespace||namespace}:null,
   MAX:900*1024,Date};
- vm.runInNewContext(source+'\nthis.validate=validate;',ctx,{timeout:1000});
+ vm.runInNewContext(source+'\nthis.validate=validate;this.readOriginalKvFile=readOriginalKvFile;',ctx,{timeout:1000});
  return ctx.validate;
 }
 test('Page uses no-network CSP and does not persist copied KV data',()=>{
@@ -51,6 +51,26 @@ test('Refuses suspicious pasted secrets and oversized raw values',()=>{
  assert.throws(fixture({acc:{status:'present',raw:'{"SYNC_KEY":"secret"}'}}),/Secret/);
  const big='{"blob":"'+('x'.repeat(900*1024))+'"}';
  assert.throws(fixture({acc:{status:'present',raw:big}}),/เกินขนาด/);
+});
+test('Original KV file chooser accepts Cloudflare progress_acc with no extension',async()=>{
+ const ctx={TextEncoder,MAX:900*1024};
+ vm.runInNewContext(source+'\nthis.readOriginalKvFile=readOriginalKvFile;',ctx,{timeout:1000});
+ const raw=' { "study":{"ans":{"32":0}}, "srs":{}, "updated":1794467041811 } ';
+ const file={name:'progress_acc',size:new TextEncoder().encode(raw).length,text:async()=>raw};
+ assert.equal(await ctx.readOriginalKvFile(file,'acc'),raw);
+ const renamed={...file,name:'progress-acc-kv-original-2026-11-12.json'};
+ assert.equal(await ctx.readOriginalKvFile(renamed,'acc'),raw);
+});
+test('File chooser rejects other subjects, cloud snapshot, secrets and unrecognizable names',async()=>{
+ const ctx={TextEncoder,MAX:900*1024};
+ vm.runInNewContext(source+'\nthis.readOriginalKvFile=readOriginalKvFile;',ctx,{timeout:1000});
+ const get=(name,raw)=>({name,size:new TextEncoder().encode(raw).length,text:async()=>raw});
+ await assert.rejects(ctx.readOriginalKvFile(get('progress_eco','{"updated":0}'),'acc'),/ชื่อไฟล์/);
+ await assert.rejects(ctx.readOriginalKvFile(get('snapshot.json','{"updated":0}'),'acc'),/ชื่อไฟล์/);
+ await assert.rejects(ctx.readOriginalKvFile(get('progress_acc','{"subjects":{}}'),'acc'),/Cloud Snapshot/);
+ await assert.rejects(ctx.readOriginalKvFile(get('progress_acc','{"SYNC_KEY":"bad"}'),'acc'),/Secret/);
+ await assert.rejects(ctx.readOriginalKvFile(get('progress_acc','not-json'),'acc'),/JSON/);
+ await assert.rejects(ctx.readOriginalKvFile(get('progress_acc','[]'),'acc'),/JSON object/);
 });
 test('Never asks for staging SYNC_KEY or enables production writes',()=>{
  assert.doesNotMatch(html,/\b(?:If-Match|wrangler deploy|kv key put|kv key delete|PUT\s*\/progress)\b/);
