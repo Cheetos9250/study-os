@@ -122,7 +122,7 @@ function classifyStaging(preview,remote,revision){
  if(revision==='"0"'&&same(remote,blank()))return 'empty-revision-0';
  return 'blocked-existing-different-data';
 }
-let busy=false,lastReport=null;
+let busy=false;let lastReport=null;
 function makeReport(subjectRows,blocked){
  ensure(Array.isArray(subjectRows)&&subjectRows.length===SUBJECTS.length&&
   subjectRows.every((v,i)=>isRecord(v)&&v.subject===SUBJECTS[i]&&
