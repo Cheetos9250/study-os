@@ -59,32 +59,52 @@ function cBridgeGameToCard(wordId,correct){
  if(!cSafeSet(d.markKey+'-srs',JSON.stringify(old)))return false;
  return true;
 }
-function cMirrorCardToVocab(card,rating){
- const w=cWordForCard(card);
- if(!w){cStudyRecord(Number(rating)>=3);return;}
- const oldRecord=ORIGINAL_VOCA_RECORD;
- oldRecord(w.id,Number(rating)>=3);
- if(data.progress[w.id])data.progress[w.id].syncTs=Date.now();
- store();cLocalRecord(w.id,Number(rating)>=3);
+function cReflectWordSchedule(w,card){
+ const d=uDeck('eng'),st=d&&card&&uReadSrs(d).s[card.mid],p=data.progress[w.id];
+ if(!st||!p)return false;
+ const deadline=Number(st.due)||Date.now(),stamp=Number(st.ts)||Date.now();
+ p.due=localDate(new Date(deadline));
+ p.last=localDate(new Date(stamp));
+ p.interval=Math.max(1,Number(st.ivl)||1);
+ p.mastered=st.st==='rev'&&Number(st.ivl||0)>=7;
+ p.syncTs=stamp;
+ return true;
 }
+function cMirrorCardToVocab(card,rating){
+ const correct=Number(rating)>=2,w=cWordForCard(card);
+ if(!w){cStudyRecord(correct);return;}
+ ORIGINAL_VOCA_RECORD(w.id,correct);
+ cReflectWordSchedule(w,card);
+ store();cLocalRecord(w.id,correct);
+}
+/* One-time legacy migration only. Page load must never rewrite an existing schedule. */
 function cBridgeExistingSrs(){
  const d=uDeck('eng');if(!d)return;
- const s=uReadSrs(d).s;
- let changed=false;
+ const state=uReadSrs(d);
+ let changedWords=false,changedCards=false;
  for(const w of allWords()){
   const c=cOriginalCardFor(w);if(!c)continue;
-  const st=s[c.mid],p=data.progress[w.id]||{},local=Number(p.syncTs||0);
-  if(st&&st.ts>local){
-   const correct=Number(st.last||0)>=3;
-   data.progress[w.id]={...p,seen:true,mastered:st.st==='rev'&&Number(st.ivl||0)>=7,streak:correct?Math.max(1,Number(p.streak||0)):0,interval:Math.max(1,Number(st.ivl||1)),due:localDate(new Date(Number(st.due||Date.now()))),last:localDate(new Date(Number(st.ts||Date.now()))),syncTs:Number(st.ts)};
-   changed=true;
-  }else if(p.seen&&local>Number(st?.ts||0)){
-   const state=uReadSrs(d),due=Date.parse(String(p.due||cDate())+'T00:00:00+07:00');
-   state.s[c.mid]={...(st||{}),st:'rev',step:0,ease:Number(st?.ease)||2.5,ivl:Math.max(1,Number(p.interval)||1),lapses:Number(p.wrong)||0,due:Number.isFinite(due)?due:Date.now(),ts:local,last:Number(p.streak||0)>0?3:1};
-   cSafeSet(d.markKey+'-srs',JSON.stringify(state));
+  const st=state.s[c.mid],p=data.progress[w.id];
+  if(st&&(!p||!p.seen)){
+   const stamp=Number(st.ts)||0,deadline=Number(st.due)||Date.now();
+   const correct=Number(st.last||0)>=2;
+   data.progress[w.id]={...(p||{}),seen:true,correct:Number(p?.correct)||0,wrong:Number(p?.wrong)||0,
+    streak:correct?Math.max(1,Number(p?.streak)||0):0,
+    interval:Math.max(1,Number(st.ivl)||1),due:localDate(new Date(deadline)),
+    last:localDate(new Date(stamp||Date.now())),
+    mastered:st.st==='rev'&&Number(st.ivl||0)>=7,syncTs:stamp};
+   changedWords=true;
+  }else if(!st&&p?.seen){
+   const day=Date.parse(String(p.due||cDate())+'T00:00:00+07:00');
+   const last=Date.parse(String(p.last||cDate())+'T12:00:00+07:00');
+   state.s[c.mid]={st:'rev',step:0,ease:2.5,ivl:Math.max(1,Number(p.interval)||1),
+    lapses:Number(p.wrong)||0,due:Number.isFinite(day)?day:Date.now(),
+    ts:Number(p.syncTs)||last||Date.now(),last:Number(p.streak||0)>0?3:1};
+   changedCards=true;
   }
  }
- if(changed)store();
+ if(changedCards)cSafeSet(d.markKey+'-srs',JSON.stringify(state));
+ if(changedWords)store();
 }
 function cShadow(name,val,ts=Date.now()){return {kind:name,value:val,ts:Number(ts)||Date.now()}}
 function cSetShadow(dict,key,item){const v=dict[key];if(!v||Number(v.ts||0)<=Number(item.ts||0))dict[key]=item;}
@@ -206,7 +226,9 @@ function cSetKey(){
  const k=window.prompt('ใส่ SYNC_KEY ที่ตั้งไว้ใน Cloudflare Worker study-api (ใช้รหัสเดียวกับหน้า Study OS เดิม)',cCloudKey()?'':'');
  if(k===null)return;
  if(!k.trim()){cCloudNotice('ยังไม่ได้ตั้งรหัสซิงก์');return}
- cSafeSet(CLOUD_KEY,k.trim());CLOUD.enabled=true;cSafeSet(CLOUD_AUTO,'1');cCloudSync(true);render();
+ cSafeSet(CLOUD_KEY,k.trim());
+ // One manual sync is requested by entering the key. Auto Sync remains opt-in.
+ cCloudSync(true);render();
 }
 
 async function cFullRestore(file){
@@ -222,7 +244,13 @@ async function cFullRestore(file){
   const writes={};
   for(const d of USTATE.decks){
    const k1='study-'+d.key,k2=d.markKey+'-srs',a=subs[k1],b=subs[k2];
-   if(!a||!b||typeof a!=='object'||typeof b!=='object'||!a.ans||!b.s||!b.m)throw Error('ไม่มีข้อมูลวิชา '+d.key);
+   const owns=(key)=>Object.prototype.hasOwnProperty.call(subs,key);
+   const record=(value)=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+   if(!owns(k1)||!owns(k2)||!record(a)||!record(b)||
+      (a.ans!==undefined&&!record(a.ans))||(a.ats!==undefined&&!record(a.ats))||
+      (b.s!==undefined&&!record(b.s))||(b.m!==undefined&&!record(b.m))||
+      (Object.keys(b).length>0&&(b.s===undefined||b.m===undefined)))
+     throw Error('ไม่มีข้อมูลวิชา '+d.key);
    writes[k1]=JSON.stringify(a);writes[k2]=JSON.stringify(b);
   }
   writes[STORAGE_KEY]=JSON.stringify(v);
@@ -263,7 +291,7 @@ function cForgetKey(){
 }
 function cPanel(){
  const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'ยังไม่เคยยืนยันการซิงก์';
- return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
+ return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p style="color:#ae6741;font-weight:700">Cloud Sync ยังอยู่ระหว่าง QA: Worker จริงยังไม่ผ่านการทดสอบ concurrent writes และอาจเกิดข้อมูลเขียนทับเมื่อซิงก์พร้อมกันหลายเครื่อง โปรดทำ Full backup ก่อนใช้งาน และหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
 }
 
 function cFullBackup(){
@@ -300,10 +328,13 @@ function cInstall(){
  ORIGINAL_VOCA_RECORD=recordAnswer;
  recordAnswer=function(id,correct){
   ORIGINAL_VOCA_RECORD(id,correct);
-  if(data.progress[id])data.progress[id].syncTs=Date.now();
-  store();cLocalRecord(id,correct);
-  if(USTATE.ready)cBridgeGameToCard(id,correct);
-  cCloudDebounce();
+  cLocalRecord(id,correct);
+  const bridged=USTATE.ready&&cBridgeGameToCard(id,correct);
+  const w=getWord(id),card=bridged&&w?cOriginalCardFor(w):null;
+  if(!card||!cReflectWordSchedule(w,card)){
+   if(data.progress[id])data.progress[id].syncTs=Date.now();
+  }
+  store();cCloudDebounce();
  };
  const oldAdd=addWord;
  addWord=function(){

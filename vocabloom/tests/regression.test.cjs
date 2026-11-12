@@ -109,3 +109,81 @@ test('Full restore safely restores all five subject slots and rejects invalid JS
  assert.equal(result.restored,true,'Expected complete subject restore');
  assert.equal(result.invalidPreserved,true,'Bad JSON must not overwrite restored data');
 });
+
+
+test('BR-08: actual Full backup round-trips on clean profile with empty English/Chinese study slots',async()=>{
+ const saveCode=extract(cloud,'function cFullBackup(){','function cPanelAction(el){');
+ const restoreCode=extract(cloud,'async function cFullRestore(file){','function cForgetKey(){');
+ const fixture=new Function('bundle',[
+  'const memory=new Map(), structuredClone=x=>JSON.parse(JSON.stringify(x));',
+  'let data={progress:{apple:{seen:true,correct:3}},days:{today:{answered:3,correct:2}},custom:[],settings:{goal:10}};',
+  'const localStorage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,String(v)),removeItem:k=>memory.delete(k)};',
+  'const STORAGE_KEY="vocabloom_mvp_v1",CLOUD_LOCAL_DAYS="device-days",CLOUD_STUDY_DAYS="study-days";',
+  'const USTATE={decks:bundle.decks},CLOCAL={device:"device-A",days:{today:{answered:3,correct:2}},studyDays:{}},CLOUD={busy:false,remoteStatus:"local"};',
+  'const cSafeGet=k=>localStorage.getItem(k),cSafeSet=(k,v)=>{try{localStorage.setItem(k,v);return true}catch{return false}},cSafeJSON=(k,def)=>{try{return JSON.parse(memory.get(k))||def}catch{return def}};',
+  'const cDate=()=> "2026-11-12";let captured=null,status="";',
+  'const URL={createObjectURL:blob=>{captured=blob;return "blob:qa"},revokeObjectURL:()=>{}};',
+  'const document={createElement:()=>({click(){},remove(){}}),body:{append(){}},getElementById:()=>null};',
+  'const setTimeout=()=>0;const window={confirm:()=>true};const cCloudNotice=s=>status=s,render=()=>{};',
+  saveCode,restoreCode,
+  'return async()=>{',
+  ' for(const d of bundle.decks){memory.set("study-"+d.key,d.key==="acc"?JSON.stringify({ans:{0:1},ats:{0:123}}):"{}");memory.set(d.markKey+"-srs",d.key==="acc"?JSON.stringify({s:{card:{ts:123,due:555}},m:{day:0,newDone:1}}):"{}");}',
+  ' const expected=Object.fromEntries([...memory]);',
+  ' cFullBackup();if(!captured)throw Error("No Blob from cFullBackup");',
+  ' const exported=JSON.parse(await captured.text());',
+  ' const blankFields=JSON.stringify(exported.subjects["study-eng"])==="{}"&&JSON.stringify(exported.subjects["study-zh"])==="{}";',
+  ' const clean=new Map();memory.clear();data={progress:{},days:{},custom:[],settings:{}};CLOCAL.device="device-B";',
+  ' await cFullRestore({size:captured.size,text:()=>captured.text()});',
+  ' const restored=Object.keys(expected).every(k=>memory.get(k)===expected[k])&&data.progress.apple?.correct===3;',
+  ' const deviceDaysSkipped=Object.keys(CLOCAL.days).length===0;',
+  ' const before=JSON.stringify([...memory]);await cFullRestore({size:10,text:async()=>"{invalid"});',
+  ' const rejected=JSON.stringify([...memory])===before;',
+  ' return {blankFields,restored,deviceDaysSkipped,rejected,exported};',
+  '};'
+ ].join('\n'))(decks);
+ const r=await fixture();
+ assert.equal(r.blankFields,true,'English/Chinese study slots must remain empty, not fabricated');
+ assert.equal(r.restored,true,'Full backup must restore every slot and VocaBloom progress unchanged');
+ assert.equal(r.deviceDaysSkipped,true,'Device-specific activity must not double count on another device');
+ assert.equal(r.rejected,true,'Invalid backup must leave prior restored data unchanged');
+});
+test('UP-02/UP-04: reloading must not rewrite either existing SRS or vocabulary schedules',()=>{
+ const migration=extract(cloud,'function cBridgeExistingSrs(){','function cShadow(');
+ const run=new Function('payload','bridgeCode',[
+  'const memory=new Map(),localStorage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,String(v))};',
+  'const d={markKey:"eng-vocab-v1"},word={id:"example",en:"accounts payable"},card={mid:"n-test"};',
+  'let data={progress:{example:{seen:true,correct:3,wrong:0,streak:2,interval:7,due:"2026-11-20",last:"2026-11-12",syncTs:1001}}};',
+  'const allWords=()=>[word],uDeck=()=>d,cOriginalCardFor=()=>card;',
+  'const uReadSrs=()=>{const raw=localStorage.getItem("eng-vocab-v1-srs");return raw?JSON.parse(raw):{s:{},m:{day:0,newDone:0}};};',
+  'const cSafeSet=(k,v)=>{localStorage.setItem(k,v);return true};',
+  'const localDate=d=>d.toISOString().slice(0,10),cDate=()=> "2026-11-12";',
+  'const store=()=>memory.set("vocabloom_mvp_v1",JSON.stringify(data));',
+  migration,
+  'const original={s:{"n-test":{st:"rev",step:1,ease:2.65,ivl:10,due:1795280400000,ts:1000,last:4}},m:{day:0,newDone:0}};',
+  'memory.set("eng-vocab-v1-srs",JSON.stringify(original));store();',
+  'const beforeSrs=memory.get("eng-vocab-v1-srs"),beforeWord=memory.get("vocabloom_mvp_v1");',
+  'cBridgeExistingSrs();cBridgeExistingSrs();',
+  'return {scheduleUnchanged:memory.get("eng-vocab-v1-srs")===beforeSrs,wordUnchanged:memory.get("vocabloom_mvp_v1")===beforeWord};'
+ ].join('\n'))({},migration);
+ assert.equal(run.scheduleUnchanged,true,'Existing SRS interval/due/last must not change on reload');
+ assert.equal(run.wordUnchanged,true,'Existing vocabulary date/interval must not change on reload');
+});
+test('UP-03-H: Hard rating counts as remembered, and schedule uses canonical SRS timestamps',()=>{
+ const bridgeCode=extract(cloud,'function cReflectWordSchedule(w,card){','/* One-time legacy migration only.');
+ const execute=new Function('bridgeCode',[
+  'const d={markKey:"eng-vocab-v1"},word={id:"word1",en:"accounts payable"},card={mid:"n-card1"};',
+  'let data={progress:{}},passedCorrect=null,deviceCorrect=null;',
+  'const uDeck=()=>d,cWordForCard=()=>word,uReadSrs=()=>({s:{"n-card1":{st:"learn",ivl:0,due:1794461552006,ts:1794460952006}}});',
+  'const localDate=d=>new Date(d).toISOString().slice(0,10),store=()=>{};',
+  'const ORIGINAL_VOCA_RECORD=(id,correct)=>{passedCorrect=correct;data.progress[id]={seen:true,correct:correct?1:0,wrong:correct?0:1,streak:correct?1:0,due:"2026-11-13"};};',
+  'const cLocalRecord=(id,correct)=>{deviceCorrect=correct;};',
+  bridgeCode,
+  'cMirrorCardToVocab(card,2);',
+  'return {passedCorrect,deviceCorrect,progress:data.progress.word1};'
+ ].join('\n'))(bridgeCode);
+ assert.equal(execute.passedCorrect,true,'Hard must not be counted as wrong');
+ assert.equal(execute.deviceCorrect,true);
+ assert.equal(execute.progress.wrong,0);
+ assert.equal(execute.progress.syncTs,1794460952006);
+ assert.equal(execute.progress.due,'2026-11-12');
+});
