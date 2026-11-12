@@ -6,7 +6,7 @@ Updated: 2026-11-12. **Production cutover is BLOCKED. Do not change the live Wor
 - A local-only VocaBLoom full backup was supplied by the owner and stored privately in their Primary Google Drive under VocaBLoom / Backups. This contains Notion vocabulary and on-device subject stores; it does not prove anything about production KV data.
 - The isolated staging Worker study-api-cas-staging-only was tested in the browser. The synthetic CAS probe passed 200/409 collision, retry preservation, and 428 legacy write rejection. This does not verify real data migration.
 - The repo has a read-only **Cloud snapshot (read-only)** button in VocaBLoom → Settings → Unified Learning Sync. It sends five authenticated GETs, no PUT. The output uses the vocabloom-cloud-readonly-snapshot format.
-- This repository **does not contain the actual current production study-api Worker source**. Do not infer its routes, storage bindings, data contracts, or backup capabilities from the staging prototype.
+- The owner supplied the complete-looking production Worker JavaScript separately for an offline code audit on 12 Nov 2026. The supplied code is **not committed here** and is not an independently verified deployment/bindings inventory. See PRODUCTION-WORKER-CODE-AUDIT-2026-11-12.md for the safe route/storage summary.
 
 ## No-credential, no-network audit page
 - Open vocabloom/migration-audit.html on project GitHub Pages.
@@ -16,7 +16,7 @@ Updated: 2026-11-12. **Production cutover is BLOCKED. Do not change the live Wor
 - Keep both original JSON files private. Do not commit them or send them to the public GitHub repo.
 
 ## Missing gates before any production Worker deployment
-1. Obtain the current **complete production Worker code**, routes and bindings (including KV namespace and Notion integration). Inspect safely without changing the deployed code. Store securely, not in a public PR if it contains credentials.
+1. Confirm the owner-supplied production Worker code corresponds to the **currently deployed revision** and read the actual Cloudflare routes/bindings (including KV namespace and Notion integration) without changing the deployed code. Store securely, not in a public PR if it contains credentials.
 2. Obtain a **server-side** point-in-time backup of the source KV data and any related data. The browser Cloud snapshot is a separate read-only export, not a verified server-admin backup.
 3. Validate the five subjects acc, eco, math, eng and zh from source backup and browser snapshot, including byte counts/hashes and every data field. Do not assume an absent record is empty.
 4. Make a staging import plan with no production target. Check legacy schema, 350 KB per-subject limit and new SQLite Durable Object namespace. Apply only to isolated staging after independent backup.
@@ -40,3 +40,10 @@ Read-only snapshots captured from a legacy Worker can contain an exact object of
 The offline audit page labels `{"updated":0}` as `legacy-metadata-only`, shows counts as **unknown** rather than zero, and keeps the production cutover gate **BLOCKED**. The strict staging importer still rejects incomplete source records; no automatic normalization or import is approved. Source schema and administrative server-side backup must be reviewed first. Never overwrite a populated subject with local defaults solely because a different device reports zero entries.
 
 The Production Worker has no verified `X-Sync-Revision` or strong `ETag` on any of the five subjects in the latest read-only snapshot. Continuing to press manual Legacy Sync can overwrite remote data; do not enable it during migration preparation.
+
+
+## Status after owner-provided production Worker audit (12 Nov 2026)
+
+The supplied Worker source confirms that progress GET reads `PROGRESS.get("progress:"+subject)`, falling back to `{"updated":0}` when the returned KV value is null; PUT is an unconditional `PROGRESS.put` and lacks any CAS validator. The existing `/quiz`, `/cards` and Notion-mutating `/review` endpoints must be preserved in a future combined Worker. Source-level review alone does not prove which KV namespace ID is bound to the currently deployed Worker.
+
+Use the **read-only**, offline `experiments/study-sync-cas/inspect-legacy-kv.mjs` gate for a comparison against a separately captured administrative KV manifest. Do not normalize metadata-only placeholders into empty progress objects. A verified server-side backup and explicit cutover approval are still required.
