@@ -91,9 +91,9 @@ test('GET only to exact staging routes and no upload of preview JSON',async()=>{
  assert.equal(calls[0].opts.credentials,'omit');
  assert.equal(calls[0].opts.headers['X-Sync-Key'],'FAKE_STAGING_KEY');
  assert.equal(calls[0].opts.body,undefined);
- assert.throws(()=>getJson('/progress/secret','FAKE_STAGING_KEY'),/เส้นทาง/);
- assert.throws(()=>getJson('/__staging/probe/abcd','FAKE_STAGING_KEY'),/เส้นทาง/);
- assert.throws(()=>getJson('/review','FAKE_STAGING_KEY'),/เส้นทาง/);
+ await assert.rejects(getJson('/progress/secret','FAKE_STAGING_KEY'),/เส้นทาง/);
+ await assert.rejects(getJson('/__staging/probe/abcd','FAKE_STAGING_KEY'),/เส้นทาง/);
+ await assert.rejects(getJson('/review','FAKE_STAGING_KEY'),/เส้นทาง/);
 });
 test('Weak-only ETag, malformed JSON or unauthorized response fail closed',async()=>{
  const workerResponse=(status,etag,json)=>({status,
