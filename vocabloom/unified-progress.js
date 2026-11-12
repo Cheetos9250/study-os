@@ -210,7 +210,7 @@ function cCloudRevision(response){
 }
 async function cCloudSync(manual=false){
  if(CLOUD.busy||(!manual&&!CLOUD.enabled)||!cCloudKey()||!USTATE.ready)return;
- CLOUD.busy=true;cCloudNotice('กำลังตรวจเวอร์ชันและซิงก์ข้อมูล...');let count=0,legacyConsent=false;
+ CLOUD.busy=true;CLOUD.mode='unknown';cCloudNotice('กำลังตรวจเวอร์ชันและซิงก์ข้อมูล...');let count=0,legacyConsent=false;
  try{
   const api=await cApiUrl(),key=cCloudKey();
   const hds={'X-Sync-Key':key,'Content-Type':'application/json'};
@@ -223,7 +223,9 @@ async function cCloudSync(manual=false){
     if(resp.status===404||resp.status===405)throw Error('Worker ไม่รองรับเส้นทางซิงก์ '+d.key);
     if(!resp.ok)throw Error('Cloudflare GET '+d.key+' HTTP '+resp.status);
     const revision=cCloudRevision(resp);
+    if(revision&&CLOUD.mode!=='legacy')CLOUD.mode='cas';
     if(!revision){
+     CLOUD.mode='legacy';
      if(!manual){
       CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');
       throw Error('Worker ยังไม่รองรับ Safe Sync (ไม่มี ETag) จึงปิด Auto Sync เพื่อป้องกันคะแนนถูกเขียนทับ · คะแนนในเครื่องไม่ถูกแก้ไข');
@@ -341,7 +343,8 @@ function cForgetKey(){
 }
 function cPanel(){
  const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'ยังไม่เคยยืนยันการซิงก์';
- return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p style="color:#ae6741;font-weight:700">Cloud Sync ยังอยู่ระหว่าง QA: Worker จริงยังไม่ผ่านการทดสอบ concurrent writes และอาจเกิดข้อมูลเขียนทับเมื่อซิงก์พร้อมกันหลายเครื่อง โปรดทำ Full backup ก่อนใช้งาน และหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน</p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
+ const engine=CLOUD.mode==='cas'?'Safe Sync (ETag / If-Match)':CLOUD.mode==='legacy'?'Legacy Worker (ไม่มี ETag)':'ยังไม่ได้ตรวจความสามารถ Worker';
+ return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p style="color:#ae6741;font-weight:700">Cloud Sync ยังอยู่ระหว่าง QA: Worker จริงยังไม่ได้รับการยืนยันว่ารองรับการเขียนข้อมูลพร้อมกันอย่างปลอดภัย · Auto Sync จะปิดตัวเองหากไม่พบ ETag · การซิงก์แบบเดิมต้องยืนยันความเสี่ยงทุกครั้ง โปรดทำ Full backup ก่อนใช้งาน</p><p>โหมดเซิร์ฟเวอร์: <strong>'+h(engine)+'</strong></p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Full backup</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
 }
 
 function cFullBackup(){
