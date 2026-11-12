@@ -24,7 +24,7 @@ const preview=()=>{
   subjects,revisions:Object.fromEntries(SUBJECTS.map(s=>[s,null]))
  };
 };
-function mockApp({alreadyImported=false}={}){
+function mockApp({alreadyImported=false,putStatus=null,alterAfterPut=false,healthStatus=200}={}){
  const p=preview();
  const stage=Object.fromEntries(SUBJECTS.map(s=>[s,blank()]));
  const revision=Object.fromEntries(SUBJECTS.map(s=>[s,0]));
@@ -38,7 +38,7 @@ function mockApp({alreadyImported=false}={}){
   assert.equal(options.redirect,'error');
   if(path==='/__staging/health'){
    assert.equal(options.method,'GET');
-   return {status:200,headers:{get:()=>null},
+   return {status:healthStatus,headers:{get:()=>null},
     json:async()=>({staging:true,protocol:'vocabloom-cas-staging-v1',subjects:SUBJECTS})};
   }
   const match=path.match(/^\/progress\/(acc|eco|math|eng|zh)$/);
@@ -50,8 +50,10 @@ function mockApp({alreadyImported=false}={}){
   assert.equal(options.method,'PUT');
   assert.equal(name,'acc');
   assert.equal(options.headers['If-Match'],'"0"');
+  if(putStatus!==null)return {status:putStatus};
   if(revision.acc!==0)return {status:409};
   stage.acc=JSON.parse(options.body);
+  if(alterAfterPut)stage.acc.study.ans['32']=1;
   revision.acc++;
   return {status:200};
  };
@@ -194,4 +196,37 @@ test('Public code does not embed private dataset, production secrets, or automat
  assert.match(html,/Production Worker PUT = 0/);
  assert.match(html,/lastReport=makeReport/);
  assert.match(html,/staging-before-import-private\.json/);
+});
+
+test('CAS conflict HTTP 409 refuses retry and never claims success',async()=>{
+ const m=mockApp({putStatus:409});
+ await m.click('check');
+ await m.click('backup');
+ m.elements.agree.checked=true;
+ await m.click('apply');
+ assert.equal(m.calls.filter(x=>x.method==='PUT').length,1);
+ assert.equal(m.revision.acc,0);
+ assert.equal(m.elements.report.disabled,true);
+ assert.match(m.elements.result.textContent,/Accounting PUT HTTP 409/);
+ assert.match(m.elements.result.textContent,/ห้ามกดซ้ำทันที/);
+});
+test('If readback differs after a response 200, stop with no success report',async()=>{
+ const m=mockApp({alterAfterPut:true});
+ await m.click('check');
+ await m.click('backup');
+ m.elements.agree.checked=true;
+ await m.click('apply');
+ assert.equal(m.calls.filter(x=>x.method==='PUT').length,1);
+ assert.equal(m.revision.acc,1);
+ assert.equal(m.elements.report.disabled,true);
+ assert.match(m.elements.result.textContent,/อ่าน Accounting กลับมาไม่ตรงต้นฉบับ/);
+});
+test('Wrong staging credentials / identity do not reach any progress record',async()=>{
+ const m=mockApp({healthStatus:401});
+ await m.click('check');
+ assert.match(m.elements.result.textContent,/BLOCKED/);
+ assert.equal(m.calls.length,1);
+ assert.equal(m.calls[0].path,'/__staging/health');
+ assert.equal(m.elements.backup.disabled,true);
+ assert.equal(m.calls.filter(x=>x.method==='PUT').length,0);
 });
