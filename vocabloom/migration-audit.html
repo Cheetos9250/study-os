@@ -97,14 +97,21 @@ function checkRemote(doc){
   requireOk(record(raw),'Cloud snapshot '+subject+' ไม่ใช่ Object');
   requireOk(byteLength(raw)<=350_000,'Cloud snapshot '+subject+' เกินขนาดที่รองรับ');
   if(Object.keys(raw).length===0){
-   counts[subject]={emptyLegacy:true,quizAnswers:0,srsCards:0,activityShadows:0};
+   // An empty object proves only that the endpoint returned an empty object.
+   // Never assume an absent legacy KV record can safely be imported as empty.
+   counts[subject]={shape:'empty-object',quizAnswers:0,srsCards:0,activityShadows:0};
+  }else if(Object.keys(raw).length===1&&Object.hasOwn(raw,'updated')&&
+    Number.isFinite(raw.updated)&&raw.updated===0){
+   // Legacy production can return {updated:0} for an untouched/unknown subject.
+   // Preserve this distinction; staging importer must NOT silently normalize it.
+   counts[subject]={shape:'legacy-metadata-only',quizAnswers:null,srsCards:null,activityShadows:null};
   }else{
    requireOk(record(raw.study)&&record(raw.srs)&&record(raw.study.ans)&&record(raw.study.ats)&&
     record(raw.srs.s)&&record(raw.srs.m),'Cloud snapshot '+subject+' ข้อมูล study/SRS ไม่ครบ');
    requireOk(raw.study.known===undefined||Array.isArray(raw.study.known),
     'Cloud snapshot '+subject+' known ไม่ใช่ Array');
    const cards=Object.keys(raw.srs.s);
-   counts[subject]={emptyLegacy:false,quizAnswers:count(raw.study.ans),
+   counts[subject]={shape:'complete-progress',quizAnswers:count(raw.study.ans),
     srsCards:cards.filter(k=>!k.startsWith('vb/v1/')).length,
     activityShadows:cards.filter(k=>k.startsWith('vb/v1/')).length};
   }
@@ -136,6 +143,11 @@ async function audit(){
   if(!remote)notes.unshift('ยังไม่มี Cloud snapshot ทั้ง 5 วิชา');
   if(remoteInfo&&Object.values(remoteInfo.revisionStatus).some(x=>x==='legacy-or-unversioned'))
    notes.push('มีอย่างน้อยหนึ่งวิชาที่ไม่แสดง CAS revision');
+  if(remoteInfo&&Object.values(remoteInfo.subjects).some(x=>x.shape!=='complete-progress'))
+   notes.push('Cloud snapshot มีข้อมูลวิชาที่เป็น metadata-only หรือว่าง ต้องตรวจต้นทางก่อนแปลงข้อมูล');
+  if(remoteInfo&&SUBJECTS.some(k=>remoteInfo.subjects[k].quizAnswers>0&&
+     count(local.value.subjects['study-'+k]?.ans)===0))
+   notes.push('ข้อมูลคำตอบบางวิชาพบใน Cloud แต่ไม่พบใน Local เครื่องนี้ ต้องรักษาข้อมูล Cloud ไว้');
   const report={
    product:'VocaBLoom',auditVersion:1,
    status:'BLOCKED_FOR_PRODUCTION_MIGRATION',
@@ -153,8 +165,9 @@ async function audit(){
    lines.push('PASS · Cloud snapshot: พบข้อมูลครบ 5 วิชา');
    for(const key of SUBJECTS){
     const x=remoteInfo.subjects[key];
-    lines.push('READ · '+key.toUpperCase()+': quiz '+x.quizAnswers+
-     ', cards '+x.srsCards+', shadows '+x.activityShadows+
+    lines.push((x.shape==='complete-progress'?'READ':'WARN')+' · '+key.toUpperCase()+
+     ': '+x.shape+', quiz '+(x.quizAnswers===null?'unknown':x.quizAnswers)+
+     ', cards '+(x.srsCards===null?'unknown':x.srsCards)+
      ', revision '+remoteInfo.revisionStatus[key]);
    }
   }else lines.push('PENDING · ยังไม่มี Cloud snapshot จาก Worker จริง');
