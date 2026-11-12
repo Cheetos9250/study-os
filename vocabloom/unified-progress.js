@@ -6,6 +6,7 @@ const CLOUD_LOCAL_DAYS='vocabloom-device-days-v1', CLOUD_STUDY_DAYS='vocabloom-d
 const CLOUD_LAST='vocabloom-last-sync-v1', CLOUD_AUTO='vocabloom-auto-sync-v1';
 const CLOUD_PREFIX='vb/v1/';
 const CLOUD_AUTOSYNC_MIGRATION='vocabloom-autosync-safety-v2';
+const CLOUD_AUTO_ENDPOINT='vocabloom-auto-sync-endpoint-v1';
 const CLOUD={busy:false,error:'',message:'',last:0,timer:null,api:'',progressSplit:false,enabled:false,remoteStatus:'not verified'};
 function cSafeGet(k){try{return localStorage.getItem(k)}catch{return null}}
 function cSafeSet(k,v){try{localStorage.setItem(k,v);return true}catch{return false}}
@@ -198,7 +199,14 @@ function cApplySubject(d,merged){
 function cCloudNotice(msg,error=false){CLOUD.message=msg;CLOUD.error=error?msg:'';const el=document.getElementById('cloudSyncState');if(el)el.textContent=msg;}
 async function cApiUrl(){
  if(CLOUD.api)return CLOUD.api;
- try{const r=await fetch('../data/config.json',{cache:'no-store'});if(!r.ok)throw Error('config HTTP '+r.status);const j=await r.json();const original=String(j.api||'').replace(/\/+$/,'');const url=String(j.progress_api||original).replace(/\/+$/,'');if(!/^https:\/\//.test(url))throw Error('Missing HTTPS API');CLOUD.progressSplit=url!==original;CLOUD.api=url;if(CLOUD.progressSplit){CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');}return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
+ try{const r=await fetch('../data/config.json',{cache:'no-store'});if(!r.ok)throw Error('config HTTP '+r.status);const j=await r.json();const original=String(j.api||'').replace(/\/+$/,'');const url=String(j.progress_api||original).replace(/\/+$/,'');if(!/^https:\/\//.test(url))throw Error('Missing HTTPS API');CLOUD.progressSplit=url!==original;CLOUD.api=url;
+ // A new endpoint must not inherit old Auto Sync consent. A separately
+ // approved endpoint may retain its own deliberate opt-in across reloads.
+ if(CLOUD.progressSplit&&cSafeGet(CLOUD_AUTO_ENDPOINT)!==url){
+  CLOUD.enabled=false;
+  if(cSafeGet(CLOUD_AUTO)==='1')cSafeSet(CLOUD_AUTO,'0');
+ }
+ return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
 }
 function cCloudStorageKey(){return CLOUD.progressSplit?CLOUD_PROGRESS_KEY:CLOUD_KEY;}
 function cCloudKey(){return String(cSafeGet(cCloudStorageKey())||'').trim();}
@@ -426,6 +434,43 @@ function cFullBackup(){
  cCloudNotice('ส่งออกสำรองทั้ง 5 วิชาแล้ว (ไม่รวม SYNC_KEY)');
 }
 
+async function cToggleAuto(){
+ if(CLOUD.autoBusy)return;
+ CLOUD.autoBusy=true;
+ try{
+  // Resolve destination before permitting opt-in. A newly split endpoint
+  // cannot inherit authorization that was granted to the old Worker.
+  await cApiUrl();
+  if(CLOUD.enabled){
+   CLOUD.enabled=false;
+   cSafeSet(CLOUD_AUTO,'0');
+   clearTimeout(CLOUD.timer);
+   render();
+   return;
+  }
+  if(CLOUD.progressSplit){
+   if(!cCloudKey()){
+    cCloudNotice('ต้องตั้งรหัสของ Progress Worker ใหม่ก่อนเปิด Auto Sync',true);
+    return;
+   }
+   if(!window.confirm('คุณกำลังเปิด Auto Sync สำหรับ Progress Worker ใหม่แยกจาก Worker เดิม\n\nตรวจ Full backup และผลทดสอบการย้ายข้อมูลแล้วหรือยัง? การเปิดจะเขียนคะแนนทั้ง 5 วิชาไปยังปลายทางใหม่นี้\n\nอนุญาตให้เปิด Auto Sync สำหรับปลายทางนี้เท่านั้นหรือไม่?'))return;
+   if(!cSafeSet(CLOUD_AUTO_ENDPOINT,CLOUD.api))
+    throw Error('ไม่สามารถบันทึกการยืนยันปลายทาง Auto Sync บนเครื่องนี้');
+  }
+  if(!cSafeSet(CLOUD_AUTO,'1'))
+   throw Error('ไม่สามารถบันทึกการเปิด Auto Sync บนเครื่องนี้');
+  CLOUD.enabled=true;
+  render();
+  cCloudSync(false);
+ }catch(e){
+  CLOUD.enabled=false;
+  cSafeSet(CLOUD_AUTO,'0');
+  cCloudNotice(String(e.message||e),true);
+ }finally{
+  CLOUD.autoBusy=false;
+  render();
+ }
+}
 function cPanelAction(el){
  if(el.dataset.action==='cloud-restore'){document.getElementById('fullRestoreInput')?.click();return true;}
  if(el.dataset.action==='cloud-forget'){cForgetKey();return true;}
@@ -433,7 +478,7 @@ function cPanelAction(el){
  if(el.dataset.action==='cloud-backup'){cFullBackup();return true;}
  if(el.dataset.action==='cloud-config'){cSetKey();return true;}
  if(el.dataset.action==='cloud-sync'){cCloudSync(true);return true;}
- if(el.dataset.action==='cloud-auto'){CLOUD.enabled=!CLOUD.enabled;cSafeSet(CLOUD_AUTO,CLOUD.enabled?'1':'0');render();if(CLOUD.enabled)cCloudSync(false);return true;}
+ if(el.dataset.action==='cloud-auto'){cToggleAuto();return true;}
  return false;
 }
 function cDashboardExtra(){
