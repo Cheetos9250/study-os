@@ -97,10 +97,10 @@ This remains a **code-side preparation only**: the live split endpoint is not ac
 
 ## Async Auto Sync switch-off race — guarded before Phase 6
 
-A VocaBLoom background sync may begin while the page still has the previous stored Auto Sync preference. Its first \`await cApiUrl()\` can discover a **different** optional \`progress_api\` URL and deactivate inherited Auto Sync. Without a second permission check after this asynchronous config resolution, the already-running sync could continue and issue CAS writes to the newly configured worker using the separate progress credential, despite the deliberate new-endpoint opt-in gate.
+A VocaBLoom background sync may begin while the page still has the previous stored Auto Sync preference. Its first `await cApiUrl()` can discover a **different** optional `progress_api` URL and deactivate inherited Auto Sync. Without a second permission check after this asynchronous config resolution, the already-running sync could continue and issue CAS writes to the newly configured worker using the separate progress credential, despite the deliberate new-endpoint opt-in gate.
 
 The client now **rechecks Auto Sync after endpoint resolution**, at the beginning of each progress GET/retry and **immediately before each PUT**, stopping with an explanatory error if Auto Sync has been disabled. This also handles a user turning Auto Sync off during an in-flight GET, and stops the remaining subjects after an already-acknowledged PUT. An acknowledged write cannot be undone by disabling Auto Sync; consequently a partial sync must be identified and reconciled rather than represented as an all-five-subject success.
 
 Deterministic offline regressions cover: endpoint discovery disabling Auto Sync before any GET; turning off Auto Sync while a GET is in flight (zero PUT); turning it off just after a successful first PUT (no further subject writes, incomplete status); and a separately explicit manual sync remaining unaffected by the background-only guard.
 
-This is frontend safety hardening, not a Production cutover. It makes no changes to \`data/config.json\`, cloud Worker code, production KV, Notion, stored study progress or existing credentials.
+This is frontend safety hardening, not a Production cutover. It makes no changes to `data/config.json`, cloud Worker code, production KV, Notion, stored study progress or existing credentials.
