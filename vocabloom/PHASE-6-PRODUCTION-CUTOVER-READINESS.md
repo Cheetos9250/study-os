@@ -115,3 +115,12 @@ The candidate uses a distinct `ProductionProgressDO` class, requires a new `PROD
 There is intentionally **no migration importer, production Wrangler config, Cloudflare secret, deployment workflow, or activated `data/config.json` progress endpoint** in this branch. The original `study-api` still owns Notion `/quiz`, `/cards`, `/review`, and legacy KV until the future cutover is independently authorized. See `experiments/prod-progress-cas/README.md` for the blockers and simulator instructions.
 
 Even if offline tests pass, do not provision or deploy until Staging exit is independently verified, source KV is freshly captured, old writers are accounted for, the migration process is tested, and the owner explicitly approves each production change.
+
+
+## Notion review dispatch gate (five legacy course pages)
+
+A second part of the old `/review` dispatch logic was found after the separate API/credential fix: `syncNotion()` was still checking `window.__xs.ready()`, which reports **Progress** readiness. Consequently, a learner with the original Notion credential but **without** a new CAS Progress credential could see the Review Step button yet fail to dispatch `/review`. Conversely, an available Progress credential should never authorize a Notion action when the original credential is missing.
+
+All five pages now dispatch the original API `/review` only when `window.__xs.reviewReady()` is true. Their separate direct Notion connector branch retains priority when available. Tests exercise the **real `syncNotion()` function** in all five pages: original Notion credential present/new Progress credential absent, the inverse combination, and direct Notion connector preference.
+
+This correction is **dormant safety preparation** while `data/config.json` remains unchanged. It does not authorize Production cutover, write to Notion, or modify scores. A real browser test of both types of Review Step update remains a release gate.
