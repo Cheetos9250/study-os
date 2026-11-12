@@ -104,3 +104,14 @@ The client now **rechecks Auto Sync after endpoint resolution**, at the beginnin
 Deterministic offline regressions cover: endpoint discovery disabling Auto Sync before any GET; turning off Auto Sync while a GET is in flight (zero PUT); turning it off just after a successful first PUT (no further subject writes, incomplete status); and a separately explicit manual sync remaining unaffected by the background-only guard.
 
 This is frontend safety hardening, not a Production cutover. It makes no changes to `data/config.json`, cloud Worker code, production KV, Notion, stored study progress or existing credentials.
+
+
+## Separate Production CAS Worker — code candidate, not a deployment
+
+A new review-only implementation is kept under `experiments/prod-progress-cas/worker.mjs`, with deterministic tests and no Wrangler config. It is not connected to Cloudflare and cannot be deployed by the existing staging build command. Its own CI workflow runs only offline Node tests with synthetic credentials and study values.
+
+The candidate uses a distinct `ProductionProgressDO` class, requires a new `PROD_PROGRESS_DO` binding with SQLite storage, a new independent `PROGRESS_SYNC_KEY`, the explicit expected hostname `vocabloom-progress-cas-prod.kasidit09022550.workers.dev`, and an explicit `PROGRESS_CAS_ENABLED=true` flag before even serving authenticated GET. It defaults to **HTTP 423 for all writes**. Only `PROGRESS_WRITES_ENABLED=true` **and** `PROGRESS_MIGRATION_VERIFIED=true` can enable CAS PUT requests. These flags are a defense-in-depth administrative gate, not cryptographic proof of source migration; a separate approval and independently verified KV migration are still required.
+
+There is intentionally **no migration importer, production Wrangler config, Cloudflare secret, deployment workflow, or activated `data/config.json` progress endpoint** in this branch. The original `study-api` still owns Notion `/quiz`, `/cards`, `/review`, and legacy KV until the future cutover is independently authorized. See `experiments/prod-progress-cas/README.md` for the blockers and simulator instructions.
+
+Even if offline tests pass, do not provision or deploy until Staging exit is independently verified, source KV is freshly captured, old writers are accounted for, the migration process is tested, and the owner explicitly approves each production change.
