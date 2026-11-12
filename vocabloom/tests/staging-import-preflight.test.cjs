@@ -26,6 +26,8 @@ function functions(fetchMock){
   PROTOCOL:'vocabloom-cas-staging-v1',
   isRecord:x=>x!==null&&typeof x==='object'&&!Array.isArray(x),
   bytes:x=>new TextEncoder().encode(JSON.stringify(x)).length,
+  exactKeys:(obj,expected)=>obj!==null&&typeof obj==='object'&&!Array.isArray(obj)&&
+   JSON.stringify(Object.keys(obj).sort())===JSON.stringify([...expected].sort()),
   fail:s=>{throw new Error(s)},
   ensure:(condition,message)=>{if(!condition)throw new Error(message)},
   blank,fetch:fetchMock
