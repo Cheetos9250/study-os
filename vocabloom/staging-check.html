@@ -85,7 +85,14 @@ async function fetchJson(path,key){
  check(response.status===200,path+' ตอบ HTTP '+response.status);
  let value;
  try{value=await response.json();}catch{throw new Error(path+' ส่ง JSON ไม่ถูกต้อง');}
- return {value,etag:response.headers.get('ETag')};
+ return {
+  value,
+  etag:response.headers.get('ETag'),
+  // Diagnostic metadata only; never include the request key or progress body.
+  visibleHeaders:[...response.headers.keys()].filter(name=>
+   /^(etag|x-sync-revision|content-type|cache-control)$/i.test(name)).join(',')||'(none)',
+  responseType:response.type
+ };
 }
 async function health(key){
  const {value}=await fetchJson('/__staging/health',key);
@@ -101,9 +108,15 @@ async function runRead(){
   await health(key);
   writeLine('PASS · ยืนยันตัวตน Staging สำเร็จ');
   for(const subject of SUBJECTS){
-   const {value,etag}=await fetchJson('/progress/'+subject,key);
+   const {value,etag,visibleHeaders,responseType}=await fetchJson('/progress/'+subject,key);
    check(isState(value),'รูปแบบข้อมูลวิชา '+subject+' ไม่ถูกต้อง');
-   check(/^"[0-9]+"$/.test(etag||''),'ไม่พบ ETag สำหรับ '+subject);
+   if(!/^"[0-9]+"$/.test(etag||'')){
+    writeLine('DIAGNOSTIC · '+subject.toUpperCase()+
+     ' · raw ETag='+JSON.stringify(etag)+
+     ' · visible headers='+visibleHeaders+
+     ' · response.type='+responseType);
+    throw new Error('ETag ไม่ใช่รูปแบบเวอร์ชันที่ปลอดภัยสำหรับ '+subject);
+   }
    writeLine('PASS · '+subject.toUpperCase()+' อ่านข้อมูลได้ (revision '+etag+')');
   }
   readPassed=true;writeLine('PASS · ตรวจข้อมูล 5 วิชาแบบอ่านอย่างเดียวครบแล้ว');
