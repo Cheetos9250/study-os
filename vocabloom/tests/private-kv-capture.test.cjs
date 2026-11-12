@@ -55,5 +55,6 @@ test('Refuses suspicious pasted secrets and oversized raw values',()=>{
 test('Never asks for staging SYNC_KEY or enables production writes',()=>{
  assert.doesNotMatch(html,/\b(?:If-Match|wrangler deploy|kv key put|kv key delete|PUT\s*\/progress)\b/);
  assert.match(html,/BLOCKED · ห้ามย้าย Production/);
- assert.match(html,/progress:acc/);
+ assert.match(script,/SUBJECTS=\['acc','eco','math','eng','zh'\]/);
+ assert.match(script,/'progress:'\+subject/);
 });
