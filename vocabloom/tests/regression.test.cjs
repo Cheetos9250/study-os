@@ -187,3 +187,34 @@ test('UP-03-H: Hard rating counts as remembered, and schedule uses canonical SRS
  assert.equal(execute.progress.syncTs,1794460952006);
  assert.equal(execute.progress.due,'2026-11-12');
 });
+
+
+test('P2: existing Auto Sync opt-in is cleared once without clearing scores or key',()=>{
+ const code=extract(cloud,'function cInitLocal(){','function cLocalRecord(wordId,correct){');
+ const fixture=new Function('initCode',[
+  'const map=new Map([["study-sync-key","KEEP_THIS_KEY"],["vocabloom-auto-sync-v1","1"],["study-acc","{\\"ans\\":{\\"1\\":2}}"]]);',
+  'const localStorage={getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,String(v))};',
+  'const cSafeGet=k=>localStorage.getItem(k),cSafeSet=(k,v)=>{localStorage.setItem(k,v);return true};',
+  'const cSafeJSON=(k,f)=>{try{return JSON.parse(map.get(k))||f}catch{return f}};',
+  'const cDevice=()=> "device-test",cDate=()=>"2026-11-12";',
+  'const CLOUD_LOCAL_DAYS="day-local",CLOUD_STUDY_DAYS="study-days",CLOUD_LAST="last-sync",CLOUD_AUTO="vocabloom-auto-sync-v1",CLOUD_AUTOSYNC_MIGRATION="vocabloom-autosync-safety-v2";',
+  'const CLOCAL={days:{},studyDays:{},device:""},CLOUD={last:0,enabled:true,message:""};',
+  'const data={progress:{},days:{},custom:[]};const structuredClone=x=>JSON.parse(JSON.stringify(x));const store=()=>{};',
+  initCode,
+  'cInitLocal();',
+  'const first={enabled:CLOUD.enabled,flag:map.get(CLOUD_AUTO),migration:map.get(CLOUD_AUTOSYNC_MIGRATION),key:map.get("study-sync-key"),score:map.get("study-acc")};',
+  'map.set(CLOUD_AUTO,"1");cInitLocal();',
+  'return {first,second:CLOUD.enabled};'
+ ].join('\n'))(code);
+ assert.equal(fixture.first.enabled,false);
+ assert.equal(fixture.first.flag,'0');
+ assert.equal(fixture.first.migration,'1');
+ assert.equal(fixture.first.key,'KEEP_THIS_KEY');
+ assert.equal(JSON.parse(fixture.first.score).ans['1'],2);
+ assert.equal(fixture.second,true,'Manual later opt-in must remain enabled');
+});
+test('P2: key prompt explicitly discloses immediate sync and dark links are readable',()=>{
+ assert.ok(cloud.includes('ระบบจะซิงก์ทันที 1 รอบ'));
+ assert.ok(cloud.includes('อ่านและเขียนข้อมูลทั้ง 5 วิชา'));
+ assert.ok(html.includes('body.dark .text-link { color:#c4baff; }'));
+});
