@@ -105,12 +105,14 @@ test('Same URL in optional progress_api uses original key and does not disable a
 test('User-driven key changes/deletion route only to selected endpoint scope',()=>{
  const all=read('vocabloom/unified-progress.js');
  assert.match(all,/cSafeSet\(cCloudStorageKey\(\),stored\)/);
+ assert.match(all,/JSON\.stringify\(\{endpoint:CLOUD\.api,key:k\.trim\(\)\}\)/);
  assert.match(all,/localStorage\.removeItem\(cCloudStorageKey\(\)\)/);
  assert.match(all,/const api=await cApiUrl\(\),key=cCloudKey\(\);/);
  assert.match(all,/if\(!key\)throw Error\(/);
  for(const file of SUBJECTS){
   const s=read(file);
   assert.match(s,/localStorage\.setItem\(progressKeyName,scoped\)/,file);
+  assert.match(s,/JSON\.stringify\(\{endpoint:api,key:k\}\)/,file);
   assert.match(s,/localStorage\.removeItem\(progressKeyName\)/,file);
   assert.match(s,/btnEl\.onclick=async\(\)=>\{ await cfg\(\);/,file);
   assert.match(s,/const base=await cfg\(\);[\s\S]{0,220}if\(!key\(\)\)/,file);
