@@ -28,7 +28,7 @@ const bytes=value=>Buffer.byteLength(JSON.stringify(value),'utf8');
 function canonical(value){
  if(Array.isArray(value))return value.map(canonical);
  if(!isRecord(value))return value;
- const out={};
+ const out=Object.create(null);
  for(const key of Object.keys(value).sort())out[key]=canonical(value[key]);
  return out;
 }
@@ -76,7 +76,7 @@ export function inspectSnapshot(doc){
 export function ensureStagingUrl(baseUrl){
  let url;
  try{url=new URL(baseUrl)}catch{throw Error('Invalid staging URL');}
- const testOnlyHost=/^study-api-cas-staging-only\.[a-z0-9.-]+\.workers\.dev$/i.test(url.hostname);
+ const testOnlyHost=/^study-api-cas-staging-only\.[a-z0-9-]+\.workers\.dev$/i.test(url.hostname);
  const localhost=/^(localhost|127\.0\.0\.1)$/.test(url.hostname);
  if(!testOnlyHost&&!localhost)
    throw Error('Refusing non-staging host. Only study-api-cas-staging-only.*.workers.dev or localhost is allowed');
