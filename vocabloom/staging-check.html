@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src https://study-api-cas-staging-only.kasidit09022550.workers.dev; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>VocaBLoom · Staging Check</title>
+<style>
+:root {color-scheme:light; font-family:system-ui,-apple-system,'Noto Sans Thai',sans-serif; background:#f8fafc;color:#162132}
+*{box-sizing:border-box}body{margin:0;padding:24px}main{max-width:760px;margin:32px auto}
+h1{font-size:clamp(1.5rem,4vw,2.1rem);margin:0 0 6px}p{line-height:1.7}
+.muted{color:#576579}.panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:22px;margin:20px 0}
+label{font-weight:650;display:block;margin:14px 0 8px}
+input{width:100%;font:inherit;padding:12px 14px;border:1px solid #9baac0;border-radius:8px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+button{font:inherit;font-weight:650;padding:11px 16px;border-radius:9px;border:1px solid #2c3e67;background:#2c3e67;color:#fff;cursor:pointer}
+button.secondary{background:#fff;color:#2c3e67}button:disabled{opacity:.48;cursor:not-allowed}
+.notice{border-left:4px solid #64748b;background:#f1f5f9;padding:12px 16px;border-radius:6px}
+#result{white-space:pre-wrap;overflow-wrap:anywhere;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px;display:block;min-height:130px;font:13px/1.7 ui-monospace,Consolas,monospace}
+#result:focus-visible{outline:3px solid #2563eb}
+.small{font-size:.89rem}
+</style>
+</head>
+<body>
+<main>
+<h1>VocaBLoom · Cloud Sync Staging Check</h1>
+<p class="muted">ทดสอบ Worker แยกจากข้อมูลการเรียนจริง — ไม่ต้องเปิด DevTools และไม่ต้องส่งรหัสให้ใคร</p>
+<section class="panel">
+<div class="notice">ใช้เฉพาะ <strong>Staging SYNC_KEY</strong> ที่บันทึกใน Bitwarden เท่านั้น ห้ามใช้รหัสของ Worker จริง หน้านี้ไม่มีบริการภายนอก ไม่มีระบบวิเคราะห์ผู้ใช้ และไม่บันทึกรหัสใน localStorage, cookies หรือ GitHub</div>
+<label for="secret">Staging SYNC_KEY</label>
+<input id="secret" type="password" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="วางรหัสทดสอบจาก Bitwarden">
+<div class="actions">
+<button id="read" type="button">1. ตรวจระบบแบบอ่านอย่างเดียว</button>
+<button id="probe" type="button" disabled>2. ทดสอบ Sync ด้วยข้อมูลจำลอง</button>
+<button id="clear" type="button" class="secondary">ล้างรหัส</button>
+</div>
+<p class="small muted">ขั้นตอน 1 อ่านสถานะและข้อมูลของ 5 วิชาโดยไม่เขียนคะแนน ส่วนขั้นตอน 2 เขียนข้อมูลจำลองเฉพาะพื้นที่ใหม่ที่สุ่มขึ้นมาและแยกจากคะแนนจริง</p>
+</section>
+<section class="panel">
+<h2>ผลการตรวจสอบ</h2>
+<output id="result" role="status" aria-live="polite" tabindex="0">ยังไม่เริ่มทดสอบ</output>
+<p class="small muted">เมื่อเสร็จแล้วส่งเฉพาะข้อความผล PASS/FAIL ให้ ChatGPT ไม่ต้องส่งรหัสหรือข้อมูลคะแนน</p>
+</section>
+</main>
+<script>
+(() => {
+'use strict';
+const BASE='https://study-api-cas-staging-only.kasidit09022550.workers.dev';
+const SUBJECTS=['acc','eco','math','eng','zh'];
+const IDENTITY='vocabloom-cas-staging-v1';
+const secret=document.getElementById('secret');
+const result=document.getElementById('result');
+const readBtn=document.getElementById('read');
+const probeBtn=document.getElementById('probe');
+const clearBtn=document.getElementById('clear');
+let readPassed=false,busy=false;
+const writeLine=(s)=>{result.textContent+=s+'\n';};
+const reset=()=>{result.textContent='';};
+const check=(ok,s)=>{if(!ok)throw new Error(s);};
+const empty=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
+const isState=(x)=>x&&typeof x==='object'&&!Array.isArray(x)&&
+ x.study&&typeof x.study==='object'&&x.srs&&typeof x.srs==='object'&&
+ x.study.ans&&x.study.ats&&x.srs.s&&x.srs.m;
+const setBusy=(v)=>{
+ busy=v;readBtn.disabled=v;probeBtn.disabled=v||!readPassed;clearBtn.disabled=v;secret.disabled=v;
+};
+function getSecret(){
+ const s=secret.value.trim();
+ if(!s||s.length<8)throw new Error('ยังไม่ได้ใส่ Staging SYNC_KEY ที่ถูกต้อง');
+ return s;
+}
+async function request(path,key,method='GET',body=null,etag=null){
+ check(/^\/(?:progress\/(?:acc|eco|math|eng|zh)|__staging\/(?:health|probe\/[a-f0-9]{24}))$/.test(path),'พบเส้นทางที่ไม่อนุญาต');
+ const headers={'X-Sync-Key':key};
+ if(method==='PUT'){
+  headers['Content-Type']='application/json';
+  if(etag!==null)headers['If-Match']=etag;
+ }
+ return fetch(BASE+path,{method,headers,body:method==='PUT'?JSON.stringify(body):undefined,
+  cache:'no-store',credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'});
+}
+async function fetchJson(path,key){
+ const response=await request(path,key);
+ check(response.status===200,path+' ตอบ HTTP '+response.status);
+ let value;
+ try{value=await response.json();}catch{throw new Error(path+' ส่ง JSON ไม่ถูกต้อง');}
+ return {value,etag:response.headers.get('ETag')};
+}
+async function health(key){
+ const {value}=await fetchJson('/__staging/health',key);
+ check(value.staging===true&&value.protocol===IDENTITY,'Worker ไม่ได้ยืนยันว่าเป็น Staging ที่ถูกต้อง');
+ check(JSON.stringify(value.subjects)===JSON.stringify(SUBJECTS),'รายการวิชาไม่ตรงกับ Staging ที่คาดไว้');
+ return value;
+}
+async function runRead(){
+ if(busy)return;
+ readPassed=false;
+ try{
+  const key=getSecret();setBusy(true);reset();writeLine('กำลังตรวจตัวตน Staging ...');
+  await health(key);
+  writeLine('PASS · ยืนยันตัวตน Staging สำเร็จ');
+  for(const subject of SUBJECTS){
+   const {value,etag}=await fetchJson('/progress/'+subject,key);
+   check(isState(value),'รูปแบบข้อมูลวิชา '+subject+' ไม่ถูกต้อง');
+   check(/^"[0-9]+"$/.test(etag||''),'ไม่พบ ETag สำหรับ '+subject);
+   writeLine('PASS · '+subject.toUpperCase()+' อ่านข้อมูลได้ (revision '+etag+')');
+  }
+  readPassed=true;writeLine('PASS · ตรวจข้อมูล 5 วิชาแบบอ่านอย่างเดียวครบแล้ว');
+  writeLine('เลือกขั้นตอน 2 เพื่อทดสอบการบันทึกเฉพาะข้อมูลจำลอง');
+ }catch(e){writeLine('FAIL · '+String(e.message||e));writeLine('หยุดการทดสอบ ไม่มีการเขียนคะแนน');}
+ finally{setBusy(false);}
+}
+function newId(){
+ const b=crypto.getRandomValues(new Uint8Array(12));
+ return [...b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+async function runProbe(){
+ if(busy||!readPassed)return;
+ try{
+  const key=getSecret();setBusy(true);reset();writeLine('กำลังตรวจ Staging อีกครั้ง ...');
+  await health(key);
+  const id=newId(),path='/__staging/probe/'+id;
+  const first=await fetchJson(path,key);
+  check(first.etag==='"0"'&&JSON.stringify(first.value)===JSON.stringify(empty()),
+   'พื้นที่ทดสอบไม่ว่าง หรือไม่ได้เริ่มที่ revision 0');
+  writeLine('PASS · สร้างพื้นที่ข้อมูลจำลองแยกเฉพาะครั้งนี้');
+  const a=empty(),b=empty();
+  a.srs.s['test-device-a']={ts:101,due:1001};
+  b.srs.s['test-device-b']={ts:102,due:1002};
+  const two=await Promise.all([request(path,key,'PUT',a,first.etag),request(path,key,'PUT',b,first.etag)]);
+  check(two.map(x=>x.status).sort((x,y)=>x-y).join(',')==='200,409',
+   'การเขียนพร้อมกันไม่ตอบ 200/409 ตามที่คาด: '+two.map(x=>x.status).join('/'));
+  writeLine('PASS · การเขียนพร้อมกันได้รับ 200 และ 409');
+  const winner=await fetchJson(path,key);
+  check(winner.etag==='"1"','revision ไม่เพิ่มเป็น 1');
+  const losing=two[0].status===409?a:b;
+  const merged=empty();
+  merged.srs.s={...winner.value.srs.s,...losing.srs.s};
+  const retry=await request(path,key,'PUT',merged,winner.etag);
+  check(retry.status===200,'การลองใหม่ล้มเหลว HTTP '+retry.status);
+  const final=await fetchJson(path,key);
+  check(final.etag==='"2"'&&final.value.srs.s['test-device-a']&&final.value.srs.s['test-device-b'],
+   'ข้อมูลจากทั้งสองอุปกรณ์ไม่ครบ');
+  writeLine('PASS · ลองใหม่สำเร็จ ข้อมูลจำลองจากทั้งสองอุปกรณ์ครบ');
+  const legacy=await request(path,key,'PUT',empty(),null);
+  check(legacy.status===428,'Legacy PUT ที่ไม่มี If-Match ไม่ถูกปฏิเสธ (HTTP '+legacy.status+')');
+  const unchanged=await fetchJson(path,key);
+  check(unchanged.etag===final.etag&&JSON.stringify(unchanged.value)===JSON.stringify(final.value),
+   'Legacy PUT ทำให้ข้อมูลเปลี่ยน');
+  writeLine('PASS · ปฏิเสธการเขียนแบบเก่า และข้อมูลจำลองไม่เปลี่ยน');
+  writeLine('PASS · STAGING SYNC TEST COMPLETE');
+ }catch(e){writeLine('FAIL · '+String(e.message||e));writeLine('คะแนนจริงไม่ใช่เป้าหมายของคำขอเขียนในขั้นตอนนี้');}
+ finally{secret.value='';readPassed=false;setBusy(false);writeLine('ล้างรหัสออกจากช่องแล้ว');}
+}
+readBtn.addEventListener('click',runRead);
+probeBtn.addEventListener('click',runProbe);
+clearBtn.addEventListener('click',()=>{secret.value='';readPassed=false;reset();writeLine('ล้างรหัสแล้ว');setBusy(false);});
+})();
+</script>
+</body>
+</html>
