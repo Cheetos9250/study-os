@@ -100,3 +100,14 @@ The file must contain the explicit STAGING_ONLY_NO_PRODUCTION marker and five va
 Any unexpected existing staging data blocks an import. A passing read-only check is NOT a data lock or permission for writes: new data might be added between checking and importing. If a staging import is subsequently approved, the importer must repeat its all-five preflight immediately before writing and verify each readback.
 
 Before any staging import, independently preserve the currently existing staging records; re-confirm the source KV backup and capture freshness; and obtain explicit approval for an isolated Staging-only import. Never apply to Production.
+
+
+## Staging Import Preflight — redacted report
+
+Open `vocabloom/staging-import-preflight.html` on the published GitHub Pages site. This page only accepts the **private Staging Preview** from the owner's Drive and the **Staging-only SYNC_KEY** from Bitwarden, retained solely in the browser during the one check. It requests a staging identity marker and five `GET /progress/{subject}` endpoints via the explicit staging-only hostname. It cannot issue PUT, Import, Restore or deploy requests.
+
+For each of `acc`, `eco`, `math`, `eng`, and `zh`, the preflight classifies the staging state as `already-identical`, `empty-revision-0`, or `blocked-existing-different-data` using the strong `X-Sync-Revision` or ETag validator and the expected complete Study/SRS schema. A nonempty/mismatching state blocks future import. Preflight never locks records; repeat it immediately before any separately authorized import.
+
+After a *complete five-subject read*, the owner can download `vocabloom-staging-readonly-preflight-report.json`. This sanitized report contains only the timestamp, protocol, read-only mode, per-subject classification and revision. It never includes the Staging SYNC_KEY, subject bodies, individual scores, vocabulary, user identifiers, or the private preview file. Error/incomplete runs do not enable report export. Downloading the report does not authorize any data import; both production cutover and staging apply remain separate explicit decision gates.
+
+No source of secrets, Production Worker, or KV key is modified by this page.
