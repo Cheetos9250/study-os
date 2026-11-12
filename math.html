@@ -535,8 +535,12 @@ window.__xs=(()=>{
     } finally { applying=false; }
   }
   async function sync(manual){
-    if(busy) return; const base=await cfg();
-    if(!key()){ if(manual) askKey(); return; }
+    // Legacy Study OS: never write to Cloudflare from page-load, visibility or auto-save.
+    // Production Worker does not yet protect concurrent GET/PUT updates (SY-08).
+    if(!manual||busy) return;
+    if(!key()){ askKey(); return; }
+    if(!window.confirm('Cloud Sync ยังไม่ผ่านการทดสอบการเขียนพร้อมกันหลายอุปกรณ์\n\nการซิงก์ครั้งนี้จะอ่านและเขียนข้อมูลวิชา '+D.key+' ขึ้น Cloudflare Worker โปรดสำรองคะแนนก่อน และอย่าเปิดซิงก์บนอีกอุปกรณ์พร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
+    const base=await cfg();
     if(!base) { if(manual) say('ยังไม่ได้ตั้งค่า api ใน data/config.json'); return; }
     busy=true; say('กำลังซิงก์…',true);
     try{
@@ -545,20 +549,20 @@ window.__xs=(()=>{
       if(r.status===401){ say('รหัสซิงก์ไม่ถูกต้อง กดปุ่มเพื่อตั้งใหม่'); try{ localStorage.removeItem(LSK); }catch(e){} busy=false; paint(); return; }
       if(!r.ok) throw new Error('get '+r.status);
       const remote=await r.json(); const merged=merge(local(), remote||{});
-      apply(merged);
       const p=await fetch(url,{method:'PUT',headers:hdr(),body:JSON.stringify(merged)});
       if(!p.ok) throw new Error('put '+p.status);
+      apply(merged);
       say('ซิงก์แล้ว '+hhmm(),true);
     }catch(e){ say('ซิงก์ไม่สำเร็จ ลองใหม่อีกครั้ง'); }
     busy=false; paint();
   }
   function askKey(){
-    let k=''; try{ k=window.prompt('ใส่รหัสซิงก์ (รหัสเดียวกับที่ตั้งไว้ใน Cloudflare ชื่อ SYNC_KEY)')||''; }catch(e){}
+    let k=''; try{ k=window.prompt('ใส่รหัส SYNC_KEY สำหรับ Cloudflare Worker\n\nหน้า Study OS รุ่นเก่าไม่ซิงก์อัตโนมัติอีกต่อไป เพื่อป้องกันความเสี่ยงข้อมูลถูกเขียนทับ การใส่รหัสจะขอยืนยันก่อนซิงก์เอง 1 ครั้ง')||''; }catch(e){}
     k=k.trim(); if(!k) return;
     try{ localStorage.setItem(LSK,k); }catch(e){}
-    paint(); try{ renderSync(); }catch(e){} sync(false);
+    paint(); try{ renderSync(); }catch(e){} sync(true);
   }
-  function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์':'☁ ตั้งรหัสซิงก์'; }
+  function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์ด้วยตนเอง':'☁ ตั้งรหัสซิงก์'; }
   function mount(){
     box=document.createElement('div');
     box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:50;display:flex;gap:8px;align-items:center;background:var(--surface,#fff);color:var(--ink,#1c1c1c);border:1px solid var(--line,#bbb);border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12)';
@@ -568,10 +572,12 @@ window.__xs=(()=>{
     box.append(msgEl,btnEl); document.body.appendChild(box); paint();
   }
   mount();
+  say('Cloud Sync ปิดอัตโนมัติ',true);
   cfg().then(()=>{ try{ renderSync(); }catch(e){} });
-  setTimeout(()=>sync(false),1200);
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') sync(false); });
-  return { dirty(){ if(applying||!key()) return; clearTimeout(timer); timer=setTimeout(()=>sync(false),4000); }, ready(){ return !!(api&&key()); }, api:()=>api, hdr, sync };
+  // LocalStorage writes still happen immediately in save() and saveS().
+  // Do not dispatch background GET/PUT even if the browser already has a SYNC_KEY.
+  return { dirty(){ /* intentionally local-only until explicit opt-in/manual click */ },
+    ready(){ return !!(api&&key()); }, api:()=>api, hdr, sync };
 })();
 </script>
 
