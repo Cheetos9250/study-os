@@ -247,6 +247,14 @@ function cInstall(){
   if(USTATE.ready)cBridgeGameToCard(id,correct);
   cCloudDebounce();
  };
+ const oldAdd=addWord;
+ addWord=function(){
+  const ids=new Set((data.custom||[]).map(w=>w.id));
+  const result=oldAdd();
+  const newWords=(data.custom||[]).filter(w=>!ids.has(w.id));
+  if(newWords.length){for(const w of newWords)w.syncTs=Date.now();store();cCloudDebounce();}
+  return result;
+ };
  const oldRate=uRate;
  uRate=function(d,rating){
   const before=uCurrent(d);
