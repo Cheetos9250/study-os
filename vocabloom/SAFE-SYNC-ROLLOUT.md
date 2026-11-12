@@ -1,6 +1,6 @@
 # VocaBloom Safe Sync protocol — release and migration guide
 
-Updated: 2026-11-12. **No production Worker deployment or data migration has occurred.**
+Updated: 2026-11-12. **No production Worker deployment or data migration has occurred.** A guarded Accounting import has completed on the **isolated Staging Worker only**, according to the owner's UI result; independent later persistence verification is a separate gate.
 
 ## What the frontend now does
 
@@ -30,7 +30,7 @@ This is separate from **Local backup**: the remote snapshot does not export the 
 
 A safe production rollout cannot proceed until:
 
-1. Retrieve the **actual current production Worker source** for `study-api.kasidit09022550.workers.dev`. The GitHub repository does not contain it. Audit its authentication, CORS, Notion review endpoint, existing `/progress` routes and any other writers.
+1. Confirm that the complete-looking Production Worker JavaScript **provided privately by the owner on 12 Nov 2026** exactly matches the currently deployed `study-api` revision, bindings and routes. The complete Production Worker source is intentionally not stored in this public GitHub repository. Its code-level review confirms legacy KV writes, `/quiz`, `/cards` and `/review`, but Cloudflare deployment identity still needs independent verification.
 2. Back up and verify existing server-side study data for `acc`, `eco`, `math`, `eng`, `zh` using an authorized administrative process. Record counts/checksums and recovery steps. Do not use an exported browser dataset as a substitute for server backup.
 3. Deploy a **separate** staging Worker named differently from Production with a separate Durable Object namespace, test key and isolated dataset. Run real concurrent two-device tests. Cloudflare SQLite-backed Durable Objects offer transactional, strongly consistent storage, but production behavior must be verified.
 4. Test the new ETag and `If-Match` headers through actual browser CORS preflight. Especially ensure `Access-Control-Allow-Headers` lists `If-Match` and `Access-Control-Expose-Headers` lists `ETag`.
@@ -47,3 +47,7 @@ A safe production rollout cannot proceed until:
 - Production Cloud Sync is not marked "ready" until the server migration and live multi-device tests pass.
 
 References: https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/ and https://developers.cloudflare.com/durable-objects/best-practices/rules-of-durable-objects/
+
+## Optional separate progress endpoint (pre-cutover refactor)
+
+VocaBLoom's `unified-progress.js` and the five legacy pages now read optional `progress_api` from `data/config.json` **only for progress GET/PUT**; if absent they use existing `api` unchanged. The Notion quiz/card loader in every legacy page continues to use `api`. The actual published config still contains just `api`, so this refactor does not switch or activate any Worker. Do not point `api` to the CAS-only Staging Worker, which does not serve Notion endpoints. Do not set `progress_api` until a separate Production CAS Worker, token strategy, admin backup, rollback, and explicit approval exist. See `PHASE-6-PRODUCTION-CUTOVER-READINESS.md`.

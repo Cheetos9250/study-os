@@ -501,7 +501,7 @@ window.__xs=(()=>{
   const LSK='study-sync-key'; let api='', timer=null, busy=false, applying=false, box=null, msgEl=null, btnEl=null;
   const key=()=>{ try{ return localStorage.getItem(LSK)||''; }catch(e){ return ''; } };
   const hdr=()=>({'X-Sync-Key':key(),'Content-Type':'application/json'});
-  async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok) api=String((await c.json()).api||'').replace(/\/+$/,''); }catch(e){} return api; }
+  async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); api=String(j.progress_api||j.api||'').replace(/\/+$/,''); } }catch(e){} return api; }
   const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'var(--ok,#1d7a4a)':'var(--bad,#b3261e)'; } };
   const hhmm=()=>new Intl.DateTimeFormat('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date());
   function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[]}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
