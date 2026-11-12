@@ -209,7 +209,17 @@ async function cApiUrl(){
  return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
 }
 function cCloudStorageKey(){return CLOUD.progressSplit?CLOUD_PROGRESS_KEY:CLOUD_KEY;}
-function cCloudKey(){return String(cSafeGet(cCloudStorageKey())||'').trim();}
+function cCloudKey(){
+ const raw=String(cSafeGet(cCloudStorageKey())||'');
+ if(!CLOUD.progressSplit)return raw.trim();
+ // The new Progress token is scoped to one exact URL. Legacy plain-string
+ // progress tokens are deliberately invalid until the owner re-enters them.
+ try{
+  const entry=JSON.parse(raw);
+  return entry&&entry.endpoint===CLOUD.api&&typeof entry.key==='string'
+   ?entry.key.trim():'';
+ }catch{return ''}
+}
 /* ETag/If-Match protects concurrent clients when the backend supports atomic revisions.
  * Legacy KV is manual-confirmation-only. Never background-write an unversioned response. */
 const CLOUD_MAX_RETRIES=6;
@@ -302,12 +312,17 @@ function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;if(CLOUD.busy){
 async function cSetKey(){
  try{await cApiUrl();}catch(e){cCloudNotice(String(e.message||e),true);return;}
  const promptText=CLOUD.progressSplit?
-  'ใส่รหัสของ Progress Worker ใหม่เท่านั้น\n\nห้ามใช้รหัส Worker เดิมหรือ Staging กรุณาสำรอง Full backup ก่อนซิงก์ครั้งแรก':
+  'ใส่รหัสของ Progress Worker นี้เท่านั้น\n\nรหัสจะใช้ได้เฉพาะ URL ที่เลือกอยู่ ห้ามใช้รหัส Worker เดิมหรือ Staging กรุณาสำรอง Full backup ก่อนซิงก์ครั้งแรก':
   'ใส่ SYNC_KEY ของ Cloudflare Worker study-api (รหัสเดียวกับ Study OS เดิม)\n\nเมื่อใส่รหัส ระบบจะซิงก์ทันที 1 รอบ: อ่านและเขียนข้อมูลทั้ง 5 วิชาขึ้น Worker โปรดทำ Full backup ก่อน และอย่าใช้งานสองเครื่องพร้อมกันจนกว่าระบบจะผ่าน QA';
  const k=window.prompt(promptText,cCloudKey()?'':'');
  if(k===null)return;
  if(!k.trim()){cCloudNotice('ยังไม่ได้ตั้งรหัสซิงก์');return}
- cSafeSet(cCloudStorageKey(),k.trim());
+ const stored=CLOUD.progressSplit
+  ?JSON.stringify({endpoint:CLOUD.api,key:k.trim()}):k.trim();
+ if(!cSafeSet(cCloudStorageKey(),stored)){
+  cCloudNotice('ไม่สามารถเก็บรหัสซิงก์ในเครื่อง จึงยกเลิกการซิงก์',true);
+  return;
+ }
  // One manual sync is requested by entering the key. Auto Sync remains opt-in.
  cCloudSync(true);render();
 }

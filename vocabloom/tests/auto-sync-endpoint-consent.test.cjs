@@ -15,7 +15,7 @@ const CONSENT='vocabloom-auto-sync-endpoint-v1';
 const PROGRESS_KEY='study-sync-progress-key-v1';
 const BASE={
  'study-sync-key':OLD,
- [PROGRESS_KEY]:NEW,
+ [PROGRESS_KEY]:JSON.stringify({endpoint:FUTURE,key:NEW}),
  [KEY]:'1'
 };
 const snippet=(start,end)=>{
