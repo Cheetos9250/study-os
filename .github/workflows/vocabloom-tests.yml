@@ -6,12 +6,14 @@ on:
       - "vocabloom/**"
       - "data/cards.json"
       - "data/quiz.json"
+      - "scripts/sync_notion.py"
       - ".github/workflows/vocabloom-tests.yml"
   pull_request:
     paths:
       - "vocabloom/**"
       - "data/cards.json"
       - "data/quiz.json"
+      - "scripts/sync_notion.py"
   workflow_dispatch:
 
 permissions:
@@ -27,4 +29,6 @@ jobs:
         with:
           node-version: '22'
       - name: Validate VocaBloom and Study OS
-        run: node --test vocabloom/tests/regression.test.cjs
+        run: node --test vocabloom/tests/*.test.cjs
+      - name: Validate Notion exporter data contract
+        run: python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'
