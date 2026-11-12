@@ -50,7 +50,7 @@ test('Unauthenticated and wrong-origin requests are rejected; preflight is scope
  const req=new Request(f.url('acc'),{method:'OPTIONS',headers:{Origin:ORIGIN,'Access-Control-Request-Headers':'if-match,x-sync-key'}});
  const opt=await entry.fetch(req,f.env);
  assert.equal(opt.status,204);
- assert.equal(opt.headers.get('Access-Control-Expose-Headers'),'ETag');
+ assert.equal(opt.headers.get('Access-Control-Expose-Headers'),'ETag, X-Sync-Revision');
  assert.ok(opt.headers.get('Access-Control-Allow-Headers').includes('If-Match'));
  assert.equal((await f.request('GET','random')).status,404);
 });
@@ -60,10 +60,12 @@ test('Initial GET exposes version 0; unconditioned legacy writes fail closed',as
  const first=await f.request('GET','acc');
  assert.equal(first.status,200);
  assert.equal(first.headers.get('ETag'),'"0"');
+ assert.equal(first.headers.get('X-Sync-Revision'),'"0"');
  assert.deepEqual(await first.json(),empty());
  assert.equal((await f.request('PUT','acc',{body:empty()})).status,428);
  assert.equal((await f.request('PUT','acc',{etag:'"0"',body:{invalid:true}})).status,400);
  assert.equal((await f.request('GET','acc')).headers.get('ETag'),'"0"');
+ assert.equal((await f.request('GET','acc')).headers.get('X-Sync-Revision'),'"0"');
 });
 
 test('CAS allows only one writer for the same revision; no silent overwrite',async()=>{
@@ -160,4 +162,17 @@ test('Authenticated health marker identifies staging protocol, without data writ
   staging:true,protocol:'vocabloom-cas-staging-v1',subjects:['acc','eco','math','eng','zh']
  });
  assert.equal(f.buckets.size,0,'Health route must not initialize any Durable Object');
+});
+
+test('Worker exposes stable CAS revision independently from HTTP ETag',async()=>{
+ const f=fixture();
+ const first=await f.request('GET','eng');
+ assert.equal(first.headers.get('X-Sync-Revision'),'"0"');
+ assert.equal(first.headers.get('Access-Control-Expose-Headers'),'ETag, X-Sync-Revision');
+ const write=await f.request('PUT','eng',{etag:'"0"',body:empty()});
+ assert.equal(write.status,200);
+ assert.equal(write.headers.get('X-Sync-Revision'),'"1"');
+ const conflict=await f.request('PUT','eng',{etag:'"0"',body:empty()});
+ assert.equal(conflict.status,409);
+ assert.equal(conflict.headers.get('X-Sync-Revision'),'"1"');
 });
