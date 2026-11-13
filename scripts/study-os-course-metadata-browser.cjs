@@ -217,6 +217,21 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await draft.locator("#metadata-refresh").click();
     await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
     assert.equal(await draft.locator("#name-acc").inputValue(),"Accounting");
+    // Two rapid submit events must never cause a misleading stale-write conflict.
+    const revisionBefore=Number((await draft.locator("#metadata-status").textContent()).match(/Revision (\\d+)/)?.[1]);
+    assert.equal(Number.isSafeInteger(revisionBefore),true);
+    await draft.locator("#name-acc").fill("บัญชีบันทึกครั้งเดียว");
+    await draft.locator("#metadata-form").evaluate(form=>{
+      form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+      form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+    });
+    await draft.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
+    await draft.locator('#editor[aria-busy="false"]').waitFor();
+    assert.match(await draft.locator("#metadata-status").textContent(),new RegExp("Revision "+(revisionBefore+1)+"$"));
+    await draft.reload();
+    await draft.locator("#metadata-open").click();
+    await draft.locator("#editor").waitFor({state:"visible"});
+    assert.equal(await draft.locator("#name-acc").inputValue(),"บัญชีบันทึกครั้งเดียว");
     // Simulate a fresh browser profile with no course-metadata storage.
     // This exercises backup portability, not real OS-level eviction.
     const restoredProfile=await browser.newContext({viewport:{width:820,height:1180}});
