@@ -8,9 +8,10 @@ const root = path.resolve(__dirname, "../..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const links = [...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map(m => m[1]);
 
-test("academic homepage has accessible Thai document metadata", () => {
-  assert.match(html, /<html lang="th">/);
+test("academic homepage has accessible English document metadata", () => {
+  assert.match(html, /<html lang="en">/);
   assert.match(html, /<meta name="viewport"/);
+  assert.doesNotMatch(html, /[\u0e00-\u0e7f]/, "homepage copy and accessibility labels must be English");
   assert.match(html, /<main>/);
   assert.match(html, /<h1 id="welcome-title">/);
 });
@@ -46,4 +47,15 @@ test("homepage has responsive, focus, dark-mode, and reduced-motion rules", () =
 
 test("homepage is navigation-only and cannot mutate progress", () => {
   assert.doesNotMatch(html, /<script\b|localStorage|sessionStorage|fetch\s*\(|XMLHttpRequest|<form\b/i);
+});
+
+test("academic cards have self-contained decorative SVG subject icons", () => {
+  const icons=[...html.matchAll(/<span class="symbol" aria-hidden="true">(<svg[\s\S]*?<\/svg>)<\/span>/g)];
+  assert.equal(icons.length,3);
+  for (const [,svg] of icons) {
+    assert.match(svg,/viewBox="0 0 24 24"/);
+    assert.match(svg,/stroke="currentColor"/);
+    assert.match(svg,/focusable="false"/);
+    assert.doesNotMatch(svg,/<script|foreignObject|<image|href=/i);
+  }
 });

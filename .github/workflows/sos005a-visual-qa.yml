@@ -1,4 +1,4 @@
-name: SOS-005a isolated visual QA (no deployment)
+name: Study OS home visual QA (no deployment)
 on:
   pull_request:
     paths:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   visual-qa:
-    if: github.head_ref == 'feat/study-os-academic-home-20261113'
+    if: github.head_ref == 'feat/study-os-course-icons-20261113'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -59,6 +59,9 @@ jobs:
                 page.on('pageerror',error=>errors.push(error.message));
                 await page.goto(base);await page.evaluate(()=>document.fonts.ready);
                 assert.equal(await page.locator('.subject').count(),3);
+                assert.equal(await page.locator('html').getAttribute('lang'),'en');
+                assert.equal(await page.locator('.symbol svg').count(),3);
+                assert.doesNotMatch(await page.locator('body').innerText(),/[\u0e00-\u0e7f]/);
                 assert.deepEqual(await page.locator('.subject').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href'))),['acc.html','eco.html','math.html']);
                 assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
                 const fonts=await page.evaluate(()=>({body:getComputedStyle(document.body).fontFamily,heading:getComputedStyle(document.querySelector('h1')).fontFamily,loaded:[...document.fonts].filter(font=>font.status==='loaded').map(font=>font.family)}));
@@ -75,7 +78,7 @@ jobs:
                 assert.ok(contrasts.every(item=>item.ratio>=4.5),JSON.stringify(contrasts));
                 assert.deepEqual(errors,[]);
                 await page.screenshot({path:path.join(output,`${width}-${colorScheme}.png`),fullPage:true});
-                evidence.push({width,colorScheme,fonts,minimumTextContrast:Math.min(...contrasts.map(item=>item.ratio))});await context.close();
+                evidence.push({width,colorScheme,language:'en',svgIcons:3,fonts,minimumTextContrast:Math.min(...contrasts.map(item=>item.ratio))});await context.close();
               }
               const destinations=[];
               for(const target of ['acc.html','eco.html','math.html','eng.html','zh.html','vocabloom/']){
