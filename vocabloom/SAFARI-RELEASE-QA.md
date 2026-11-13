@@ -13,7 +13,7 @@ Status: **NOT EXECUTED on physical iPad Safari**. This is a reproducible manual 
 
 1. On iPad Safari, open the approved preview and record Safari/iPadOS version, orientation, and test URL.
 2. Confirm English-only subject navigation, no Accounting/Economics/Math/Chinese learning content visible in VocaBloom, and responsive navigation in portrait/landscape. Legacy data must remain untouched.
-3. Open English Flashcards and Vocabulary Practice. Verify four unique choices per question, immediate answer feedback, score, Previous/Next, and New set.
+3. Open English Flashcards and Vocabulary Practice. Verify four unique choices per question, immediate answer feedback, score, Previous/Next, and New set. Also inspect meaning-list distractors for repeated Thai senses (for example, `hinge on` versus `contingent on`); do not treat mere substring similarity as proof of duplicate meanings because antonyms such as `unsaturated` and `saturated` may be useful contrasts.
 4. Switch tabs and return: active practice answers should remain; switch chapter: answers and session snapshot should reset. Test a chapter with fewer than four meanings and verify a helpful empty state.
 5. With Safari developer tools or a disposable browser profile, verify practice answers do **not** change `study-eng`, English SRS keys, or the unified progress key.
 6. Refresh Verified content during a practice session: questions and correct options should remain frozen; New set should use refreshed content.
