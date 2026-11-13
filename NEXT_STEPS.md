@@ -96,3 +96,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Course-search browser regression CI 43373533213 **success**. Escape-to-clear and browser regression commits `d582ecf`, `a75d89b`; verify [CI 43374096872](https://github.com/Cheetos9250/study-os/actions/runs/43374096872).
 - Review `COURSE_METADATA_DESIGN.md` (`dc28c05`) before implementing editable display-only metadata. Preserve IDs/routes and isolate versioned local storage; no production migration or sync.
+
+## Course metadata foundation — 2026-11-13
+
+- Escape-to-clear CI 43374096872 **success**. Pure metadata validator `e169998`, unit tests `9b48fb4`, design update `63fd982`; check [CI 43377242274](https://github.com/Cheetos9250/study-os/actions/runs/43377242274) for the exact model/test checkpoint.
+- Next: design and implement versioned isolated browser-local metadata persistence with explicit Save/Reset and atomic export/import; add concurrency, denied-storage and browser QA before UI integration. Stable course IDs/routes and legacy progress must never be mutated. No production deployment or migration.
