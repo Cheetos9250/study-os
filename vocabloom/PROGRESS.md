@@ -165,3 +165,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Previous whitespace deduplication implementation/test SHA `dd8f1e4a44dfa2cbf282e0d33934fa31f73f9a53` passed [regression 43378205242](https://github.com/Cheetos9250/study-os/actions/runs/43378205242) and [isolated browser 43378205248](https://github.com/Cheetos9250/study-os/actions/runs/43378205248).
 - On audit, found the synthetic test's **assertion** used a double-escaped regex and therefore did not actually collapse whitespace in the option-comparison assertion, although its fixed test inputs exercised the code. Corrected test-only regex at SHA `97c93f0435fb2c8de27115351237f28cdb6bd648`. CI regression 43378451795 and browser 43378451810 pending at writing time. No runtime or production change.
+
+### Invisible Unicode separator deduplication
+
+- Corrected whitespace assertion SHA `97c93f0435fb2c8de27115351237f28cdb6bd648` passed [regression 43378451795](https://github.com/Cheetos9250/study-os/actions/runs/43378451795) and [isolated browser 43378451810](https://github.com/Cheetos9250/study-os/actions/runs/43378451810).
+- Extended English practice headword/Thai-meaning duplicate keys to strip invisible U+200B–U+200D and U+FEFF before collapsing whitespace, preventing duplicate choices from hidden separators. Final code SHA `c0690cf48412017e867af79c89b17477fdbaab6f`, synthetic test SHA `8e155a9e54ec8ede3997bc0b5d2eac614f8ca565`. Regression 43379006639 and browser 43379006644 queued at documentation time. No source row or progress changes.
