@@ -30,3 +30,7 @@ Continue language-only adapters/navigation first. Do not remove academic/Chinese
 The English importer checks complete normalized English token sequences. POS-guided regular noun/verb forms allow reviewed examples with inflections; phrasal-verb particles remain mandatory. General irregular forms and partial-headword matches remain unsupported. Existing imported IDs are derived exactly as before; the original 573-word set is preserved and eight eligible entries are added.
 
 `uPracticeContext` reads supplied examples/translations from the same Back field used for meanings. Frozen question objects now carry that context and their source reference. Answer feedback escapes every text field; no example is synthesized. Context is withheld until the learner answers, then remains stable through source refresh and Retry mistakes.
+
+## Full Backup / Restore browser validation
+
+The browser harness now also submits three malformed Full Backup variants directly to the actual `cFullRestore` handler in a disposable localStorage profile. It checks that rejected input cannot alter persisted data and cannot set a successful restore status. This is in addition to accepted/cancelled synthetic restore paths and Node-level rollback/async sync-race tests. No actual cloud service or existing learner storage is used. Hosted WebKit emulation is not equivalent to a physical iPad Safari/VoiceOver run.
