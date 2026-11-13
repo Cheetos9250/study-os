@@ -1,0 +1,36 @@
+/* Decorative, self-contained SVG icons. All labels remain real text. */
+:root{
+  --icon-accounting:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%204h14v16H5a2%202%200%200%201-2-2V6a2%202%200%200%201%202-2Z%22%2F%3E%3Cpath%20d%3D%22M7%204v16M11%208h5M11%2012h5M11%2016h3%22%2F%3E%3C%2Fsvg%3E");
+  --icon-economics:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%204v16h16M8%2016v-4M12%2016V9M16%2016v-6%22%2F%3E%3Cpath%20d%3D%22m7%209%205-4%204%202%204-4%22%2F%3E%3C%2Fsvg%3E");
+  --icon-math:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%222%22%20width%3D%2214%22%20height%3D%2220%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M8%206h8M8%2010h2M14%2010h2M8%2014h2M14%2014h2M8%2018h2M14%2018h2%22%2F%3E%3C%2Fsvg%3E");
+  --icon-english:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M21%2011a8%208%200%200%201-8%208H6l-4%203V11a8%208%200%200%201%208-8h3a8%208%200%200%201%208%208Z%22%2F%3E%3Cpath%20d%3D%22M7%208h9M7%2012h6%22%2F%3E%3C%2Fsvg%3E");
+  --icon-chinese:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229%22%2F%3E%3Cpath%20d%3D%22M3%2012h18M12%203a17%2017%200%200%201%200%2018%2017%2017%200%200%201%200-18Z%22%2F%3E%3C%2Fsvg%3E");
+  --icon-cards:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%2215%22%20height%3D%2214%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M7%203h12a2%202%200%200%201%202%202v12M7%2012h7M7%2016h4%22%2F%3E%3C%2Fsvg%3E");
+  --icon-book:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%205C8%203%205%203%202%204v15c3-1%206-1%2010%201%204-2%207-2%2010-1V4c-3-1-6-1-10%201Zm0%200v15%22%2F%3E%3C%2Fsvg%3E");
+  --icon-quiz:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%224%22%20y%3D%223%22%20width%3D%2216%22%20height%3D%2218%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22m7%208%201%201%202-2M13%208h4m-10%206%201%201%202-2m3%201h4%22%2F%3E%3C%2Fsvg%3E");
+  --icon-flip:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%207h16l-4-4M20%2017H4l4%204M20%207l-4%204M4%2017l4-4%22%2F%3E%3C%2Fsvg%3E");
+  --icon-calendar:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%225%22%20width%3D%2218%22%20height%3D%2216%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M7%203v4M17%203v4M3%2011h18M8%2015h2M14%2015h2%22%2F%3E%3C%2Fsvg%3E");
+  --icon-reset:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2011a9%209%200%201%201%202%207M3%204v7h7%22%2F%3E%3C%2Fsvg%3E");
+  --icon-cloud:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2018a5%205%200%200%201-1-10%207%207%200%200%201%2013-1%205.5%205.5%200%200%201%200%2011M12%2021V10m-4%204%204-4%204%204%22%2F%3E%3C%2Fsvg%3E");
+}
+.course-title{display:flex;align-items:baseline;gap:.35em}
+.course-title::before,.tabs button::before,#dirBtn::before,#limBtn::before,#resetSrs::before,#syncBtn::before{
+  content:"";display:inline-block;flex-shrink:0;width:1em;height:1em;
+  background:currentColor;vertical-align:-.12em;margin-right:.4em;
+  -webkit-mask:var(--study-icon) center/contain no-repeat;
+  mask:var(--study-icon) center/contain no-repeat;
+}
+.course-title::before{width:.85em;height:.85em;flex-basis:.85em;margin-right:0;color:var(--accent)}
+.course-acc{--study-icon:var(--icon-accounting)}
+.course-eco{--study-icon:var(--icon-economics)}
+.course-math{--study-icon:var(--icon-math)}
+.course-eng{--study-icon:var(--icon-english)}
+.course-zh{--study-icon:var(--icon-chinese)}
+.tabs [data-tab="cards"]{--study-icon:var(--icon-cards)}
+.tabs [data-tab="sum"]{--study-icon:var(--icon-book)}
+.tabs [data-tab="prac"]{--study-icon:var(--icon-quiz)}
+#dirBtn{--study-icon:var(--icon-flip)}
+#limBtn{--study-icon:var(--icon-calendar)}
+#resetSrs{--study-icon:var(--icon-reset)}
+#syncBtn{--study-icon:var(--icon-cloud)}
+@media(max-width:480px){.tabs button{padding-inline:8px}.tabs button::before{margin-right:.3em;width:.9em;height:.9em}}
