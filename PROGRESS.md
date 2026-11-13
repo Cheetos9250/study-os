@@ -139,3 +139,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Add a best-effort browser exit warning while changes remain unsaved. iPad/app termination may not deliver this event; manual Export answers remains the recovery action and includes the in-memory draft. No new key or migration.
 - Local: 232 Node tests passed; targeted VM checks exercise the actual persist/flush/warning functions with failing storage. Synthetic Chromium/WebKit adds failure → draft export → retry without editing → failed-status retry → reload verification. CI tracked on PR. No real storage failure/user data is induced.
 - Backup-comparison PR #70 released as `489601d`: all release CI passed (Pages 43463559531, Node/icon 43463560763, backup/basic 43463560425, recovery 43463560588). Live backup HTML/versioned JS returned 200 and matched tested source.
+
+
+## Final release checkpoint for backup comparison and save retry
+- PR #70: `489601da480e3d962d08355ce88ea577e8a74d8c`, comparison release CI and live evidence above.
+- PR #71: `9323e9088ae2e795863beecda10d08c94d81a6a1`, tested head `ec314f8d481daff94106c058e3f1002a2820e01f`. Exact-main Pages 43465152242, full Node/icon 43465154064 and answer-check 43465154190 all succeeded. 232 Node / 3 Python tests and 15 reader browser scenarios passed. Backup release separately passed 48 basic journeys + 12 recovery scenarios.
+- Read-only live check after release: reader HTML, backup HTML and `study-progress-backup.js?v=20261113-compare` returned HTTP 200 and exactly matched tested source. No real progress accessed or changed.
+- Initial PR #71 source transfer truncated the reader; CI failed before release. Corrected the source and verified exact local/remote Git tree equality; final code and release checks passed.
+- Both features are published. Remaining verification is physical iPad/Files and best-effort exit warning behavior; avoid claiming complete protection or automatic cloud sync. Further solution coverage belongs to separate PR #68; preserve its work and the new save-retry behavior when integrating.
