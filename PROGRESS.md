@@ -135,3 +135,5 @@ Next action: editable academic course metadata while preserving stable subject I
 - Updated `AGENTS.md` handoff commit `dd11889`. No merge/deploy/live writes; physical iPad Safari remains unverified.
 
 - Added Node discovery regressions for chronological overdue/upcoming order, exclusion of completed future plans, immutable groups and inclusive seven-day cutoff. Commit `12e2fd1`; CI pending.
+
+- CI [43370021313](https://github.com/Cheetos9250/study-os/actions/runs/43370021313): **static-contract success, browser-qa failure** at non-empty navigation assertion (`plan-discovery` returned empty text). Added an explicit wait for asynchronous discovery rendering after each save, commit `208c135`; root cause not yet proven and new CI must be checked.
