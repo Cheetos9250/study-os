@@ -204,3 +204,10 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - A four-card synthetic chapter with two overlapping explicit Thai senses cannot generate safe four-choice questions. Updated the empty-state explanation and added an actual `uPracticeHTML` execution test for no generated answer buttons.
 - Code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678`: [regression 43380708719](https://github.com/Cheetos9250/study-os/actions/runs/43380708719) **success**; [browser 43380708685](https://github.com/Cheetos9250/study-os/actions/runs/43380708685) **in progress** when recorded. The earlier sense-collision implementation passed both workflows at SHA `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7`.
 - Only branch source and tests changed. No real data, deployments, SRS schema, or Worker/KV/Notion state changed.
+
+### Offline semantic review and source-grounded candidate queue
+
+- A deterministic, **read-only** Thai-meaning audit CLI `scripts/audit-thai-distractors.cjs` and tests `tests/english-distractor-review.test.cjs` were added at SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00`.
+- Reviewed 582 committed Verified English rows. Exactly shared punctuation-delimited sense: 1 identified pair; broader Thai substring/bigram screening produced 87 candidate pairs (potential false positives such as `unsaturated` vs `saturated`). See `THAI-DISTRACTOR-REVIEW-2026-11-13.md` for the method and shortlist.
+- Regression [43381193510](https://github.com/Cheetos9250/study-os/actions/runs/43381193510) **success**; browser [43381193520](https://github.com/Cheetos9250/study-os/actions/runs/43381193520) **in progress** when documented. The prior small-pool code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678` passed both workflows.
+- No source edits, production changes, merges, migrations, Worker/KV interactions, or private data exposure.
