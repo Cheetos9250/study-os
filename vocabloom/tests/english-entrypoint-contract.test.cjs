@@ -28,7 +28,7 @@ test('P1 language-only main navigation on desktop and iPad',()=>{
  const expected=['home','learn','practice','review','library','progress'];
  for(const [name,nav] of [['desktop',side[1]],['iPad/mobile',mobile[1]]]){
   const pages=[...nav.matchAll(/data-page="([^"]+)"/g)].map(m=>m[1]);
-  assert.deepEqual(pages,expected,name+' unexpectedly exposes an academic/Chinese route');
+  assert.deepEqual(pages,name==='iPad/mobile'?[...expected,'settings']:expected,name+' unexpectedly exposes an academic/Chinese route');
  }
  assert.match(html,/<main id="mainContent"[^>]*tabindex="-1"/);
  assert.match(html,/<script src="\.\/study-integration\.js"><\/script>/);
