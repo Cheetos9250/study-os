@@ -117,6 +117,7 @@
     restore.disabled = true;
     try {
       var outcome = core.restoreMissing(window.localStorage, backupText, location.origin);
+      preview.replaceChildren();
       backupText = null;
       status.textContent = "Restored " + outcome.restored + " missing data sets. " + outcome.alreadyPresent + " were already present. Reload a course to check.";
     } catch (error) {

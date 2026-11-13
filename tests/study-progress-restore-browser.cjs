@@ -109,6 +109,7 @@ async function runEngine(name, engine, origin) {
     recovery.once("dialog", dialog => dialog.accept());
     await recovery.locator("#restore").click();
     await recovery.locator("#status").getByText(/Restored 4 missing data sets/).waitFor();
+    assert.equal(await recovery.locator("#preview li").count(),0);
     const saved = await recovery.evaluate(() => ({
       study: localStorage.getItem("study-acc"),
       srs: localStorage.getItem("acc-flashcards-v1-srs"),
@@ -125,6 +126,11 @@ async function runEngine(name, engine, origin) {
     await recovery.reload();
     assert.equal(await recovery.evaluate(()=>localStorage.getItem('study-acc')),ACC);
     assert.equal(await recovery.locator('#restore').isDisabled(),true);
+    await recovery.locator('#file').setInputFiles({name:'same-backup.json',mimeType:'application/json',buffer:Buffer.from(json)});
+    await recovery.locator('#status').getByText(/0 missing data sets can be restored; 4 already match/).waitFor();
+    assert.equal(await recovery.locator('#restore').isDisabled(),true);
+    assert.equal(await recovery.evaluate(()=>localStorage.getItem('study-acc')),ACC);
+    reports.push({engine:name,test:'repeat-file-is-no-op',status:'pass'});
     assert.deepEqual(recErrors, []);
     reports.push({ engine: name, test: "empty-profile/restore/no-secret", status: "pass" });
     await clean.close();
