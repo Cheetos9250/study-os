@@ -515,3 +515,19 @@ test('Practice number shortcuts respect open modals and sidebar focus',()=>{
  assert.equal(send(body),true,'Unfocused page should allow shortcuts');
  assert.deepEqual(calls,['0','0']);
 });
+
+
+test('Practice options visibly show 1–4 and advertise matching accessible keyboard shortcuts',()=>{
+ const source=[
+  "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};",
+  "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));",
+  "const h=x=>String(x);",
+  pure,
+  "return uPracticeHTML(deck);"
+ ].join('\n');
+ const html=new Function('deck',source)(deck);
+ const shortcuts=[...html.matchAll(/data-action="u-practice-answer"[^>]*aria-keyshortcuts="([1-4])"[^>]*>([1-4])\./g)];
+ assert.equal(shortcuts.length,4);
+ assert.deepEqual(shortcuts.map(x=>x[1]),['1','2','3','4']);
+ assert.deepEqual(shortcuts.map(x=>x[2]),['1','2','3','4']);
+});
