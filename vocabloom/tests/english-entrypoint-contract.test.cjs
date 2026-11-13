@@ -86,3 +86,16 @@ test('P2 imports current Verified multiline news entries without changing legacy
  assert.equal(b.example,'The talks ended without a breakthrough.');
  assert.equal(new Set(parsed.words.map(w=>w.id)).size,parsed.words.length);
 });
+
+test('Every imported Verified word exposes Thai meaning rather than a POS tag',()=>{
+ const parse=getParser(),words=parse(verified).words;
+ for(const w of words){assert.match(w.th,/[\u0E00-\u0E7F]/,w.en+' meaning is not Thai');assert.doesNotMatch(w.example,/^Example\s*:/i);}
+ const rows=[
+  {Front:'pretend',Back:'แสร้งทำ | v | Example: Children pretend to be artists.'},
+  {Front:'passion',Back:'n | ความหลงใหล | Art is his passion.'},
+  {Front:'invalid',Back:'n | v | An invalid entry.'}
+ ].map((r,i)=>({...r,Subject:'English Vocab',Status:'Verified',page_id:String(i+1).padStart(32,'0')}));
+ const result=parse({rows}).words;
+ assert.deepEqual(result.map(w=>[w.en,w.th]),[['pretend','แสร้งทำ'],['passion','ความหลงใหล']]);
+ assert.equal(result[0].example,'Children pretend to be artists.');
+});

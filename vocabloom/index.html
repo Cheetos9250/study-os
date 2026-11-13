@@ -238,9 +238,9 @@ function parseNotionExport(payload){
   const parts=back.split('|').map(x=>x.trim());
   let th='',example='';
   if(parts.length>=3){
-   // Historical pipe format: part of speech | Thai meaning | example = translation.
-   th=parts[1];
-   example=parts.slice(2).join('|').split(' = ')[0].trim();
+   // Both legacy field orders occur in Verified content. A POS tag is not a meaning.
+   th=parts.slice(0,2).find(x=>/[\u0E00-\u0E7F]/.test(x))||'';
+   example=parts.slice(2).join('|').split(' = ')[0].replace(/^\s*Example\s*:\s*/i,'').trim();
   }else{
    // Verified news vocabulary format: "n — Thai meaning" followed by "Example: ...".
    const lines=back.split(/\r?\n/);

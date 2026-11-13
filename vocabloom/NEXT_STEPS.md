@@ -4,8 +4,8 @@ Updated: 2026-11-13
 
 ## Allowed on feature branch without production access
 
-1. Continue offline English learning-content QA: inspect ambiguous Thai translations, examples, duplicate normalized words, and provenance; fix parsing/UI code, **not Notion records**, without explicit authorization.
-2. Expand regression tests for Vocabulary Practice: chapter transitions, content refresh, SRS isolation, answer validity, navigation and accessibility semantics.
+1. Define morphology-aware example eligibility for the nine excluded English entries listed in `CONTINUOUS-AUDIT-2026-11-13.md`; keep `securities filing` partial-headword handling explicit. Preserve imported IDs and do not edit Notion records.
+2. Extend session-only practice with sentence context/explanations after auditing ambiguous senses and distractors. Retry mistakes and cross-chapter duplicate handling are implemented and regression-tested; keep SRS isolation intact.
 3. Review CAS client and offline candidate Worker contracts with synthetic data; keep all testing off production.
 4. Keep `PROGRESS.md`, `NEXT_STEPS.md`, and `P0-P1-ENGLISH-EXPERIENCE-AUDIT.md` aligned after verified work.
 

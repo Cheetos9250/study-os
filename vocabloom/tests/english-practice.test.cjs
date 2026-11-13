@@ -102,3 +102,32 @@ test('Practice exposes question, selected answer and feedback to assistive techn
  assert.match(html.after,/aria-pressed="true"/);
  assert.match(html.after,/role="status" aria-live="polite">Correct/);
 });
+
+test('Selected chapter retains words and meanings duplicated in an earlier chapter',()=>{
+ const cards=[['a','shared','ความหมายหนึ่ง','', 'a1'],['a','another','ความหมายสอง','','a2'],
+ ['b','shared','ความหมายหนึ่ง','','b1'],['b','another','ความหมายสอง','','b2'],
+ ['b','third','ความหมายสาม','','b3'],['b','fourth','ความหมายสี่','','b4']];
+ const d={key:'eng',cards};
+ const questions=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={cat:'b',practiceQuestions:null,practiceOffset:0};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));${pure}return uPracticeQuestions(deck);`)(d);
+ assert.equal(questions.length,4);
+ assert.ok(questions.every(q=>q.cat==='b'));
+ assert.deepEqual(questions.map(q=>q.id),['practice-b1','practice-b2','practice-b3','practice-b4']);
+});
+
+test('Retry mistakes freezes only incorrect answered questions and never touches storage',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const out=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all'};const ui={};const localStorage={getItem(){throw Error('Unexpected read')},setItem(){throw Error('Unexpected write')}};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uDeck=()=>deck;let renders=0;const render=()=>renders++;${pure}${actions}
+ const first=uPracticeQuestions(deck);uAction({dataset:{action:'u-practice-retry'}});const noOp=renders===0;
+ USTATE.practiceAnswers[first[0].id]=first[0].right;
+ USTATE.practiceAnswers[first[1].id]=(first[1].right+1)%4;
+ USTATE.practiceAnswers[first[3].id]=(first[3].right+1)%4;
+ USTATE.quizIndex=9;uAction({dataset:{action:'u-practice-retry'}});
+ const retry=uPracticeQuestions(deck),cleared=Object.keys(USTATE.practiceAnswers).length;
+ USTATE.practiceAnswers[retry[0].id]=retry[0].right;uAction({dataset:{action:'u-practice-retry'}});
+ return {noOp,first,retry,cleared,index:USTATE.quizIndex,remaining:uPracticeQuestions(deck),answers:USTATE.practiceAnswers};`)(deck);
+ assert.ok(out.noOp);
+ assert.deepEqual(out.retry,[out.first[1],out.first[3]],'Keep exact prompt/options from answered mistakes');
+ assert.equal(out.cleared,0);assert.equal(out.index,0);
+ assert.deepEqual(out.remaining,out.retry,'No mistakes in retry must not reset the round');
+ assert.equal(Object.keys(out.answers).length,1);
+});

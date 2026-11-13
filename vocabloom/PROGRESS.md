@@ -23,3 +23,12 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 ## Release gate
 
 **BLOCKED** pending physical iPad Safari/VoiceOver testing and independent staging CAS atomicity/readback verification, plus explicit owner authorization for any production deployment or migration. See `SAFARI-RELEASE-QA.md` and `PHASE-6-PRODUCTION-CUTOVER-READINESS.md`.
+
+## Continuous development — 2026-11-13
+
+- Continued from PR #41 head `5bb1261`, preserving the existing working proposal.
+- Fixed the main vocabulary importer independently of the earlier integrated Practice fix: 236 POS-tag translations now read the Thai field correctly. All 573 imported IDs and word count are unchanged.
+- Fixed cross-chapter practice deduplication and added Retry mistakes using only current-session incorrect answers, with no SRS/cloud/persistent score writes.
+- Local verification: **226 Node regressions + 3 Python exporter tests + 62 synthetic CAS tests passed**. Browser launch attempted but blocked by the environment's socket permissions; no browser pass claimed.
+- Read-only refresh: Pages GET 200; Worker content GETs 403; Notion English Verified 583 versus committed 582 with the known two-sense `rebound` duplicate. Administrative KV and live cross-device data remain unverified.
+- See `CONTINUOUS-AUDIT-2026-11-13.md` for exact scope, commands, sources and limitations; new `PROJECT.md`/`ARCHITECTURE.md`/`DECISIONS.md`/`CHANGELOG.md` provide continuation context.
