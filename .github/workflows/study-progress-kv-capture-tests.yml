@@ -29,6 +29,18 @@ jobs:
           node-version: '22'
       - name: Test mock Cloudflare KV capture and absent-key rules
         run: node --test tests/study-progress-kv-capture.test.mjs
+      - name: Exercise GPG encryption with disposable synthetic bytes
+        run: |
+          set -euo pipefail
+          TMP=$(mktemp -d)
+          trap 'rm -rf "$TMP"' EXIT
+          printf 'SYNTHETIC-ONLY-DO-NOT-USE-REAL-USER-DATA\n' > "$TMP/progress.txt"
+          tar -czf "$TMP/raw.tar.gz" -C "$TMP" progress.txt
+          PASS='SYNTHETIC_TEST_PASSPHRASE_LONG_ENOUGH'
+          gpg --batch --yes --quiet --pinentry-mode loopback --no-symkey-cache --symmetric --cipher-algo AES256 --passphrase-fd 3 --output "$TMP/encrypted.tar.gz.gpg" "$TMP/raw.tar.gz" 3<<<"$PASS"
+          gpg --batch --yes --quiet --pinentry-mode loopback --no-symkey-cache --decrypt --passphrase-fd 3 --output "$TMP/decrypted.tar.gz" "$TMP/encrypted.tar.gz.gpg" 3<<<"$PASS"
+          cmp --silent "$TMP/raw.tar.gz" "$TMP/decrypted.tar.gz"
+          test -s "$TMP/encrypted.tar.gz.gpg"
       - name: Verify read-only encrypted manual capture gate
         run: |
           node --input-type=module -e "
