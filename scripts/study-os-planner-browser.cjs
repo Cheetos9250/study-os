@@ -55,6 +55,9 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 0 · เสร็จแล้ว 1/);
     await page.locator("#plan-list button").click();
     await page.locator("#plan-title").fill("ทบทวน Demand and Supply");
+    await page.locator("#plan-export").click();
+    await page.locator("#plan-status").filter({hasText:"มีข้อมูลแผนที่ยังไม่บันทึก"}).waitFor();
+    assert.equal(await page.locator("#plan-title").inputValue(),"ทบทวน Demand and Supply");
     await page.locator("#plan-subject").selectOption("eco");
     await page.locator("#plan-minutes").fill("45");
     const tomorrow = await page.evaluate(date => new Date(Date.parse(date+"T00:00:00Z")+86400000).toISOString().slice(0,10),today);
