@@ -27,3 +27,13 @@
 ## Planner follow-up
 
 After current QA passes: add editable course display metadata with stable subject IDs; extend planner discovery to upcoming/overdue plans; verify iPad Safari and restore from downloaded plan backup after browser storage loss in an isolated profile. Future cross-device plan sync needs its own reviewed schema/authorization; do not attach it to legacy progress KV automatically. Reminders are not implemented or scheduled.
+
+## Current handoff — 2026-11-13 (after plan discovery CI)
+
+1. **Completed:** pure `discoverPlans` helper and tests; code commit `b66f187`, CI run 43367779307 **success**. Contract: `docs/study-os-plan-discovery-contract-2026-11-13.md`.
+2. **Next:** integrate overdue/today/upcoming summaries into the existing homepage planner UI without changing IndexedDB schema or implicit completion. Preserve draft edits, atomic imports, and explicit user completion.
+3. Extend isolated Chromium/WebKit browser QA for classification, stale state, mobile/tablet layout, and blocked/corrupt storage; check exact-head CI and screenshots.
+4. Add editable academic course display metadata only after a separate stable-ID and backup contract; avoid altering `acc`/`eco`/`math` keys or academic page contents.
+5. Physical iPad Safari, storage-eviction recovery and cross-device plan sync are still unverified; do not claim production readiness.
+
+Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, API config, or production data without explicit authorization.
