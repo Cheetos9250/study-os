@@ -85,3 +85,14 @@ test("Planner export requires the local study form to be saved or explicitly cle
   assert.match(source,/if \(dirty\) \{\s*status\.textContent="มีข้อมูลแผนที่ยังไม่บันทึก/);
   assert.match(source,/dirty = false; title\.value = ""/);
 });
+
+test("Planner import validates backups and requires deliberate user confirmation",()=>{
+  const source=fs.readFileSync(path.join(root,"lib","study-os-planner-ui.js"),"utf8");
+  assert.match(source,/api\.validateBackup\(backup\)/);
+  assert.match(source,/if \(warnDraft\(\)\) return/);
+  assert.match(source,/if \(busy \|\| warnDraft\(\)\) return/);
+  assert.match(source,/if \(!confirm\(/);
+  assert.match(source,/event\.target\.value = ""/);
+  assert.match(source,/ยกเลิกการนำเข้าแล้ว ไม่มีข้อมูลเปลี่ยนแปลง/);
+  assert.doesNotMatch(source,/removeItem\(|deleteDatabase\(/);
+});

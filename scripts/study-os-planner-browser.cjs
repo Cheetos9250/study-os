@@ -132,8 +132,23 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
       await target.locator("#open-planner").click();
       await target.locator("#planner-content").waitFor({state:"visible"});
       const upload = payload => ({name:"planner-backup.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(payload))});
+      // Cancel a valid import: no records may be added, and the same file remains selectable.
+      const rejectedDialog = new Promise((resolve,reject) =>
+        target.once("dialog",dialog=>dialog.dismiss().then(resolve,reject)));
+      await target.locator("#plan-file").setInputFiles(upload(backup));
+      await rejectedDialog;
+      await target.getByText("ยกเลิกการนำเข้าแล้ว ไม่มีข้อมูลเปลี่ยนแปลง",{exact:true}).waitFor();
+      assert.match(await target.locator("#plan-summary").innerText(),/0 รายการ/);
+      target.once("dialog",dialog=>dialog.accept());
       await target.locator("#plan-file").setInputFiles(upload(backup));
       await target.getByText("นำเข้าเพิ่ม 4 รายการ · มีอยู่แล้ว 0 รายการ",{exact:true}).waitFor();
+      // An unsaved new-plan draft must not be omitted or discarded by importing.
+      await target.locator("#plan-title").fill("Unsaved import draft");
+      await target.locator("#plan-file").setInputFiles(upload(backup));
+      await target.locator("#plan-status").filter({hasText:"มีข้อมูลแผนที่ยังไม่บันทึก"}).waitFor();
+      assert.equal(await target.locator("#plan-title").inputValue(),"Unsaved import draft");
+      await target.locator("#plan-cancel").click();
+      target.once("dialog",dialog=>dialog.accept());
       await target.locator("#plan-file").setInputFiles(upload(backup));
       await target.getByText("นำเข้าเพิ่ม 0 รายการ · มีอยู่แล้ว 4 รายการ",{exact:true}).waitFor();
       await target.evaluate(async () => { window.__restored = await StudyOSPlanner.openPlanner(indexedDB); });
@@ -144,6 +159,7 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
         await window.__restored.update(id,{title:"Updated since export"},current.revision);
       },backup.sessions[0].id);
       const newRecord = require("../lib/study-os-planner.js").createSession({subject:"acc",title:"Must roll back",date:tomorrow,minutes:10},"rollback-candidate",1000);
+      target.once("dialog",dialog=>dialog.accept());
       await target.locator("#plan-file").setInputFiles(upload({...backup,sessions:[newRecord,...backup.sessions]}));
       await target.locator("#plan-status").filter({hasText:"จึงไม่นำเข้าหรือเขียนทับ"}).waitFor();
       assert.equal(await target.evaluate(async () => (await window.__restored.list()).length),4);
