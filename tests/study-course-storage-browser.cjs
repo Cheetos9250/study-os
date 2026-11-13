@@ -28,6 +28,13 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
      const pending=page.waitForEvent('download');await page.locator('.course-save-download').click();const download=await pending;
      const downloadedFile=await download.path();const json=JSON.parse(await fs.readFile(downloadedFile,'utf8'));assert.equal(json.format,'study-os-progress-local-backup');assert.notEqual(json.entries[srsKey],old);assert.ok(Object.keys(JSON.parse(json.entries[srsKey]).s).length>0);assert.ok(!JSON.stringify(json).includes('SYNTHETIC-SECRET'));
      await checkRecovery(downloadedFile,json);
+     if(width===390){
+      await page.evaluate(()=>{const nativeGet=Storage.prototype.getItem;window.blockProgressReads=true;Storage.prototype.getItem=function(key){if(window.blockProgressReads)throw new DOMException('Synthetic blocked reads','SecurityError');return nativeGet.call(this,key);};});
+      const partialPending=page.waitForEvent('download');await page.locator('.course-save-download').click();const partialFile=await (await partialPending).path();const partial=JSON.parse(await fs.readFile(partialFile,'utf8'));
+      assert.deepEqual(Object.keys(partial.entries),[srsKey]);assert.equal(partial.entries[srsKey],json.entries[srsKey]);assert.match(await page.locator('.course-save-warning').innerText(),/Partial backup created/);
+      await page.evaluate(()=>{window.blockProgressReads=false;});await checkRecovery(partialFile,partial);
+     }
+
      assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),beforeDownload,'export wrote browser data');assert.equal(await page.evaluate(()=>progressWrites.hasPending()),true,'export must not claim local save succeeded');
      for(const colorScheme of ['light','dark']){await page.emulateMedia({colorScheme});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'warning overflow');const bounds=await page.locator('.course-save-warning').boundingBox();assert.ok(bounds.y>=0&&bounds.y+bounds.height<1000,'warning exceeds viewport');await page.screenshot({path:path.join(output,`${name}-${width}-${course}-${colorScheme}.png`),fullPage:true});}
      await page.evaluate(()=>{window.blockProgress=false;});await page.locator('.course-save-retry').click();assert.equal(await page.locator('.course-save-warning').isHidden(),true);assert.equal(await page.evaluate(k=>localStorage.getItem(k),srsKey),json.entries[srsKey]);
