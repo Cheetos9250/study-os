@@ -106,3 +106,21 @@ test("academic course pages retain their three learning modes", () => {
     }
   }
 });
+
+
+test("academic embedded course content matches the shared read-only snapshot exactly", () => {
+  for (const key of ["acc", "eco", "math"]) {
+    const deck = source.decks.find(item => item.key === key);
+    const html = fs.readFileSync(path.join(root, key + ".html"), "utf8");
+    const marker = "const D = ";
+    const start = html.indexOf(marker);
+    assert.ok(start !== -1, key + " embedded course data missing");
+    const jsonStart = start + marker.length;
+    const jsonEnd = html.indexOf(";\\n", jsonStart);
+    assert.ok(jsonEnd > jsonStart, key + " embedded course data terminator missing");
+    const embedded = JSON.parse(html.slice(jsonStart, jsonEnd));
+    for (const field of ["key", "cats", "cards", "quiz", "sum", "markKey"]) {
+      assert.deepEqual(embedded[field], deck[field], key + " source drift in " + field);
+    }
+  }
+});
