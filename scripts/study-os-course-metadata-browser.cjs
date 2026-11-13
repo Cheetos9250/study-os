@@ -198,6 +198,37 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await draft.locator("#metadata-refresh").click();
     await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
     assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์อีกแท็บ");
+    // Simulate a fresh browser profile with no course-metadata storage.
+    // This exercises backup portability, not real OS-level eviction.
+    const restoredProfile=await browser.newContext({viewport:{width:820,height:1180}});
+    try{
+      await restoredProfile.route("**/*",route=>new URL(route.request().url()).origin===base?route.continue():route.abort());
+      const restoredPage=await restoredProfile.newPage();
+      await restoredPage.goto(base+"/course-metadata-draft.html");
+      await restoredPage.evaluate(()=>{
+        localStorage.setItem("study-acc","SYNTHETIC-LEGACY-PROGRESS");
+        localStorage.setItem("study-sync-key","SYNTHETIC-SECRET-DO-NOT-READ");
+      });
+      await restoredPage.locator("#metadata-open").click();
+      await restoredPage.locator("#editor").waitFor({state:"visible"});
+      assert.equal(await restoredPage.locator("#name-eco").inputValue(),"Economics");
+      restoredPage.once("dialog",dialog=>dialog.accept());
+      await restoredPage.locator("#metadata-file").setInputFiles({
+        name:"portable-study-os-course-metadata.json",mimeType:"application/json",
+        buffer:Buffer.from(JSON.stringify(backup))
+      });
+      await restoredPage.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
+      assert.equal(await restoredPage.locator("#name-eco").inputValue(),"เศรษฐศาสตร์");
+      assert.equal(await restoredPage.locator("#metadata-order").inputValue(),"acc,eco,math");
+      await restoredPage.reload();
+      await restoredPage.locator("#metadata-open").click();
+      await restoredPage.locator("#editor").waitFor({state:"visible"});
+      assert.equal(await restoredPage.locator("#name-eco").inputValue(),"เศรษฐศาสตร์");
+      assert.deepEqual(await restoredPage.evaluate(()=>({
+        progress:localStorage.getItem("study-acc"),
+        secret:localStorage.getItem("study-sync-key")
+      })),{progress:"SYNTHETIC-LEGACY-PROGRESS",secret:"SYNTHETIC-SECRET-DO-NOT-READ"});
+    }finally{await restoredProfile.close();}
     // An unavailable IndexedDB must not open the editor or trigger any implicit reset.
     const blockedEditor=await context.newPage();
     await blockedEditor.addInitScript(()=>Object.defineProperty(window,"indexedDB",{configurable:true,value:undefined}));
