@@ -75,6 +75,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),http=r
     await page.evaluate(()=>{const native=Storage.prototype.setItem;window.allowProgressWrites=false;Storage.prototype.setItem=function(key,value){if(key===PROGRESS_KEY&&!window.allowProgressWrites)throw new DOMException('Synthetic quota failure','QuotaExceededError');return native.call(this,key,value);};});
     await page.locator('#answer').fill('SYNTHETIC-UNSAVED-WORKING');await page.locator('#answer').blur();
     await page.locator('#saveStatus').getByText(/Not saved/).waitFor();assert.equal(await page.evaluate(()=>progressDirty),true);assert.equal(await page.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),null);
+    await page.locator('#nextBottom').click();assert.match(await page.locator('#saveStatus').innerText(),/Not saved/,'navigation must not claim failed progress was saved');await page.locator('#previousBottom').click();assert.equal(await page.locator('#answer').inputValue(),'SYNTHETIC-UNSAVED-WORKING');
     const pendingDownload=page.waitForEvent('download');await page.locator('details.settings summary').click();await page.locator('#export').click();
     const downloaded=await pendingDownload;const exported=JSON.parse(await fs.readFile(await downloaded.path(),'utf8'));
     assert.equal(exported.progress[question].notes,'SYNTHETIC-UNSAVED-WORKING','manual export must include the in-memory draft even while storage fails');
