@@ -80,7 +80,10 @@ def run_case(browser, engine, tablet):
     listen = page.get_by_role("button", name="Hear English word pronunciation")
     assert listen.is_visible(), "English Practice pronunciation control is missing"
     assert page.locator("#u-practice-question").get_attribute("lang") == "en"
-    listen.click()
+    speech_supported = page.evaluate("Boolean(window.speechSynthesis && typeof window.SpeechSynthesisUtterance === 'function')")
+    assert listen.is_enabled() == speech_supported
+    if speech_supported:
+        listen.click()
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Listen modified learning storage"
     assert page.evaluate("Object.keys(USTATE.practiceAnswers).length") == 0, "Listen recorded an answer"
     assert page.locator('[data-action="u-practice-example-speak"]').count() == 0, "Source example must stay hidden before answer"
@@ -90,7 +93,9 @@ def run_case(browser, engine, tablet):
     assert page.get_by_text("Source example", exact=True).is_visible()
     example_listen = page.get_by_role("button", name="Hear source example pronunciation")
     assert example_listen.is_visible()
-    example_listen.click()
+    assert example_listen.is_enabled() == speech_supported
+    if speech_supported:
+        example_listen.click()
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Listening to source example changed progress"
     content["refresh"] = True
     page.evaluate("async()=>{await uBoot()}")
