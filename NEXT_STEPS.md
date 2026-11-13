@@ -51,3 +51,9 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - New Chromium/WebKit synthetic planner assertions for discovery counts were committed at `598771a`; check CI run 43369517015 and fix any failures before proceeding.
 - Added root `AGENTS.md` for cross-chat/agent handoff, source-of-truth rules, test evidence boundaries and production approval gates.
 - Next implement more granular overdue/upcoming planner views only after the existing discovery-count browser regression is green; then consider editable course metadata with stable IDs and isolated backup semantics.
+
+## Navigation checkpoint — 2026-11-13
+
+- Discovery count browser regression CI 43369517015 **success**.
+- Explicit overdue/upcoming date-navigation buttons are implemented on draft PR #44; verify exact-head Chromium/WebKit CI for `5f0f9b0` and extend tests to non-empty overdue/upcoming groups before claiming full coverage.
+- Preserve the local-only planner, stable academic IDs, conflict-safe revisions and backup semantics. No release, merge or live sync without approval.
