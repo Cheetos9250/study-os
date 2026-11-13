@@ -97,3 +97,10 @@ Next action: editable academic course metadata while preserving stable subject I
 - Documentation contract: `docs/study-os-plan-discovery-contract-2026-11-13.md` at `b0eb7642b4f894a47a78f45c31805c8a8649118a`.
 - **Not yet integrated into homepage planner UI.** Existing planner, backup/import and browser tests remain unchanged in this checkpoint. No production Merge/Deploy/Notion/Worker/KV changes.
 - Next: integrate discovery into homepage planner with explicit action only, retain IndexedDB revision safety, extend Chromium/WebKit QA, and verify exact-head CI. Physical iPad Safari remains unverified.
+
+## Plan discovery homepage integration — 2026-11-13
+
+- Browser-compatible `lib/study-os-plan-discovery.js` added with a Node `.cjs` wrapper. `index.html` loads it before the existing planner UI.
+- Existing planner UI now displays counts for overdue, today, next 7 days, and explicitly completed sessions from the **already loaded local planner records**. No new storage keys, network requests, automatic completion, migration or backend writes.
+- Code commits `8d3e4eb`, `2baa73b`, `3c2ad8b`, `5fa42b8`, workflow update `dc836b0`. CI for this new integration must be checked separately; prior passing run 43367779307 covered the earlier pure helper only.
+- UI has not been verified on a physical iPad. Do not treat this draft as production-ready until exact-head Chromium/WebKit tests and relevant screenshots are reviewed.
