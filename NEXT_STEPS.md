@@ -18,6 +18,6 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 
 
 ## Textbook answer checking
-- Review the local QS-6-1 final-quantity checker and its exact-head browser CI before release. It covers 1/403 questions, not a general AI grader.
+- QS-6-1 was released in PR #66 (`8334892`), with exact-main CI and read-only live verification. Review the QS-6-2 monetary-answer expansion and its synthetic browser CI; coverage is 2/403, not a general AI grader.
 - Expand only after obtaining/reviewing each question's expected result and rubric from legitimate source material. Journal-entry and multi-part exercises require structured checks; never infer a verified grade from an arbitrary number in working.
 - Keep manual completion status and existing answer storage/backups intact. Use disposable data for device verification.
