@@ -71,3 +71,10 @@
 - A real WebKit synthesis issue in the browser harness was located: rewriting `#plan-cancel` text during blur/change between pointerdown and mouseup suppressed the click. App fix `18ffac5` only updates that label when changed; browser regression passed CI 43388836576 and 43388844050.
 - `beforeunload` now requests a warning only for uncommitted form input; synthetic Chromium/WebKit tests at `d8e3d54` passed CI 43389207595 and 43389199821. Do not claim this proves native iPad Safari behavior.
 - Current priority: review PR #44, check exact-head CI, then physical iPad Safari/VoiceOver and disposable-profile JSON restore. Never merge/deploy/modify live Notion, Worker, KV, scheduler or CAS without explicit approval.
+
+
+## Course metadata dashboard continuation — 2026-11-13
+
+- Draft homepage `index.html` now links to `course-metadata-draft.html` and has opt-in, **read-only** buttons to apply or revert locally saved course names/order. Applying reads isolated IndexedDB only after click; reverting changes the display, not saved data. Legacy `acc/eco/math` routes and progress are untouched.
+- Updated the academic regression workflow's file-path triggers for metadata source/editor/browser and tests (`6bf155c`). Added Node VM mock runtime test `tests/study-os-course-metadata-home.test.cjs` (`48ffc31`). All three test cases passed a direct V8 mock-context run using the committed source, but full GitHub Node/Chromium/WebKit CI results are **not established** for these new commits. Do not call physical Safari tested.
+- `PROGRESS.md` and `NEXT_STEPS.md` have current detail. First action next turn: fetch latest PR head and CI, investigate any failing checks, then run disposable-profile and iPad verification. No merge, production deploy, live data writes or scheduled sync changes without explicit permission.
