@@ -14,7 +14,19 @@ Date: 2026-11-13. Draft PR #44. No production deployment.
 `tests/study-os-plan-discovery.test.cjs` covers overdue/today/upcoming/completed separation, horizon boundary, invalid dates, invalid records and nonmutation. Workflow path filters include both new files.
 
 ## Integration status
-Pure Node helper only; not yet shown in homepage planner. Existing planner persistence and browser QA remain separate. A future UI integration should preserve explicit completion, existing IndexedDB schema, concurrent-tab revision checks, import/backup and failure messages. Re-run both browser engines after UI integration.
+Initial checkpoint: pure Node helper only (later integrated into draft homepage; see the newer checkpoint below). Existing planner persistence and browser QA remain separate; preserve explicit completion and revision safety.
 
 ## Release constraints
 No Merge, Deploy, Notion, Worker, KV, progress migration or production data write without authorization. Physical iPad Safari still requires independent validation.
+
+
+## Homepage integration and read-only date navigation (2026-11-13)
+
+This earlier "pure helper only" checkpoint is superseded by the following **unreleased** PR #44 changes:
+
+- The existing academic homepage planner now shows overdue, today, inclusive-next-seven-days, and completed counts using already-loaded browser-local sessions. No additional IndexedDB store or data migration.
+- A collapsed `details#plan-discovery-details` renders chronological overdue and upcoming session buttons through `textContent`, keeping untrusted titles as text. Each button targets `#plan-list`, selects the existing date view and moves keyboard focus to the list; it never marks sessions done or writes storage.
+- An empty state is displayed when both groups are empty; completed sessions stay excluded from overdue/upcoming. The existing "ดูงานค้าง" and "ดูแผนถัดไป" controls still select earliest overdue/nearest upcoming dates.
+- Static contracts and isolated Chromium/WebKit QA cover multiple out-of-order dates, date navigation, visible session title, focus target, mobile expanded-list overflow and group sorting. CI 43384056492 (e7369f4) and CI 43384365182 (38a854d) both succeeded in static and browser jobs.
+- A later synthetic regression exercises check/uncheck completion, renamed topics, persistence after reload and explicit refresh after cross-tab completion. Code commit 0654f3737: inspect its exact-head CI before claiming it passed.
+- This is **not** a cloud reminder, notification, cross-device sync, measured study duration or physical iPad Safari test. PR #44 is Draft, not deployed.

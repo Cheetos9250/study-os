@@ -48,3 +48,11 @@
 - Candidate homepage includes a collapsed chronological overdue/upcoming read-only list that selects dates and focuses the daily plan list without completing a session. CI 43383830130 and mobile CI 43384050769 passed; completion/edit/reload CI 43384365182 passed synthetic Chromium/WebKit + Node.
 - Accessibility relationship and cross-tab refresh changes 6741afd/c0154f0/0654f37 need exact-head CI review, not inferred success from old runs. Inspect PROGRESS.md, NEXT_STEPS.md and PR #44 before edits; avoid overlapping live branch writes when another agent changes head.
 - Real iPad Safari/VoiceOver, production KV/CAS/cloud and user data restoration remain unverified and approval-gated.
+
+
+## Academic planner latest handoff — 2026-11-13
+
+- Draft PR #44 now includes collapsed, chronological read-only lists for overdue/upcoming local study plans, with accessible focus target and no automatic completion or new persistence. Existing planner storage and five legacy course routes remain unchanged.
+- CI 43383837816, 43384056492, 43384365182, 43384557733 all passed Node and isolated Chromium/WebKit browser jobs. The cross-tab refresh test at 0654f3737 requires exact-head CI verification before claiming success; see PROGRESS.md.
+- Course display metadata editor is a separate, unlinked local-only draft; do not attach its settings to the homepage, migrate legacy progress or enable production release.
+- Continue from current PR head and PROGRESS.md/NEXT_STEPS.md. Real iPad Safari and live systems remain unverified. No merge/production write without explicit approval.

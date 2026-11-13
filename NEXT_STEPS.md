@@ -157,3 +157,11 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - Check exact-head CI for accessibility target-relationship and cross-tab view-refresh additions (commits 6741afd, c0154f0, 0654f37), then test physical iPad Safari/VoiceOver in an isolated preview. Verify long-title wrapping, focus, no implicit completion and local backup restore before considering release.
 - Next academic priority after usability gates: safe question/card identity adapters for defensible learning analytics. Keep measured study time distinct from planned minutes and avoid inferred accuracy/due counts from raw legacy records.
 - PR #44 stays draft. Do not merge, deploy, turn on notifications/cloud sync, or change Notion/Worker/KV/CAS/legacy progress without separate owner approval.
+
+
+## Read-only planner discovery continuation — 2026-11-13
+
+- CI 43384056492 and 43384365182 confirmed Chromium/WebKit synthetic tests of responsive chronological overdue/upcoming list navigation and updates from explicit completion/undo, edit, and reload. Accessibility target contract CI 43384557733 passed.
+- Verify the exact-head CI for new cross-tab refresh behavior (code 0654f3737, run 43384672610); inspect browser job logs if failing. If green, run one independent source review of PR #44 for static/service isolation, mobile/keyboard semantics and no implicit planner mutation.
+- Before any live release: physically verify iPad Safari, VoiceOver, real browser storage retention and user-owned backup restore using an isolated preview. Preserve all existing acc/eco/math identities, legacy pages, Notion/Worker/KV config, and all explicit production approval gates.
+- Do not merge, deploy, turn on notifications or cross-device sync, or activate data migrations without separate authorization.

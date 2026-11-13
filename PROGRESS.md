@@ -233,3 +233,13 @@ Next action: editable academic course metadata while preserving stable subject I
 - Completion/edit/reload list regressions (3beba0e/38a854d) passed [CI 43384365182](https://github.com/Cheetos9250/study-os/actions/runs/43384365182).
 - Subsequent accessibility link relationship and cross-tab refresh QA changes 6741afd/c0154f0/0654f37 require independent exact-head CI confirmation; older successes do not prove those newer commits.
 - These are isolated browser tests, not physical iPad Safari. The course-metadata editor stays unlinked. PR #44 is draft; no merge, deployment, production KV/Notion/Worker/CAS writes or migration were made.
+
+
+## Planner discovery list and accessibility continuation — 2026-11-13
+
+- Expanded the existing homepage planner's read-only discovery from counts and earliest/nearest date navigation to a collapsed chronological list of **overdue** and **next seven-day upcoming** sessions. Buttons select a session date, update the ordinary planner list and move focus to that list. No implicit done status, schema migration, cloud write or new permissions. Code commits 6b5227b (HTML) and c235379 (UI).
+- Added Chromium/WebKit browser assertions for out-of-order dates, chronological group order, date selection without completion and focus behavior, plus Node static contracts; commits 2fc76f2 and 79885d0, [CI 43383837816](https://github.com/Cheetos9250/study-os/actions/runs/43383837816) **success**.
+- Added mobile expanded-view wrap/overflow assertions (e7369f4), [CI 43384056492](https://github.com/Cheetos9250/study-os/actions/runs/43384056492) **success**.
+- Synthetic browser QA extended to explicit checkbox completion/undo and topic rename, verifying proper discovery counts, removal/reappearance and persistence across reload (38a854d), [CI 43384365182](https://github.com/Cheetos9250/study-os/actions/runs/43384365182) **success**. Read-only buttons now explicitly identify the controlled plan list; c0154f0 passed [CI 43384557733](https://github.com/Cheetos9250/study-os/actions/runs/43384557733).
+- An additional test checks explicit "อัปเดตรายการ" after another local tab marks a session complete and later incomplete (0654f3737). Check [CI 43384672610](https://github.com/Cheetos9250/study-os/actions/runs/43384672610) before marking this newest test passed.
+- Evidence is static and isolated Chromium/WebKit with synthetic records, **not** real iPad Safari, external service or production data. Draft PR #44 remains unmerged and unlinked metadata editor remains unreleased.
