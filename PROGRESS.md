@@ -150,3 +150,8 @@ Next action: editable academic course metadata while preserving stable subject I
 
 - Expanded isolated synthetic Chromium/WebKit browser navigation fixture to two overdue and two upcoming dates (created in intentionally nonchronological order), asserting oldest overdue and nearest upcoming selection, no implicit completion and persistence after reload. Commit `d66fbd9`.
 - Added accessible navigation group name and `aria-controls` / `aria-describedby` links from buttons to list/discovery, commit `2b9f5a0`; static HTML regression commit `64c0c33`. Exact-head CI pending. No production deployment or data changes.
+
+## Course discovery — 2026-11-13
+
+- CI [43371435910](https://github.com/Cheetos9250/study-os/actions/runs/43371435910) **success** for multi-date navigation and accessibility checkpoint (static-contract and browser-qa).
+- Added nonpersistent accessible academic course search over the existing stable `acc/eco/math` course cards; searches English and Thai aliases, never touches localStorage/IndexedDB or live Notion. Commits `0dbbb22`, `2f45c73`, static regression `20c55d2`. New CI pending; physical iPad Safari unverified. This is filtering, **not** editable course metadata yet.
