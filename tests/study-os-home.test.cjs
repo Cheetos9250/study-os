@@ -47,3 +47,16 @@ test("Planner navigation controls expose group, list target and discovery contex
     assert.match(html,new RegExp('id="'+id+'"[^>]*aria-controls="plan-list"[^>]*aria-describedby="plan-discovery"'));
   }
 });
+
+test("Academic course search remains client-only and preserves stable course links", () => {
+  assert.match(html,/id="course-search"[^>]*type="search"|type="search"[^>]*id="course-search"/);
+  assert.match(html,/id="course-search-status"[^>]*role="status"/);
+  assert.match(html,/src="lib\/study-os-course-search\.js"/);
+  const script = fs.readFileSync(path.join(root,"lib","study-os-course-search.js"),"utf8");
+  assert.match(script,/addEventListener\("input"/);
+  assert.match(script,/card\.hidden = !match/);
+  assert.doesNotMatch(script,/localStorage|indexedDB|fetch\(|XMLHttpRequest|\.remove\(/);
+  for (const subject of ["acc","eco","math"]) {
+    assert.match(html,new RegExp('data-course="'+subject+'"[^>]*data-search="[^"]+"[^>]*href="'+subject+'\\.html"'));
+  }
+});
