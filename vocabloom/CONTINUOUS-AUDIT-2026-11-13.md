@@ -198,3 +198,9 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - Implemented `uPracticeSenses` and `uPracticeSharesSense` in `study-integration.js`; distractors now avoid any shared explicit Thai sense with each other or the answer. An ambiguous small pool can yield fewer than ten practice questions rather than misleading options.
 - Added synthetic overlap fixtures and rotated real Verified data assertions in `tests/english-practice.test.cjs` and `tests/english-content-quality.test.cjs`.
 - Implementation/test head `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7`; regression [43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) **success**; isolated browser [43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) **in progress** when recorded. All existing service calls stay blocked within hosted browser tests. No merge, production writes or migration.
+
+### Ambiguous small-pool UX
+
+- A four-card synthetic chapter with two overlapping explicit Thai senses cannot generate safe four-choice questions. Updated the empty-state explanation and added an actual `uPracticeHTML` execution test for no generated answer buttons.
+- Code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678`: [regression 43380708719](https://github.com/Cheetos9250/study-os/actions/runs/43380708719) **success**; [browser 43380708685](https://github.com/Cheetos9250/study-os/actions/runs/43380708685) **in progress** when recorded. The earlier sense-collision implementation passed both workflows at SHA `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7`.
+- Only branch source and tests changed. No real data, deployments, SRS schema, or Worker/KV/Notion state changed.
