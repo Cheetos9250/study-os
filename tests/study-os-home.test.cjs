@@ -76,3 +76,12 @@ test("Planner discovery details navigate by date without mutating stored session
   assert.doesNotMatch(section,/client\.(?:add|update|reset|importBackup)\(/);
   assert.doesNotMatch(section,/innerHTML/);
 });
+
+test("Planner export requires the local study form to be saved or explicitly cleared",()=>{
+  const source=fs.readFileSync(path.join(root,"lib","study-os-planner-ui.js"),"utf8");
+  assert.match(source,/form\.addEventListener\("input",markDraft\)/);
+  assert.match(source,/form\.addEventListener\("change",markDraft\)/);
+  assert.match(source,/get\("plan-cancel"\)\.textContent=editing \? "ยกเลิกการแก้ไข" : "ล้างแบบฟอร์ม"/);
+  assert.match(source,/if \(dirty\) \{\s*status\.textContent="มีข้อมูลแผนที่ยังไม่บันทึก/);
+  assert.match(source,/dirty = false; title\.value = ""/);
+});
