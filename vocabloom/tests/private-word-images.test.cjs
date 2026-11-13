@@ -38,7 +38,7 @@ test('Image UI is read-only in flashcards, lessons, games and library until user
 });
 test('Personal images are only stored in IndexedDB and never written into progress, backup, service or GitHub',()=>{
  assert.match(media,/indexedDB\.open\(DB_NAME,1\)/);
- assert.match(media,/tx\.objectStore\(STORE\)\.put\(file,key\)/);
+ assert.match(media,/tx\.objectStore\(STORE\)\.put\(new Blob\(\[file\],\{type:file\.type\}\),key\)/);
  assert.match(media,/tx\.objectStore\(STORE\)\.delete\(key\)/);
  assert.doesNotMatch(media,/fetch\(|XMLHttpRequest|navigator\.sendBeacon|localStorage|sessionStorage|cloudSync|github\.com|notion\.so/i);
  assert.match(media,/image\/png','image\/jpeg','image\/webp/);
