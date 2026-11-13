@@ -104,3 +104,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Verified previous malformed same-device daily-map browser tests at SHA `2c8569bd9693d2998b3f5dd80749764637bc973a`: [browser 43369918907](https://github.com/Cheetos9250/study-os/actions/runs/43369918907) and [regression 43369918882](https://github.com/Cheetos9250/study-os/actions/runs/43369918882) completed **success**.
 - Inspected actual `cLocalRecord` and `cStudyRecord` consumers. Added same-device Full Restore validation of nested daily rows: record-shaped entries, finite nonnegative numeric `answered`/`correct`, and string-array `ids` when present. Added synthetic tests rejecting malformed rows and preserving valid counters, code/test SHA `f5b6c75b2c6dc475e82dfcdaae909394a5c7c304`.
 - CI for this newest code/test SHA was still queued/running at documentation time. No live service or production storage changes.
+
+### Nested daily-row CI verified; browser assertions extended
+
+- Implementation SHA `f5b6c75b2c6dc475e82dfcdaae909394a5c7c304`: [regression 43370356856](https://github.com/Cheetos9250/study-os/actions/runs/43370356856) and [isolated browser 43370356909](https://github.com/Cheetos9250/study-os/actions/runs/43370356909) both completed **success**.
+- Added direct browser checks for nested same-device daily counter failures (negative answered, nonnumeric correct, non-string IDs), asserting unchanged disposable localStorage at code/test SHA `f737cf7886ba797c86d2e6ef9fa503cd4b8e8f13`. This **new** browser extension awaits its own CI confirmation.
+- This remains isolated Chromium/WebKit QA, not real iPad Safari or staging Cloudflare persistence.
