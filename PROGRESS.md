@@ -122,3 +122,12 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Owner authorized publishing completed/tested website work. PR #67 merged as `61d64f9d9272bbd2bea3176066ebdc6c33c54b8e`; its tested PR head is `b7e7e4dc24ae4346a79d9c2199e26f8aed0aabd7`.
 - Exact PR-head CI: answer-check 43458654412 and full Node/icon 43458654422 passed (225 Node, 3 Python, 13 synthetic browser scenarios). Main Pages 43459873288, answer-check 43459874131 and full Node/icon 43459874149 are the release runs; final outcome/live verification is recorded on PR #67 after completion.
 - Release adds QS-6-2, explicit final-answer lines and reviewed-solution reveal. Coverage remains 2/403; no backend/source PDF/real-data changes.
+
+
+## Read-only backup comparison — implementation checkpoint
+- Adds exact saved-data comparison between a selected backup and this browser: identical, differing, only in browser, only in file. Results expose dataset labels/counts, never raw answers or credentials. An empty/different browser is not called a successful match.
+- Does not infer which differing copy is newer and does not claim file-format validation proves successful recovery. No upload, restore, storage write or new storage key is added.
+- File-selection request IDs prevent an older asynchronous read from displaying stale results; a new/invalid selection clears previous comparison. Cross-tab progress events invalidate the comparison, and Compare again explicitly rereads the selected file against current saved data.
+- Extended synthetic basic journeys to Chromium/WebKit at 390/820/1280px with light/dark screenshots, comparison/race/cross-tab checks, and a clean-browser preview before isolated recovery. Existing course/PDF/answer data are unchanged.
+- Local: 229 Node tests, 3 Python tests, JavaScript syntax and diff checks passed. Exact-head CI/browser evidence tracked on the PR. Physical iPad/Files remains outside controlled QA.
+- Branch: feat/backup-file-comparison-20261113. PR #44/#68 branches remain untouched; no Notion dispatch, backend deploy or production-data mutation.

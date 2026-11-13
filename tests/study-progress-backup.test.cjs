@@ -86,3 +86,27 @@ test("textbook answers join the main backup without PDF caches or credentials", 
   assert.deepEqual(backup.inspectSnapshot(text,origin).keys,[key]);
   assert.doesNotMatch(text,/EXCLUDE_SECRET|EXCLUDE_PDF/);
 });
+
+test('comparison reads only allowed keys and never reveals raw answers or credentials',()=>{
+ const raw='PRIVATE_ANSWER',text=backup.createSnapshot(storage({'study-acc':raw}),origin,timestamp),reads=[];
+ const result=backup.compareSnapshot(text,{getItem(k){reads.push(k);assert.ok(backup.keys.includes(k));return k==='study-acc'?raw:null;},setItem(){throw Error('write');},removeItem(){throw Error('delete');}},origin);
+ assert.equal(result.exactMatch,true);assert.deepEqual(result.matched,['study-acc']);
+ assert.equal(reads.length,backup.keys.length);assert.doesNotMatch(JSON.stringify(result),/PRIVATE_ANSWER/);
+});
+test('comparison separates differing, local-only, backup-only and identical datasets',()=>{
+ const text=backup.createSnapshot(storage({'study-acc':'old','study-eco':'same','study-zh':'from file'}),origin,timestamp);
+ const r=backup.compareSnapshot(text,storage({'study-acc':'current','study-eco':'same','study-math':'current'}),origin);
+ assert.equal(r.exactMatch,false);assert.deepEqual(r.different,['study-acc']);assert.deepEqual(r.matched,['study-eco']);assert.deepEqual(r.localOnly,['study-math']);assert.deepEqual(r.backupOnly,['study-zh']);
+});
+test('empty browser is not incorrectly called a matching backup',()=>{
+ const text=backup.createSnapshot(storage({'studyos.accounting.textbook.progress.v1':'{}'}),origin,timestamp);
+ const r=backup.compareSnapshot(text,storage({}),origin);assert.equal(r.exactMatch,false);assert.deepEqual(r.backupOnly,['studyos.accounting.textbook.progress.v1']);
+ assert.equal(backup.labelForKey(r.backupOnly[0]),'Accounting textbook answers');
+});
+test('comparison fails closed on unreadable storage and validates files before reading storage',()=>{
+ const text=backup.createSnapshot(storage({'study-acc':'{}'}),origin,timestamp);
+ assert.throws(()=>backup.compareSnapshot(text,storage({},'study-acc'),origin),/Cannot read/);
+ assert.throws(()=>backup.compareSnapshot(text,{getItem(){return 123;}},origin),/Invalid local/);
+ assert.throws(()=>backup.compareSnapshot(text,null,origin),/unavailable/);
+ assert.throws(()=>backup.compareSnapshot(text,{getItem(){throw Error('must not read');}},'https://other.example'),/different site origin/);
+});

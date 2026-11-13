@@ -88,6 +88,37 @@
     return { count: names.length, keys: names, origin: value.origin, createdAt: value.createdAt };
   }
 
+  function compareSnapshot(text, storage, currentOrigin) {
+    var info = inspectSnapshot(text, currentOrigin);
+    if (!storage || typeof storage.getItem !== "function") throw new Error("Browser storage is unavailable.");
+    var entries = JSON.parse(text).entries;
+    var result = { matched: [], different: [], localOnly: [], backupOnly: [], info: info };
+    for (var i = 0; i < KEYS.length; i++) {
+      var key = KEYS[i], local;
+      try { local = storage.getItem(key); }
+      catch (_) { throw new Error("Cannot read browser storage. No comparison was completed."); }
+      if (local !== null && typeof local !== "string") throw new Error("Invalid local progress data type.");
+      var inBackup = Object.prototype.hasOwnProperty.call(entries, key);
+      if (local !== null && inBackup) result[local === entries[key] ? "matched" : "different"].push(key);
+      else if (local !== null) result.localOnly.push(key);
+      else if (inBackup) result.backupOnly.push(key);
+    }
+    result.exactMatch = !result.different.length && !result.localOnly.length && !result.backupOnly.length;
+    return result;
+  }
+
+  function labelForKey(key) {
+    if (key === "studyos.accounting.textbook.progress.v1") return "Accounting textbook answers";
+    if (key === "vocabloom_mvp_v1") return "VocaBloom learning history";
+    var names = { acc: "Accounting", eco: "Economics", math: "Mathematics", eng: "English", zh: "Chinese" };
+    for (var course of Object.keys(COURSES)) {
+      if (key === "study-" + course) return names[course] + " quiz answers";
+      if (key === COURSES[course] + "-srs") return names[course] + " flashcard schedules";
+      if (key === COURSES[course] + "-typ") return names[course] + " typing preferences";
+    }
+    return "Unknown data set";
+  }
+
   return { VERSION: VERSION, MAX_BYTES: MAX_BYTES, keys: KEYS.slice(), createSnapshot: createSnapshot,
-    inspectSnapshot: inspectSnapshot };
+    inspectSnapshot: inspectSnapshot, compareSnapshot: compareSnapshot, labelForKey: labelForKey };
 });

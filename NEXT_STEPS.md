@@ -30,3 +30,9 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 - Next grading action: obtain/review source questions and expected results for additional exercises; no verified bulk answer key is present. Never advertise all 403 as automatically graded.
 
 - Frontend release policy: completed/tested web work may now be published under the owner's standing authorization recorded in PROJECT.md. Do not ask the same frontend release question again; retain separate production-data/backend/sync approval gates.
+
+
+## Backup comparison handoff
+- Validate/release the read-only comparison branch after exact-head browser CI and screenshot inspection. Check differing answers, another browser with empty storage, latest-file selection, and cross-tab invalidation using disposable data only.
+- Continue physical iPad/Files export → choose-file → compare → isolated restore rehearsal; synthetic WebKit is not proof of native Files behavior. No real user backup has been inspected by the agent.
+- Preserve PR #68's separate worked-solutions work; do not duplicate its reader/solution changes.
