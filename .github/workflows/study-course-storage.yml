@@ -1,0 +1,55 @@
+name: Study OS course save reliability
+on:
+  push:
+    paths:
+      - acc.html
+      - eco.html
+      - math.html
+      - eng.html
+      - zh.html
+      - scripts/study-course-storage.js
+      - scripts/study-progress-backup.js
+      - assets/study-course-save.css
+      - tests/study-course-storage*.cjs
+      - .github/workflows/study-course-storage.yml
+  pull_request:
+    paths:
+      - acc.html
+      - eco.html
+      - math.html
+      - eng.html
+      - zh.html
+      - scripts/study-course-storage.js
+      - scripts/study-progress-backup.js
+      - assets/study-course-save.css
+      - tests/study-course-storage*.cjs
+      - .github/workflows/study-course-storage.yml
+permissions:
+  contents: read
+jobs:
+  course-storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Full regression
+        run: |
+          node --test tests/*.test.cjs vocabloom/tests/*.test.cjs
+          python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'
+      - name: Install isolated browser dependency
+        run: npm install --prefix "$RUNNER_TEMP/course-storage" --no-save --ignore-scripts playwright@1.62.1
+      - name: Install browsers
+        run: '"$RUNNER_TEMP/course-storage/node_modules/.bin/playwright" install --with-deps chromium webkit'
+      - name: Test synthetic course save failures
+        env:
+          NODE_PATH: ${{ runner.temp }}/course-storage/node_modules
+          QA_OUTPUT: ${{ runner.temp }}/course-storage-qa
+        run: node tests/study-course-storage-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: study-course-save-synthetic-qa
+          path: ${{ runner.temp }}/course-storage-qa

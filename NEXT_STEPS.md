@@ -42,3 +42,9 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 - Reader save retry is released in PR #71 (`9323e90`), with exact-main Node/Python/browser CI and live verification. Next: verify native iPad behavior using disposable answers, and preserve the retry/warning functions when integrating separate PR #68 solutions.
 - Physical iPad: use disposable answers to test storage failure/retry and Export answers. Browser exit prompts are best-effort and must not be described as guaranteed protection.
 - Backup comparison is now released in PR #70 (`489601d`); preserve its read-only behavior and file-selection guards.
+
+
+## Course save reliability handoff
+- Finish exact-head CI and screenshot review for the five-course save guard, then publish under standing frontend authorization. Preserve quiz/SRS/typing schemas, sync callbacks and existing backup allowlist.
+- Rehearse warning → unsaved backup → retry with disposable progress on physical iPad; never deliberately fill/block the owner's real storage for QA. A browser exit prompt is not guaranteed.
+- Keep separate PR #68's textbook solutions and protected PR #44 branch untouched.

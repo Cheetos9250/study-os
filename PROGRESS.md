@@ -147,3 +147,14 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Read-only live check after release: reader HTML, backup HTML and `study-progress-backup.js?v=20261113-compare` returned HTTP 200 and exactly matched tested source. No real progress accessed or changed.
 - Initial PR #71 source transfer truncated the reader; CI failed before release. Corrected the source and verified exact local/remote Git tree equality; final code and release checks passed.
 - Both features are published. Remaining verification is physical iPad/Files and best-effort exit warning behavior; avoid claiming complete protection or automatic cloud sync. Further solution coverage belongs to separate PR #68; preserve its work and the new save-retry behavior when integrating.
+
+
+## Course progress save feedback and recovery
+- Found silent localStorage write failures in all five course quiz/SRS/typing save paths. Added one shared, course-scoped guard that retains the latest failed dataset in memory, displays an Unsaved learning progress banner, and retries on explicit user action.
+- Download unsaved backup overlays pending values onto the existing allowlisted snapshot format, so newer in-memory ratings/answers/preferences are included instead of only old stored bytes. It excludes credentials and never writes during export. A download does not clear pending state or claim that browser storage succeeded.
+- Existing sync dirty callbacks and manual-sync behavior are retained; no backend/progress endpoint changes. No new storage key or learning-content edits. Reader/PR #68 work remains separate. Exit warnings are best-effort; iPad may omit them.
+- Local validation: 239 Node tests, 3 Python tests, syntax/diff checks passed. Compared embedded course data against main: unchanged for all five pages. Initial integration check caught a missing CSS link in the legacy implicit-head markup; corrected before PR.
+- New synthetic Chromium/WebKit CI covers 30 course/viewport journeys at 390/820/1280px with light/dark screenshots: rating save failure, secret-free unsaved backup, retry, quiz or typing retry, and reload persistence. Existing basic/backup QA is also required before release. Physical iPad remains unverified.
+- Branch: fix/course-progress-save-feedback-20261113. Exact-head CI/PR/release evidence tracked in the corresponding PR.
+
+- If stored data cannot be read/included, draft export falls back to a clearly labelled partial backup containing pending in-memory datasets only. It does not imply that other stored data was backed up.
