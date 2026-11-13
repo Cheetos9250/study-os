@@ -165,3 +165,8 @@ Next action: editable academic course metadata while preserving stable subject I
 - Verified [CI 43373533213](https://github.com/Cheetos9250/study-os/actions/runs/43373533213) **success** (static-contract + browser-qa) for multilingual course-search regression `0bd4922`.
 - Added Escape-to-clear course search (`d582ecf`) and Chromium/WebKit keyboard regression (`a75d89b`); new CI pending.
 - Added design-only `COURSE_METADATA_DESIGN.md` (`dc28c05`) defining immutable subject IDs/routes, isolated browser-local presentation overrides, atomic backups, test gates and no production mutation. Editable metadata is not yet implemented.
+
+## Metadata model foundation — 2026-11-13
+
+- CI [43374096872](https://github.com/Cheetos9250/study-os/actions/runs/43374096872) **success**: static-contract and browser-qa passed Escape-to-clear course search tests.
+- Added pure course presentation metadata schema/validator (`e169998`) and Node tests (`9b48fb4`) for immutable subject identities, order, text validation and corrupt input. Updated `COURSE_METADATA_DESIGN.md` (`63fd982`). New [CI 43377242274](https://github.com/Cheetos9250/study-os/actions/runs/43377242274) queued at inspection. No UI persistence, production writes, merge or deploy.
