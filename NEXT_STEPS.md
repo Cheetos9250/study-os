@@ -116,3 +116,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - CI 43378426163 **success** for synthetic metadata-store CAS/rollback browser QA. New unlinked `course-metadata-draft.html` and `lib/study-os-course-metadata-editor.js` provide explicit opt-in Save/Reset and JSON import/export; browser script is `lib/study-os-course-metadata-store.js`. Verify [CI 43378984252](https://github.com/Cheetos9250/study-os/actions/runs/43378984252) before claiming draft editor browser QA success.
 - Next: test confirmation dialogs, stale-form conflict UI, corrupt import rollback, download/reimport and denied IndexedDB. Remove redundant legacy `.cjs` store after verifying canonical `.js` consumers; keep draft unlinked until QA and approval for any production exposure.
+
+## Editor conflict/reset QA — 2026-11-13
+
+- Added `9cf2ed6` browser regression for reset confirmation/cancel, cross-tab stale editor rejection and explicit reload. Verify [CI 43379151530](https://github.com/Cheetos9250/study-os/actions/runs/43379151530); prior draft CI 43378984252 browser job was still in progress at inspection.
+- Next: inspect failed CI logs if any, then test corrupt JSON import rollback and downloadable backup round-trip. Keep draft unlinked and production unchanged.
