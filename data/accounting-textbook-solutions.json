@@ -4,12 +4,12 @@
     "scope": "Chapter 1–9 questions indexed in Study OS",
     "provenance": "Original study solutions, not a publisher answer key. Source-check status differs by question; do not treat all entries as verified.",
     "sourceFile": "Owner's Google Drive Acc textbook.pdf",
-    "reviewStatus": "65 draft answers, 36 newly source-reviewed against original PDF (29 Chapter 1 + 7 Chapter 2); older 29 drafts individually unverified unless previously labeled.",
+    "reviewStatus": "77 draft worked solutions; 48 new entries from the two sessions checked against original PDF; 29 older drafts have varying source review status. Chapter 2 QS-2-1–4 and E-2-1–4 title/crop mapping corrected without changing IDs.",
     "storage": "Public answers only; no textbook question wording, PDF pages, private notes or user progress",
-    "lastUpdated": "2026-11-13",
-    "reviewedCount": 65,
+    "lastUpdated": "2026-11-14",
+    "reviewedCount": 77,
     "catalogQuestionCount": 403,
-    "sourceReviewedNewCount": 36,
+    "sourceReviewedNewCount": 48,
     "indexCaveat": "The 403-item catalog is not a complete or reliably numbered audit of the printed questions; some exercise identifiers are missing or misread. Do not claim every printed question has an answer."
   },
   "answers": {
@@ -504,12 +504,111 @@
       "verification": "source-reviewed-2026-11-13"
     },
     "E-2-6": {
-      "answer": "a. Cash paid on accounts payable during October = $300,500. b. Sales on account during October = $89,390.",
-      "explanation": "a: ending accounts payable = starting accounts payable + credit purchases - payments. $132,500 = $152,000 + $281,000 - payments; payments=$300,500. b: ending receivables = beginning receivables + credit sales - collections. $89,000 = $102,500 + credit sales - $102,890; sales=$89,390.",
+      "answer": "a. Cash paid on accounts payable during October = $300,500. b. Sales on account during October = $89,390. c. Cash on September 30 = $19,250.",
+      "explanation": "a: ending accounts payable = starting accounts payable + credit purchases - payments. $132,500 = $152,000 + $281,000 - payments; payments=$300,500. b: ending receivables = beginning receivables + credit sales - collections. $89,000 = $102,500 + credit sales - $102,890; sales=$89,390. c: September 30 cash + October receipts $102,500 − October disbursements $103,150 = October 31 cash $18,600; beginning cash = $19,250.",
+      "pages": [
+        96,
+        97
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "QS-2-1": {
+      "answer": "a, e, h, i — sales receipt; supplier invoice; bank statement; telephone bill.",
+      "explanation": "These documents provide original evidence of transactions. A trial balance, balance sheet, account, and income statement are accounting records or reports, not the source evidence requested.",
+      "pages": [
+        94
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "QS-2-2": {
+      "answer": "a A; b A; c A; d A; e A; f EQ; g L; h L; i EQ (contra-equity).",
+      "explanation": "Cash, prepaid rent, office supplies, prepaid insurance, and office equipment are assets. Owner's capital is equity; accounts payable and unearned rent are liabilities. Withdrawals reduce equity rather than being an expense.",
+      "pages": [
+        94
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "QS-2-3": {
+      "answer": "a Advertising Expense — E, 655; b Rent Revenue — R, 406; c Rent Receivable — A, 110; d Machinery — A, 169; e Accounts Payable — L, 201; f Furniture — A, 161; g Notes Payable — L, 245; h Owner, Capital — EQ, 301; i Utilities Expense — E, 690.",
+      "explanation": "Account types and numbers are taken from the source book's Chart of Accounts (Appendix CA and CA-1, PDF pages 1134–1135). Owner, Capital is the first generic proprietor-capital slot (301); companies can choose different owner account slots. Notes Payable without a term is 245 in this chart.",
+      "pages": [
+        94,
+        1134,
+        1135
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "QS-2-4": {
+      "answer": "a Credit; b Debit; c Debit; d Debit; e Debit; f Debit; g Credit; h Debit; i Credit.",
+      "explanation": "Revenue, liability and owner-capital accounts normally carry credit balances. Assets, expenses and owner withdrawals normally carry debit balances. A normal balance is the side used to record increases.",
+      "pages": [
+        94
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "E-2-1": {
+      "answer": "a 4; b 1; c 2; d 3.",
+      "explanation": "First analyze each transaction using supporting documents; then journalize it; then post to the general ledger; finally prepare and analyze a trial balance.",
       "pages": [
         96
       ],
-      "verification": "source-reviewed-2026-11-13"
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "E-2-2": {
+      "answer": "a 5 — Three; b 2 — Equity; c 4 — Liability; d 1 — Asset; e 3 — Account.",
+      "explanation": "The balance sheet separates assets, liabilities and equity. Owner capital/withdrawals are equity-related; payables are obligations. An account records the increases/decreases in one accounting item.",
+      "pages": [
+        96
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "E-2-3": {
+      "answer": "a 1 — Chart; b 2 — General ledger; c 5 — Source document; d 4 — Account; e 3 — Journal.",
+      "explanation": "A chart lists accounts and numbers without balances; a general ledger stores the actual account balances; source documents originate transaction evidence; an individual account tracks one item; journals record transactions chronologically.",
+      "pages": [
+        96
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "E-2-4": {
+      "answer": "a Land: asset, debit normal/increase; b Cash: asset, debit/debit; c Legal Expense: expense, debit/debit; d Prepaid Insurance: asset, debit/debit; e Accounts Receivable: asset, debit/debit; f Owner, Withdrawals: contra-equity, debit/debit; g License Fee Revenue: revenue, credit/credit; h Unearned Revenue: liability, credit/credit; i Fees Earned: revenue, credit/credit; j Equipment: asset, debit/debit; k Notes Payable: liability, credit/credit; l Owner, Capital: equity, credit/credit.",
+      "explanation": "Entries increase an account on its normal-balance side. Assets and expenses have debit balances; liabilities, revenues and capital have credit balances. Owner withdrawals are contra-equity and increase with a debit.",
+      "pages": [
+        96
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "E-2-7": {
+      "answer": "Pose-for-Pics — August general journal: Aug 1 Dr Cash $6,500; Dr Photography Equipment $33,500; Cr M. Harris, Capital $40,000. Aug 2 Dr Prepaid Insurance $2,100; Cr Cash $2,100. Aug 5 Dr Office Supplies $880; Cr Cash $880. Aug 20 Dr Cash $3,331; Cr Photography Fees Earned $3,331. Aug 31 Dr Utilities Expense $675; Cr Cash $675.",
+      "explanation": "Owner contributions are credited to capital, not earned fees. The 24-month insurance contract is a prepaid asset on Aug 2, not fully expensed at purchase. Supplies remain an asset until used. Each entry has equal total debits and credits.",
+      "pages": [
+        97
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "E-2-8": {
+      "answer": "Pose-for-Pics — August 31 trial balance: Debit: Cash $6,176; Office Supplies $880; Prepaid Insurance $2,100; Photography Equipment $33,500; Utilities Expense $675. Credit: M. Harris, Capital $40,000; Photography Fees Earned $3,331. Total debits $43,331 = total credits $43,331.",
+      "explanation": "Post all five entries from E-2-7. Cash ending balance = $6,500 − $2,100 − $880 + $3,331 − $675 = $6,176. The capital contribution is $6,500 cash + $33,500 equipment = $40,000. The trial balance proves debits equal credits but does not alone prove every transaction is correct.",
+      "pages": [
+        97
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "E-2-9": {
+      "answer": "Spade Company journal: a Dr Cash $100,750; Cr K. Spade, Capital $100,750. b Dr Office Supplies $1,250; Cr Cash $1,250. c Dr Office Equipment $10,050; Cr Accounts Payable $10,050. d Dr Cash $15,500; Cr Fees Earned $15,500. e Dr Accounts Payable $10,050; Cr Cash $10,050. f Dr Accounts Receivable $2,700; Cr Fees Earned $2,700. g Dr Rent Expense $1,225; Cr Cash $1,225. h Dr Cash $1,125; Cr Accounts Receivable $1,125. i Dr K. Spade, Withdrawals $10,000; Cr Cash $10,000. Ending T-account balances: Cash Dr $94,850; Accounts Receivable Dr $1,575; Office Supplies Dr $1,250; Office Equipment Dr $10,050; Accounts Payable $0; K. Spade, Capital Cr $100,750; Withdrawals Dr $10,000; Fees Earned Cr $18,200; Rent Expense Dr $1,225.",
+      "explanation": "Cash = 100,750 − 1,250 + 15,500 − 10,050 − 1,225 + 1,125 − 10,000 = $94,850, matching the printed book check figure. Receivables = $2,700−$1,125=$1,575. The $10,050 payable is fully cleared. The sum of debit ending balances is $118,950, equal to credit balances $100,750 capital + $18,200 revenue.",
+      "pages": [
+        97
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "P-2-1A": {
+      "answer": "Linkworks — April general journal: Apr 1 Dr Cash $80,000; Dr Office Equipment $26,000; Cr K. Tanner, Capital $106,000. Apr 2 Dr Prepaid Rent $9,000; Cr Cash $9,000. Apr 3 Dr Office Equipment $8,000; Dr Office Supplies $3,600; Cr Accounts Payable $11,600. Apr 6 Dr Cash $4,000; Cr Services Revenue $4,000. Apr 9 Dr Accounts Receivable $6,000; Cr Services Revenue $6,000. Apr 13 Dr Accounts Payable $11,600; Cr Cash $11,600. Apr 19 Dr Prepaid Insurance $2,400; Cr Cash $2,400. Apr 22 Dr Cash $4,400; Cr Accounts Receivable $4,400. Apr 25 Dr Accounts Receivable $2,890; Cr Services Revenue $2,890. Apr 28 Dr K. Tanner, Withdrawals $5,500; Cr Cash $5,500. Apr 29 Dr Office Supplies $600; Cr Accounts Payable $600. Apr 30 Dr Utilities Expense $435; Cr Cash $435. April 30 trial balance — Debits: Cash $59,465; Accounts Receivable $4,490; Office Supplies $4,200; Prepaid Insurance $2,400; Prepaid Rent $9,000; Office Equipment $34,000; K. Tanner, Withdrawals $5,500; Utilities Expense $435. Credits: Accounts Payable $600; K. Tanner, Capital $106,000; Services Revenue $12,890. Total debits = total credits = $119,490.",
+      "explanation": "The ledger is prepared by posting each journal entry into its account. Check figures from the textbook: cash $59,465; accounts receivable $4,490; accounts payable $600; total trial balance $119,490. Cash = 80,000−9,000+4,000−11,600−2,400+4,400−5,500−435 = $59,465. Receivables = 6,000−4,400+2,890 = $4,490. Office supplies = 3,600+600 = $4,200. Equipment = 26,000+8,000 = $34,000. Revenues = 4,000+6,000+2,890 = $12,890. The prepaid rent and insurance are assets at purchase; this problem does not request period-end adjusting entries.",
+      "pages": [
+        100
+      ],
+      "verification": "source-reviewed-2026-11-14"
     }
   }
 }
