@@ -237,6 +237,29 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.match(await tab.locator("#plan-discovery").textContent(),/งานค้าง 2 · วันนี้ 0 · 7 วันข้างหน้า 2 · เสร็จแล้ว 0/);
     assert.match(await tab.locator("#plan-discovery-list").textContent(),/Upcoming edited QA/);
     assert.doesNotMatch(await tab.locator("#plan-discovery-list").textContent(),/Upcoming navigation QA/);
+    // Another same-origin tab may explicitly complete a plan. Refresh must show its
+    // latest revision without silently updating or completing any records itself.
+    const secondary=await navigation.newPage();
+    await secondary.goto(base);
+    await secondary.evaluate(async()=>{
+      window.__crossTabPlanner=await StudyOSPlanner.openPlanner(indexedDB);
+      const record=(await window.__crossTabPlanner.list()).find(item=>item.title==="Upcoming edited QA");
+      if(!record)throw new Error("missing synthetic cross-tab plan");
+      await window.__crossTabPlanner.update(record.id,{done:true},record.revision);
+    });
+    await tab.locator("#plan-refresh").click();
+    await tab.getByText("อัปเดตรายการแล้ว",{exact:true}).waitFor();
+    await tab.waitForFunction(()=>document.querySelector("#plan-discovery")?.textContent?.includes("7 วันข้างหน้า 1 · เสร็จแล้ว 1"));
+    assert.doesNotMatch(await tab.locator("#plan-discovery-list").textContent(),/Upcoming edited QA/);
+    await secondary.evaluate(async()=>{
+      const record=(await window.__crossTabPlanner.list()).find(item=>item.title==="Upcoming edited QA");
+      await window.__crossTabPlanner.update(record.id,{done:false},record.revision);
+      window.__crossTabPlanner.close();
+    });
+    await tab.locator("#plan-refresh").click();
+    await tab.getByText("อัปเดตรายการแล้ว",{exact:true}).waitFor();
+    await tab.waitForFunction(()=>document.querySelector("#plan-discovery")?.textContent?.includes("7 วันข้างหน้า 2 · เสร็จแล้ว 0"));
+    assert.match(await tab.locator("#plan-discovery-list").textContent(),/Upcoming edited QA/);
   } finally { await navigation.close(); }
   return {engine,planner:"passed; synthetic IndexedDB: persistence, editing, explicit completion, dates, concurrent tabs, stale draft, export/import, idempotency, atomic rollback, denied/corrupt storage, loaded-page offline"};
 };
