@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Outfit:wght@400;500;600;700;800&amp;family=IBM+Plex+Sans+Thai:wght@400;500;700&amp;family=Noto+Sans+Thai:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <title>Restore missing progress · Study OS</title>
+  <style>
+    :root{--bg:#f8f9fc;--card:#fff;--ink:#202445;--muted:#606580;--line:#eaebf2;--accent:#5b53d7;--on-accent:#fff}
+    @media(prefers-color-scheme:dark){:root{--bg:#181b2b;--card:#24283c;--ink:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--accent:#a9a2ff;--on-accent:#202445}}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "DM Sans","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
+    main{max-width:650px;margin:0 auto;padding:28px 18px 60px}
+    a{color:var(--accent)}
+    h1,h2{font-family:"Outfit","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
+    h1{font-size:clamp(25px,5vw,32px);line-height:1.25;margin:24px 0 12px}
+    h2{font-size:19px;margin:0 0 8px}
+    p{margin:0 0 14px}
+    .muted{color:var(--muted)}
+    .panel{padding:22px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin:18px 0}
+    button,.file-label{display:inline-block;appearance:none;border:0;border-radius:10px;background:var(--accent);color:var(--on-accent);font:inherit;font-weight:600;padding:12px 18px;cursor:pointer;max-width:100%}
+    .file-label{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+    button:focus-visible,.file-label:focus-within,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+    .notice{padding:12px 14px;border-left:3px solid var(--accent);background:var(--bg);border-radius:6px}
+    #status,#checkStatus{min-height:1.5em;overflow-wrap:anywhere;margin-top:12px}
+    code{font-size:0.9em;overflow-wrap:anywhere}
+
+    button:disabled{opacity:.5;cursor:not-allowed}
+    #preview{padding-left:22px;font-size:14px;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+  <a href="progress-backup.html">← Back to backup</a>
+  <h1>Restore missing learning progress</h1>
+  <p class="muted">Recover a saved JSON backup on an iPad or another browser, without overwriting any existing course history.</p>
+  <div class="panel">
+    <h2>1. Choose a backup file</h2>
+    <p>Use a file created by Study OS's backup page. Your file stays in this browser; no upload takes place.</p>
+    <label class="file-label" for="file">Select a JSON backup
+      <input id="file" type="file" accept=".json,application/json">
+    </label>
+    <p id="status" role="status" aria-live="polite">No file selected.</p>
+    <ul id="preview" aria-label="Backup data sets"></ul>
+    <p class="notice">If any existing local progress differs from the backup, restoring is blocked. This tool only adds missing keys; it never replaces or clears existing history.</p>
+  </div>
+  <div class="panel">
+    <h2>2. Restore missing data</h2>
+    <p>Close other Study OS tabs before restoring. Use only a backup you created and trust. Review the file summary above, then confirm the action.</p>
+    <button type="button" id="restore" disabled>Restore missing progress</button>
+    <p>This operation does not touch Notion, Cloudflare, Study Planner IndexedDB, or any stored sync keys. It does not restore data that was never in the backup file.</p>
+  </div>
+</main>
+<script src="scripts/study-progress-backup.js"></script>
+<script src="scripts/study-progress-restore.js"></script>
+<script>
+(function() {
+  "use strict";
+  var core = window.StudyProgressRestore;
+  var input = document.getElementById("file");
+  var restore = document.getElementById("restore");
+  var status = document.getElementById("status");
+  var backupText = null;
+  var selection = 0;
+  var preview = document.getElementById("preview");
+  function datasetName(key) {
+    if (key === "vocabloom_mvp_v1") return "VocaBloom learning history";
+    var courses = {acc:"Accounting",eco:"Economics",math:"Mathematics",eng:"English",zh:"Chinese"};
+    if (key.startsWith("study-")) return courses[key.slice(6)] + " quiz history";
+    var prefix = key.replace(/-(srs|typ)$/, "");
+    var names = {"acc-flashcards-v1":"Accounting","econ-flashcards-v1":"Economics","math-flashcards-v1":"Mathematics","eng-vocab-v1":"English","zh-vocab-v1":"Chinese"};
+    return names[prefix] + (key.endsWith("-srs") ? " flashcard schedule" : " typing preference");
+  }
+  input.addEventListener("change", async function() {
+    var request = ++selection;
+    restore.disabled = true;
+    backupText = null;
+    preview.replaceChildren();
+    var file = input.files && input.files[0];
+    if (!file) { status.textContent = "No file selected."; return; }
+    try {
+      if (file.size > window.StudyProgressBackup.MAX_BYTES) throw Error("File exceeds 6 MB");
+      status.textContent = "Checking " + file.name + "…";
+      var raw = await file.text();
+      if (request !== selection) return;
+      var result = core.plan(window.localStorage, raw, location.origin);
+      var info = window.StudyProgressBackup.inspectSnapshot(raw, location.origin);
+      [["missing","Missing: "],["identical","Already saved: "],["conflicts","Different local data: "]].forEach(function(group) {
+        result[group[0]].forEach(function(key) {
+          var item = document.createElement("li");
+          item.textContent = group[1] + datasetName(key);
+          preview.appendChild(item);
+        });
+      });
+      if (result.conflicts.length) {
+        status.textContent = "Blocked: " + result.conflicts.length + " existing data sets differ from this backup. No changes have been made.";
+        return;
+      }
+      backupText = raw;
+      status.textContent = result.missing.length + " missing data sets can be restored; " + result.identical.length + " already match. No changes have been made. File: " + file.name + " · Created " + info.createdAt;
+      restore.disabled = result.missing.length === 0;
+    } catch (error) {
+      if (request !== selection) return;
+      status.textContent = "Backup check failed: " + error.message;
+    }
+  });
+  restore.addEventListener("click", function() {
+    if (!backupText || restore.disabled) return;
+    if (!window.confirm("Add only missing progress? Existing data will not be overwritten.")) return;
+    restore.disabled = true;
+    try {
+      var outcome = core.restoreMissing(window.localStorage, backupText, location.origin);
+      preview.replaceChildren();
+      backupText = null;
+      status.textContent = "Restored " + outcome.restored + " missing data sets. " + outcome.alreadyPresent + " were already present. Reload a course to check.";
+    } catch (error) {
+      backupText = null;
+      status.textContent = "Restore stopped: " + error.message;
+    }
+  });
+})();
+</script>
+</body>
+</html>

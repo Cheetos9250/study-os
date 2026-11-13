@@ -19,7 +19,7 @@ This entry covers the course UI work on 2026-11-13, not a complete infrastructur
 - Initial 40-case run passed, but screenshot inspection found the practice tab outside the visible navigation at 320px. Added the layout fix and a visible-tab bounds assertion; final exact-head evidence is tracked in PR #56.
 
 ## Working branch
-`feat/study-os-site-icons-20261113`
+`safety/study-progress-restore-missing-only-20261113`
 
 ## Scope boundaries
 PR #44 remains untouched. No Notion sync dispatch, production data changes or backend deployment is included.
@@ -39,3 +39,14 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Linked icons from the home, all five course pages and backup page. VocaBloom retains its own icon.
 - Icon assets are local; no content, scripts, progress data or sync behavior changed.
 - Existing iOS Home Screen shortcuts may need to be re-added to refresh cached artwork; physical-device appearance remains unverified.
+
+
+## Missing-only progress recovery — PR #53
+- Integrated the existing local-only restore tool with the released backup page, homepage and icons/fonts.
+- Review confirmed full-file conflict refusal, immediate pre-write checks, read-back verification, and rollback limited to this operation's unchanged new keys. Browser localStorage is not transactional across tabs; close other Study OS tabs first.
+- Added readable dataset/file preview and fixed asynchronous file-selection races so an older selection cannot re-enable restore.
+- Extended synthetic checks for cancellation, race handling, repeated restore, quota rollback and concurrent changes. No real user progress is read or restored by QA.
+- Exact-head CI/release evidence is tracked in PR #53. Physical iPad Safari/PWA storage and Files flow remain unverified.
+
+- Also added explicit confirmation before clearing course quiz answers; browser checks verify cancel preserves answers, confirmed reset leaves flashcard schedules intact, and a new answer persists after reload.
+- The first integrated browser run timed out navigating to a course in WebKit. Added explicit URL/load waits and failure diagnostics before repeating the full journey suite.

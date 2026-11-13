@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 test('Study OS pages expose the shared browser and iOS icons',()=>{
-  for(const page of ['index.html','acc.html','eco.html','math.html','eng.html','zh.html','progress-backup.html']){
+  for(const page of ['index.html','acc.html','eco.html','math.html','eng.html','zh.html','progress-backup.html','progress-restore.html']){
     const html=fs.readFileSync(path.join(root,page),'utf8');
     assert.match(html,/<link rel="icon" type="image\/x-icon" href="assets\/favicon.ico">/,page);
     assert.match(html,/<link rel="icon" type="image\/svg\+xml" href="assets\/favicon.svg">/,page);

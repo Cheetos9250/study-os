@@ -331,7 +331,7 @@ function renderQ(){
 }
 function wireQ(){
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
-  const r=$('#resetBtn'); if(r) r.onclick=()=>{ store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
+  const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('ล้างคำตอบแบบฝึกทั้งหมดในวิชานี้? คะแนนและประวัติคำตอบจะถูกล้าง')) return; store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
 
 /* ---------- tabs ---------- */
