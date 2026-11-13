@@ -135,3 +135,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Fix SHA `cc1bcaf9bbdf5c1f584d15b0096d03b652a30f2d` passed [regression 43372068149](https://github.com/Cheetos9250/study-os/actions/runs/43372068149) and [isolated browser 43372068107](https://github.com/Cheetos9250/study-os/actions/runs/43372068107).
 - Extended synthetic failure regression to start with a **populated** cloud merged-day cache and a `synced` status and verify both survive a post-write render failure. Test SHA `3b2ad6d636dafa72816594cc26b6d6841807c35a`; its own CI is pending. No production data accessed.
+
+### English practice meaning fail-closed hardening
+
+- Prior populated cloud-cache rollback test SHA `3b2ad6d636dafa72816594cc26b6d6841807c35a` passed [regression 43373593892](https://github.com/Cheetos9250/study-os/actions/runs/43373593892) and [isolated browser 43373594003](https://github.com/Cheetos9250/study-os/actions/runs/43373594003).
+- Inspected `uPracticeMeaning` and tightened the multiline fallback so English-only text cannot be displayed as a Thai answer. Implementation SHA `af933c54817bb691ad8df8c73a918e7d2a2ade9d`, synthetic examples test SHA `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec`. Fresh CI pending. This does not modify source vocabulary, quiz records or SRS.
