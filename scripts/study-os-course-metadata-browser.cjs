@@ -178,6 +178,15 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await blockedEditor.locator("#metadata-open").click();
     await blockedEditor.locator("#metadata-status").filter({hasText:"เปิดเครื่องมือไม่ได้"}).waitFor();
     assert.equal(await blockedEditor.locator("#editor").isVisible(),false);
+    const withoutScripts=await browser.newContext({javaScriptEnabled:false});
+    try{
+      await withoutScripts.route("**/*",route=>new URL(route.request().url()).origin===base?route.continue():route.abort());
+      const disabledPage=await withoutScripts.newPage();
+      await disabledPage.goto(base+"/course-metadata-draft.html");
+      assert.equal(await disabledPage.locator("noscript p[role=alert]").isVisible(),true);
+      assert.equal(await disabledPage.locator("#metadata-open").isVisible(),false);
+      assert.equal(await disabledPage.locator("#editor").isVisible(),false);
+    }finally{await withoutScripts.close();}
     return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export, denied factory and opt-in editor reload"};
   }finally{await context.close();}
 };
