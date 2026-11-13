@@ -53,6 +53,21 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       });
       assert.equal(rejected,true);
     }finally{await denied.close();}
-    return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export and denied factory"};
+    const draft=await context.newPage();
+    await draft.goto(base+"/course-metadata-draft.html");
+    assert.equal(await draft.locator("#editor").isVisible(),false);
+    await draft.locator("#metadata-open").click();
+    await draft.locator("#editor").waitFor({state:"visible"});
+    assert.equal(await draft.locator("#name-acc").inputValue(),"บัญชีทดสอบ");
+    await draft.locator("#name-acc").fill("บัญชีแก้ไข");
+    await draft.locator("#metadata-form button[type=submit]").click();
+    await draft.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
+    await draft.reload();
+    await draft.locator("#metadata-open").click();
+    await draft.locator("#editor").waitFor({state:"visible"});
+    assert.equal(await draft.locator("#name-acc").inputValue(),"บัญชีแก้ไข");
+    assert.equal(await draft.locator("#metadata-order").inputValue(),"acc,eco,math");
+    assert.equal(await draft.locator("#name-eco").inputValue(),"Economics");
+    return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export, denied factory and opt-in editor reload"};
   }finally{await context.close();}
 };
