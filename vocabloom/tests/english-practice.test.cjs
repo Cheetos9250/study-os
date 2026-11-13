@@ -269,3 +269,19 @@ test('New set varies distractors and option order even for exactly five or ten c
  }
  assert.deepEqual(evaluate(5),evaluate(5),'Same round and source remain deterministic');
 });
+
+
+test('Practice refocus targets new feedback and the next question without scrolling',()=>{
+ const makeNode=()=>({attributes:{},calls:[],setAttribute(k,v){this.attributes[k]=v},focus(opts){this.calls.push(opts)}});
+ const feedback=makeNode(),question=makeNode();
+ const document={querySelector(selector){return selector.includes('.notice')?feedback:selector==='#u-practice-question'?question:null}};
+ const focus=new Function('document',pure+'return uPracticeRefocus;')(document);
+ focus('answer');
+ focus('question');
+ assert.equal(feedback.attributes.tabindex,'-1');
+ assert.equal(question.attributes.tabindex,'-1');
+ assert.deepEqual(feedback.calls,[{preventScroll:true}]);
+ assert.deepEqual(question.calls,[{preventScroll:true}]);
+ const noDocument=new Function('document',pure+'return uPracticeRefocus;')(undefined);
+ assert.doesNotThrow(()=>noDocument('answer'));
+});
