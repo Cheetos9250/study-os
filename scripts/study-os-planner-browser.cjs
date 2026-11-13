@@ -193,6 +193,8 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.equal(await tab.locator("#plan-list input[type=checkbox]").isChecked(),false);
     await tab.reload();
     await tab.locator("#open-planner").click();
+    await tab.locator("#planner-content").waitFor({state:"visible"});
+    await tab.waitForFunction(() => document.querySelector("#plan-discovery")?.textContent?.includes("7 วันข้างหน้า 1"));
     assert.match(await tab.locator("#plan-discovery").textContent(),/งานค้าง 1 · วันนี้ 0 · 7 วันข้างหน้า 1 · เสร็จแล้ว 0/);
   } finally { await navigation.close(); }
   return {engine,planner:"passed; synthetic IndexedDB: persistence, editing, explicit completion, dates, concurrent tabs, stale draft, export/import, idempotency, atomic rollback, denied/corrupt storage, loaded-page offline"};
