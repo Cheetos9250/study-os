@@ -1,3 +1,12 @@
+## Accounting textbook continuation — 79 drafts (2026-11-14, PR #68)
+
+- Source read: owner's original *Fundamental Accounting Principles, 24e* PDF; current study scope Chapters 1–9. **79 of 403 indexed question IDs** have drafted worked solutions; **324 indexed IDs remain without a draft**, and the index is not a complete audit of the printed book.
+- Added **14 source-reviewed answers this turn**: QS 2-1 through 2-4; E 2-1 through 2-4; E 2-7, 2-8, 2-9; P 2-1A, P 2-7A, P 2-1B. Completed the missing part (c) of E 2-6. Source pages checked: PDF 94, 96, 97, 100, 103 and the chart of accounts on PDF 1134–1135. The 36 previously source-reviewed drafts remain; **50 are marked PDF-reviewed, 29 older drafts still carry mixed/incomplete review status**.
+- Fixed *eight incorrect question-image/title pairings* in Chapter 2: QS 2-1..4 and E 2-1..4; kept every original ID stable to avoid losing saved progress. All other suspect auto-indexed question titles and PDF crops remain to be audited. Known missing printed questions include QS 1-10, E 1-10 and E 1-17; Chapter 2 QS 2-10..15 are still misnumbered in the automated index.
+- The reader now distinguishes **PDF-checked** answers from **unverified draft** answers instead of labeling all entries source-reviewed. This does not change stored student answers, progress, the private PDF, answer checking, Cloudflare, Notion or sync.
+- In-session validation: 79 unique indexed answer IDs; nonempty explanations and accurate source page links; 50 source-reviewed markers; eight inspected crop/label pairs; **13 independently recomputed accounting figures all passed**. This is not the same as Node/CI or physical-iPad testing. Exact-head CI and the real iPad reader remain unverified.
+- PR #68 remains **unmerged and unreleased**. Older 65-answer status further below is a historical snapshot superseded by this note.
+
 ## Textbook worked solutions — 65 drafts, unreleased (2026-11-13)
 
 - Branch `feat/accounting-textbook-worked-solutions-20261113`, PR #68. **65/403 indexed question IDs** have drafted solutions; **338/403 remain without a draft**. The catalog itself is not a fully audited record of all printed questions.
