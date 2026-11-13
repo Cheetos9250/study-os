@@ -110,7 +110,10 @@ def run_case(browser, engine, tablet):
     page.locator('[data-action="u-q-next"]').click()
     assert page.evaluate("document.activeElement?.id === 'u-practice-question'"), "Next should focus the new question"
     second = page.evaluate("uPracticeQuestions(uDeck('eng'))[1]")
-    page.locator(f'[data-action="u-practice-answer"][data-answer="{second["right"]}"]').click()
+    # The hardware-keyboard 1–4 shortcut must invoke the same session-only answer path.
+    page.keyboard.press(str(second["right"] + 1))
+    assert page.evaluate("(id) => USTATE.practiceAnswers[id]", second["id"]) == second["right"]
+    assert page.evaluate("document.activeElement?.classList.contains('notice')"), "Keyboard answer did not focus feedback"
     page.get_by_role("button", name="Retry mistakes (1)").click()
     retry = page.evaluate("uPracticeQuestions(uDeck('eng'))")
     assert retry == [first], "Retry must preserve exact mistaken prompt/options only"
