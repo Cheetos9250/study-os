@@ -78,6 +78,7 @@ def run_case(browser, engine, tablet):
     snapshot = page.evaluate("JSON.stringify({...localStorage})")
     first = page.evaluate("uPracticeQuestions(uDeck('eng'))[0]")
     page.locator(f'[data-action="u-practice-answer"][data-answer="{(first["right"] + 1) % 4}"]').click()
+    assert page.evaluate("document.activeElement?.classList.contains('notice')"), "Answer feedback lost keyboard focus"
     assert page.get_by_role("button", name="Retry mistakes (1)").is_enabled()
     assert page.get_by_text("Source example", exact=True).is_visible()
     content["refresh"] = True
@@ -87,6 +88,7 @@ def run_case(browser, engine, tablet):
     page.evaluate("async()=>{await uBoot()}")
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Refresh changed learner storage after original content was restored"
     page.locator('[data-action="u-q-next"]').click()
+    assert page.evaluate("document.activeElement?.id === 'u-practice-question'"), "Next should focus the new question"
     second = page.evaluate("uPracticeQuestions(uDeck('eng'))[1]")
     page.locator(f'[data-action="u-practice-answer"][data-answer="{second["right"]}"]').click()
     page.get_by_role("button", name="Retry mistakes (1)").click()
