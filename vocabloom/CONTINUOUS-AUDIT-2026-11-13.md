@@ -162,3 +162,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - [Regression 43374162891](https://github.com/Cheetos9250/study-os/actions/runs/43374162891) for test SHA `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec` **failed** the existing HTML escaping fixture: its malicious sample used English-only `Back` and was now correctly excluded from the Thai-meaning pool.
 - Updated the test fixture to contain Thai meaning text plus malicious HTML so it still tests output escaping without contradicting the new eligibility rule, SHA `ae12e71181274941cf264bee1353728058fab48c`. Fresh CI **pending**; failure is recorded, not hidden. No production changes.
+
+### English practice Verified-source provenance
+
+- Prior Thai meaning guard fix passed regression 43374289061 and browser 43374289044.
+- New rotated question source-provenance regression SHA `410c109dff6e6db7efee9e80d72b02062bbdd18e` checks Thai options against committed Verified rows and answer/headword mapping. CI queued: regression 43377262906, browser 43377262767. No source content or production writes. This does not establish semantic quality of distractors.
