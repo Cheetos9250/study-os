@@ -150,3 +150,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Previous English meaning guard fixture fix SHA `ae12e71181274941cf264bee1353728058fab48c` passed [regression 43374289061](https://github.com/Cheetos9250/study-os/actions/runs/43374289061) and [isolated browser 43374289044](https://github.com/Cheetos9250/study-os/actions/runs/43374289044).
 - Added a source-grounding regression over rotated English practice sets: every displayed Thai option must match a committed Verified English vocabulary meaning and the correct answer must match its source headword. Test SHA `410c109dff6e6db7efee9e80d72b02062bbdd18e`; [regression 43377262906](https://github.com/Cheetos9250/study-os/actions/runs/43377262906) and [browser 43377262767](https://github.com/Cheetos9250/study-os/actions/runs/43377262767) queued at documentation time. This structural provenance test is not a human linguistic review.
+
+### Source provenance test CI failure corrected
+
+- [Regression 43377262906](https://github.com/Cheetos9250/study-os/actions/runs/43377262906) **failed** in the new test because the Thai Unicode regex was double-escaped; a valid Thai option `ความคืบหน้าครั้งสำคัญ` was incorrectly rejected. This was a test assertion bug, not evidence of incorrect vocabulary.
+- Corrected the regex at SHA `9aa646bf7afc40777e5ef30928afa94b724368d1`. Fresh CI requires verification. No production or content changes.
