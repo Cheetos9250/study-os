@@ -87,3 +87,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - The earlier browser quota-write rollback test at SHA `e79267315c0f3d28286f8d1c8d7ae651b0d2383f` **passed** in [isolated browser run 43368381323](https://github.com/Cheetos9250/study-os/actions/runs/43368381323); [regression run 43368381319](https://github.com/Cheetos9250/study-os/actions/runs/43368381319) also **passed**. These verify disposable browser localStorage rollback, not live user data.
 - Added a stricter assertion at SHA `c7d287357360fbdc10c7ea33f3e7a10ded3f9413` to compare the in-memory `data`, `CLOCAL.days` and `CLOCAL.studyDays` snapshots before/after a one-shot synthetic quota failure. This follow-up needs its **own** CI confirmation and must not inherit the earlier success claim.
+
+### Daily-counter backup validation hardening
+
+- Verified the previous in-memory quota rollback browser extension: [browser 43368920021](https://github.com/Cheetos9250/study-os/actions/runs/43368920021) and [regression 43368920096](https://github.com/Cheetos9250/study-os/actions/runs/43368920096) both completed **success**.
+- Found a separate restore-validation gap: same-device `deviceDays` and `studyDays` accepted arrays and scalars because `typeof [] === 'object'`. Updated `unified-progress.js` to reject malformed same-device daily maps before confirmation/writes, while ignoring cross-device daily maps as before. Added executable regression cases for both behaviors at SHA `ef260b87a69167a802fd61020ef84099db29a635`.
+- New regression/browser workflows [43369307639](https://github.com/Cheetos9250/study-os/actions/runs/43369307639) and [43369307661](https://github.com/Cheetos9250/study-os/actions/runs/43369307661) were **in progress** when documented. No production data was touched.
