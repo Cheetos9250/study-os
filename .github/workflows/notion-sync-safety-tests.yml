@@ -1,0 +1,31 @@
+name: Notion sync change-control checks (no deploy)
+
+on:
+  push:
+    paths:
+      - ".github/workflows/sync.yml"
+      - ".github/workflows/notion-sync-safety-tests.yml"
+      - "tests/notion-sync-safety.test.cjs"
+  pull_request:
+    paths:
+      - ".github/workflows/sync.yml"
+      - ".github/workflows/notion-sync-safety-tests.yml"
+      - "tests/notion-sync-safety.test.cjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check draft-PR-only sync workflow contract
+        run: node --test tests/notion-sync-safety.test.cjs
+      - name: Run existing exporter regression tests against fixtures
+        run: python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'
