@@ -21,7 +21,7 @@ test('every individually indexed exercise has a render location',()=>{
 });
 
 test('web reader renders the user-imported source PDF inside the question panel',()=>{
- for(const needle of ['pdfjsLib.getDocument','page.render({canvasContext:ctx,viewport})','ctx.drawImage(image','viewer-inner','questionList','questionStatus','answer','questionCode','extraPage','surrounding'])assert.ok(html.includes(needle),'Missing: '+needle);
+ for(const needle of ['pdfjsLib.getDocument','pdfjsLib.GlobalWorkerOptions.workerSrc','page.render({canvasContext:ctx,viewport})','ctx.drawImage(image','viewer-inner','questionList','questionStatus','answer','questionCode','extraPage','surrounding'])assert.ok(html.includes(needle),'Missing: '+needle);
  assert.match(html,/indexedDB\.open\(IDB,1\)/);
  assert.match(html,/bookPut\(blob\)/);
  assert.match(html,/bookGet\(\)/);
