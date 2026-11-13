@@ -57,3 +57,9 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - Discovery count browser regression CI 43369517015 **success**.
 - Explicit overdue/upcoming date-navigation buttons are implemented on draft PR #44; verify exact-head Chromium/WebKit CI for `5f0f9b0` and extend tests to non-empty overdue/upcoming groups before claiming full coverage.
 - Preserve the local-only planner, stable academic IDs, conflict-safe revisions and backup semantics. No release, merge or live sync without approval.
+
+## Non-empty navigation QA checkpoint — 2026-11-13
+
+- CI 43369814606 passed static and browser QA for the empty-group navigation implementation.
+- Commit `3271476` adds independent Chromium/WebKit synthetic profile coverage for non-empty overdue/upcoming groups, dates, incomplete status and reload persistence. Check [CI 43370021313](https://github.com/Cheetos9250/study-os/actions/runs/43370021313), fix any failures, and update this document with actual result.
+- After green CI: consider explicit overdue/upcoming list views and more accessible status messages; do not modify production or conflate synthetic WebKit with physical iPad Safari.
