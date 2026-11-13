@@ -76,3 +76,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - CI 43371040880 **success** for both static-contract and browser-qa at `37dcad4` (synthetic Chromium/WebKit). The post-reload test race is resolved.
 - Next priorities: improve planner date-navigation accessibility and test chronological selection across multiple overdue/upcoming dates; evaluate course-management requirements without migrating or modifying existing data. Physical iPad Safari remains unverified. Keep PR #44 draft and do not deploy or merge without approval.
+
+## Multi-date planner QA — 2026-11-13
+
+- Commits `d66fbd9`, `2b9f5a0`, `64c0c33` expand synthetic browser navigation to 2 overdue + 2 upcoming dates and add accessible group/relationship markup with static regression checks. Check [CI 43371435910](https://github.com/Cheetos9250/study-os/actions/runs/43371435910) before marking this checkpoint verified.
+- Next: inspect course-management data boundaries and user-facing course navigation; do not create/migrate production course records or enable cloud sync without explicit approval.
