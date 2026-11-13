@@ -179,3 +179,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - **Verified code head `d8e3d54`:** backup validation and explicit import consent, unsaved-form block, repeat-file import, WebKit clear-button blur/click repair and `beforeunload` draft warning passed static-contract and synthetic Chromium/WebKit browser jobs. CI: [43389207595](https://github.com/Cheetos9250/study-os/actions/runs/43389207595) and [43389199821](https://github.com/Cheetos9250/study-os/actions/runs/43389199821).
 - Next verify the documentation-only exact-head CI and independently inspect source diff for unchanged production paths. In a non-production preview on **physical iPad Safari**, test import confirmation and cancel, repeated Files selection, dirty-form warning on navigation, blur/tap clear action, VoiceOver labels and download/restore using synthetic test data.
 - Do not infer a physical Safari success or production readiness from WebKit automation. Keep PR #44 Draft and unmerged; do not deploy, alter Notion/Worker/KV/scheduler, migrate legacy data or enable cross-device progress sync without separate explicit owner authorization.
+
+## Basic editor usability handoff — 2026-11-13
+
+- Draft homepage now links to `course-metadata-draft.html`; saved metadata is shown as linked course preview in that editor. Browser regression `5192b45` checks preview and homepage link. Verify exact-head CI before claiming success. Production remains untouched.
+- Next: confirm static and browser CI, test preview after custom order/reload, and consider explicit opt-in read-only application of custom labels to homepage cards without altering subject IDs or legacy progress. Physical iPad Safari/VoiceOver remains unverified. No merge/deploy without explicit approval.
