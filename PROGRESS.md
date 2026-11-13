@@ -223,3 +223,13 @@ Next action: editable academic course metadata while preserving stable subject I
 - Both browser and CommonJS metadata-store entrypoints refuse to increment a valid saturated revision beyond Number.MAX_SAFE_INTEGER. Existing bytes are retained/readable. Store commits c38a0fe and c74f8be; synthetic browser regression f0aa499, [CI 43383022547](https://github.com/Cheetos9250/study-os/actions/runs/43383022547) **success**.
 - Independent PR changed-file inspection found 47 changed paths, none in legacy subject HTML, data/config, VocaBloom, Notion synchronization, or CAS experiment paths. This is a **source diff observation**, not a live environment audit.
 - Prepared manual release gate at docs/study-os-course-metadata-ipad-qa-2026-11-13.md. No physical iPad Safari tests, real storage eviction, live data operations or production release were performed. PR #44 remains draft.
+
+
+## Read-only academic planner group list — 2026-11-13
+
+- Added collapsed, read-only overdue/next-seven-day lists in draft `index.html` and `lib/study-os-planner-ui.js`; items are sorted by `discoverPlans`, rendered as textContent, and select the view date without modifying session completion or storage. Feature commits 6b5227b and c235379.
+- Chronological browsing, safe text, focus and no-implicit-completion static + synthetic Chromium/WebKit browser QA passed [CI 43383830130](https://github.com/Cheetos9250/study-os/actions/runs/43383830130) at code commit 79885d0.
+- Expanded 390px mobile viewport checks passed [CI 43384050769](https://github.com/Cheetos9250/study-os/actions/runs/43384050769) at e7369f4.
+- Completion/edit/reload list regressions (3beba0e/38a854d) passed [CI 43384365182](https://github.com/Cheetos9250/study-os/actions/runs/43384365182).
+- Subsequent accessibility link relationship and cross-tab refresh QA changes 6741afd/c0154f0/0654f37 require independent exact-head CI confirmation; older successes do not prove those newer commits.
+- These are isolated browser tests, not physical iPad Safari. The course-metadata editor stays unlinked. PR #44 is draft; no merge, deployment, production KV/Notion/Worker/CAS writes or migration were made.
