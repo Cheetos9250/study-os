@@ -63,3 +63,11 @@
 - Latest app/test head `5080f8b3f` adds a guard against exporting planner backups while new/edited form data is unsaved, plus an explicit clear-form action. CI 43385562926 and 43385558513 both completed success (static and isolated Chromium/WebKit browser QA).
 - Earlier date discovery list, keyboard focus, explicit completion, edits, cross-tab refresh and responsive tests passed by CI 43384672610. No implicit completion/storage writes were added by read-only navigation.
 - For subsequent tasks, inspect exact current PR #44 head and PROGRESS.md/NEXT_STEPS.md before editing. Keep PR draft, avoid production merge/deploy and all existing production/Notion/Worker/KV writes. Physical iPad Safari remains untested.
+
+
+## Planner JSON import and WebKit browser handoff — 2026-11-13
+
+- Draft PR #44 adds local backup schema prevalidation plus an explicit consent dialog, cancel/no-write path, unsaved-add/edit import block and safe same-file re-import. The underlying transaction still adds missing IDs, skips identical, and atomically rejects changed IDs without overwriting.
+- A real WebKit synthesis issue in the browser harness was located: rewriting `#plan-cancel` text during blur/change between pointerdown and mouseup suppressed the click. App fix `18ffac5` only updates that label when changed; browser regression passed CI 43388836576 and 43388844050.
+- `beforeunload` now requests a warning only for uncommitted form input; synthetic Chromium/WebKit tests at `d8e3d54` passed CI 43389207595 and 43389199821. Do not claim this proves native iPad Safari behavior.
+- Current priority: review PR #44, check exact-head CI, then physical iPad Safari/VoiceOver and disposable-profile JSON restore. Never merge/deploy/modify live Notion, Worker, KV, scheduler or CAS without explicit approval.

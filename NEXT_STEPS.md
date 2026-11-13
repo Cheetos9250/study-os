@@ -172,3 +172,10 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - **Verified:** CI 43385562926 and 43385558513 completed success for unsaved new/editing plan export warnings and reset of the explicit draft form; static and Chromium/WebKit browser checks passed at `5080f8b3f`.
 - **Next priority:** independent source review of draft PR #44 for stale cross-tab UX, keyboard/VoiceOver semantics, data safety and CSS layout; then physical iPad Safari and backup restore in an isolated preview. Do not call simulated WebKit evidence physical hardware QA.
 - **Safety:** no deployment, merge, Notion/KV/Worker write, change to existing subject pages, content sync or progress CAS cutover without explicit owner authorization.
+
+
+## Planner import and WebKit action safety — 2026-11-13
+
+- **Verified code head `d8e3d54`:** backup validation and explicit import consent, unsaved-form block, repeat-file import, WebKit clear-button blur/click repair and `beforeunload` draft warning passed static-contract and synthetic Chromium/WebKit browser jobs. CI: [43389207595](https://github.com/Cheetos9250/study-os/actions/runs/43389207595) and [43389199821](https://github.com/Cheetos9250/study-os/actions/runs/43389199821).
+- Next verify the documentation-only exact-head CI and independently inspect source diff for unchanged production paths. In a non-production preview on **physical iPad Safari**, test import confirmation and cancel, repeated Files selection, dirty-form warning on navigation, blur/tap clear action, VoiceOver labels and download/restore using synthetic test data.
+- Do not infer a physical Safari success or production readiness from WebKit automation. Keep PR #44 Draft and unmerged; do not deploy, alter Notion/Worker/KV/scheduler, migrate legacy data or enable cross-device progress sync without separate explicit owner authorization.

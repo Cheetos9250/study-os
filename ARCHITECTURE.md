@@ -57,3 +57,10 @@ Automated Chromium/WebKit synthetic QA validates empty/nonempty groups, multiple
 ## Planner form draft/export safeguards (unreleased)
 
 The academic planner UI tracks unsaved form input/change events only in memory, not by adding a storage key. Export continues to serialize **persisted** records from the existing isolated planner IndexedDB store. If the current add/edit form has uncommitted changes, Export displays a Thai warning rather than silently omitting the draft from the downloaded JSON. The learner can explicitly save or clear the draft. Existing versioned backup/import, stable subject identities, transaction revisions and local-only scope are unchanged. Synthetic browser tests verify the warning for both new plans and edits; no production/cloud sync or physical iPad validation is implied.
+
+
+## Planner import consent and unsaved-draft browser behavior (draft-only)
+
+`lib/study-os-planner-ui.js` handles JSON file selection entirely in the browser: it clears the file input for repeat selection, checks the 1 MiB limit, parses JSON, prevalidates the versioned schema through `StudyOSPlanner.validateBackup`, blocks when a local study form draft is unsaved, and requests explicit user consent before calling `client.importBackup`. Cancellation and failed prevalidation cause no writes. The existing `study-os-planner-v1` IndexedDB import transaction remains atomic for add/skip/conflict. Neither the schema nor production API settings change.
+
+An input blur may emit a form `change` event after mouse/pointer press but before click. The planner's `markDraft` handler therefore updates the cancel button label only if its value actually changed, avoiding a reproduced WebKit click suppression. A `beforeunload` guard requests confirmation only for uncommitted local form edits. Native iPad Safari behavior and storage eviction/recovery still require physical-device testing.
