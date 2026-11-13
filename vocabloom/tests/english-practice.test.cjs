@@ -184,3 +184,31 @@ test('Invisible Unicode separators cannot create duplicate Thai distractors',()=
  assert.equal(questions.length,4);
  assert.ok(!questions.some(q=>q.q==='beta'||q.q.includes('al\u200Bpha')));
 });
+
+
+test('Practice avoids ambiguous Thai distractors sharing an explicit slash or semicolon sense',()=>{
+ const cards=[
+  {cat:'e1',f:'hinge on',b:'v | ขึ้นอยู่กับ',mid:'sense-1'},
+  {cat:'e1',f:'contingent on',b:'adj | ขึ้นอยู่กับ; มีเงื่อนไขว่า',mid:'sense-2'},
+  {cat:'e1',f:'alpha',b:'n | ความรู้',mid:'sense-3'},
+  {cat:'e1',f:'beta',b:'n | ความเข้าใจ',mid:'sense-4'},
+  {cat:'e1',f:'gamma',b:'n | ความพยายาม',mid:'sense-5'},
+  {cat:'e1',f:'delta',b:'n | ความสำเร็จ',mid:'sense-6'},
+  {cat:'e1',f:'epsilon',b:'n | การเรียนรู้',mid:'sense-7'}
+ ];
+ const evaluate=new Function('cards',"const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null};const uCards=()=>cards;"+pure+"return {questions:uPracticeQuestions({key:'eng'}),senses:uPracticeSenses};");
+ const result=evaluate(cards);
+ assert.equal(result.questions.length,7);
+ for(const q of result.questions){
+  assert.equal(q.opts.length,4);
+  const all=q.opts.map(result.senses);
+  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){
+   assert.ok(!all[i].some(s=>all[j].includes(s)),'Overlapping Thai sense for '+q.q);
+  }
+ }
+ const hinge=result.questions.find(q=>q.q==='hinge on');
+ const contingent=result.questions.find(q=>q.q==='contingent on');
+ assert.ok(hinge&&contingent);
+ assert.ok(!hinge.opts.includes('ขึ้นอยู่กับ; มีเงื่อนไขว่า'));
+ assert.ok(!contingent.opts.includes('ขึ้นอยู่กับ'));
+});
