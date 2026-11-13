@@ -79,3 +79,10 @@
 - Added `vocabloom/tests/english-practice.test.cjs` for 10-question generation, deterministic answer options, both vocabulary meaning formats, and absence of persistence in practice action.
 - GitHub Actions CI for code SHA `836c17e695f7f401ac23005968b71de30bcc9133`: https://github.com/Cheetos9250/study-os/actions/runs/43352649466 — **success**. Earlier failing runs were caused by incorrect escaping in new tests/code and were fixed before this passing run.
 - This remains an **unmerged feature-branch proposal**, not a tested live iPad/Safari or deployed Production feature. Release gates from Handoff v1.2 remain open.
+
+## P2 chapter-filter and practice continuity QA
+
+- Fixed an English Practice integration defect: selecting a chapter now constrains both questions and distractor meanings to that chapter, rather than drawing from the entire English deck.
+- Changing chapter clears the in-memory practice answers, resets the practice offset, and returns to question one. No persistent progress keys, Notion records, or Cloudflare/KV data were modified.
+- Extended `english-practice.test.cjs` with chapter filtering, missing-chapter empty state, and session-reset checks. GitHub Actions CI passed at SHA `d5bb29a9f22f0afa80497d4d52e54a4c796bbd70`, run https://github.com/Cheetos9250/study-os/actions/runs/43352826565 .
+- Browser/iPad Safari, live Cloudflare, backup/restore and cross-device concurrency remain unverified. No merge/deployment authorized.
