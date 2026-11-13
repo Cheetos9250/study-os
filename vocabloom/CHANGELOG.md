@@ -18,3 +18,5 @@ All entries below describe an unmerged proposal, not a production release.
 - Keep partial `securities filing` example excluded; do not rewrite source text.
 - Show supplied source examples, translations and references after practice answers; freeze and HTML-escape context.
 - Add eligibility/security regression tests and browser scenarios for active content refresh, Full Backup download and cancelled/accepted disposable Full Restore.
+- Removed redundant nested distractor deduplication and added a 1,000-card correctness regression; local Node suite now 233 passing tests.
+- Verified optimized generation with 233 Node tests, 3 Python tests and all four extended hosted browser cases; narrowed browser push path triggers to relevant app/test/data files.

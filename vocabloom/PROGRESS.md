@@ -52,3 +52,14 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Implementation `bd4135fa15dc336910e4f4f77e250288d466b2ef`: regression run https://github.com/Cheetos9250/study-os/actions/runs/43363405764 and browser run https://github.com/Cheetos9250/study-os/actions/runs/43363405759 both completed **success**.
 - Browser job `131681983704` logs show **4 passed** cases (Chromium/WebKit, desktop/tablet), each importing 581 words and reporting zero live service requests. The extended content-refresh and disposable download/cancelled-restore/accepted-restore assertions executed as part of each case.
 - Data/config, five legacy course pages, shared decks, Notion exporter and unified-progress code were unchanged in this round. Hosted browser emulation remains distinct from physical iPad/Safari and actual cross-device KV tests.
+
+### Practice generation performance follow-up
+
+- Removed a redundant nested duplicate scan from distractor generation; the candidate pool already has unique normalized meanings.
+- Local regression now **233 Node tests passed**, including 1,000-card option correctness. One local real-export measurement improved from 843 ms to 3 ms for ten generated questions; physical-device performance is unmeasured.
+- Audited 650 rotated question instances with zero exact shared Thai-meaning atoms between the correct option and distractors. This is structural QA, not a complete semantic review.
+
+### Verified performance follow-up CI
+
+- Final application/test SHA `20f27cc8656296d55840bec2fff5208571b4145c`: regression https://github.com/Cheetos9250/study-os/actions/runs/43364282209 and browser https://github.com/Cheetos9250/study-os/actions/runs/43364281981 completed **success**. All four extended browser cases passed with 581 imported words and zero live service requests.
+- Browser workflow path filters now track app HTML/JS/JSON, tests, data exports and the workflow itself, so documentation-only push commits do not reinstall browsers. The job's permissions and isolated execution are unchanged.

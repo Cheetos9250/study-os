@@ -3,13 +3,19 @@ name: VocaBloom isolated browser QA (no deployment)
 on:
   push:
     paths:
-      - 'vocabloom/**'
+      - 'vocabloom/*.html'
+      - 'vocabloom/*.js'
+      - 'vocabloom/*.json'
+      - 'vocabloom/tests/**'
       - 'data/cards.json'
       - 'data/quiz.json'
       - '.github/workflows/vocabloom-browser-tests.yml'
   pull_request:
     paths:
-      - 'vocabloom/**'
+      - 'vocabloom/*.html'
+      - 'vocabloom/*.js'
+      - 'vocabloom/*.json'
+      - 'vocabloom/tests/**'
       - 'data/cards.json'
       - 'data/quiz.json'
       - '.github/workflows/vocabloom-browser-tests.yml'

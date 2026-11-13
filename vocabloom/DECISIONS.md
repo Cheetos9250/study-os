@@ -25,3 +25,7 @@ Evaluate whole English tokens rather than arbitrary substring inclusion. Permit 
 Use whole token sequences and source POS to permit regular plural/conjugated forms. Inflect the first token of recognized phrasal verbs and the last token of other phrases; do not accept missing/reordered particles or arbitrary derivations. Doubled-consonant handling is explicit for audited `admit`/`flop`, rather than guessing word stress. This retains all 573 previous IDs and adds eight reviewed entries; it is not a full morphology engine.
 
 Show only source-supplied examples/translations after a practice answer, frozen with its questions/options and HTML-escaped. Do not invent text, reveal the answer through context before answering, or turn session-only Practice into persisted SRS scoring.
+
+## Round 2 — deterministic distractor performance
+
+Rely on the existing normalized unique-meaning pool when choosing distractors; exclude the current card and rotate candidates instead of re-scanning for duplicates inside every option. Preserve active snapshots and question/card IDs. Option ordering for newly generated sessions may change; it is not persistent learning progress. The 650-question Thai-atom audit is a screening check, not authority to mark all language content semantically Verified.

@@ -84,3 +84,18 @@ Added parsing for legacy Thai-labeled examples, pipe-separated examples/translat
 At `bd4135fa15dc336910e4f4f77e250288d466b2ef`, [regression 43363405764](https://github.com/Cheetos9250/study-os/actions/runs/43363405764) and [browser 43363405759](https://github.com/Cheetos9250/study-os/actions/runs/43363405759) returned **success**. Browser job `131681983704` logs were inspected: Chromium desktop/tablet and WebKit desktop/tablet each passed, imported **581** words, and reported **0 live service requests**. Each case completed the expanded refresh, backup-download and cancelled/accepted synthetic restore assertions before printing passed.
 
 Final diff checks confirmed no changes in `data/`, `scripts/sync_notion.py`, `unified-progress.js`, `study-decks.json` or any of the five legacy subject pages. No merge, production deployment, live import/restore, Notion/KV/Worker mutation, secret change or Auto Sync activation occurred. Documentation follows this tested implementation without changing its application or test code.
+
+### Practice generation follow-up
+
+The subsequent distractor audit exposed a nested duplicate search in every candidate option, even though the pool already guarantees normalized unique meanings. Replaced it with exclusion of the current card and deterministic rotation of the existing unique pool. Question IDs, answer correctness, four-option uniqueness and frozen-session behavior remain preserved; newly created sets may have a different valid option order.
+
+- Local regression: **233 Node tests passed**, including a new 1,000-card correctness case.
+- One same-environment, ten-question real-export generation measurement: **843 ms before, 3 ms after**. This is a single illustrative local measurement, not an iPad benchmark or performance guarantee.
+- Checked **650 generated question instances** across rotated sessions after the change: no correct/distractor pair shared an exact semicolon/comma-separated Thai meaning atom. Nine shared-meaning groups exist in the source. This limited structural audit does **not** certify semantic uniqueness of every possible translation or chapter.
+- No persistent Practice answers, SRS, data export, sync or source IDs changed. Hosted regression/browser results for this performance commit are recorded after verification below.
+
+### Final application CI
+
+At `20f27cc8656296d55840bec2fff5208571b4145c`, [233-test Node / Python regression 43364282209](https://github.com/Cheetos9250/study-os/actions/runs/43364282209) and [extended browser run 43364281981](https://github.com/Cheetos9250/study-os/actions/runs/43364281981) completed **success**. Browser logs confirmed the four Chromium/WebKit desktop/tablet cases, each importing 581 words with no live service requests. This verifies the optimized distractor generator together with context, refresh and synthetic backup/restore flows.
+
+Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported data and the workflow itself. Documentation-only push commits can skip browser installation without bypassing relevant application changes. Job execution and read-only permissions are unchanged. The subsequent handoff/workflow-filter commit does not alter the tested application/test code. Physical iPad and live sync gates remain open.
