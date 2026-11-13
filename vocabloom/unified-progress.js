@@ -351,8 +351,12 @@ async function cFullRestore(file){
   }
   writes[STORAGE_KEY]=JSON.stringify(v);
   const otherDevice=!!payload.deviceId&&payload.deviceId!==CLOCAL.device;
-  const importedDays=!otherDevice&&payload.deviceDays&&typeof payload.deviceDays==='object'?payload.deviceDays:{};
-  const importedStudyDays=!otherDevice&&payload.studyDays&&typeof payload.studyDays==='object'?payload.studyDays:{};
+  // Daily counter maps must be plain records; arrays would corrupt later merge logic.
+  if(!otherDevice&&((payload.deviceDays!==undefined&&!record(payload.deviceDays))||
+      (payload.studyDays!==undefined&&!record(payload.studyDays))))
+    throw Error('โครงสร้างข้อมูลรายวันไม่ถูกต้อง');
+  const importedDays=!otherDevice&&record(payload.deviceDays)?payload.deviceDays:{};
+  const importedStudyDays=!otherDevice&&record(payload.studyDays)?payload.studyDays:{};
   writes[CLOUD_LOCAL_DAYS]=JSON.stringify(importedDays);
   writes[CLOUD_STUDY_DAYS]=JSON.stringify(importedStudyDays);
   // Reading the backup file is asynchronous; a cloud sync may have started meanwhile.
