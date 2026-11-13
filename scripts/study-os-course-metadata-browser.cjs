@@ -102,6 +102,11 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
         }finally{connection.close();store.close();}
       });
       assert.equal(corruptionProtected,true);
+      await corruptPage.goto(base+"/course-metadata-draft.html");
+      await corruptPage.locator("#metadata-open").click();
+      await corruptPage.locator("#metadata-status").filter({hasText:"ระบบจะไม่เขียนทับหรือลบข้อมูลเดิม"}).waitFor();
+      assert.equal(await corruptPage.locator("#editor").isVisible(),false);
+      assert.equal(await corruptPage.locator("#metadata-open").isVisible(),true);
     }finally{await corruptContext.close();}
     const draft=await context.newPage();
     await draft.goto(base+"/course-metadata-draft.html");
