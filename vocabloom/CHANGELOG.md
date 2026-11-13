@@ -44,3 +44,7 @@ All entries below describe an unmerged proposal, not a production release.
 - Added disposable mock tests for invalid and valid daily-row payloads; CI verification remains pending in `PROGRESS.md`.
 
 - Extended hosted browser QA with direct rejection cases for malformed nested daily counters (negative, nonnumeric and invalid IDs), without writing to live services.
+
+## 2026-11-13 — Legacy backup compatibility regression coverage
+
+- Added synthetic Full Restore tests for missing optional day maps, historical sparse daily rows and isolation from malformed cross-device daily counters. No production behavior changed.
