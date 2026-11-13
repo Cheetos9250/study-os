@@ -65,6 +65,7 @@ async function main() {
             await context.close();
           }
         }
+        evidence.push(await require("./study-os-planner-browser.cjs")(browser,base,engine,output));
         // Fresh synthetic profile per subject; no user/browser data is used.
         for (const subject of ["acc","eco","math","eng","zh"]) {
           const context = await browser.newContext({viewport:{width:820,height:1180},hasTouch:true});

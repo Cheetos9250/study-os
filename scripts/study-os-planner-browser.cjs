@@ -1,0 +1,133 @@
+"use strict";
+const assert = require("node:assert/strict");
+const fs = require("node:fs/promises");
+const path = require("node:path");
+module.exports = async function checkPlanner(browser,base,engine,output) {
+  const context = await browser.newContext({viewport:{width:390,height:844},hasTouch:true,acceptDownloads:true});
+  await context.route("**/*",route => new URL(route.request().url()).origin === base ? route.continue() : route.abort());
+  const page = await context.newPage();
+  const errors = [];
+  page.on("pageerror",error => errors.push(error.message));
+  await page.addInitScript(() => {
+    window.__dbOpens = 0;
+    const original = IDBFactory.prototype.open;
+    IDBFactory.prototype.open = function(...args) { window.__dbOpens++; return original.apply(this,args); };
+  });
+  try {
+    await page.goto(base);
+    assert.equal(await page.evaluate(() => window.__dbOpens),0,"no automatic database creation");
+    await page.evaluate(() => localStorage.setItem("study-sync-key","SYNTHETIC-DO-NOT-EXPORT"));
+    await page.locator("#open-planner").click();
+    await page.locator("#planner-content").waitFor({state:"visible"});
+    const today = await page.locator("#plan-date").inputValue();
+    await page.locator("#plan-title").fill("   ");
+    await page.locator("#plan-save").click();
+    await page.locator("#plan-status").filter({hasText:"บันทึกหรืออ่านแผนไม่ได้"}).waitFor();
+    assert.equal(await page.locator("#plan-title").inputValue(),"   ");
+    assert.match(await page.locator("#plan-summary").innerText(),/0 รายการ/);
+    await page.locator("#plan-title").fill("ทบทวน Adjusting Entries");
+    await page.locator("#plan-save").click();
+    await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    assert.match(await page.locator("#plan-summary").innerText(),/1 รายการ · วางแผน 30 นาที · เสร็จแล้ว 0/);
+    await page.reload(); await page.locator("#open-planner").click();
+    await page.locator("#planner-content").waitFor({state:"visible"});
+    assert.match(await page.locator("#plan-list").innerText(),/Adjusting Entries/);
+    await page.locator("#plan-list input[type=checkbox]").check();
+    await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    assert.match(await page.locator("#plan-summary").innerText(),/เสร็จแล้ว 1 รายการ/);
+    await page.locator("#plan-list button").click();
+    await page.locator("#plan-title").fill("ทบทวน Demand and Supply");
+    await page.locator("#plan-subject").selectOption("eco");
+    await page.locator("#plan-minutes").fill("45");
+    const tomorrow = await page.evaluate(date => new Date(Date.parse(date+"T00:00:00Z")+86400000).toISOString().slice(0,10),today);
+    await page.locator("#plan-date").fill(tomorrow);
+    await page.locator("#plan-save").click();
+    await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    assert.equal(await page.locator("#plan-view-date").inputValue(),tomorrow);
+    assert.equal(await page.locator("#plan-list a").getAttribute("href"),"eco.html");
+    assert.match(await page.locator("#plan-summary").innerText(),/วางแผน 45 นาที · เสร็จแล้ว 1/);
+    // An empty date picker must not cause a render error.
+    await page.locator("#plan-view-date").fill("");
+    assert.match(await page.locator("#plan-summary").innerText(),/เลือกวันที่/);
+    await page.locator("#plan-view-date").fill(tomorrow);
+
+    // Real same-browser tabs share IndexedDB; readwrite transactions serialize edits.
+    const other = await context.newPage();
+    await other.goto(base);
+    for (const tab of [page,other]) await tab.evaluate(async () => { window.__planner = await StudyOSPlanner.openPlanner(indexedDB); });
+    const id = await page.evaluate(async () => (await window.__planner.list())[0].id);
+    const revision = await page.evaluate(async () => (await window.__planner.list())[0].revision);
+    const attempts = await Promise.all([page,other].map((tab,index) => tab.evaluate(async ({id,revision,index}) => {
+      try { await window.__planner.update(id,{title:"Concurrent edit "+index},revision); return "saved"; }
+      catch(error) { return error.name; }
+    },{id,revision,index})));
+    assert.deepEqual(attempts.sort(),["ConflictError","saved"]);
+    await Promise.all([page,other].map((tab,index) => tab.evaluate(async ({index,tomorrow}) => {
+      await window.__planner.add({subject:"math",title:"Concurrent add "+index,date:tomorrow,minutes:15},crypto.randomUUID());
+    },{index,tomorrow})));
+    assert.equal(await page.evaluate(async () => (await window.__planner.list()).length),3);
+    // UI stale edits preserve the typed draft and do not replace newer persisted content.
+    await page.locator("#plan-refresh").click();
+    await page.getByText("อัปเดตรายการแล้ว",{exact:true}).waitFor();
+    await page.locator("#plan-list button").first().click();
+    await page.locator("#plan-title").fill("Unsaved draft");
+    await other.evaluate(async id => {
+      const record = (await window.__planner.list()).find(item => item.id === id);
+      await window.__planner.update(id,{title:"Newer saved topic"},record.revision);
+    },id);
+    await page.locator("#plan-save").click();
+    await page.locator("#plan-status").filter({hasText:"อีกแท็บ"}).waitFor();
+    assert.equal(await page.locator("#plan-title").inputValue(),"Unsaved draft");
+    assert.equal(await other.evaluate(async id => (await window.__planner.list()).find(item => item.id === id).title,id),"Newer saved topic");
+    await page.locator("#plan-cancel").click();
+    await page.locator("#plan-refresh").click();
+    await page.getByText("อัปเดตรายการแล้ว",{exact:true}).waitFor();
+    // Text is rendered as text; saved records are never injected as markup.
+    await page.locator("#plan-title").fill('<img src=x onerror="window.__injected=1">');
+    await page.locator("#plan-date").fill(tomorrow);
+    await page.locator("#plan-save").click();
+    await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    assert.equal(await page.locator("#plan-list img").count(),0);
+    assert.equal(await page.evaluate(() => window.__injected),undefined);
+    const downloaded = page.waitForEvent("download");
+    await page.locator("#plan-export").click();
+    const file = await downloaded;
+    const backup = JSON.parse(await fs.readFile(await file.path(),"utf8"));
+    assert.equal(backup.format,"study-os-planner"); assert.equal(backup.sessions.length,4);
+    assert.doesNotMatch(JSON.stringify(backup),/SYNTHETIC-DO-NOT-EXPORT|study-sync-key/);
+    assert.equal(await page.evaluate(() => localStorage.getItem("study-sync-key")),"SYNTHETIC-DO-NOT-EXPORT");
+    // Operations in an already loaded page do not require network access.
+    await context.setOffline(true);
+    await page.locator("#plan-title").fill("Offline loaded-page plan");
+    await page.locator("#plan-save").click();
+    await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    await context.setOffline(false);
+    await page.screenshot({path:path.join(output,`${engine}-planner-mobile.png`),fullPage:true});
+    await page.setViewportSize({width:820,height:1180});
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);
+    await page.screenshot({path:path.join(output,`${engine}-planner-tablet.png`),fullPage:true});
+    assert.deepEqual(errors,[]);
+    // Unknown record versions must be preserved, never reset on a failed read.
+    await page.evaluate(async () => {
+      const db = await new Promise((resolve,reject) => { const r=indexedDB.open(StudyOSPlanner.DB_NAME,1);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error); });
+      await new Promise((resolve,reject) => {const tx=db.transaction("sessions","readwrite");tx.objectStore("sessions").add({id:"future-version",schemaVersion:99,privateMarker:"PRESERVE"});tx.oncomplete=resolve;tx.onabort=reject;}); db.close();
+    });
+    await page.reload(); await page.locator("#open-planner").click();
+    await page.locator("#plan-status").filter({hasText:"ยังเปิดแผนไม่ได้"}).waitFor();
+    assert.equal(await page.locator("#planner-content").isVisible(),false);
+    assert.equal(await page.evaluate(async () => {
+      const r=indexedDB.open(StudyOSPlanner.DB_NAME,1);const db=await new Promise(resolve=>r.onsuccess=()=>resolve(r.result));
+      const tx=db.transaction("sessions","readonly");const q=tx.objectStore("sessions").get("future-version");
+      return new Promise(resolve=>{q.onsuccess=()=>{resolve(q.result.privateMarker);db.close();};});
+    }),"PRESERVE");
+  } finally { await context.close(); }
+  const denied = await browser.newContext();
+  try {
+    const tab = await denied.newPage();
+    await tab.addInitScript(() => Object.defineProperty(window,"indexedDB",{get(){throw new DOMException("blocked","SecurityError");}}));
+    await tab.goto(base); await tab.locator("#open-planner").click();
+    await tab.locator("#plan-status").filter({hasText:"ยังเปิดแผนไม่ได้"}).waitFor();
+    assert.equal(await tab.locator("#planner-content").isVisible(),false);
+  } finally { await denied.close(); }
+  return {engine,planner:"passed; synthetic IndexedDB: persistence, editing, explicit completion, dates, concurrent tabs, stale draft, export, denied/corrupt storage, loaded-page offline"};
+};

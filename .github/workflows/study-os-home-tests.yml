@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'index.html'
+      - 'lib/study-os-planner*.js'
+      - 'tests/study-os-planner.test.cjs'
+      - 'scripts/study-os-planner-browser.cjs'
       - 'scripts/study-os-browser-check.cjs'
       - 'scripts/study-os-source-overlap.cjs'
       - 'tests/study-os-dashboard.test.cjs'
@@ -29,6 +32,9 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'lib/study-os-planner*.js'
+      - 'tests/study-os-planner.test.cjs'
+      - 'scripts/study-os-planner-browser.cjs'
       - 'scripts/study-os-browser-check.cjs'
       - 'scripts/study-os-source-overlap.cjs'
       - 'tests/study-os-dashboard.test.cjs'

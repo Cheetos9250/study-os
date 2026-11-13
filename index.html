@@ -11,7 +11,7 @@
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Thai",Tahoma,sans-serif;line-height:1.65}
     a{color:inherit}
-    button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:6px}
+    input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:6px}
     .wrap{max-width:1080px;margin:auto;padding:0 22px}
     .top{background:var(--surface);border-bottom:1px solid var(--border)}
     .top-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-block:17px}
@@ -37,6 +37,14 @@
     .course.acc{border-top:5px solid #267a59}.course.eco{border-top:5px solid #b77b37}.course.math{border-top:5px solid #4d70b6}
     .progress-panel{margin:24px 0;padding:24px;border:1px solid var(--border);border-radius:19px;background:var(--surface)}
     button{font:inherit;cursor:pointer;color:var(--ink);background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-height:44px}
+    .plan-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+    .plan-form label{display:flex;flex-direction:column;gap:5px;font-size:14px}.plan-wide{grid-column:1/-1}
+    input,select{min-width:0;max-width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px;min-height:44px}
+    .plan-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+    .plan-list{list-style:none;padding:0}.plan-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 0;border-top:1px solid var(--border)}
+    .plan-row label{display:flex;align-items:center;gap:10px;flex:1;min-width:180px;overflow-wrap:anywhere}.plan-row input{flex-shrink:0;width:22px;min-height:44px;margin:0}.plan-row a{font-size:14px}
+    [hidden]{display:none!important}
+    @media(max-width:500px){.plan-form{grid-template-columns:1fr}.progress-panel{padding:20px}.plan-row label{flex-basis:100%}}
     .progress-row{padding:16px 0;border-top:1px solid var(--border)}
     .progress-row h3{margin:0 0 6px}.progress-row p{margin:0;color:var(--muted);font-size:14px}
     .note{margin:22px 0 46px;font-size:13px;color:var(--muted)}
@@ -58,6 +66,7 @@
   <div class="wrap top-inner">
     <a class="brand" href="./">Study OS<span>Academic Learning</span></a>
     <nav aria-label="การนำทางหลัก">
+      <a href="#planner">แผนการเรียน</a>
       <a href="#courses">รายวิชา</a>
       <a href="#languages">แอปฝึกภาษา</a>
     </nav>
@@ -68,6 +77,25 @@
     <span class="eyebrow">Your academic workspace</span>
     <h1 id="hero-title">เรียนอย่างเป็นระบบ<br>ทบทวนได้ทุกวัน</h1>
     <p class="lead">พื้นที่รวมบทสรุป แฟลชการ์ด และแบบฝึกหัดสำหรับวิชาเรียนมหาวิทยาลัย เลือกรายวิชาเพื่อเริ่มต้นจากชุดบทเรียนเดิม</p>
+  </section>
+  <section class="progress-panel" id="planner" aria-labelledby="planner-title">
+    <div class="section-head"><div><h2 id="planner-title">แผนการเรียน</h2><p class="sub">เลือกวิชา วันที่ และเวลาที่ตั้งใจเรียน แล้วติ๊กเสร็จเมื่อเรียนจบ</p></div><button id="open-planner" type="button" hidden>เปิดแผนการเรียน</button></div>
+    <p class="sub">แผนบันทึกเฉพาะเบราว์เซอร์นี้ ยังไม่ซิงก์ข้ามอุปกรณ์ ดาวน์โหลดเก็บไว้ได้ เวลาที่แสดงคือเวลาตามแผน</p>
+    <p id="plan-status" role="status">เปิดแผนการเรียนเพื่อเริ่มวางแผน</p>
+    <div id="planner-content" hidden>
+      <div class="plan-tools"><label for="plan-view-date">แผนวันที่</label><input id="plan-view-date" type="date" required><button id="plan-today" type="button">วันนี้</button><button id="plan-refresh" type="button">อัปเดตรายการ</button></div>
+      <p id="plan-summary" class="sub"></p>
+      <ul id="plan-list" class="plan-list" aria-label="รายการแผนการเรียน"></ul>
+      <form id="plan-form" class="plan-form">
+        <label>วิชา<select id="plan-subject" required><option value="acc">Accounting</option><option value="eco">Economics</option><option value="math">Mathematics</option></select></label>
+        <label>วันที่เรียน<input id="plan-date" type="date" required></label>
+        <label class="plan-wide">หัวข้อที่ต้องการเรียน<input id="plan-title" type="text" maxlength="160" required placeholder="เช่น ทบทวน Adjusting Entries"></label>
+        <label>เวลาเรียนตามแผน (นาที)<input id="plan-minutes" type="number" min="1" max="240" step="1" value="30" required></label>
+        <div class="plan-tools"><button id="plan-save" type="submit">เพิ่มแผน</button><button id="plan-cancel" type="button" hidden>ยกเลิกการแก้ไข</button></div>
+      </form>
+      <div class="plan-tools"><button id="plan-export" type="button">ดาวน์โหลดแผนทั้งหมด</button></div>
+    </div>
+    <noscript><p>เปิด JavaScript เพื่อบันทึกแผนการเรียน</p></noscript>
   </section>
   <section id="courses" aria-labelledby="courses-title">
     <div class="section-head">
@@ -119,5 +147,7 @@
 <footer><div class="wrap">Study OS · Academic Learning · ข้อมูลรายวิชาและความคืบหน้าเดิมยังอยู่</div></footer>
 <script src="lib/study-os-legacy-progress-reader.js" defer></script>
 <script src="lib/study-os-dashboard.js" defer></script>
+<script src="lib/study-os-planner.js" defer></script>
+<script src="lib/study-os-planner-ui.js" defer></script>
 </body>
 </html>
