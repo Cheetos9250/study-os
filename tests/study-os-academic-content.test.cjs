@@ -116,7 +116,7 @@ test("academic embedded course content matches the shared read-only snapshot exa
     const start = html.indexOf(marker);
     assert.ok(start !== -1, key + " embedded course data missing");
     const jsonStart = start + marker.length;
-    const jsonEnd = html.indexOf(";\\n", jsonStart);
+    const jsonEnd = html.indexOf(";\n", jsonStart);
     assert.ok(jsonEnd > jsonStart, key + " embedded course data terminator missing");
     const embedded = JSON.parse(html.slice(jsonStart, jsonEnd));
     for (const field of ["key", "cats", "cards", "quiz", "sum", "markKey"]) {
