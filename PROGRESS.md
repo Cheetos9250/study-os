@@ -145,3 +145,8 @@ Next action: editable academic course metadata while preserving stable subject I
 - CI 43370697293 **failed browser-qa** (static-contract passed). Job log pinpointed `scripts/study-os-planner-browser.cjs:196`, the **post-reload** assertion, not the earlier initial render. The test clicked open then asserted before async IndexedDB reload completed. Added visible planner and discovery waits at this exact post-reload step in commit `37dcad4`; CI pending. This corrects prior tentative diagnosis.
 
 - **Verified:** CI [43371040880](https://github.com/Cheetos9250/study-os/actions/runs/43371040880) completed **success**: both `static-contract` and `browser-qa` passed for fix `37dcad4`. This covers synthetic Chromium/WebKit non-empty overdue/upcoming navigation and post-reload persistence; not a physical iPad Safari test. Updated `AGENTS.md` handoff in `dfe7b96`. No merge, deploy or production writes.
+
+## Multiple-date navigation and accessibility — 2026-11-13
+
+- Expanded isolated synthetic Chromium/WebKit browser navigation fixture to two overdue and two upcoming dates (created in intentionally nonchronological order), asserting oldest overdue and nearest upcoming selection, no implicit completion and persistence after reload. Commit `d66fbd9`.
+- Added accessible navigation group name and `aria-controls` / `aria-describedby` links from buttons to list/discovery, commit `2b9f5a0`; static HTML regression commit `64c0c33`. Exact-head CI pending. No production deployment or data changes.
