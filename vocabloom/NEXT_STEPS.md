@@ -30,3 +30,9 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 
 - The new empty-state wording and synthetic no-answer-button test at SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678` passed regression [43380708719](https://github.com/Cheetos9250/study-os/actions/runs/43380708719). Verify final browser [43380708685](https://github.com/Cheetos9250/study-os/actions/runs/43380708685).
 - Continue reviewing meanings with **semantic** overlaps that exact punctuation-delimited matching cannot detect, and ask for an approved private fixture before testing real historical backups. Physical Safari and staging CAS are still release-blocking.
+
+### Human review queue and release gates
+
+- Run `node vocabloom/scripts/audit-thai-distractors.cjs --all`, then review the candidates documented in `THAI-DISTRACTOR-REVIEW-2026-11-13.md`. The initial scan flagged 87 possible pairs but **not 87 confirmed mistakes**. Keep antonyms/grammatical contrasts unless separately proven ambiguous in a real question.
+- Audit/test SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00` passed [regression 43381193510](https://github.com/Cheetos9250/study-os/actions/runs/43381193510); check final browser [43381193520](https://github.com/Cheetos9250/study-os/actions/runs/43381193520).
+- Retain all earlier physical iPad Safari/VoiceOver, real historical backup, staging CAS and explicit deployment approval gates.
