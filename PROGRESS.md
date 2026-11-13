@@ -137,3 +137,5 @@ Next action: editable academic course metadata while preserving stable subject I
 - Added Node discovery regressions for chronological overdue/upcoming order, exclusion of completed future plans, immutable groups and inclusive seven-day cutoff. Commit `12e2fd1`; CI pending.
 
 - CI [43370021313](https://github.com/Cheetos9250/study-os/actions/runs/43370021313): **static-contract success, browser-qa failure** at non-empty navigation assertion (`plan-discovery` returned empty text). Added an explicit wait for asynchronous discovery rendering after each save, commit `208c135`; root cause not yet proven and new CI must be checked.
+
+- CI 43370327132: static-contract **success**; browser-qa still in progress at last inspection. Added independent pure discovery tests for completed date edits and same-day vs upcoming partition, commit `2fb864f`; exact-head CI pending.
