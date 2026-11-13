@@ -148,9 +148,24 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
       await target.locator("#plan-status").filter({hasText:"มีข้อมูลแผนที่ยังไม่บันทึก"}).waitFor();
       assert.equal(await target.locator("#plan-title").inputValue(),"Unsaved import draft");
       await target.locator("#plan-cancel").click();
-      target.once("dialog",dialog=>dialog.accept());
+      assert.equal(await target.locator("#plan-title").inputValue(),"");
+      assert.equal(await target.locator("#plan-file").inputValue(),"");
+      // Keep this diagnostic until a repeated same-file import has passed in both engines.
+      let importDialogSeen=false;
+      target.once("dialog",async dialog=>{importDialogSeen=true;await dialog.accept();});
       await target.locator("#plan-file").setInputFiles(upload(backup));
-      await target.getByText("นำเข้าเพิ่ม 0 รายการ · มีอยู่แล้ว 4 รายการ",{exact:true}).waitFor();
+      try {
+        await target.getByText("นำเข้าเพิ่ม 0 รายการ · มีอยู่แล้ว 4 รายการ",{exact:true}).waitFor({timeout:7000});
+      } catch(error) {
+        const state=await target.evaluate(()=>({
+          status:document.getElementById("plan-status").textContent,
+          title:document.getElementById("plan-title").value,
+          files:document.getElementById("plan-file").files.length,
+          fileValue:document.getElementById("plan-file").value,
+          busy:document.getElementById("planner-content").getAttribute("aria-busy")
+        }));
+        throw new Error("Repeat planner import failed: "+JSON.stringify({state,importDialogSeen,error:error.message}));
+      }
       await target.evaluate(async () => { window.__restored = await StudyOSPlanner.openPlanner(indexedDB); });
       const persisted = await target.evaluate(() => window.__restored.list());
       assert.deepEqual(persisted.map(item => item.id).sort(),backup.sessions.map(item => item.id).sort());
