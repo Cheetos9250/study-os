@@ -1,0 +1,43 @@
+name: Accounting textbook answer checks
+on:
+  pull_request:
+    paths:
+      - accounting-textbook.html
+      - scripts/accounting-answer-check.js
+      - tests/accounting-answer-check*.cjs
+      - .github/workflows/accounting-answer-check.yml
+  push:
+    paths:
+      - accounting-textbook.html
+      - scripts/accounting-answer-check.js
+      - tests/accounting-answer-check*.cjs
+      - .github/workflows/accounting-answer-check.yml
+permissions:
+  contents: read
+jobs:
+  answer-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Full regression
+        run: |
+          node --test tests/*.test.cjs vocabloom/tests/*.test.cjs
+          python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'
+      - name: Install isolated browser dependency
+        run: npm install --prefix "$RUNNER_TEMP/answer-browser" --no-save --ignore-scripts playwright@1.62.1
+      - name: Install browsers
+        run: '"$RUNNER_TEMP/answer-browser/node_modules/.bin/playwright" install --with-deps chromium webkit'
+      - name: Check answers in synthetic Chromium and WebKit contexts
+        env:
+          NODE_PATH: ${{ runner.temp }}/answer-browser/node_modules
+          QA_OUTPUT: ${{ runner.temp }}/accounting-answer-qa
+        run: node tests/accounting-answer-check-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: accounting-answer-synthetic-qa
+          path: ${{ runner.temp }}/accounting-answer-qa

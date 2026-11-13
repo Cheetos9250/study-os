@@ -19,3 +19,6 @@ Read `PROGRESS.md` for code release SHAs and CI runs, and `NEXT_STEPS.md` for re
 
 ## Accounting textbook workspace
 `accounting-textbook.html` supports the published chapters 1–9 reader. The user selects the original PDF privately in the browser. Saved textbook answers/status are included in the main backup/recovery alongside the reader's separate export. The original PDF is excluded and must be selected separately. Question crop completeness and physical iPad PDF persistence remain unverified.
+
+## Reviewed textbook answer checks
+The reader has a local final-quantity checker under review for QS-6-1 (1/403 questions). It compares a single numeric answer with a reviewed calculation and explains the result. It does not grade written reasoning, journal entries or unsupported questions, and does not change completion status. No answer/PDF upload or new storage key is involved.
