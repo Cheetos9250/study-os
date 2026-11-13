@@ -39,3 +39,11 @@ test("Home uses local academic scripts and preserves progress read-only behavior
 test("Published content endpoint must remain original", () => {
   assert.deepEqual(config, {api: "https://study-api.kasidit09022550.workers.dev"});
 });
+
+test("Planner navigation controls expose group, list target and discovery context", () => {
+  const html = fs.readFileSync(path.join(root,"index.html"),"utf8");
+  assert.match(html, /role="group" aria-label="นำทางแผนการเรียนตามกำหนด"/);
+  for (const id of ["plan-overdue","plan-upcoming"]) {
+    assert.match(html,new RegExp('id="'+id+'"[^>]*aria-controls="plan-list"[^>]*aria-describedby="plan-discovery"'));
+  }
+});
