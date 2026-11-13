@@ -37,3 +37,10 @@ After current QA passes: add editable course display metadata with stable subjec
 5. Physical iPad Safari, storage-eviction recovery and cross-device plan sync are still unverified; do not claim production readiness.
 
 Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, API config, or production data without explicit authorization.
+
+## Integration checkpoint — 2026-11-13
+
+- Plan discovery is now wired to the draft homepage planner: overdue/today/7-day upcoming/completed **counts only**. No automatic actions.
+- **Immediate:** check CI for `dc836b0` and subsequent exact-head commits; investigate any failing static/browser tests, and inspect synthetic Chromium/WebKit planner screenshots.
+- **Then:** add browser regression assertions for the four discovery counts, including edits, date changes and explicit completion. Keep existing backup/import and multi-tab guarantees.
+- **Later:** optional filters/lists and course metadata after tests; real iPad Safari and production release remain blocked pending separate validation/approval.
