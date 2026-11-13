@@ -330,7 +330,7 @@ async function cSetKey(){
 async function cFullRestore(file){
  if(!file)return;
  if(CLOUD.busy){cCloudNotice('กรุณารอให้ซิงก์เสร็จก่อนนำเข้าข้อมูล',true);return;}
- let saved=null,oldData=null,oldDays=null,oldStudyDays=null;
+ let saved=null,oldData=null,oldDays=null,oldStudyDays=null,oldMergedDays=null,oldRemoteStatus=null;
  try{
   if(Number(file.size)>8*1024*1024)throw Error('ไฟล์ใหญ่เกิน 8 MB');
   const payload=JSON.parse(await file.text());
@@ -376,6 +376,7 @@ async function cFullRestore(file){
   if(!window.confirm('นำเข้า Full backup แล้วเขียนทับคะแนนในเบราว์เซอร์นี้ทั้ง 5 วิชาใช่หรือไม่? ควรดาวน์โหลด Full backup ปัจจุบันก่อน'))return;
   saved=Object.fromEntries(Object.keys(writes).map(key=>[key,cSafeGet(key)]));
   oldData=structuredClone(data);oldDays=structuredClone(CLOCAL.days);oldStudyDays=structuredClone(CLOCAL.studyDays);
+  oldMergedDays=structuredClone(CLOUD.studyMergedDays);oldRemoteStatus=CLOUD.remoteStatus;
   for(const [key,value] of Object.entries(writes))if(!cSafeSet(key,value))throw Error('พื้นที่เก็บข้อมูลไม่เพียงพอ');
   data=structuredClone(v);CLOCAL.days=structuredClone(importedDays);CLOCAL.studyDays=structuredClone(importedStudyDays);
   CLOUD.studyMergedDays=null;CLOUD.remoteStatus='restored locally';
@@ -389,6 +390,7 @@ async function cFullRestore(file){
    if(oldData)data=oldData;
    if(oldDays)CLOCAL.days=oldDays;
    if(oldStudyDays)CLOCAL.studyDays=oldStudyDays;
+   CLOUD.studyMergedDays=oldMergedDays;CLOUD.remoteStatus=oldRemoteStatus;
   }
   cCloudNotice('นำเข้าไม่สำเร็จ: '+String(e.message||e),true);
  }
