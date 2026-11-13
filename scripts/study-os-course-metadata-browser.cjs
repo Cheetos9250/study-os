@@ -176,6 +176,22 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     });
     await draft.waitForFunction(()=>document.getElementById("name-acc").value==="Accounting");
     assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์");
+    // A downloaded backup cannot silently overwrite a newer edit from another tab.
+    await other.locator("#metadata-refresh").click();
+    await other.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
+    await other.locator("#name-eco").fill("เศรษฐศาสตร์อีกแท็บ");
+    await other.locator("#metadata-form button[type=submit]").click();
+    await other.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
+    draft.once("dialog",dialog=>dialog.accept());
+    await draft.locator("#metadata-file").setInputFiles({
+      name:"stale-study-os-course-metadata.json",mimeType:"application/json",
+      buffer:Buffer.from(JSON.stringify(backup))
+    });
+    await draft.locator("#metadata-status").filter({hasText:"ข้อมูลเปลี่ยนในแท็บอื่น"}).waitFor();
+    assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์");
+    await draft.locator("#metadata-refresh").click();
+    await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
+    assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์อีกแท็บ");
     // An unavailable IndexedDB must not open the editor or trigger any implicit reset.
     const blockedEditor=await context.newPage();
     await blockedEditor.addInitScript(()=>Object.defineProperty(window,"indexedDB",{configurable:true,value:undefined}));
