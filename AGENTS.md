@@ -25,8 +25,11 @@
 - Cross-device progress sync requires independently verified backup, readback, rollback and writer inventory/freeze before any production CAS cutover.
 - Do not expose browser sync keys or Notion credentials in logs, analytics, exports or documentation.
 
-## Current handoff
-- The homepage has an academic planner with local add/edit/complete, conflict-safe IndexedDB persistence and planner-only backup/import.
-- Pure plan discovery groups overdue/today/upcoming/completed. Draft homepage displays counts and provides read-only overdue/upcoming date navigation.
-- CI run 43369814606 passed the empty-state navigation checkpoint. Non-empty synthetic Chromium/WebKit tests were added in `3271476`; failures 43370021313, 43370327132 and 43370697293 localized to a post-reload assertion race. Commit `37dcad4` waits for IndexedDB-backed UI reload; verify CI 43371040880 before claiming success. Physical iPad Safari remains unverified.
-- Read `PROGRESS.md` and `NEXT_STEPS.md` for subsequent updates; these take precedence over this handoff snapshot.
+## Current handoff — 2026-11-13
+
+- Academic dashboard and opt-in planner live only in draft PR #44; local planning supports explicit completion, revision-safe multi-tab edits, backup/import and overdue/upcoming discovery. Course search is in-memory and route identities are fixed.
+- Separate unlinked course-metadata draft editor and isolated IndexedDB store support explicit Save, Reset, JSON download/import, cross-tab revision conflict protection and strict acc/eco/math identities. No production homepage integration or cloud sync.
+- Fixed corrupt metadata record handling (null, invalid revision/payload) to fail closed, preserve existing raw records and show a no-auto-reset warning. Browser and CommonJS store sources match.
+- CI 43380131840 passed static-contract and synthetic Chromium/WebKit browser QA for download/restore and corrupt-record protection. CI 43380434836 passed no-JavaScript fallback QA. Last UI warning regression commit 9fdb772: inspect its exact-head CI before declaring success.
+- All browser tests are synthetic; real iPad Safari, real storage eviction, Cloudflare administration/KV and production backup/restore are not verified.
+- Read PROGRESS.md and NEXT_STEPS.md for checkpoints and subsequent CI status; never infer approval to merge, deploy or change production data.
