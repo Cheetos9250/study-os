@@ -26,14 +26,14 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           await context.route('**/*',route=>{
             const request=route.request(),url=new URL(request.url());
             if(request.method()!=='GET')writeAttempts.push(request.method()+' '+url.pathname);
-            return request.method()==='GET'&&(url.origin===base||['fonts.googleapis.com','fonts.gstatic.com'].includes(url.hostname))?route.continue():route.abort();
+            return request.method()==='GET'&&url.origin===base?route.continue():route.abort();
           });
           const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
           await page.goto(base+'/');
           for(const course of ['acc','eco','math','eng','zh']){
             const link=page.locator(`a[href="${course}.html"]`).first();
             console.log('Course journey:',engine,width,course);
-            await Promise.all([page.waitForURL(base+'/'+course+'.html'),link.click()]);
+            await Promise.all([page.waitForURL(base+'/'+course+'.html',{waitUntil:'domcontentloaded'}),link.click()]);
             await page.waitForLoadState('domcontentloaded');
             try{await page.locator('.front-t').waitFor();}catch(error){console.error({engine,width,course,url:page.url(),errors,body:await page.locator('body').innerText()});await page.screenshot({path:path.join(output,'failure-'+engine+'-'+width+'-'+course+'.png'),fullPage:true});throw error;}
             await page.locator('.card').click();
@@ -96,7 +96,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           await page.locator('a[href="./"]').click();await page.locator('#welcome-title').waitFor();
           evidence.push({engine,width,backupDownloadCheck:'passed',credentialsExcluded:true,storageUnchanged:true,networkWrites:0});
           const recovered=await browser.newContext({viewport:{width,height:1000}});
-          await recovered.route('**/*',route=>{const u=new URL(route.request().url());return route.request().method()==='GET'&&(u.origin===base||['fonts.googleapis.com','fonts.gstatic.com'].includes(u.hostname))?route.continue():route.abort();});
+          await recovered.route('**/*',route=>{const u=new URL(route.request().url());return route.request().method()==='GET'&&u.origin===base?route.continue():route.abort();});
           const restored=await recovered.newPage();await restored.goto(base+'/progress-restore.html');
           await restored.locator('#file').setInputFiles(file);
           await restored.locator('#status').getByText(/missing data sets can be restored/).waitFor();
@@ -112,7 +112,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
         }
       }finally{await browser.close();}
     }
-    await fs.writeFile(path.join(output,'results.json'),JSON.stringify({scope:'synthetic localhost only; no real user storage or production API access; WebKit is not physical iPad Safari',evidence},null,2));
+    await fs.writeFile(path.join(output,'results.json'),JSON.stringify({scope:'functional synthetic localhost only; external fonts, PDF engine and APIs blocked; no real user storage; WebKit is not physical iPad Safari',evidence},null,2));
     console.log('PASS: Chromium/WebKit navigation, rating persistence, local backup download and file validation');
   }finally{await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

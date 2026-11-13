@@ -46,7 +46,7 @@ async function runEngine(name, engine, origin) {
       });
       await ctx.route("**/*", route => {
         const u = new URL(route.request().url());
-        return route.request().method() === "GET" && (u.origin === origin || ["fonts.googleapis.com","fonts.gstatic.com"].includes(u.hostname)) ? route.continue() : route.abort();
+        return route.request().method() === "GET" && u.origin === origin ? route.continue() : route.abort();
       });
       return ctx;
     }
