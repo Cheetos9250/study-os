@@ -55,3 +55,9 @@
 - Found and corrected two test assumptions during CI: the mobile navigation legitimately includes Settings, and the historical Notion word ID retains the last 40 alphanumeric characters. These were **test fixture errors**, not app defects.
 - Final CI for code commit `2e53db1cfe59183877d16d79bf26d1a6b2f8086d`: GitHub Actions run https://github.com/Cheetos9250/study-os/actions/runs/43351838716 — **success**. This confirms the branch's offline test suite, not real Safari or Cloudflare Production behavior.
 - Still blocked for release: actual iPad Safari interaction, full local backup/restore on disposable profile, read-only live Cloudflare/KV validation, and explicit owner approval for any merge or deployment.
+
+## P1/P2 safety follow-up — offline progress and backup contracts
+
+- Added `vocabloom/tests/progress-preservation-contract.test.cjs` (4 offline tests) for two-device SRS/answer merge, newest card revision selection, reset timestamp handling, day counters, five-deck restore completeness, confirmation-before-write, rollback scaffolding, and absence of cloud sync during local restore.
+- GitHub Actions push run https://github.com/Cheetos9250/study-os/actions/runs/43352012898 at code SHA `577e6e4a0ed4257c952fad234ad59d7304e62229`: **success**. This is offline CI only; no actual backup was imported and no Worker was contacted.
+- These tests are not a proof that legacy KV last-writer-wins is safe; Production CAS remains blocked and all iPad/live QA gates remain open.
