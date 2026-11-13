@@ -10,7 +10,7 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     const page=await context.newPage();
     await page.goto(base);
     await page.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata.js"),"utf8")});
-    await page.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata-store.cjs"),"utf8")});
+    await page.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata-store.js"),"utf8")});
     const result=await page.evaluate(async()=>{
       const {openCourseMetadata,ConflictError,DATABASE}=globalThis.StudyOSCourseMetadataStore;
       const first=await openCourseMetadata(indexedDB);
@@ -46,7 +46,7 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       const blocked=await denied.newPage();
       await blocked.goto(base);
       await blocked.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata.js"),"utf8")});
-      await blocked.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata-store.cjs"),"utf8")});
+      await blocked.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata-store.js"),"utf8")});
       const rejected=await blocked.evaluate(async()=>{
         try{await globalThis.StudyOSCourseMetadataStore.openCourseMetadata(null);return false;}
         catch(error){return error instanceof TypeError;}
