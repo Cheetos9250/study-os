@@ -85,6 +85,15 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
           });
         }
         try{
+          // Valid but saturated revision remains readable/exportable; writes must fail closed.
+          const saturated={revision:Number.MAX_SAFE_INTEGER,metadata:defaults};
+          await raw("readwrite",saturated);
+          if((await store.read()).revision!==Number.MAX_SAFE_INTEGER) throw new Error("saturated record must remain readable");
+          let overflowRejected=false;
+          try{await store.save(defaults,Number.MAX_SAFE_INTEGER);}
+          catch(error){overflowRejected=error instanceof RangeError;}
+          if(!overflowRejected) throw new Error("metadata revision overflow was not rejected");
+          if(JSON.stringify(await raw("readonly"))!==JSON.stringify(saturated)) throw new Error("revision overflow modified persisted metadata");
           for(const [record,revision] of [
             [null,0],
             [{revision:0,metadata:defaults},0],
