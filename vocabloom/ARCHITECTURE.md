@@ -46,3 +46,7 @@ The same-device Full Restore importer validates each `deviceDays` and `studyDays
 ## Explicit Thai-sense distractor guard (2026-11-13)
 
 Each eligible English Practice card now precomputes normalized Thai sense fragments split at explicit comma, semicolon or slash delimiters. Distractor rotation rejects any candidate sharing an **exact** fragment with the correct answer or an already selected wrong option. When three nonoverlapping distractors do not exist, the question is omitted instead of presenting ambiguous options. This is a bounded formatting-based check, not human semantic validation or a translation change. Existing practice IDs, frozen active session snapshots, source exports, SRS and cloud state remain unchanged.
+
+## Read-only semantic review utility
+
+`scripts/audit-thai-distractors.cjs` inspects committed Verified English rows offline and lists potential Thai-meaning collisions using exact substring containment and character-bigram similarity. The output is **review-only** JSON; the utility is not imported by the live application, never mutates Notion/source/progress, and does not suppress runtime choices. `tests/english-distractor-review.test.cjs` verifies stable output and explicitly retains the valid `unsaturated` / `saturated` contrast for human review.
