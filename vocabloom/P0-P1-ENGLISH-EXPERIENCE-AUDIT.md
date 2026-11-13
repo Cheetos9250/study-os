@@ -31,7 +31,7 @@
 
 ## Risk, validation and remaining gates
 
-- Automated CI: run `node --test vocabloom/tests/*.test.cjs` and `python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'` on this branch/PR. Record actual SHA/run ID when completed.
+- Automated CI: **PASS** on draft PR #41 at commit `c69ff92b00a39de3e00139695b3c1d130979940b`, run https://github.com/Cheetos9250/study-os/actions/runs/43351073664 . **180/180 Node tests** and **3/3 Python tests** passed; the three new P1 isolation tests are included. This is repository CI, not live browser or Cloudflare QA.
 - Cross-device/real-browser QA **not yet completed**: iPad Safari, university browser, offline/cache behavior, local Full Backup/Restore, SRS continuity across refresh, and all five legacy Study OS subjects. These need careful non-destructive tests on a dedicated test profile.
 - Cloudflare runtime/Production KV and any CAS Staging writes **not tested**. Production migration remains blocked without separate approvals, independently validated backups, writer freeze, and rollback gates.
 - Current content `api` and optional `progress_api` selection unchanged; no secret changes, Auto Sync enablement, import, merge, or deploy.
@@ -41,9 +41,9 @@
 
 - [x] English-only filter and default were implemented on a separate branch.
 - [x] Original five decks and all shared sync/legacy files were preserved in the proposed diff.
-- [ ] PR/Actions regression results verified for this branch.
+- [x] PR/Actions regression results verified for this branch (run `43351073664`, 180 Node and 3 Python passed).
 - [ ] Real iPad Safari/manual visual QA completed.
 - [ ] Independent live Worker/Notion behavior/backup verification completed (read-only only).
 - [ ] Owner approval for future merge or deploy (not requested or implied here).
 
-**Status:** P0 repository/Notion audit complete with remaining live-environment limitations; P1 implemented in a feature branch pending CI and real-browser QA. **No merge, no Production deploy, no data migration.**
+**Status:** P0 repository/Notion audit complete with remaining live-environment limitations; P1 implemented in a feature branch and GitHub CI passed. Real iPad browser and Cloudflare read-only QA are still outstanding. **No merge, no Production deploy, no data migration.**
