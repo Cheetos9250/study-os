@@ -4,6 +4,7 @@ Run after installing Playwright and its Chromium/WebKit browsers:
   python3 vocabloom/tests/browser_smoke.py
 No live Notion, Worker, KV, secrets, or existing browser profiles are used.
 """
+import base64
 import json
 import mimetypes
 from pathlib import Path
@@ -72,7 +73,47 @@ def run_case(browser, engine, tablet):
     imported = page.evaluate("data.notion.map(w=>({id:w.id,th:w.th,example:w.example}))")
     assert len(imported) >= 570
     assert all(any('\u0e00' <= c <= '\u0e7f' for c in w['th']) for w in imported)
+    # Personal anime images are imported by the user only; blob bytes stay in this isolated browser profile.
+    image = {
+        "name": "one-pixel.png",
+        "mimeType": "image/png",
+        "buffer": base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/6N8AAAAASUVORK5CYII="),
+    }
+    pre_image_storage = page.evaluate("JSON.stringify({...localStorage})")
+    page.locator('[data-page="library"]:visible').first.click()
+    first_word = page.locator('.word-row').first
+    library_word = page.evaluate("allWords()[0].en")
+    assert first_word.locator('[data-private-image-pick]').count() == 1
+    first_word.locator('[data-private-image-pick]').click()
+    page.locator('#voca-private-image-picker').set_input_files(image)
+    page.wait_for_function("document.querySelector('.word-row .word-thumb img')?.complete === true")
+    assert page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", library_word)
+    assert page.evaluate("JSON.stringify({...localStorage})") == pre_image_storage, "Private picture changed progress storage"
+    # A reload must fetch the same image directly from the local IndexedDB.
+    page.reload()
+    page.wait_for_function("USTATE.ready && !notionBusy && USTATE.rows.length > 0")
+    page.locator('[data-page="library"]:visible').first.click()
+    page.wait_for_selector('.word-row .word-thumb img')
+    assert page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", library_word)
+    # The integrated Flashcards front has its own attachment control and uses the same local image store.
     page.locator('[data-page="studymerge"]:visible').first.click()
+    page.locator('[data-action="u-tab"][data-tab="cards"]').click()
+    image_word = page.evaluate("uCurrent(uDeck('eng')).f")
+    assert page.locator('.voca-integrated-photo').count() == 1
+    page.locator('[data-private-image-pick]').first.click()
+    page.locator('#voca-private-image-picker').set_input_files(image)
+    page.wait_for_selector('.voca-integrated-photo img')
+    assert page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", image_word)
+    page.locator('[data-action="u-flip"]').click()
+    assert page.locator('.voca-integrated-photo img').count() == 0
+    page.locator('[data-action="u-flip"]').click()
+    page.wait_for_selector('.voca-integrated-photo img')
+    with page.expect_event("dialog") as image_dialog:
+        page.locator('[data-private-image-remove]').first.click()
+    image_dialog.value.accept()
+    page.wait_for_function("document.querySelector('.voca-integrated-photo img') === null")
+    assert not page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", image_word)
+    assert page.evaluate("JSON.stringify({...localStorage})") == pre_image_storage, "Private image controls modified progress/SRS"
     page.locator('[data-action="u-tab"][data-tab="practice"]').click()
     page.wait_for_selector('[data-action="u-practice-answer"]')
     options = page.locator('[data-action="u-practice-answer"]')
