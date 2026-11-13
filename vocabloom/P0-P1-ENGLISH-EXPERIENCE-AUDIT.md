@@ -123,3 +123,10 @@
 - Six tests pass: revisioned `If-Match` write, retry on two HTTP 412 conflicts, stop at six retries without applying stale state, reject weak/malformed revisions, refuse unversioned Legacy Auto Sync and require explicit manual consent, and reject stale local application when answers keep changing during PUT.
 - Initial test incorrectly expected zero local application after only one concurrent edit; the client correctly retried and applied after stabilization. Updated the test to model a fresh edit during *each* PUT. Final CI passed at SHA `fbdea4607ad1001d897d84c29a624e3571bee8f2`: https://github.com/Cheetos9250/study-os/actions/runs/43354762158 .
 - CAS backend atomicity, true multi-device interleavings, iPad Safari and production Worker remain unverified. Legacy KV remains unsafe for concurrent writes. No merge, production deployment or Cloudflare mutation authorized.
+
+## P2 split Progress endpoint and consent isolation — offline QA
+
+- Added `vocabloom/tests/progress-endpoint-consent.test.cjs` exercising the actual `cApiUrl` and `cCloudKey` logic with a fake config fetch and fake local storage.
+- Verified: new split endpoint disables inherited Auto Sync; exact previously approved URL retains its own opt-in; mismatched endpoint token is rejected; legacy endpoint continues using legacy credential without consent migration; non-HTTPS endpoint fails closed.
+- CI passed at SHA `f98c96d3fac12814c538e8492431579433c3e408`: https://github.com/Cheetos9250/study-os/actions/runs/43355108180 .
+- No actual Cloudflare Worker, credentials, KV, browser storage, or production endpoint was accessed or modified. Backend CAS atomicity and Safari behavior remain unverified.
