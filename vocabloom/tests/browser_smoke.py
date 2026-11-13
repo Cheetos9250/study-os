@@ -145,6 +145,31 @@ def run_case(browser, engine, tablet):
     page.wait_for_function("CLOUD.remoteStatus === 'restored locally'")
     assert page.evaluate("JSON.parse(localStorage.getItem('study-acc'))") == backup["subjects"]["study-acc"]
     assert page.evaluate("id=>uReadSrs(uDeck('eng')).s[id]", card_id) == schedule
+    # One-shot synthetic quota error during Full Restore must roll back earlier writes.
+    before_quota = page.evaluate("JSON.stringify({...localStorage})")
+    page.evaluate("""() => {
+      window.__qaOriginalSetItem = Storage.prototype.setItem;
+      window.__qaQuotaFailed = false;
+      Storage.prototype.setItem = function(key, value) {
+        if(key === 'study-eng' && !window.__qaQuotaFailed) {
+          window.__qaQuotaFailed = true;
+          throw new DOMException('Synthetic quota failure', 'QuotaExceededError');
+        }
+        return window.__qaOriginalSetItem.call(this, key, value);
+      };
+    }""")
+    try:
+        with page.expect_event("dialog") as quota_dialog:
+            page.locator("#fullRestoreInput").set_input_files(upload)
+        quota_dialog.value.accept()
+        page.wait_for_function("window.__qaQuotaFailed === true")
+        page.wait_for_timeout(200)
+    finally:
+        page.evaluate("""() => {
+          Storage.prototype.setItem = window.__qaOriginalSetItem;
+          delete window.__qaOriginalSetItem;
+        }""")
+    assert page.evaluate("JSON.stringify({...localStorage})") == before_quota, "Quota failure did not roll back browser storage"
     assert not errors, errors
     assert not unexpected, unexpected
     context.close()
