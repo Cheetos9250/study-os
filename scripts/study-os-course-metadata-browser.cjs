@@ -218,7 +218,7 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
     assert.equal(await draft.locator("#name-acc").inputValue(),"Accounting");
     // Two rapid submit events must never cause a misleading stale-write conflict.
-    const revisionBefore=Number((await draft.locator("#metadata-status").textContent()).match(/Revision (\\d+)/)?.[1]);
+    const revisionBefore=Number((await draft.locator("#metadata-status").textContent()).split("Revision ")[1]);
     assert.equal(Number.isSafeInteger(revisionBefore),true);
     await draft.locator("#name-acc").fill("บัญชีบันทึกครั้งเดียว");
     await draft.locator("#metadata-form").evaluate(form=>{
