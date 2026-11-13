@@ -179,6 +179,12 @@ function uPracticeKeydown(event){
  if(ui.page!=='studymerge'||USTATE.tab!=='practice'||event.defaultPrevented||event.isComposing||
   event.repeat||event.ctrlKey||event.altKey||event.metaKey||event.shiftKey||!/^[1-4]$/.test(event.key))return;
  if(event.target?.closest?.('input,textarea,select,[contenteditable],[role="dialog"]'))return;
+ // Keep number shortcuts away from navigation and any open modal.
+ if(typeof document!=='undefined'){
+  const modal=document.getElementById('modalLayer'),main=document.getElementById('mainContent');
+  if(modal&&!modal.hidden)return;
+  if(main&&event.target&&event.target!==document.body&&event.target!==document.documentElement&&!main.contains(event.target))return;
+ }
  const d=uDeck(UACTIVE_LANGUAGE),q=d?uPracticeQuestions(d)[USTATE.quizIndex]:null;
  if(!q||USTATE.practiceAnswers[q.id]!==undefined)return;
  event.preventDefault();
