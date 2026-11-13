@@ -198,6 +198,22 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await draft.locator("#metadata-refresh").click();
     await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
     assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์อีกแท็บ");
+    // Unsaved edits must not be silently excluded from a downloaded backup.
+    await draft.locator("#name-acc").fill("ยังไม่บันทึก");
+    await draft.locator("#metadata-export").click();
+    await draft.locator("#metadata-status").filter({hasText:"มีการแก้ไขที่ยังไม่บันทึก"}).waitFor();
+    assert.equal(await draft.locator("#name-acc").inputValue(),"ยังไม่บันทึก");
+    // An import must require explicit confirmation before discarding typed text.
+    draft.once("dialog",dialog=>dialog.dismiss());
+    await draft.locator("#metadata-file").setInputFiles({
+      name:"discard-warning-test.json",mimeType:"application/json",
+      buffer:Buffer.from(JSON.stringify(backup))
+    });
+    assert.equal(await draft.locator("#name-acc").inputValue(),"ยังไม่บันทึก");
+    draft.once("dialog",dialog=>dialog.accept());
+    await draft.locator("#metadata-refresh").click();
+    await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
+    assert.equal(await draft.locator("#name-acc").inputValue(),"Accounting");
     // Simulate a fresh browser profile with no course-metadata storage.
     // This exercises backup portability, not real OS-level eviction.
     const restoredProfile=await browser.newContext({viewport:{width:820,height:1180}});
