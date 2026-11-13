@@ -27,6 +27,6 @@
 
 ## Current handoff
 - The homepage has an academic planner with local add/edit/complete, conflict-safe IndexedDB persistence and planner-only backup/import.
-- Pure plan discovery groups overdue/today/upcoming/completed. Draft homepage displays counts only.
-- CI run 43369814606 passed the overdue/upcoming navigation empty-state checkpoint. Subsequent non-empty navigation browser tests were added in commit `3271476`; verify their own CI before claiming success.
+- Pure plan discovery groups overdue/today/upcoming/completed. Draft homepage displays counts and provides read-only overdue/upcoming date navigation.
+- CI run 43369814606 passed the empty-state navigation checkpoint. Non-empty synthetic Chromium/WebKit tests were added in `3271476`; failures 43370021313, 43370327132 and 43370697293 localized to a post-reload assertion race. Commit `37dcad4` waits for IndexedDB-backed UI reload; verify CI 43371040880 before claiming success. Physical iPad Safari remains unverified.
 - Read `PROGRESS.md` and `NEXT_STEPS.md` for subsequent updates; these take precedence over this handoff snapshot.
