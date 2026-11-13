@@ -86,3 +86,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Multi-date navigation CI 43371435910 passed both static-contract and browser-qa. Course search commits `0dbbb22`, `2f45c73`, `20c55d2` add accessible local-only filtering with no persisted metadata or changes to course identity. Verify [CI 43371847878](https://github.com/Cheetos9250/study-os/actions/runs/43371847878) before marking course search verified.
 - Next: add isolated browser QA for Thai/English course search and no-match reset; design editable course metadata as a separate schema with stable IDs and backup guarantees, without touching production data.
+
+## Course search browser regression — 2026-11-13
+
+- CI 43371919159 passed static-contract/browser-qa after `08f8717`. New browser regression commit `0bd4922` checks Thai/English search, empty state and reset across Chromium/WebKit and four viewports. Verify [CI 43373533213](https://github.com/Cheetos9250/study-os/actions/runs/43373533213) before claiming the new test passes.
+- Editable course metadata remains a design task: preserve `acc/eco/math` IDs and legacy progress keys, use separate local namespace and atomic backup/import, do not migrate or mutate production data without approval.
