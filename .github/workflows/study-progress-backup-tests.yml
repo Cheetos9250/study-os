@@ -1,0 +1,34 @@
+name: Study OS local progress backup safety checks
+
+on:
+  push:
+    paths:
+      - "progress-backup.html"
+      - "scripts/study-progress-backup.js"
+      - "tests/study-progress-backup.test.cjs"
+      - ".github/workflows/study-progress-backup-tests.yml"
+  pull_request:
+    paths:
+      - "progress-backup.html"
+      - "scripts/study-progress-backup.js"
+      - "tests/study-progress-backup.test.cjs"
+      - ".github/workflows/study-progress-backup-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run read-only backup safety tests
+        run: node --test tests/study-progress-backup.test.cjs
+      - name: Confirm page has no auto-import or external network code
+        run: |
+          node -e "const fs=require('fs');const x=fs.readFileSync('progress-backup.html','utf8');const j=fs.readFileSync('scripts/study-progress-backup.js','utf8');if(/localStorage\.(?:setItem|removeItem)|fetch\(|XMLHttpRequest|navigator\.sendBeacon/.test(x+j))process.exit(1);if(!x.includes('scripts/study-progress-backup.js'))process.exit(1);"
