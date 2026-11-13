@@ -212,3 +212,18 @@ test('Practice avoids ambiguous Thai distractors sharing an explicit slash or se
  assert.ok(!hinge.opts.includes('ขึ้นอยู่กับ; มีเงื่อนไขว่า'));
  assert.ok(!contingent.opts.includes('ขึ้นอยู่กับ'));
 });
+
+
+test('Ambiguous four-word pool fails closed with an accurate empty-state message',()=>{
+ const cards=[
+  {cat:'e1',f:'hinge on',b:'v | ขึ้นอยู่กับ',mid:'small-1'},
+  {cat:'e1',f:'contingent on',b:'adj | ขึ้นอยู่กับ; มีเงื่อนไขว่า',mid:'small-2'},
+  {cat:'e1',f:'knowledge',b:'n | ความรู้',mid:'small-3'},
+  {cat:'e1',f:'understanding',b:'n | ความเข้าใจ',mid:'small-4'}
+ ];
+ const evaluate=new Function('cards',"const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};const uCards=()=>cards;const h=x=>String(x);"+pure+"return {questions:uPracticeQuestions({key:'eng'}),html:uPracticeHTML({key:'eng'})};");
+ const out=evaluate(cards);
+ assert.equal(out.questions.length,0,'Do not fabricate a fourth unambiguous option');
+ assert.match(out.html,/non-overlapping Thai meanings/);
+ assert.doesNotMatch(out.html,/data-action="u-practice-answer"/);
+});
