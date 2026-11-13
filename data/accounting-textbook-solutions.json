@@ -4,12 +4,12 @@
     "scope": "Chapter 1–9 questions indexed in Study OS",
     "provenance": "Original study solutions, not a publisher answer key. Source-check status differs by question; do not treat all entries as verified.",
     "sourceFile": "Owner's Google Drive Acc textbook.pdf",
-    "reviewStatus": "45 drafted solutions (16 newly source-reviewed against pages 56–62); 29 prior entries retain their earlier verification status, mostly unverified.",
+    "reviewStatus": "58 drafted solutions; 29 newly source-reviewed in this turn against original PDF (Ch.1, pages 56–67). Earlier 29 drafts mostly need source verification.",
     "storage": "Public answers only; no textbook question wording, PDF pages, private notes or user progress",
     "lastUpdated": "2026-11-13",
-    "reviewedCount": 45,
+    "reviewedCount": 58,
     "catalogQuestionCount": 403,
-    "sourceReviewedNewCount": 16,
+    "sourceReviewedNewCount": 29,
     "indexCaveat": "The 403-item catalog is not a complete or reliably numbered audit of the printed questions; some exercise identifiers are missing or misread. Do not claim every printed question has an answer."
   },
   "answers": {
@@ -345,6 +345,113 @@
       "explanation": "Start-up equity bears greatest business risk; medium-risk bonds are generally riskier than low-risk corporate bonds; U.S. Treasury bonds are the least risky of the options under the exercise's simplifying assumptions.",
       "pages": [
         62
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-1B": {
+      "answer": "Transactions (assets; liabilities; equity; net income; cash operating/investing/financing): 1 +800; 0; +800; 0; F +800. 2 +100; +100; 0; 0; no cash. 3 0; 0; 0; 0; I -400. 4 +900; 0; +900; +900; O +900. 5 -400; 0; -400; -400; O -400. 6 +200; +200; 0; 0; no cash. 7 -300; 0; -300; -300; O -300. 8 -50; 0; -50; 0; F -50. 9 +600; 0; +600; +600; no cash. 10 0; 0; 0; 0; O +600.",
+      "explanation": "An owner capital contribution increases cash and equity (financing). Credit purchases increase asset and payable balances but no cash changes. Cash equipment purchases are investing. Earned service revenue raises profit; rent and wages lower profit. Collection of receivables increases operating cash without additional revenue; withdrawals are financing rather than expenses.",
+      "pages": [
+        63
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-2B": {
+      "answer": "1 Company V: 2018 equity $29,000; 2019 equity $23,000; 2019 net loss $(5,500). 2 Company W: 2018 equity $20,000; 2019 equity $78,000; 2019 liabilities $22,000. 3 Company X: owner investments $29,200. 4 Company Y: 2019 assets $135,100. 5 Company Z: 2018 liabilities $100,000.",
+      "explanation": "V: 54,000-25,000=29,000; 59,000-36,000=23,000; NI=23,000-29,000-5,000+5,500=-5,500. W: 80,000-60,000=20,000; ending equity 20,000+20,000+40,000-2,000=78,000; liability 100,000-78,000=22,000. X: ending equity 186,500-65,800=120,700; starting equity 141,500-68,500=73,000; investment 120,700-73,000-18,500=29,200. Y: starting equity 92,500-51,500=41,000; ending equity 41,000+48,100+24,000-20,000=93,100; assets 93,100+42,000=135,100. Z: ending equity 170,000-42,000=128,000; starting equity 128,000-60,000-32,000+8,000=44,000; starting liabilities 144,000-44,000=100,000.",
+      "pages": [
+        63,
+        64
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-3B": {
+      "answer": "Audi Company — Income Statement, 2019: Consulting revenue $6,600; rental revenue $4,400; total revenues $11,000. Salaries expense $4,000; rent expense $2,400; selling and administrative expenses $1,600; total expenses $8,000. Net income $3,000.",
+      "explanation": "$6,600+$4,400=$11,000 revenue; $4,000+$2,400+$1,600=$8,000 expenses; $11,000-$8,000=$3,000 net income. Exclude asset, liability, capital and withdrawal balances.",
+      "pages": [
+        64
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-4B": {
+      "answer": "Audi Company — Statement of Owner's Equity, 2019: Beginning capital $1,700; owner investment $200; net income $3,000; owner withdrawals $2,600; ending capital $2,300.",
+      "explanation": "Beginning capital $1,700 + investment $200 + net income from P-1-3B $3,000 - withdrawals $2,600 = $2,300.",
+      "pages": [
+        64
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-5B": {
+      "answer": "Audi Company — Balance Sheet, December 31, 2019: Assets: cash $2,000; accounts receivable $1,800; supplies $1,200; equipment $1,000; total assets $6,000. Liabilities: accounts payable $3,700. Owner's equity: Audi capital $2,300. Total liabilities and equity $6,000.",
+      "explanation": "Total assets $2,000+$1,800+$1,200+$1,000=$6,000. From P-1-4B ending equity is $2,300. Accounting equation: $6,000=$3,700+$2,300.",
+      "pages": [
+        64
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-6B": {
+      "answer": "Banji Company — Statement of Cash Flows, 2019: Operating activities $(3,000); investing activities +$1,600; financing activities +$1,800; net increase in cash +$400; beginning cash $1,300; ending cash $1,700.",
+      "explanation": "Cash movement: -$3,000+$1,600+$1,800=$400; $1,300 beginning +$400 change=$1,700 ending.",
+      "pages": [
+        64
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-7B": {
+      "answer": "Niko's Maintenance Co., June: Ending cash $130,735; accounts receivable $0; equipment $2,400; total assets $133,135; accounts payable $0; ending owner equity $133,135. Revenue $16,925; expenses $9,790; net income $7,135. Ending capital = $130,000 + $7,135 - $4,000 = $133,135. Cash flows: operating +$7,135; investing $(2,400); financing +$126,000; net increase/ending cash $130,735.",
+      "explanation": "Revenue: $850 + $7,500 + $7,900 + $675 = $16,925. Expenses: rent $6,000; advertising $1,150; wages $1,600; telephone $150; utilities $890, total $9,790. Receivables from City Center and Paula's Beauty Shop were both collected. Equipment purchased on credit for $2,400 was later paid cash; no unpaid liability remains. Owner withdrew $4,000. $130,735 cash + $2,400 equipment = $133,135 assets.",
+      "pages": [
+        64,
+        65
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-8B": {
+      "answer": "Nadal Computing: Cash $5,350; accounts receivable $1,000; supplies $1,200; office equipment $36,700; office suite $50,000; total assets $94,250; accounts payable $2,200; ending owner equity $92,050. Revenues $6,800; expenses $3,250; net income $3,550.",
+      "explanation": "Cash = $90,000-$50,000-$25,000-$750+$4,000-$11,500+$1,800-$700-$2,500=$5,350. Receivable $2,800-$1,800=$1,000; equipment $10,000+$25,000+$1,700=$36,700; payables $1,200+$1,700-$700=$2,200. Income $2,800+$4,000-$750-$2,500=$3,550. Owner equity $100,000+$3,550-$11,500=$92,050; liabilities plus equity $94,250.",
+      "pages": [
+        65
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-9B": {
+      "answer": "Rivera Roofing, July: Ending cash $87,545; accounts receivable $5,000; supplies $3,700; office equipment $2,300; roofing equipment $5,000; total assets $103,545; accounts payable $7,100. Revenues $20,800; expenses $2,555; net income $18,245. Ending equity $96,445. Statement of cash flows: operating +$12,645; investing $(3,300); financing +$78,200; net cash increase/ending cash $87,545. Alternative $5,000 equipment purchase fully funded by $5,000 additional owner cash: assets unchanged; liabilities decrease to $3,100 and equity increases to $100,445.",
+      "explanation": "Cash = $80,000-$700-$1,000-$600+$7,600-$2,300+$8,200-$1,560-$295-$1,800=$87,545. Revenue $7,600+$8,200+$5,000=$20,800; expenses rent $700+wages $1,560+utilities $295=$2,555. Receivables $8,200+$5,000-$8,200=$5,000. Payables unpaid roofing equipment $4,000 plus supplies $3,100=$7,100. Ending equity $80,000+$18,245-$1,800=$96,445. In the alternative, financing substitutes $4,000 extra owner equity for $4,000 payable, with no change in total assets.",
+      "pages": [
+        65,
+        66
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-11B": {
+      "answer": "AT&T: return on assets 1.6% ($4,184m / $269,868m). Verizon: return on assets 4.5% ($10,198m / $225,233m). AT&T reports higher total sales ($126,723m vs $110,875m), but Verizon achieves higher profit relative to average invested assets. Based solely on these figures, Verizon is more asset-efficient.",
+      "explanation": "ROA = net income / average total assets. 4,184/269,868≈1.55%; 10,198/225,233≈4.53%. A higher sales figure does not imply a higher return on assets. Consider valuation, leverage and risks before any real investment.",
+      "pages": [
+        66
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-12B": {
+      "answer": "Expected-return ranking, 1 highest to 4 lowest: a low-risk corporate bond = 2; b stock of a successful company = 1; c money stored in a fireproof vault = 4; d U.S. Treasury bond = 3.",
+      "explanation": "Under the book's simplified risk-and-return tradeoff, the successful company's stock has the highest expected return, then corporate bond, Treasury bond, and finally cash kept in a vault with no investment return.",
+      "pages": [
+        66
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-13B": {
+      "answer": "1 Operating (O); 2 Financing (F); 3 Investing (I); 4 Operating (O); 5 Operating (O); 6 Financing (F); 7 Operating (O); 8 Operating (O).",
+      "explanation": "Client services, product research, employee supervision, rent, and utilities relate to day-to-day operations. A bank loan and owner's contribution are financing. Machinery purchase is investing in long-lived productive assets.",
+      "pages": [
+        66
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-14B": {
+      "answer": "Operating activities: delivering products/services and paying workers, rent or utilities. Investing activities: purchasing machinery/land and selling equipment or other long-lived assets. Financing activities: raising cash through owners or borrowing and repaying debt/returning capital to owners.",
+      "explanation": "The exercise asks for the three major business activities in outline form and at least two representative transactions/events for each. Operating creates revenue and incurs normal costs; investing acquires/disposes of productive resources; financing obtains/returns capital.",
+      "pages": [
+        67
       ],
       "verification": "source-reviewed-2026-11-13"
     }
