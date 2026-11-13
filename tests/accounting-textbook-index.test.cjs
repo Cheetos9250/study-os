@@ -47,7 +47,6 @@ test('study links use a separate local progress namespace',()=>{
   assert.match(home, /class="textbook-feature"/);
   assert.match(home, /Browse exercises/);
   assert.match(home, /aria-label="Browse accounting textbook exercises by chapter and question number"/);
-  assert.equal((home.match(/href="accounting-textbook\\.html"/g)||[]).length,0); // Literal href is checked below.
   assert.equal((home.match(/href="accounting-textbook.html"/g)||[]).length,1);
   assert.doesNotMatch(html,/localStorage\.clear\(/);
   assert.doesNotMatch(html,/studyos\.acc\./);
