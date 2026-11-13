@@ -130,3 +130,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Regression run [43371899898](https://github.com/Cheetos9250/study-os/actions/runs/43371899898) for SHA `a535b1babdde470e13ea07dd40a0c89d83df28be` **failed** 1/243: BR-08 actual Full Backup round-trip. Root cause: the new snapshot called `structuredClone(undefined)` when a legacy test fixture omitted `CLOUD.studyMergedDays`.
 - Corrected snapshot to preserve an undefined cache without cloning it, fix SHA `cc1bcaf9bbdf5c1f584d15b0096d03b652a30f2d`. This is a compatibility correction, not evidence of passing tests. Verify fresh regression and browser CI before release consideration.
+
+### Restore cloud-state rollback verified and expanded
+
+- Fix SHA `cc1bcaf9bbdf5c1f584d15b0096d03b652a30f2d` passed [regression 43372068149](https://github.com/Cheetos9250/study-os/actions/runs/43372068149) and [isolated browser 43372068107](https://github.com/Cheetos9250/study-os/actions/runs/43372068107).
+- Extended synthetic failure regression to start with a **populated** cloud merged-day cache and a `synced` status and verify both survive a post-write render failure. Test SHA `3b2ad6d636dafa72816594cc26b6d6841807c35a`; its own CI is pending. No production data accessed.
