@@ -92,3 +92,13 @@ test('Practice HTML escapes malicious vocabulary and option strings',()=>{
  assert.ok(html.includes('&lt;img'));assert.ok(html.includes('&lt;script'));
  assert.ok(!html.includes('<img src=x'));assert.ok(!html.includes('<script>'));
 });
+
+test('Practice exposes question, selected answer and feedback to assistive technologies',()=>{
+ const html=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all'};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const h=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');${pure}const before=uPracticeHTML(deck);const q=uPracticeQuestions(deck)[0];USTATE.practiceAnswers[q.id]=q.right;const after=uPracticeHTML(deck);return {before,after};`)(deck);
+ assert.match(html.before,/role="status" aria-live="polite"/);
+ assert.match(html.before,/id="u-practice-question"/);
+ assert.match(html.before,/aria-describedby="u-practice-question"/);
+ assert.match(html.before,/aria-pressed="false"/);
+ assert.match(html.after,/aria-pressed="true"/);
+ assert.match(html.after,/role="status" aria-live="polite">Correct/);
+});
