@@ -108,9 +108,8 @@ def run_case(browser, engine, tablet):
     assert page.locator('.voca-integrated-photo img').count() == 0
     page.locator('[data-action="u-flip"]').click()
     page.wait_for_selector('.voca-integrated-photo img')
-    with page.expect_event("dialog") as image_dialog:
-        page.locator('[data-private-image-remove]').first.click()
-    image_dialog.value.accept()
+    page.once("dialog", lambda dialog: dialog.accept())
+    page.locator('[data-private-image-remove]').first.click()
     page.wait_for_function("document.querySelector('.voca-integrated-photo img') === null")
     assert not page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", image_word)
     assert page.evaluate("JSON.stringify({...localStorage})") == pre_image_storage, "Private image controls modified progress/SRS"
