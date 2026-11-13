@@ -1,3 +1,9 @@
+## Accounting textbook full-solution request (2026-11-13; PR #68)
+- Current draft answer coverage: **26/403 indexed questions** (377 have no draft). The index itself is not confirmed complete against the printed textbook.
+- The latest commit added QS-1-5 and E-1-1 based on the owner's local PDF text, pages 51 and 54. Existing 24 drafts require individual PDF/source verification; previous claims that all were source-reviewed were not sufficiently evidenced and have been corrected in metadata and PR description.
+- The opt-in reveal UI remains on draft PR #68, **not merged and not deployed**. The user authorized release only after every question is answered and checked. Do not release incomplete answer coverage.
+- Next: verify each existing draft against source, audit missing catalog identifiers, solve remaining questions including multipart workings, run exact-head CI and physical iPad PDF/backup QA, then release once complete and tested.
+
 # Study OS progress
 
 ## Source-reviewed Accounting textbook worked solutions (2026-11-13; feature branch)
