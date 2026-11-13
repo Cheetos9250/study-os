@@ -170,3 +170,8 @@ Next action: editable academic course metadata while preserving stable subject I
 
 - CI [43374096872](https://github.com/Cheetos9250/study-os/actions/runs/43374096872) **success**: static-contract and browser-qa passed Escape-to-clear course search tests.
 - Added pure course presentation metadata schema/validator (`e169998`) and Node tests (`9b48fb4`) for immutable subject identities, order, text validation and corrupt input. Updated `COURSE_METADATA_DESIGN.md` (`63fd982`). New [CI 43377242274](https://github.com/Cheetos9250/study-os/actions/runs/43377242274) queued at inspection. No UI persistence, production writes, merge or deploy.
+
+## Isolated metadata storage prototype — 2026-11-13
+
+- Verified [CI 43377242274](https://github.com/Cheetos9250/study-os/actions/runs/43377242274) **success** for pure metadata model/tests (static-contract and browser-qa).
+- Added opt-in CommonJS IndexedDB metadata store (`e4034b3`) with revision-checked transactions and explicit read/save/reset/import/export; separate database from planner/progress. Added static/Node isolation tests (`46b8cd1`) and design notes (`72c2713`). No homepage integration or production writes; browser concurrency/rollback tests pending.
