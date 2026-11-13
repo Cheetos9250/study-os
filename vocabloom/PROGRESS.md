@@ -155,3 +155,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - [Regression 43377262906](https://github.com/Cheetos9250/study-os/actions/runs/43377262906) **failed** in the new test because the Thai Unicode regex was double-escaped; a valid Thai option `ความคืบหน้าครั้งสำคัญ` was incorrectly rejected. This was a test assertion bug, not evidence of incorrect vocabulary.
 - Corrected the regex at SHA `9aa646bf7afc40777e5ef30928afa94b724368d1`. Fresh CI requires verification. No production or content changes.
+
+### English distractor whitespace-equivalence hardening
+
+- Verified source-provenance test fix SHA `9aa646bf7afc40777e5ef30928afa94b724368d1` passed [regression 43377373010](https://github.com/Cheetos9250/study-os/actions/runs/43377373010) and [isolated browser 43377372983](https://github.com/Cheetos9250/study-os/actions/runs/43377372983).
+- Inspected English practice question generation: duplicate meaning/headword keys previously normalized Unicode/case but not internal whitespace. Updated normalization at SHA `9067a8a7c9266d273c3dea5f88215258021eacdf` to collapse whitespace before deduplication, preventing visibly equivalent answer options. Added synthetic test SHA `dd8f1e4a44dfa2cbf282e0d33934fa31f73f9a53`; regression 43378205242 and browser 43378205248 were in progress at documentation time. Existing source records, quiz provenance, and SRS remain unchanged.
