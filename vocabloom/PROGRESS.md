@@ -82,3 +82,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Reconciled `CHANGELOG.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `NEXT_STEPS.md`, `PROJECT.md`, `PROGRESS.md` and the continuous audit with verified browser restore results. Created `AGENTS.md` for cross-agent continuation and release boundaries.
 - Added a one-shot synthetic `QuotaExceededError` in disposable browser Full Restore, then asserted that all localStorage values return to their pre-restore snapshot. Test code SHA: `e79267315c0f3d28286f8d1c8d7ae651b0d2383f`. CI runs [browser 43368381323](https://github.com/Cheetos9250/study-os/actions/runs/43368381323) and [regression 43368381319](https://github.com/Cheetos9250/study-os/actions/runs/43368381319) were **queued at time of writing**. Do not count this scenario as passed until both workflows complete.
 - No live progress writes, Worker/KV/Notion modifications, merge or deployment.
+
+### Quota rollback CI result and deeper in-memory check
+
+- The earlier browser quota-write rollback test at SHA `e79267315c0f3d28286f8d1c8d7ae651b0d2383f` **passed** in [isolated browser run 43368381323](https://github.com/Cheetos9250/study-os/actions/runs/43368381323); [regression run 43368381319](https://github.com/Cheetos9250/study-os/actions/runs/43368381319) also **passed**. These verify disposable browser localStorage rollback, not live user data.
+- Added a stricter assertion at SHA `c7d287357360fbdc10c7ea33f3e7a10ded3f9413` to compare the in-memory `data`, `CLOCAL.days` and `CLOCAL.studyDays` snapshots before/after a one-shot synthetic quota failure. This follow-up needs its **own** CI confirmation and must not inherit the earlier success claim.
