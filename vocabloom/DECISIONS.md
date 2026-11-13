@@ -83,3 +83,8 @@ A spoken source sentence should stop when the learner answers, moves to another 
 Browser Speech Synthesis availability does not guarantee that constructing, canceling or speaking succeeds. Catch runtime audio failures, show limited nonblocking feedback, and always allow answers/navigation to proceed. Do not change cloud, SRS or progress on an audio error.
 
 Use 1–4 as discoverable optional hardware-keyboard shortcuts only within the English Practice page, showing corresponding 1–4 option labels and `aria-keyshortcuts` in the UI. Do not intercept when a field is editable, a dialog is open, an unrelated navigation control has focus, modifier keys are held, or the current question is answered. Preserve mouse/touch operation and all original card IDs.
+
+
+## 2026-11-13 — User-only anime images without public assets
+
+Support user-selected anime imagery via a strictly local image attachment layer. No bundled One Piece/Naruto/Bleach artwork, remote scraping, image URLs in Notion, or server upload. Use IndexedDB Blobs keyed by normalized English headword so the word library, first-step lessons, picture/type practice and English Flashcards can share an attachment without changing legacy card/progress identities. Reject SVG and spoofed/non-image uploads, cap file size at 2 MiB, and display source word text independently of the picture. Images are deliberately excluded from current Full Backup and cross-device sync; a consented private portability design is a future separate decision. Use existing flashcard SRS without modification.
