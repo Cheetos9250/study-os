@@ -170,3 +170,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Corrected whitespace assertion SHA `97c93f0435fb2c8de27115351237f28cdb6bd648` passed [regression 43378451795](https://github.com/Cheetos9250/study-os/actions/runs/43378451795) and [isolated browser 43378451810](https://github.com/Cheetos9250/study-os/actions/runs/43378451810).
 - Extended English practice headword/Thai-meaning duplicate keys to strip invisible U+200B–U+200D and U+FEFF before collapsing whitespace, preventing duplicate choices from hidden separators. Final code SHA `c0690cf48412017e867af79c89b17477fdbaab6f`, synthetic test SHA `8e155a9e54ec8ede3997bc0b5d2eac614f8ca565`. Regression 43379006639 and browser 43379006644 queued at documentation time. No source row or progress changes.
+
+### Rotated Verified-question normalized option audit
+
+- Invisible-separator guard SHA `8e155a9e54ec8ede3997bc0b5d2eac614f8ca565` passed [regression 43379006639](https://github.com/Cheetos9250/study-os/actions/runs/43379006639) and [isolated browser 43379006644](https://github.com/Cheetos9250/study-os/actions/runs/43379006644).
+- Added a regression checking every option in rotated Verified English practice questions for duplicates after Unicode NFKC, invisible-separator stripping and whitespace normalization. Test-only final SHA `6775d45b667e12298409b3557f9ca6081d8916af`; regression 43379340424 and browser 43379338387 pending at documentation time. This checks mechanical duplicates, not whether semantically similar Thai translations are acceptable distractors. No source/progress/production writes.
