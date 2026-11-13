@@ -20,3 +20,7 @@ Legacy production KV is not atomic CAS. Experimental staging and production-cand
 ## Separation plan
 
 Continue language-only adapters/navigation first. Do not remove academic/Chinese data, shared backup coverage or writer guards. A separate backend/data migration requires authoritative private five-subject backups, staging persistence/concurrency evidence, old-writer reconciliation and explicit approval. See `PHASE-6-PRODUCTION-CUTOVER-READINESS.md`.
+
+## Browser QA boundary
+
+`tests/browser_smoke.py` creates disposable Chromium/WebKit profiles. A route handler serves app files and the English export from the checked-out tree, blocks external services and all non-GET requests, and checks that Practice leaves persistent storage unchanged. It then exercises a synthetic flashcard schedule and reload without altering academic fixture records. The dedicated CI uses Ubuntu 24.04 with a pinned Playwright dependency; it does not deploy or use application secrets. Tablet emulation is not physical iPad evidence.

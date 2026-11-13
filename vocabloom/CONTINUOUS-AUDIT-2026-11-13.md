@@ -44,3 +44,13 @@ This verifies field parsing, provenance and structural validity, not expert appr
 ## Release status
 
 No merge, production deployment, Notion mutation, Worker/KV write, migration, secret change or Auto Sync activation. Real cross-device preservation still requires staging persistence/atomicity tests and authoritative private production backups. Browser and live-backend gaps remain release gates; offline successes do not close them.
+
+## Browser automation follow-up
+
+Added `tests/browser_smoke.py` and `.github/workflows/vocabloom-browser-tests.yml` after the first implementation CI passed (runs 43360419238/43360414670 at `2122559e4ae3a218983baaf7da17db97a9dd8996`). The first browser run 43360646671 at `b1d43dd0582da5591d7e1deae6baef2131857df3` failed during browser dependency installation: `ubuntu-latest` resolved to Ubuntu 26.04, unsupported by the pinned Playwright 1.56 package. No browser assertions ran in that attempt. Pinned the browser job to supported Ubuntu 24.04 in `17aaf38ada559e4f4ea5849360980fb70ed0f145`; final execution evidence follows below.
+
+### Verified hosted browser result
+
+At code/workflow SHA `17aaf38ada559e4f4ea5849360980fb70ed0f145`, browser run [43360796688](https://github.com/Cheetos9250/study-os/actions/runs/43360796688) and duplicate push run [43360785239](https://github.com/Cheetos9250/study-os/actions/runs/43360785239) completed **success**. Job `131673559726` logs explicitly report four passed cases: Chromium desktop, Chromium tablet, WebKit desktop, WebKit tablet. Each imported 573 English words and reported zero live service requests. Regression run [43360796750](https://github.com/Cheetos9250/study-os/actions/runs/43360796750) also completed **success** at that SHA.
+
+The browser harness exercised actual DOM clicks for wrong/correct answers, Retry mistakes, New set, chapter selection and flashcard rating, verified Practice left browser storage unchanged, and confirmed the synthetic English SRS schedule survived reload while academic fixture records remained unchanged. This is hosted Linux browser emulation using disposable synthetic progress and mocked content/services, **not** physical iPad Safari/VoiceOver or live cross-device/Cloudflare validation. The final documentation commit does not change tested application code or the browser harness.

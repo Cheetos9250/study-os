@@ -32,3 +32,10 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Local verification: **226 Node regressions + 3 Python exporter tests + 62 synthetic CAS tests passed**. Browser launch attempted but blocked by the environment's socket permissions; no browser pass claimed.
 - Read-only refresh: Pages GET 200; Worker content GETs 403; Notion English Verified 583 versus committed 582 with the known two-sense `rebound` duplicate. Administrative KV and live cross-device data remain unverified.
 - See `CONTINUOUS-AUDIT-2026-11-13.md` for exact scope, commands, sources and limitations; new `PROJECT.md`/`ARCHITECTURE.md`/`DECISIONS.md`/`CHANGELOG.md` provide continuation context.
+
+### Hosted browser gate completed
+
+- Added `tests/browser_smoke.py` and the read-only no-deploy browser workflow. Initial dependency failure on Ubuntu 26.04 was corrected by pinning Ubuntu 24.04.
+- **Four browser cases passed**: Chromium and WebKit, each desktop and tablet viewport. Real DOM interaction, practice storage isolation, synthetic SRS persistence after reload, and academic fixture preservation were verified with all services mocked.
+- Tested code/workflow SHA: `17aaf38ada559e4f4ea5849360980fb70ed0f145`. Browser CI: https://github.com/Cheetos9250/study-os/actions/runs/43360796688 ; Node/Python regression CI: https://github.com/Cheetos9250/study-os/actions/runs/43360796750 — both **success**, logs inspected.
+- This closes the hosted browser automation gap only. Physical Safari/VoiceOver, actual production progress and staging CAS persistence remain open release gates. No production release or merge occurred.

@@ -15,3 +15,7 @@ Offer Retry mistakes using only answered incorrect items in the frozen practice 
 ## Deferred
 
 Do not relax exact-headword example checks in this patch: inflected examples need a deliberate morphology/content policy. Do not alter production Notion deduplication for multi-sense `rebound` (issue #40), Chinese/Pinyin content, sync endpoints or CAS rollout.
+
+## Proposed next acceptance criteria — example matching (not implemented)
+
+Evaluate whole English tokens rather than arbitrary substring inclusion. Permit explicitly supported inflections (`modify`/`modified`, `rally`/`rallied`, `authority`/`authorities`) and inflect only the verb token in phrasal verbs (`ramp up`/`ramped up`). Tests must reject substring false positives and sentences that omit a required token (`securities filing` versus only `filing`). Preserve source text and existing IDs; report uncertain cases for review rather than inventing examples. This proposal does not authorize production content edits or alter current import eligibility.

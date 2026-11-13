@@ -6,8 +6,8 @@ Updated: 2026-11-13
 
 1. Define morphology-aware example eligibility for the nine excluded English entries listed in `CONTINUOUS-AUDIT-2026-11-13.md`; keep `securities filing` partial-headword handling explicit. Preserve imported IDs and do not edit Notion records.
 2. Extend session-only practice with sentence context/explanations after auditing ambiguous senses and distractors. Retry mistakes and cross-chapter duplicate handling are implemented and regression-tested; keep SRS isolation intact.
-3. Review CAS client and offline candidate Worker contracts with synthetic data; keep all testing off production.
-4. Keep `PROGRESS.md`, `NEXT_STEPS.md`, and `P0-P1-ENGLISH-EXPERIENCE-AUDIT.md` aligned after verified work.
+3. Extend the existing Chromium/WebKit browser harness with disposable backup/restore and content-refresh interactions. Four desktop/tablet learning flows already pass; physical Safari and live cross-device behavior remain separate.
+4. Keep project/architecture/decision/changelog documents and the current evidence in `CONTINUOUS-AUDIT-2026-11-13.md` aligned. Older P0/P1 audits are historical snapshots; do not replace their recorded results with assumptions.
 
 ## Requires a real test environment or user approval
 
