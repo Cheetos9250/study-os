@@ -1,0 +1,175 @@
+name: Study OS AI Coding Agent (opt-in, draft PR only)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/auto-ai-coding.yml'
+      - 'scripts/auto_ai_agent.py'
+      - 'scripts/tests/test_auto_ai_agent.py'
+      - 'NEXT_STEPS.md'
+      - 'docs/AUTO_AI_AGENT.md'
+  workflow_dispatch:
+    inputs:
+      proposal_only:
+        type: boolean
+        description: 'Generate and test proposal without creating a draft PR'
+        required: true
+        default: true
+  schedule:
+    # Weekdays 09:41 in Thailand. Runs only after a reviewed merge to main
+    # AND an explicit opt-in repository variable is enabled.
+    - cron: '41 2 * * 1-5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: study-os-auto-ai
+  cancel-in-progress: false
+
+jobs:
+  unit-tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test AI agent without secrets or paid requests
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+
+  preflight:
+    if: github.event_name != 'pull_request' && vars.STUDY_OS_AUTO_AI_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      can_run: ${{ steps.gate.outputs.can_run }}
+    steps:
+      - name: Skip if an Auto AI draft PR is already open
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          count="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json headRefName --jq '[.[] | select(.headRefName | startswith("auto/study-os-ai-"))] | length')"
+          if [ "$count" -gt 0 ]; then
+            echo "Existing Auto AI PR blocks further API calls."
+            echo "can_run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "can_run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  generate:
+    needs: preflight
+    if: needs.preflight.outputs.can_run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Generate ONE JSON proposal using Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "::error::Missing GEMINI_API_KEY secret. No API call was made."
+            exit 1
+          fi
+          python3 scripts/auto_ai_agent.py plan --root . --output auto-ai-output/proposal.json
+      - name: Save bounded proposal artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: study-os-auto-ai-proposal
+          path: auto-ai-output/proposal.json
+          if-no-files-found: error
+          retention-days: 7
+
+  verify:
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: study-os-auto-ai-proposal
+          path: auto-ai-output
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate and apply proposal without secrets
+        run: python3 scripts/auto_ai_agent.py apply --root . --output auto-ai-output/proposal.json
+      - name: Run read-only Auto Runner and AI agent safety tests
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+      - name: Run existing Node offline regression
+        run: node --test vocabloom/tests/*.test.cjs
+      - name: Run existing Python exporter unit tests
+        run: python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'
+
+  publish-draft:
+    needs: verify
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.proposal_only == false)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: study-os-auto-ai-proposal
+          path: auto-ai-output
+      - name: Create a separate branch containing ONLY approved file edits
+        env:
+          BRANCH: auto/study-os-ai-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          git switch -c "$BRANCH"
+          python3 scripts/auto_ai_agent.py apply --root . --output auto-ai-output/proposal.json
+          git add -- scripts/auto_dev_pilot.py scripts/tests/test_auto_dev_pilot.py docs/AUTO_RUNNER_PILOT.md
+          if git diff --cached --quiet; then
+            echo "::error::Proposal contains no changes."
+            exit 1
+          fi
+          git config user.name "study-os-auto-ai[bot]"
+          git config user.email "study-os-auto-ai[bot]@users.noreply.github.com"
+          git commit -m "test(study-os): bounded AI proposal for Auto Runner"
+          git push -u origin "$BRANCH"
+      - name: Create DRAFT pull request only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: auto/study-os-ai-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/auto-pr-body.md" <<'EOF'
+          ## AI-generated proposal (human review required)
+
+          Generated via the opt-in Study OS AI Coding Agent using one bounded Gemini request.
+
+          - Model: gemini-2.5-flash-lite
+          - Scope: allowlisted Auto Runner/test/documentation files only
+          - CI: Python safety unit tests + offline Node/Python regressions passed in this workflow run
+          - **DRAFT / NO AUTO MERGE / NO DEPLOY**
+          - Production data, Notion, Cloudflare, Workers, KV, credentials and existing sync workflow were not modified
+          - Review all generated code before any merge; tests alone are insufficient security assurance
+
+          This PR is an automated suggestion, not a claim that the proposed change is suitable for production.
+          EOF
+          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$BRANCH" \
+            --draft --title "test(study-os): AI-generated Auto Runner hardening proposal" \
+            --body-file "$RUNNER_TEMP/auto-pr-body.md"
