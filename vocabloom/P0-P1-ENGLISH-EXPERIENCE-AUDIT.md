@@ -146,3 +146,10 @@
 - Hardened `cFullRestore` to reject array/primitive objects in the top-level progress/days/settings/subjects structure, and recheck `CLOUD.busy` after asynchronous file reading to avoid racing with a newly started sync. Added executable mock restore tests for malformed structures and that race.
 - CI passed for the content fix and tests at SHA `beefd11d628bd0bc87424dbaea7785c93e1b0800`: https://github.com/Cheetos9250/study-os/actions/runs/43357612982 . Earlier initial content audit failed, correctly revealing the 236-record meaning-first parsing defect; it was fixed before this successful run.
 - This is committed-data and Node sandbox verification only. Live Notion refresh, iPad Safari, and real Worker/KV concurrency remain untested; release gate still BLOCKED. No merge or production change.
+
+## P2 Vocabulary Practice accessibility semantics
+
+- Added `role="status"`, `aria-live="polite"` and atomic score announcement to the practice score heading, a stable question ID with `aria-describedby` on answer choices, `aria-pressed` selection state and polite live feedback for correctness.
+- Extended the executable practice HTML test to assert the status, question relationship and selected-answer semantics before and after answering.
+- CI success for SHA `6fd9a8b6e7895158c312559ea364179a14efae55`: https://github.com/Cheetos9250/study-os/actions/runs/43359349142 .
+- These are static HTML and Node regression checks only. Actual VoiceOver announcements, focus management, iPad Safari interaction and accessibility conformance remain unverified and part of the manual release gate.
