@@ -4,11 +4,13 @@
     "scope": "Chapter 1–9 questions indexed in Study OS",
     "provenance": "Original study solutions, not a publisher answer key. Source-check status differs by question; do not treat all entries as verified.",
     "sourceFile": "Owner's Google Drive Acc textbook.pdf",
-    "reviewStatus": "29 draft solutions; E-1-19, E-1-31B and E-1-34 newly checked against source PDF page 58. Earlier draft answers require individual review.",
+    "reviewStatus": "45 drafted solutions (16 newly source-reviewed against pages 56–62); 29 prior entries retain their earlier verification status, mostly unverified.",
     "storage": "Public answers only; no textbook question wording, PDF pages, private notes or user progress",
     "lastUpdated": "2026-11-13",
-    "reviewedCount": 29,
-    "catalogQuestionCount": 403
+    "reviewedCount": 45,
+    "catalogQuestionCount": 403,
+    "sourceReviewedNewCount": 16,
+    "indexCaveat": "The 403-item catalog is not a complete or reliably numbered audit of the printed questions; some exercise identifiers are missing or misread. Do not claim every printed question has an answer."
   },
   "answers": {
     "QS-1-1": {
@@ -214,6 +216,137 @@
       "pages": [
         58
       ]
+    },
+    "E-1-11": {
+      "answer": "1 = f; 2 = a; 3 = g; 4 = h; 5 = b.",
+      "explanation": "Land purchased for cash swaps assets; supplies purchased on credit increase assets and payables; billing a client creates receivable and revenue; settling a payable reduces cash and liabilities; collecting a receivable swaps cash for receivable.",
+      "pages": [
+        56
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "E-1-13": {
+      "answer": "Ending balances: Cash $46,000; Accounts Receivable $3,000; Equipment $31,000; Accounts Payable $0; M. Chen Capital $75,000; Withdrawals $1,000; Revenues $10,500; Expenses $4,500. Total assets = total liabilities plus ending equity = $80,000.",
+      "explanation": "a: cash +60,000, equipment +15,000, capital +75,000. b: cash -1,500, rent expense +1,500. c: equipment +10,000, payable +10,000. d: cash +2,500, revenue +2,500. e: receivable +8,000, revenue +8,000. f: cash -6,000, equipment +6,000. g: cash -3,000, wages expense +3,000. h: cash +5,000, receivable -5,000. i: cash -10,000, payable -10,000. j: cash -1,000, withdrawals +1,000. Net income $6,000; ending equity $75,000 + $6,000 - $1,000 = $80,000.",
+      "pages": [
+        57
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "E-1-15": {
+      "answer": "Ernst Consulting — Income Statement, October: Consulting revenue $14,000. Expenses: rent $3,550; salaries $7,000; telephone $760; miscellaneous $580. Total expenses $11,890. Net income $2,110.",
+      "explanation": "Only revenues and expenses enter the income statement; cash, receivables, equipment, investments and owner withdrawals do not. $14,000 - ($3,550 + $7,000 + $760 + $580) = $2,110.",
+      "pages": [
+        57
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "E-1-16": {
+      "answer": "Ernst Consulting — Statement of Owner's Equity, October: Beginning capital $0; owner investments $84,000; add net income $2,110; less owner withdrawals $2,000; ending capital $84,110.",
+      "explanation": "Use net income from Exercise 1-15 and the investments/withdrawals in the same source data. Ending equity = $0 + $84,000 + $2,110 - $2,000.",
+      "pages": [
+        57
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "E-1-18": {
+      "answer": "Ernst Consulting — Statement of Cash Flows, October: Operating $(6,640); investing $(18,000); financing $36,000; net increase in cash $11,360; beginning cash $0; ending cash $11,360.",
+      "explanation": "Operating: cash collections $0; rent $(3,550), paid wages $(1,750), telephone $(760), miscellaneous $(580), total $(6,640). Of $7,000 salaries expense, $5,250 remains unpaid. Investing: paid cash for equipment $(18,000); the $46,000 land contribution is noncash and excluded. Financing: owner invested $38,000 cash, withdrew $2,000. $36,000 - $18,000 - $6,640 = $11,360.",
+      "pages": [
+        58
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-1A": {
+      "answer": "Transactions (assets; liabilities; equity; net income; cash operating/investing/financing): 1 +900; 0; +900; 0; F +900. 2 +700; 0; +700; +700; O +700. 3 -500; 0; -500; -500; O -500. 4 +100; +100; 0; 0; no cash flow. 5 +200; +200; 0; 0; no cash flow. 6 0; 0; 0; 0; I -300. 7 -200; -200; 0; 0; O -200. 8 +400; 0; +400; +400; no cash flow. 9 -50; 0; -50; 0; F -50. 10 0; 0; 0; 0; O +400.",
+      "explanation": "Receiving revenue affects income; incurring wage expense reduces income and equity. Credit purchases increase assets and payables without cash flow. Buying equipment for cash swaps assets but uses investing cash. Collecting a receivable swaps assets but supplies operating cash. Owner investment/withdrawal are financing cash flows, not revenues/expenses.",
+      "pages": [
+        59
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-2A": {
+      "answer": "1 Company A: (a) 2018 equity $30,500; (b) 2019 equity $41,500; (c) 2019 liabilities $16,500. 2 Company B: (a) 2018 equity $12,500; (b) 2019 equity $13,500; (c) net income $1,600. 3 Company C: 2019 assets $55,875. 4 Company D: owner investments $27,000. 5 Company E: 2018 liabilities $91,500.",
+      "explanation": "Use A=L+E and ending equity=beginning equity+investments+net income-withdrawals. A: 55,000-24,500=30,500; 30,500+6,000+8,500-3,500=41,500; 58,000-41,500=16,500. B: 34,000-21,500=12,500; 40,000-26,500=13,500; 13,500-12,500-1,400+2,000=1,600. C: (24,000-9,000)+9,750+8,000-5,875=26,875 equity; add 29,000 liabilities for 55,875 assets. D: (85,000-24,000)-(60,000-40,000)-14,000=27,000. E: 2019 equity 113,000-70,000=43,000; 2018 equity 43,000-6,500-20,000+11,000=27,500; 119,000-27,500=91,500.",
+      "pages": [
+        59,
+        60
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-3A": {
+      "answer": "Armani Company — Income Statement, year ended December 31, 2019: Consulting revenue $33,000; rental revenue $22,000; total revenue $55,000. Salaries expense $20,000; rent expense $12,000; selling and administrative expense $8,000; total expenses $40,000. Net income $15,000.",
+      "explanation": "Revenues $33,000+$22,000=$55,000. Expenses $20,000+$12,000+$8,000=$40,000. Net income = $15,000. Do not include asset, liability, capital or withdrawal balances in profit.",
+      "pages": [
+        60
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-4A": {
+      "answer": "Armani Company — Statement of Owner's Equity, 2019: Beginning capital $16,000; owner investments $1,000; add net income $15,000; less withdrawals $13,000; ending capital $19,000.",
+      "explanation": "Beginning $16,000 + investments $1,000 + net income from P-1-3A $15,000 - withdrawals $13,000 = $19,000.",
+      "pages": [
+        60
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-5A": {
+      "answer": "Armani Company — Balance Sheet, December 31, 2019: Assets: cash $10,000; accounts receivable $9,000; supplies $6,000; equipment $5,000; total assets $30,000. Liabilities: accounts payable $11,000. Equity: A. Armani capital $19,000. Total liabilities and equity $30,000.",
+      "explanation": "Assets sum to $30,000. Ending owner's capital is from P-1-4A. The accounting equation balances: $30,000 = $11,000 + $19,000.",
+      "pages": [
+        60
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-6A": {
+      "answer": "Kia Company — Statement of Cash Flows, year ended December 31, 2019: Operating activities +$6,000; investing activities $(2,000); financing activities $(2,800); net cash increase +$1,200; beginning cash $2,300; ending cash $3,500.",
+      "explanation": "Net cash flow = $6,000 - $2,000 - $2,800 = $1,200. Ending cash = $2,300 + $1,200 = $3,500.",
+      "pages": [
+        60
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-7A": {
+      "answer": "Gram Co., May: Ending cash $42,780; accounts receivable $0; office equipment $1,970; total assets $44,750; accounts payable $80; ending equity $44,670. Income statement: consulting revenue $11,100; total expenses $5,030; net income $6,070. Owner's equity: opening $0 + investment $40,000 + income $6,070 - withdrawals $1,400 = $44,670. Cash flows: operating +$6,070; investing $(1,890); financing +$38,600; net increase/ending cash $42,780.",
+      "explanation": "Revenues: $5,400 cash + $2,500 and $3,200 on account = $11,100. Expenses: rent $2,200, cleaning $750, wages $1,500, telephone $300, utilities $280 = $5,030. Receivables created $5,700 and collected $5,700. Equipment $1,890 credit purchase plus $80 on credit remains; $1,890 was paid. Cash receipts from customers $11,100 equal earned revenue here; operating payments $5,030. Total assets $42,780 cash + $1,970 equipment = $44,750, equal $80 payable + $44,670 equity.",
+      "pages": [
+        60,
+        61
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-8A": {
+      "answer": "Biz Consulting, ending: Cash $14,525; accounts receivable $1,000; supplies $1,200; office equipment $26,700; office suite $40,000; total assets $83,425; accounts payable $2,200; ending owner's equity $81,225; revenues $6,800; expenses $2,300; net income $4,500.",
+      "explanation": "Cash = 70,000-40,000-15,000-500+4,000-3,275+1,800-700-1,800 = $14,525. Receivables $2,800-$1,800=$1,000. Equipment $10,000+15,000+1,700=$26,700. Payables $1,200+$1,700-$700=$2,200. Net income $2,800+$4,000-$500-$1,800=$4,500. Equity $80,000+$4,500-$3,275=$81,225; assets $83,425 equal liabilities plus equity.",
+      "pages": [
+        61
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-9A": {
+      "answer": "Sony Electric, December: Ending cash $59,180; accounts receivable $900; supplies $1,150; office equipment $2,530; electrical equipment $13,000; total assets $76,760; accounts payable $8,550. Income statement: revenue $7,100; expenses $2,940; net income $4,160. Ending owner's equity $68,210. Cash flows: operating +$2,460; investing $(7,330); financing +$64,050; net increase/ending cash $59,180. Alternative initial financing (borrow $16,000 and invest only $49,000): assets unchanged $76,760; liabilities increase to $24,550; equity decreases to $52,210.",
+      "explanation": "Revenues $1,200+$5,000+$900=$7,100; expenses rent $1,000+wages $1,400+utilities $540=$2,940. Cash collections $1,200+$5,000=$6,200; operating cash paid $1,000+$800+$1,400+$540=$3,740. Investing payments $4,800+$2,530=$7,330. Financing owner invested $65,000 and withdrew $950. Ending equity $65,000+$4,160-$950=$68,210. Accounts payable $8,200 electrical equipment+$350 supplies=$8,550; check total assets $76,760.",
+      "pages": [
+        61,
+        62
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-11A": {
+      "answer": "Coca-Cola return on assets = 11.3% (8,634 / 76,448). PepsiCo return on assets = 9.2% (6,462 / 70,518). PepsiCo has higher sales ($66,504m versus $46,542m), but Coca-Cola generates more income per dollar of assets. On the supplied efficiency measure, Coca-Cola is preferred; an investment choice would also consider risk, valuation and growth.",
+      "explanation": "ROA = net income / average total assets. Values from the book's comparative table are in millions. $8,634m/$76,448m≈11.29%; $6,462m/$70,518m≈9.16%. Higher sales are not the same as higher return on assets.",
+      "pages": [
+        62
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "P-1-12A": {
+      "answer": "Risk ranking (1 = highest, 4 = lowest): a. Low-risk corporate bond = 3; b. Medium-risk corporate bond = 2; c. Company stock in a start-up = 1; d. U.S. government Treasury bond = 4.",
+      "explanation": "Start-up equity bears greatest business risk; medium-risk bonds are generally riskier than low-risk corporate bonds; U.S. Treasury bonds are the least risky of the options under the exercise's simplifying assumptions.",
+      "pages": [
+        62
+      ],
+      "verification": "source-reviewed-2026-11-13"
     }
   }
 }
