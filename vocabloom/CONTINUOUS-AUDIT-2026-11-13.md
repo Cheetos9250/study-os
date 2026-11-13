@@ -106,3 +106,9 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - Each is passed to the real `cFullRestore` in a disposable, fully mocked Chromium/WebKit browser profile; assertions require no localStorage mutation and no successful restore state.
 - [Regression run 43367785010](https://github.com/Cheetos9250/study-os/actions/runs/43367785010) and [isolated browser run 43367784703](https://github.com/Cheetos9250/study-os/actions/runs/43367784703) both completed **success**. No real Worker/Notion/KV requests were permitted by the browser harness.
 - This closes the pending CI status from the earlier PROGRESS entry. Physical iPad Safari, VoiceOver and staging CAS persistence remain **unverified**. No merge, deploy or production data write occurred.
+
+### In-memory quota rollback and daily-map hardening
+
+- Browser CI [43368920021](https://github.com/Cheetos9250/study-os/actions/runs/43368920021) and regression CI [43368920096](https://github.com/Cheetos9250/study-os/actions/runs/43368920096) completed **success** for the added in-memory rollback assertion at SHA `c7d287357360fbdc10c7ea33f3e7a10ded3f9413`.
+- Inspected actual `cFullRestore` code and identified permissive `typeof value === 'object'` validation of same-device daily counters. Updated code and added mock execution tests to reject arrays/null/scalars for same-device backups; cross-device daily maps remain ignored. Tests SHA `ef260b87a69167a802fd61020ef84099db29a635`.
+- New CI [regression 43369307639](https://github.com/Cheetos9250/study-os/actions/runs/43369307639) and [browser 43369307661](https://github.com/Cheetos9250/study-os/actions/runs/43369307661) pending at documentation time. No live backup import, iPad testing, or Worker/KV/Notion changes.
