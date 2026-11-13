@@ -16,3 +16,6 @@ Study OS provides course flashcards, lesson summaries, practice questions and lo
 
 ## Evidence and continuity
 Read `PROGRESS.md` for code release SHAs and CI runs, and `NEXT_STEPS.md` for remaining work. GitHub is the source of truth. Do not use real progress for destructive QA or dispatch Notion sync as a frontend test.
+
+## Accounting textbook workspace
+`accounting-textbook.html` supports the published chapters 1–9 reader. The user selects the original PDF privately in the browser. Textbook answers currently have a separate local export; the main backup does not yet include them. Question crop completeness and physical iPad PDF persistence remain unverified.

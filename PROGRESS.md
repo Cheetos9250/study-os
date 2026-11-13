@@ -1,5 +1,21 @@
 # Study OS progress
 
+## Accounting textbook in-page practice reader — chapters 1–9 (2026-11-13; PR #63)
+- Restricted the new in-page textbook reader to exactly **Chapters 1–9**, ending at **Accounting for Receivables**, matching the currently studied course scope. The catalog now contains **403 numbered question references** and **36 section-level metadata references**; none of chapters 10–26 or appendices appear in the interface or published catalog/geometry JSON.
+- Replaced the directory-plus-Drive-link interface with a responsive one-question-at-a-time workspace: chapter/type/search filters, original question image, answer/working field, progress status and previous/next controls on one page.
+- User selects the original, private 1,210-page PDF once on their own iPad; PDF.js renders original printed questions inside Study OS to preserve calculations, tables and diagrams. The source PDF stays browser-local via IndexedDB when storage quotas permit; it is not published or uploaded to GitHub/Cloudflare.
+- **401/403** question headings match automatically cropped geometry; **2/403** use a full source-page fallback. Next-page navigation never crosses beyond the selected chapter boundary; exact crop/question completeness remains unaudited.
+- Reuses `studyos.accounting.textbook.progress.v1`; browser-local answers/progress, backup import/export; no cross-device sync. Existing Accounting course progress and flashcards were not modified.
+- Static tests now assert exactly nine chapters, 403 numbered questions, 401 matched regions, two fallbacks, scope guards, source rendering and privacy. Real iPad Safari rendering and IndexedDB retention still need live-device QA.
+
+## Accounting textbook exercise index (feature branch, not yet released)
+- Added a source-linked **reference index**, not an unauthorized public copy of the textbook exercises, for *Fundamental Accounting Principles* (24th edition) from the owner's Google Drive.
+- Automatic PDF extraction created 1,361 individual Quick Study / Exercise / Problem references and 104 broader section references spanning chapters 1–26 and selected appendices. These are **candidate references, not an audited guarantee of every question**; some PDF text has nonstandard glyph encodings, so manual reconciliation is required.
+- Added `accounting-textbook.html` to search and filter the references, jump to the owner's original PDF, track per-question status, write personal notes, and export/import a backup of this catalog's progress.
+- The catalog uses a new local-only key (`studyos.accounting.textbook.progress.v1`), separate from existing accounting quiz/flashcard progress and from the main Study OS backup/sync tools; it is not synced across devices.
+- This change preserves existing content and does not upload source text to the public repository. Physical iPad Safari and live deployment unverified.
+
+
 This entry covers the course UI work on 2026-11-13, not a complete infrastructure audit.
 
 ## Completed

@@ -12,3 +12,6 @@ The basic study, local backup and missing-only recovery workflow is published in
 - Use synthetic data and isolated browser profiles for reset/restore tests.
 - For future UI changes, require relevant exact-head CI, inspect responsive screenshots and verify published files after an authorized release.
 - No production learning-data write, deletion, cloud migration or Notion sync dispatch is part of UI QA.
+
+## Current textbook workspace
+The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workflow and the 403-question scope. Its answer data has its own backup today; include it in the main backup before claiming one export protects every study module. Do not modify the original PDF or catalog data during backup integration.
