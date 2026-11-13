@@ -63,3 +63,7 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - CI 43369814606 passed static and browser QA for the empty-group navigation implementation.
 - Commit `3271476` adds independent Chromium/WebKit synthetic profile coverage for non-empty overdue/upcoming groups, dates, incomplete status and reload persistence. Check [CI 43370021313](https://github.com/Cheetos9250/study-os/actions/runs/43370021313), fix any failures, and update this document with actual result.
 - After green CI: consider explicit overdue/upcoming list views and more accessible status messages; do not modify production or conflate synthetic WebKit with physical iPad Safari.
+
+## Browser QA failure checkpoint — 2026-11-13
+
+- Run 43370021313 failed browser-qa at non-empty navigation discovery text; static-contract passed. Commit `208c135` adds explicit asynchronous render waits in the synthetic browser test; CI 43370327132 pending. If it fails, inspect browser job logs and DOM/console before changing application code. Do not infer a production defect from a test-only failure.
