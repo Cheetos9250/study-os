@@ -67,3 +67,25 @@ test('Practice answer actions are isolated from SRS and legacy quiz storage',()=
  assert.equal(result.snapshotCleared,true);
  assert.ok(result.renders>=3);
 });
+
+test('Actual practice actions reject missing, empty, negative, non-numeric and out-of-range answers',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const out=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all',tab:'practice',flip:false,browse:0};const ui={page:'studymerge'};const localStorage={setItem(){throw Error('Unexpected write')},getItem(){throw Error('Unexpected read')}};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uDeck=()=>deck;let renders=0;const render=()=>{renders++};const toast=()=>{};${pure}${actions}
+const q=uPracticeQuestions(deck)[0];for(const raw of [undefined,'','-1','NaN','4','Infinity','0.0',' 0'])uAction({dataset:{action:'u-practice-answer',answer:raw}});const before=Object.keys(USTATE.practiceAnswers).length;uAction({dataset:{action:'u-practice-answer',answer:String(q.right)}});return {before,after:USTATE.practiceAnswers[q.id],right:q.right,renders};`)(deck);
+ assert.equal(out.before,0);assert.equal(out.after,out.right);assert.equal(out.renders,1);
+});
+
+test('Actual chapter switching clears stale answers, snapshot and offset',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const out=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all',tab:'practice',flip:false,browse:0};const ui={page:'studymerge'};const localStorage={setItem(){throw Error('Unexpected write')},getItem(){throw Error('Unexpected read')}};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uDeck=()=>deck;const render=()=>{};const toast=()=>{};${pure}${actions}
+const q=uPracticeQuestions(deck)[0];uAction({dataset:{action:'u-practice-answer',answer:String(q.right)}});uAction({dataset:{action:'u-practice-restart'}});uPracticeQuestions(deck);uAction({dataset:{action:'u-cat',cat:'e1'}});const cleared={answers:Object.keys(USTATE.practiceAnswers).length,snapshot:USTATE.practiceQuestions,offset:USTATE.practiceOffset,cat:USTATE.cat};const filtered=uPracticeQuestions(deck);uAction({dataset:{action:'u-cat',cat:'not-a-category'}});return {cleared,filtered:filtered.map(x=>x.cat),empty:uPracticeQuestions(deck)};`)(deck);
+ assert.deepEqual(out.cleared,{answers:0,snapshot:null,offset:0,cat:'e1'});
+ assert.ok(out.filtered.length>=4&&out.filtered.every(c=>c==='e1'));
+ assert.deepEqual(out.empty,[]);
+});
+
+test('Practice HTML escapes malicious vocabulary and option strings',()=>{
+ const html=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all'};const uCards=()=>[{cat:'e1',f:'<img src=x onerror=alert(1)>',b:'<script>alert(1)</script>',mid:'bad'},...deck.cards.slice(0,8).map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}))];const h=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');${pure}return uPracticeHTML(deck);`)(deck);
+ assert.ok(html.includes('&lt;img'));assert.ok(html.includes('&lt;script'));
+ assert.ok(!html.includes('<img src=x'));assert.ok(!html.includes('<script>'));
+});
