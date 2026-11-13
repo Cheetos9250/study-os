@@ -90,3 +90,29 @@ test('Same-device valid daily rows retain counters and word IDs',async()=>{
  assert.deepEqual(JSON.parse(r.store['local-days']),p.deviceDays);
  assert.deepEqual(JSON.parse(r.store['study-days']),p.studyDays);
 });
+
+test('Legacy same-device backups without daily maps restore with empty local counters',async()=>{
+ const p=valid();p.deviceId='local-device';delete p.deviceDays;delete p.studyDays;
+ const r=await simulate(p);
+ assert.equal(r.calls.confirm,1);
+ assert.deepEqual(JSON.parse(r.store['local-days']),{});
+ assert.deepEqual(JSON.parse(r.store['study-days']),{});
+ assert.equal(r.calls.network,0);
+});
+test('Legacy daily rows without optional counters or IDs remain compatible',async()=>{
+ const p=valid();p.deviceId='local-device';
+ p.deviceDays={'2026-11-12':{answered:2,correct:1},'2026-11-11':{}};
+ p.studyDays={'2026-11-12':{answered:1},'2026-11-11':{}};
+ const r=await simulate(p);
+ assert.equal(r.calls.confirm,1);
+ assert.deepEqual(JSON.parse(r.store['local-days']),p.deviceDays);
+ assert.deepEqual(JSON.parse(r.store['study-days']),p.studyDays);
+});
+test('Malformed daily maps from other devices cannot overwrite local counters',async()=>{
+ const p=valid();p.deviceDays={'2026-11-12':{answered:-100,ids:[7]}};
+ p.studyDays={'2026-11-12':null};
+ const r=await simulate(p);
+ assert.equal(r.calls.confirm,1);
+ assert.deepEqual(JSON.parse(r.store['local-days']),{});
+ assert.deepEqual(JSON.parse(r.store['study-days']),{});
+});
