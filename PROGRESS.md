@@ -205,3 +205,11 @@ Next action: editable academic course metadata while preserving stable subject I
 - Previous course metadata JSON download, invalid-import, explicit restore and IndexedDB-denied UI tests passed CI 43380131840 and 43380014201.
 - Root PROJECT.md, AGENTS.md, ARCHITECTURE.md and COURSE_METADATA_DESIGN.md were refreshed to distinguish this unlinked draft from released functionality.
 - Not validated: physical iPad Safari, browser/OS eviction, live Cloudflare Worker/KV sync or real user backup/restore. PR #44 stays Draft; main and production remain unchanged.
+
+
+## Metadata import concurrency and mobile QA — 2026-11-13
+
+- Added synthetic end-to-end regression preventing a stale JSON backup from overwriting newer course metadata saved in a second tab. The UI reports a conflict and explicit refresh displays the newer value. Commit c95af794; CI [43381126032](https://github.com/Cheetos9250/study-os/actions/runs/43381126032) completed **success** (static-contract/browser-qa).
+- Rejected oversized metadata import (>65536 bytes) with the existing size limit before any write. Regression commit f4fc286; CI [43381245830](https://github.com/Cheetos9250/study-os/actions/runs/43381245830) **success**.
+- Tested small-screen 390x844 dark-mode draft editor opening, no horizontal overflow and keyboard focus on course name. Commit 5948042; CI [43381271777](https://github.com/Cheetos9250/study-os/actions/runs/43381271777) **success**, both jobs. Browser tests use synthetic profiles; no physical device or live sync was tested.
+- These are safety/QA additions to unlinked draft PR #44. No merge, production deploy, cloud data writes, automatic import or endpoint changes.
