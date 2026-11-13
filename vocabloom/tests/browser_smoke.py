@@ -99,6 +99,19 @@ def run_case(browser, engine, tablet):
     page.locator('[data-action="u-cat"][data-cat="e1"]').click()
     assert page.evaluate("uPracticeQuestions(uDeck('eng')).every(q=>q.cat==='e1')")
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Practice changed persistent storage"
+    # Complete a full chapter set in the real DOM, not only in the Node harness.
+    chapter_questions = page.evaluate("uPracticeQuestions(uDeck('eng'))")
+    assert len(chapter_questions) >= 4
+    for i, question in enumerate(chapter_questions):
+        page.locator(f'[data-action="u-practice-answer"][data-answer="{question["right"]}"]').click()
+        if i + 1 < len(chapter_questions):
+            page.locator('[data-action="u-q-next"]').click()
+    assert page.get_by_text("Session complete", exact=True).is_visible()
+    assert page.locator('.notice[role="status"]').filter(has_text=f"{len(chapter_questions)}/{len(chapter_questions)} correct").is_visible()
+    assert page.get_by_role("button", name="Retry mistakes (0)").is_disabled()
+    page.get_by_role("button", name="New set", exact=True).click()
+    assert page.get_by_text("Session complete", exact=True).count() == 0
+    assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Completion/new set changed persistent storage"
 
     academic = page.evaluate("keys=>Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]))", ACADEMIC_KEYS)
     page.locator('[data-action="u-tab"][data-tab="cards"]').click()
