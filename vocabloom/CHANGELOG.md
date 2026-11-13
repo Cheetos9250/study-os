@@ -87,3 +87,8 @@ All entries below describe an unmerged proposal, not a production release.
 
 - If a chapter has too few mutually non-overlapping Thai meanings to generate four distinct answer choices, Practice now explains that requirement instead of implying that four different whole-string translations are sufficient.
 - Added a regression with four source-shaped words and a shared explicit Thai sense; the resulting empty state contains no answer buttons. No SRS or cloud behavior changed.
+
+## 2026-11-13 — Offline Thai distractor review tool (unmerged)
+
+- Added a read-only CLI to screen committed Verified English translations for possible semantic overlap, plus deterministic tests.
+- Captured a human-review queue of initial candidates in `THAI-DISTRACTOR-REVIEW-2026-11-13.md`. Fuzzy candidates are not automatically removed from practice or treated as translation errors.
