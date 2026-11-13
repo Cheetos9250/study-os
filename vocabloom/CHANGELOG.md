@@ -69,3 +69,7 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — Practice distractor normalization
 
 - Generated English practice now treats headwords and Thai meanings differing only in internal whitespace as duplicates for question/option selection. Source content is unchanged.
+
+## 2026-11-13 — Invisible-separator deduplication
+
+- English practice duplicate detection now ignores invisible Unicode separators in headwords and Thai meanings. Original displayed content, Notion source rows and SRS are unchanged.
