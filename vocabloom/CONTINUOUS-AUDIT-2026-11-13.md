@@ -211,3 +211,9 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - Reviewed 582 committed Verified English rows. Exactly shared punctuation-delimited sense: 1 identified pair; broader Thai substring/bigram screening produced 87 candidate pairs (potential false positives such as `unsaturated` vs `saturated`). See `THAI-DISTRACTOR-REVIEW-2026-11-13.md` for the method and shortlist.
 - Regression [43381193510](https://github.com/Cheetos9250/study-os/actions/runs/43381193510) **success**; browser [43381193520](https://github.com/Cheetos9250/study-os/actions/runs/43381193520) **in progress** when documented. The prior small-pool code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678` passed both workflows.
 - No source edits, production changes, merges, migrations, Worker/KV interactions, or private data exposure.
+
+### Parser parity regression and Safari handoff
+
+- Added all-Verified-row comparison between read-only reviewer `thaiMeaning` and live `uPracticeMeaning`, test SHA `c096dec49caaa99b8ead9a8750c5d01be957e9df`. Regression [43381503376](https://github.com/Cheetos9250/study-os/actions/runs/43381503376) **success**; browser [43381503455](https://github.com/Cheetos9250/study-os/actions/runs/43381503455) **queued** at writing time.
+- Earlier audit tests SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00` passed regression and browser. Physical iPad Safari manual checklist was extended at `295fc229acb6ff295b87bef8b680235609c15905`, but remains **not executed**.
+- No merge, deployment or real source/progress mutation. Latest documentation-only workflow status should be checked independently.
