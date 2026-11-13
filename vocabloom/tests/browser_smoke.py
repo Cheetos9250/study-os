@@ -137,6 +137,14 @@ def run_case(browser, engine, tablet):
         }""", malformed)
         assert page.evaluate("JSON.stringify({...localStorage})") == stable, "Invalid backup modified browser storage"
         assert page.evaluate("CLOUD.remoteStatus") != "restored locally", "Invalid backup was accepted"
+    # Same-device malformed day maps must fail closed without touching progress.
+    for key, malformed_value in (("deviceDays", []), ("studyDays", "invalid")):
+        malformed = {**backup, "deviceId": page.evaluate("CLOCAL.device"), key: malformed_value}
+        stable = page.evaluate("JSON.stringify({...localStorage})")
+        page.evaluate("""async payload => {
+          await cFullRestore({size:1024,text:async()=>JSON.stringify(payload)});
+        }""", malformed)
+        assert page.evaluate("JSON.stringify({...localStorage})") == stable, "Malformed daily map modified browser storage"
     # Mutate a synthetic record, then restore through the real file input and confirmation.
     page.evaluate("localStorage.setItem('study-acc',JSON.stringify({ans:{changed:2}}))")
     with page.expect_event("dialog") as dialog_event:
