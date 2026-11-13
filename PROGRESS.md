@@ -121,3 +121,9 @@ Next action: editable academic course metadata while preserving stable subject I
 - CI run [43369282612](https://github.com/Cheetos9250/study-os/actions/runs/43369282612) for regex fix commit `e38f3db` completed **success** (static-contract and browser-qa). This evidence applies to that code checkpoint only.
 - Extended `scripts/study-os-planner-browser.cjs` to assert discovery counts in the existing Chromium/WebKit synthetic planner flows: empty planner, newly added today's plan, explicitly completed plan, and completed plan edited to tomorrow (must remain completed, **not** upcoming).
 - Browser test commits `63e55de` and correction `598771a`. New browser CI result pending; no physical iPad test or live sync. PR #44 stays draft and no production actions were performed.
+
+## Overdue/upcoming navigation — 2026-11-13
+
+- CI run [43369517015](https://github.com/Cheetos9250/study-os/actions/runs/43369517015) **success** for discovery-count regression checkpoint `598771a`, including static-contract and browser-qa. This does not cover later navigation changes.
+- Added explicit read-only planner buttons **ดูงานค้าง** (earliest overdue date) and **ดูแผนถัดไป** (nearest upcoming date within 7 days); selection only changes the viewed date, never completion or stored records. Commits `904527e` and `08f3a56`.
+- Added Chromium/WebKit synthetic empty-group navigation assertions, commit `5f0f9b0`. Exact-head CI pending. Physical iPad Safari remains unverified. No merge, deployment or production data writes.
