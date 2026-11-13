@@ -200,3 +200,14 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Added a regression comparing the read-only audit parser with the live English Practice `uPracticeMeaning` function on **every committed Verified English row**, SHA `c096dec49caaa99b8ead9a8750c5d01be957e9df`. This prevents the review tool from silently drifting away from live meaning extraction.
 - [Regression 43381503376](https://github.com/Cheetos9250/study-os/actions/runs/43381503376) completed **success**; [browser 43381503455](https://github.com/Cheetos9250/study-os/actions/runs/43381503455) was queued at documentation time. The previous read-only audit SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00` passed both regression 43381193510 and browser 43381193520.
 - Updated `SAFARI-RELEASE-QA.md` to explicitly inspect ambiguous Thai answer choices, while retaining the **NOT EXECUTED** physical iPad gate. No production reads/writes or deployments.
+
+### Practice completion summary — verified in hosted QA
+
+- Added a session-only completion notice to `study-integration.js` plus synthetic regressions and hosted Chromium/WebKit script coverage of answering all English chapter questions. Browser QA also checks a perfect score, Retry mistakes disabled and New set clearing the notice without touching persistent learner storage.
+- Final completion test SHA `dd1cd111e18710390c581ea3922a30a3ba5911fa`: [Regression 43382182948](https://github.com/Cheetos9250/study-os/actions/runs/43382182948) and [Browser 43382182871](https://github.com/Cheetos9250/study-os/actions/runs/43382182871) both completed **success**. Hosted browsers remain synthetic Chromium/WebKit, not physical Safari.
+- No persistent Practice scores, Notion/Worker/KV changes, merge or deployment.
+
+### Repeat sets with five/ten cards — current CI
+
+- Changed the deterministic distractor start and choice placement by round in `uPracticeQuestions`, keeping the existing ten-card offset for card coverage. Added regressions covering repeated five- and ten-card English sets, correct answers and deterministic replay.
+- Final code/test SHA `8e3affa83f699309cb06793844e9eb20ee355893`: [Regression 43382305310](https://github.com/Cheetos9250/study-os/actions/runs/43382305310) completed **success**. [Browser 43382305336](https://github.com/Cheetos9250/study-os/actions/runs/43382305336) was **in progress** at documentation time; check its final conclusion before claiming browser verification of this newest change.
