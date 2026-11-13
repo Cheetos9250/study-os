@@ -39,7 +39,14 @@ function uQuiz(d){const qs=d.quiz.map((x,i)=>({id:i,cat:x[0],q:x[1],opts:x[2],ri
 // These questions are NOT Notion Verified quizzes; answers never write to Study OS/SRS.
 function uPracticeMeaning(back){
  const text=String(back||'').replace(/\*\*/g,'').trim();
- if(text.includes('|'))return (text.split('|')[1]||'').trim();
+ if(text.includes('|')){
+  // Verified imports contain both "part of speech | Thai meaning" and
+  // "Thai meaning | part of speech". Never treat a POS tag as a translation.
+  const parts=text.split('|').map(x=>x.trim()),thai=/[\u0E00-\u0E7F]/;
+  if(thai.test(parts[0]))return parts[0];
+  if(thai.test(parts[1]||''))return parts[1];
+  return '';
+ }
  const first=text.split(/\r?\n/)[0]||'';
  return first.replace(/^[^\n—–:]{1,35}\s*[—–:]\s*/,'').replace(/^(?:ชนิดคำ|ตัวอย่าง)\s*:.*/,'').trim();
 }
