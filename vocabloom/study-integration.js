@@ -66,6 +66,11 @@ function uPracticeContext(back){
  }
  return {example:example.slice(0,500),translation:translation.slice(0,500)};
 }
+// Avoid distractors that repeat any explicit Thai sense in a semicolon/slash/comma list.
+function uPracticeSenses(meaning){
+ return String(meaning||'').normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').split(/[,，、;；/]/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+}
+function uPracticeSharesSense(a,b){return a.some(x=>b.includes(x));}
 function uPracticeQuestions(d){
  if(d.key!==UACTIVE_LANGUAGE)return [];
  // Freeze question/answer pairs for an active session even when Verified data refreshes.
@@ -79,16 +84,21 @@ function uPracticeQuestions(d){
   const wk=word.normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').replace(/\s+/g,' ').trim(),mk=meaning.normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').replace(/\s+/g,' ').trim();
   if(seenWords.has(wk)||seenMeanings.has(mk))continue;
   seenWords.add(wk);seenMeanings.add(mk);
-  pool.push({word,meaning,cat:c.cat,id:c.mid,context:uPracticeContext(c.b),ref:String(c.ref||'')});
+  pool.push({word,meaning,senses:uPracticeSenses(meaning),cat:c.cat,id:c.mid,context:uPracticeContext(c.b),ref:String(c.ref||'')});
  }
  if(pool.length<4)return [];
  const eligible=USTATE.cat==='all'?pool:pool.filter(x=>x.cat===USTATE.cat);
  if(eligible.length<4)return [];
  const rotated=eligible.slice(USTATE.practiceOffset%eligible.length).concat(eligible.slice(0,USTATE.practiceOffset%eligible.length));
  const questions=rotated.slice(0,Math.min(10,eligible.length)).map((c,i)=>{
-  // The pool already has unique normalized meanings; no nested duplicate scan is needed.
+  // Distinct whole translations can still share a Thai sense ("ขึ้นอยู่กับ" vs "ขึ้นอยู่กับ; ...").
   const candidates=eligible.filter(x=>x.id!==c.id),start=(i*7)%candidates.length;
-  const wrong=candidates.slice(start).concat(candidates.slice(0,start)).slice(0,3);
+  const wrong=[];
+  for(const option of candidates.slice(start).concat(candidates.slice(0,start))){
+   if(uPracticeSharesSense(c.senses,option.senses)||wrong.some(x=>uPracticeSharesSense(x.senses,option.senses)))continue;
+   wrong.push(option);
+   if(wrong.length===3)break;
+  }
   if(wrong.length<3)return null;
   const options=[c.meaning,...wrong.map(x=>x.meaning)],shift=i%4;
   const opts=options.slice(shift).concat(options.slice(0,shift));
