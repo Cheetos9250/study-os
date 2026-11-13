@@ -4,12 +4,12 @@
     "scope": "Chapter 1–9 questions indexed in Study OS",
     "provenance": "Original study solutions, not a publisher answer key. Source-check status differs by question; do not treat all entries as verified.",
     "sourceFile": "Owner's Google Drive Acc textbook.pdf",
-    "reviewStatus": "77 draft worked solutions; 48 new entries from the two sessions checked against original PDF; 29 older drafts have varying source review status. Chapter 2 QS-2-1–4 and E-2-1–4 title/crop mapping corrected without changing IDs.",
+    "reviewStatus": "79 draft solutions (50 newly source-reviewed across latest two turns; 29 earlier drafts retain mixed review status). Index 403 candidate IDs, known omissions/numbering defects remain.",
     "storage": "Public answers only; no textbook question wording, PDF pages, private notes or user progress",
     "lastUpdated": "2026-11-14",
-    "reviewedCount": 77,
+    "reviewedCount": 79,
     "catalogQuestionCount": 403,
-    "sourceReviewedNewCount": 48,
+    "sourceReviewedNewCount": 50,
     "indexCaveat": "The 403-item catalog is not a complete or reliably numbered audit of the printed questions; some exercise identifiers are missing or misread. Do not claim every printed question has an answer."
   },
   "answers": {
@@ -607,6 +607,22 @@
       "explanation": "The ledger is prepared by posting each journal entry into its account. Check figures from the textbook: cash $59,465; accounts receivable $4,490; accounts payable $600; total trial balance $119,490. Cash = 80,000−9,000+4,000−11,600−2,400+4,400−5,500−435 = $59,465. Receivables = 6,000−4,400+2,890 = $4,490. Office supplies = 3,600+600 = $4,200. Equipment = 26,000+8,000 = $34,000. Revenues = 4,000+6,000+2,890 = $12,890. The prepaid rent and insurance are assets at purchase; this problem does not request period-end adjusting entries.",
       "pages": [
         100
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "P-2-7A": {
+      "answer": "Metrix — Income Statement, March: Consulting Revenue $12,000; Rental Revenue $500; Total Revenues $12,500. Salaries Expense $3,000; Rent Expense $2,000; Advertising Expense $400; Utilities Expense $200; Total Expenses $5,600; Net Income $6,900. Statement of Owner’s Equity: Beginning Capital $0 + Owner Investment $11,600 + Net Income $6,900 − Withdrawals $2,000 = Ending A. Lopez, Capital $16,500. March 31 Balance Sheet: Cash $8,000; Accounts Receivable $3,500; Note Receivable $2,500; Office Supplies $1,500; Prepaid Insurance $1,000; Equipment $4,000; Total Assets $20,500. Liabilities: Accounts Payable $1,300; Note Payable $2,400; Unearned Revenue $300; Total Liabilities $4,000. Owner's Equity $16,500. Total Liabilities and Equity $20,500.",
+      "explanation": "Use only earned revenues and expenses in the income statement. Utilities Expense is $200 and the $2,500 note is a NOTE RECEIVABLE (an asset), not another note payable. Net income = ($12,000+$500) − ($3,000+$2,000+$400+$200)=$6,900. Equity = $11,600+$6,900−$2,000=$16,500; assets $20,500 equal liabilities $4,000 plus equity $16,500.",
+      "pages": [
+        103
+      ],
+      "verification": "source-reviewed-2026-11-14"
+    },
+    "P-2-1B": {
+      "answer": "Humble Management Services — September general journal: Sep 1 Dr Cash $38,000; Dr Office Equipment $15,000; Cr H. Humble, Capital $53,000. Sep 2 Dr Prepaid Rent $9,000; Cr Cash $9,000. Sep 4 Dr Office Equipment $8,000; Dr Office Supplies $2,400; Cr Accounts Payable $10,400. Sep 8 Dr Cash $3,280; Cr Services Revenue $3,280. Sep 12 Dr Accounts Receivable $15,400; Cr Services Revenue $15,400. Sep 13 Dr Accounts Payable $10,400; Cr Cash $10,400. Sep 19 Dr Prepaid Insurance $1,900; Cr Cash $1,900. Sep 22 Dr Cash $7,700; Cr Accounts Receivable $7,700. Sep 24 Dr Accounts Receivable $2,100; Cr Services Revenue $2,100. Sep 28 Dr H. Humble, Withdrawals $5,300; Cr Cash $5,300. Sep 29 Dr Office Supplies $550; Cr Accounts Payable $550. Sep 30 Dr Utilities Expense $860; Cr Cash $860. Trial Balance, Sep 30 — Debit: Cash $21,520; Accounts Receivable $9,800; Office Supplies $2,950; Prepaid Insurance $1,900; Prepaid Rent $9,000; Office Equipment $23,000; H. Humble, Withdrawals $5,300; Utilities Expense $860. Credit: Accounts Payable $550; H. Humble, Capital $53,000; Services Revenue $20,780. Total debits and credits $74,330 each.",
+      "explanation": "Cash = 38,000−9,000+3,280−10,400−1,900+7,700−5,300−860=$21,520. Receivables = 15,400−7,700+2,100=$9,800. Supplies = 2,400+550=$2,950; equipment = 15,000+8,000=$23,000; remaining payable $550. Services Revenue = 3,280+15,400+2,100=$20,780. The source-book checks confirm Cash $21,520, Receivables $9,800, Payables $550 and trial balance $74,330.",
+      "pages": [
+        103
       ],
       "verification": "source-reviewed-2026-11-14"
     }
