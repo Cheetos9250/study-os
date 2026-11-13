@@ -40,3 +40,7 @@ Status: **NOT EXECUTED on physical iPad Safari**. This is a reproducible manual 
 ## Release decision
 
 Current gate: **BLOCKED** until physical Safari tests and staging CAS atomicity are evidenced. Automated Node tests are necessary but not sufficient. Record failures, reproduction steps, before/after behavior and CI references in the audit document.
+
+## Pronunciation release checks (not executed on physical iPad)
+
+Using an approved, disposable iPad Safari preview, verify that **Listen** speaks the English headword, and that **Listen to example** appears only after a question has been answered and reads the exact source English sentence. Confirm a forged pre-answer action cannot speak the hidden example, and that disabled/unavailable audio states are understandable. Test portrait/landscape, VoiceOver reading order, hardware volume, repeat playback, and transitions between question/feedback focus. No physical-device audio or VoiceOver pass has been claimed; hosted Chromium/WebKit tests are not a substitute.

@@ -43,3 +43,16 @@ The audit reads committed `data/cards.json` and returns JSON with a concise top-
 ## Boundaries
 
 The fuzzy audit **does not automatically suppress any distractor**. Thai morphology and shared substrings can flag valid antonyms and related vocabulary. Runtime only screens exact punctuation-delimited Thai sense collisions. Draft PR only: no merge, deploy, private backup read, Worker/KV, Notion, migration or production data changes.
+
+## Generated-question exposure check — 2026-11-13
+
+A second read-only script narrows the existing 87 *possible* translation-pair warnings to those actually seen together as a correct answer and an incorrect option in generated Practice rounds:
+
+```sh
+node vocabloom/scripts/audit-practice-exposure.cjs --rounds=60
+node vocabloom/scripts/audit-practice-exposure.cjs --rounds=60 --all
+```
+
+The script runs the existing English card adapter and Practice question generator (without browser storage or cloud calls) for the All category and every English chapter. A read-only scan of the branch files at implementation SHA `91ae3f7d8b8c6f455019d9df80afea254398d74f` reviewed 60 rounds per category, **3,000 questions** / **12,000 choices**, with **zero exact correct-vs-distractor exposures** among the 87 fuzzy review candidates in these bounded rounds.
+
+**Interpretation:** This is encouraging structural screening, not complete linguistic certification, not an exhaustive audit of future offsets or all possible choices, and not authority to rewrite source meanings. Thai antonyms and related grammatical roles may still be useful distractors. Do not auto-filter using fuzzy similarity. See the original list above for manual review.

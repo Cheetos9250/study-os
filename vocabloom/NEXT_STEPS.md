@@ -65,3 +65,10 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - The latest application/test SHA `159ecb5d0e890fc18e0ea3a22b35e81d194cddcf` passed [regression 43383655509](https://github.com/Cheetos9250/study-os/actions/runs/43383655509) (259 Node + 3 Python) and [isolated browser 43383655513](https://github.com/Cheetos9250/study-os/actions/runs/43383655513) (four Chromium/WebKit desktop/tablet cases, zero live requests).
 - On a separately approved non-production preview and disposable physical iPad Safari session, check VoiceOver announcement and focus persistence during Verified content refresh, Previous/Next, Retry mistakes, New set, portrait/landscape and 200% zoom.
 - Continue manual review of semantic distractor candidates and separate staging CAS/backups only under the existing release gates. Do not merge/deploy or migrate real progress without explicit authorization.
+
+### Post-pronunciation / real-choice exposure follow-up
+
+- The code/test SHA `91ae3f7d8b8c6f455019d9df80afea254398d74f` passed [regression 43386329577](https://github.com/Cheetos9250/study-os/actions/runs/43386329577) (265 Node + 3 Python) and [isolated browser 43386329516](https://github.com/Cheetos9250/study-os/actions/runs/43386329516) (all 4 hosted Chromium/WebKit desktop/tablet cases; zero live service requests).
+- Review potential Thai meaning collisions using `node vocabloom/scripts/audit-practice-exposure.cjs --rounds=60 --all` (read-only). Initial scan of 3,000 generated questions / 12,000 options found 0 fuzzy-pair answer/distractor exposures, but **this does not certify translation quality or all future rotations**; expand bounded sampling and manually review source POS/context if needed.
+- Execute audio playback, speaker volume/unavailable-engine behavior, VoiceOver announcement, tab/feedback focus and full source-example answer gating on **physical iPad Safari with disposable data and an authorized preview**, not production.
+- Staging CAS persistence/concurrency, authoritative historical five-subject backup and explicit owner approval still gate any sync migration or release. No automatic merge/deploy.

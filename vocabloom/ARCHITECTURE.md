@@ -64,3 +64,9 @@ The browser-only `uPracticeRefocus` helper restores focus to the inserted answer
 ## Async content-refresh focus preservation (2026-11-13)
 
 `uBoot` can render the Study Merge view before and after its asynchronous Verified content reads. The `uPracticeRefreshRender` wrapper captures whether the active focus is on the current Practice question heading or answer-feedback status, renders, then reuses the existing `uPracticeRefocus` helper to restore the corresponding element without scrolling. It deliberately avoids stealing focus from unrelated buttons, pages and modes. This changes presentation only; the existing frozen question/session and local-only score boundaries remain unchanged.
+
+## English pronunciation and actual-question exposure audit (2026-11-13)
+
+The generated English Practice panel now provides a source-word **Listen** action using the browser `speechSynthesis` API with an `en-US` utterance. When a question has been answered and its frozen source context includes a supplied example, a separate **Listen to example** action reads only that example; the click handler independently rejects attempts to request an example before answering. Unsupported browsers render disabled Listen controls. Audio actions do not change answers, SRS, local storage, cloud state or question snapshots.
+
+`scripts/audit-practice-exposure.cjs` is a read-only diagnostic: it extracts the exact English card adapter and Practice generator from `study-integration.js`, runs bounded deterministic rounds for All and each English chapter, and intersects the generated correct-versus-distractor choices with approximate Thai meaning pairs from `audit-thai-distractors.cjs`. The output is a **human review queue**, never runtime exclusion logic or a linguistic correctness verdict. The script reads committed export/deck files only.

@@ -67,3 +67,9 @@ Practice replaces its DOM after answering or switching the current question, whi
 ## 2026-11-13 — Async refresh should preserve focus but not hijack it
 
 Preserve the active Practice question or feedback status through both renders in an asynchronous `uBoot` refresh. Restore focus only when it originated from those two recognized elements within the active Practice content; leave unrelated controls and pages alone. Keep the existing read-only source refresh and in-memory frozen snapshot semantics. Hosted browser checks do not certify physical Safari/VoiceOver.
+
+## 2026-11-13 — Pronunciation respects answer gating and source provenance
+
+Use the browser's Speech Synthesis API for optional English Practice word pronunciation, without recording a pronunciation score or changing SRS. A source-example pronunciation control appears **only after the answer is recorded**, and the action handler verifies the answer gate even if a synthetic click is forged. Speak the exact frozen source-supplied English example; do not generate or translate audio content, send external requests or modify source records. Disable the control where browser speech synthesis is unavailable.
+
+Approximate Thai meaning matches are prioritized for human review only if they appear together in actual generated answer/distractor choices. They must never silently suppress words, alter Verified Notion data or be interpreted as proven wrong answers.

@@ -115,3 +115,10 @@ All entries below describe an unmerged proposal, not a production release.
 - Preserve answer-feedback/question-heading keyboard focus while `uBoot` reloads Verified content and rerenders Practice.
 - Add a no-DOM/other-controls guard to avoid focus theft outside Practice and Node regressions for the new wrapper.
 - Extend the isolated browser refresh scenario to verify focus remains on the feedback after a source update. No data, sync, SRS, source-identity or backup change.
+
+## 2026-11-13 — English Practice pronunciation and review exposure tooling (unmerged)
+
+- Added **Listen** to hear the current English word and **Listen to example** after answering when the Verified source supplies an example, both with `en-US` speech synthesis.
+- Hide the example playback action before answering and reject forged pre-answer audio actions; disable audio controls if synthesis is unsupported. No practice persistence, SRS, quiz score, Cloudflare, Notion or backup changes.
+- Added Node and isolated browser QA for audio action guards, access labels, disabled fallback, source-only audio, no score/storage writes and real DOM visibility.
+- Added `scripts/audit-practice-exposure.cjs` and tests to scan generated Practice choices against review-only Thai similarity candidates.
