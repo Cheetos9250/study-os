@@ -69,3 +69,24 @@ test('Cross-device daily counters are ignored even when source contains malforme
  assert.deepEqual(JSON.parse(r.store['local-days']),{});
  assert.deepEqual(JSON.parse(r.store['study-days']),{});
 });
+
+test('Same-device nested daily rows reject malformed counters and IDs without writes',async()=>{
+ for(const key of ['deviceDays','studyDays']){
+  for(const row of [[],null,42,{answered:-1},{answered:'3'},{correct:Infinity},{ids:'invalid'},{ids:[3]}]){
+   const p=valid();p.deviceId='local-device';p[key]={'2026-11-12':row};
+   const r=await simulate(p);
+   assert.equal(r.calls.confirm,0,key+' must reject '+JSON.stringify(row));
+   assert.equal(r.calls.writes,0);
+   assert.deepEqual(r.store,r.original);
+  }
+ }
+});
+test('Same-device valid daily rows retain counters and word IDs',async()=>{
+ const p=valid();p.deviceId='local-device';
+ p.deviceDays={'2026-11-12':{answered:3,correct:2,ids:['w1']}};
+ p.studyDays={'2026-11-12':{answered:4,correct:1}};
+ const r=await simulate(p);
+ assert.equal(r.calls.confirm,1);
+ assert.deepEqual(JSON.parse(r.store['local-days']),p.deviceDays);
+ assert.deepEqual(JSON.parse(r.store['study-days']),p.studyDays);
+});
