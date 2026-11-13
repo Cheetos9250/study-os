@@ -110,3 +110,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Implementation SHA `f5b6c75b2c6dc475e82dfcdaae909394a5c7c304`: [regression 43370356856](https://github.com/Cheetos9250/study-os/actions/runs/43370356856) and [isolated browser 43370356909](https://github.com/Cheetos9250/study-os/actions/runs/43370356909) both completed **success**.
 - Added direct browser checks for nested same-device daily counter failures (negative answered, nonnumeric correct, non-string IDs), asserting unchanged disposable localStorage at code/test SHA `f737cf7886ba797c86d2e6ef9fa503cd4b8e8f13`. This **new** browser extension awaits its own CI confirmation.
 - This remains isolated Chromium/WebKit QA, not real iPad Safari or staging Cloudflare persistence.
+
+### Historical Full Backup compatibility checks
+
+- Direct browser nested-row rejection at SHA `f737cf7886ba797c86d2e6ef9fa503cd4b8e8f13` verified: [browser 43370623091](https://github.com/Cheetos9250/study-os/actions/runs/43370623091) and [regression 43370623145](https://github.com/Cheetos9250/study-os/actions/runs/43370623145) both **success**. Documentation head `55f1d0e4a84f390b353e20113b2cdf68128ef5a5` also passed browser 43370709823 and regression 43370709811.
+- Added isolated execution tests for legacy same-device backups missing optional daily maps, day rows missing optional counters/IDs, and malformed cross-device counters being discarded. Test SHA `7b7f66a1fc5b40cf4f5ad60fa56920b54ec87076`. **CI pending**; no production backup was inspected or restored.
