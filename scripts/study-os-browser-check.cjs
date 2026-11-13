@@ -14,7 +14,7 @@ async function main() {
       const pathname = decodeURIComponent(new URL(request.url,"http://localhost").pathname);
       const file = path.resolve(root, "." + (pathname.endsWith("/") ? pathname + "index.html" : pathname));
       if (!file.startsWith(root + path.sep)) { response.writeHead(403).end(); return; }
-      const types = {".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".json":"application/json"};
+      const types = {".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".cjs":"text/javascript; charset=utf-8",".json":"application/json"};
       response.writeHead(200,{"Content-Type":types[path.extname(file)]||"text/plain"});
       response.end(await fs.readFile(file));
     } catch { response.writeHead(404).end(); }
