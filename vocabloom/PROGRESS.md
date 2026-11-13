@@ -115,3 +115,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Direct browser nested-row rejection at SHA `f737cf7886ba797c86d2e6ef9fa503cd4b8e8f13` verified: [browser 43370623091](https://github.com/Cheetos9250/study-os/actions/runs/43370623091) and [regression 43370623145](https://github.com/Cheetos9250/study-os/actions/runs/43370623145) both **success**. Documentation head `55f1d0e4a84f390b353e20113b2cdf68128ef5a5` also passed browser 43370709823 and regression 43370709811.
 - Added isolated execution tests for legacy same-device backups missing optional daily maps, day rows missing optional counters/IDs, and malformed cross-device counters being discarded. Test SHA `7b7f66a1fc5b40cf4f5ad60fa56920b54ec87076`. **CI pending**; no production backup was inspected or restored.
+
+### Legacy backup CI confirmed; malformed file guard tests added
+
+- Synthetic legacy backup compatibility tests at SHA `7b7f66a1fc5b40cf4f5ad60fa56920b54ec87076` passed [regression 43371209483](https://github.com/Cheetos9250/study-os/actions/runs/43371209483) and [isolated browser 43371209508](https://github.com/Cheetos9250/study-os/actions/runs/43371209508). Documentation head `4676985e21eb4985bfa97e640260d2cd9185da65` also passed browser 43371264483 and regression 43371264339.
+- Extended disposable Full Restore execution harness to test oversized file rejection and invalid JSON without confirmation, writes or network calls, test SHA `743619988c916903d44fc2c74c15924771a3700a`. [Regression 43371443779](https://github.com/Cheetos9250/study-os/actions/runs/43371443779) and [browser 43371443800](https://github.com/Cheetos9250/study-os/actions/runs/43371443800) **in progress** at writing time. No production changes.
