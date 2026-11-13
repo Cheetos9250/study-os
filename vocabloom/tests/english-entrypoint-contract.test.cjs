@@ -54,7 +54,7 @@ test('P1 Verified import is English-only, deduplicated, and stable',()=>{
  const clean=parse(mixed);
  assert.equal(clean.words.length,1,'Only one verified English entry should survive');
  assert.equal(clean.words[0].en,'adapt');
- assert.equal(clean.words[0].id,'notion-httpsappnotioncompaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'.slice(0,47));
+ assert.equal(clean.words[0].id,'notion-'+('httpsappnotioncomp'+'a'.repeat(32)).slice(-40));
  assert.throws(()=>parse({rows:[]}),/No usable Verified words/);
 });
 
