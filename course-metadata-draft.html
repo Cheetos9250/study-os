@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study OS · Course Metadata Draft</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;color-scheme:light dark}
+body{max-width:760px;margin:auto;padding:20px;line-height:1.6}
+fieldset{margin:16px 0;padding:16px;border:1px solid #84958f;border-radius:12px}
+label{display:block;margin:10px 0}input,textarea{display:block;width:100%;box-sizing:border-box;padding:10px;font:inherit}
+button{font:inherit;min-height:44px;margin:4px;padding:8px 14px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #238a80}
+#editor[hidden],[hidden]{display:none!important}
+</style></head><body>
+<main><h1>แก้ไขชื่อรายวิชา · Draft</h1>
+<p>บันทึกเฉพาะเบราว์เซอร์นี้ ไม่เปลี่ยนรหัสวิชา ลิงก์ คะแนน หรือข้อมูล Notion และยังไม่เชื่อมกับหน้าแรก</p>
+<button id="metadata-open" type="button">เปิดเครื่องมือแก้ไขรายวิชา</button>
+<noscript><style>#metadata-open{display:none}</style><p role="alert">เครื่องมือแก้ไขข้อมูลรายวิชาต้องเปิดใช้งาน JavaScript ก่อน ข้อมูลเดิมในเบราว์เซอร์ยังไม่ถูกเปลี่ยนแปลง</p></noscript>
+<p id="metadata-status" role="status" aria-live="polite">ยังไม่เปิดฐานข้อมูล</p>
+<section id="editor" hidden>
+<form id="metadata-form">
+<fieldset><legend>Accounting (acc)</legend><label>ชื่อ<input id="name-acc" maxlength="80" required></label><label>คำอธิบาย<textarea id="description-acc" maxlength="240"></textarea></label></fieldset>
+<fieldset><legend>Economics (eco)</legend><label>ชื่อ<input id="name-eco" maxlength="80" required></label><label>คำอธิบาย<textarea id="description-eco" maxlength="240"></textarea></label></fieldset>
+<fieldset><legend>Mathematics (math)</legend><label>ชื่อ<input id="name-math" maxlength="80" required></label><label>คำอธิบาย<textarea id="description-math" maxlength="240"></textarea></label></fieldset>
+<fieldset><legend>ลำดับรายวิชา</legend><label>รหัสวิชาเรียงตามลำดับ (คั่นด้วยจุลภาค)<input id="metadata-order" required aria-describedby="metadata-order-help"></label><p id="metadata-order-help">ใช้ acc,eco,math โดยเรียงใหม่ได้ แต่ห้ามเพิ่มหรือลบรหัส</p></fieldset>
+<button type="submit">บันทึกการแก้ไข</button><button id="metadata-refresh" type="button">โหลดข้อมูลล่าสุด</button><button id="metadata-reset" type="button">คืนค่าเริ่มต้น</button>
+</form>
+<div><button id="metadata-export" type="button">ดาวน์โหลดข้อมูลรายวิชา</button><button id="metadata-import" type="button">นำเข้าจากไฟล์</button><input id="metadata-file" type="file" accept=".json,application/json" aria-label="ไฟล์ข้อมูลรายวิชา" hidden></div>
+<p>หากข้อมูลถูกแก้ไขจากแท็บอื่น ระบบจะไม่เขียนทับ ให้โหลดข้อมูลล่าสุดก่อน</p>
+</section></main>
+<script src="lib/study-os-course-metadata.js" defer></script>
+<script src="lib/study-os-course-metadata-store.js" defer></script>
+<script src="lib/study-os-course-metadata-editor.js" defer></script>
+</body></html>

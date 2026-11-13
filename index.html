@@ -1,22 +1,169 @@
 <!doctype html>
-<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Study OS</title>
-<style>
-:root{--bg:#f5f1e8;--ink:#1d2623;--card:#fffdf8;--line:#d9d2c0;--accent:#b5602c}
-@media (prefers-color-scheme:dark){:root{--bg:#171a19;--ink:#ece8dd;--card:#202523;--line:#37403c;--accent:#e08a52}}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif}
-main{max-width:640px;margin:0 auto;padding:32px 16px}
-h1{margin:0 0 4px;font-size:28px}p{margin:0 0 24px;opacity:.7}
-a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px;color:inherit;text-decoration:none}
-a b{display:block;font-size:18px}a span{opacity:.65;font-size:14px}
-a:hover{border-color:var(--accent)}
-</style></head><body><main>
-<h1>Study OS</h1><p>ภาคเรียน 1/2026 · แฟลชการ์ด สรุป และแบบฝึก</p>
-<a href="vocabloom/" style="border:2px solid var(--accent);padding:20px"><b>VocaBloom · All-in-One Study OS</b><span>เปิดระบบเรียนรวม: แฟลชการ์ด 5 วิชา · ทบทวน SRS · เกมศัพท์ · ข้อสอบ · สรุปบทเรียน</span></a>
-<p style="font-size:13px;margin:15px 0 12px">หน้าเดิมด้านล่างยังเปิดได้สำหรับตรวจสอบหรือสำรองข้อมูล</p>
-<a href="acc.html"><b>Foundations of Accounting</b><span>บัญชีเบื้องต้น</span></a>
-<a href="eco.html"><b>Economics</b><span>เศรษฐศาสตร์ Micro + Macro</span></a>
-<a href="math.html"><b>Math for Life</b><span>คณิตศาสตร์ในชีวิตประจำวัน</span></a>
-<a href="eng.html"><b>English Vocab</b><span>ศัพท์ภาษาอังกฤษ</span></a>
-<a href="zh.html"><b>Chinese</b><span>ภาษาจีน</span></a>
-</main></body></html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#152f35">
+  <meta name="description" content="Study OS: พื้นที่เรียนบัญชี เศรษฐศาสตร์ และคณิตศาสตร์">
+  <title>Study OS · Academic Learning</title>
+  <style>
+    :root{color-scheme:light;--bg:#f4f6f3;--surface:#fff;--ink:#183036;--muted:#5e7074;--border:#d9e3e0;--accent:#196b63;--soft:#e9f2ef}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Thai",Tahoma,sans-serif;line-height:1.65}
+    a{color:inherit}
+    input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:6px}
+    .wrap{max-width:1080px;margin:auto;padding:0 22px}
+    .top{background:var(--surface);border-bottom:1px solid var(--border)}
+    .top-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-block:17px}
+    .brand{font-size:21px;line-height:1.3;font-weight:800;letter-spacing:-.04em;text-decoration:none}
+    .brand span{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:2px}
+    nav{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+    nav a{text-decoration:none;font-size:14px;font-weight:600;color:var(--muted)}
+    nav a:hover{color:var(--accent)}
+    .hero{padding:58px 0 35px}
+    .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:800}
+    h1{font-size:clamp(34px,7vw,58px);line-height:1.18;letter-spacing:-.04em;margin:14px 0 17px;max-width:700px}
+    .lead{font-size:clamp(16px,2.3vw,19px);color:var(--muted);max-width:660px;margin:0}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+    h2{font-size:clamp(23px,4vw,30px);letter-spacing:-.025em;line-height:1.3;margin:0}
+    .sub{font-size:14px;color:var(--muted);margin:5px 0 0}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .course{display:flex;flex-direction:column;min-height:256px;padding:25px 22px 22px;text-decoration:none;border-radius:19px;background:var(--surface);border:1px solid var(--border);transition:transform .15s,border-color .15s,box-shadow .15s}
+    .course:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 12px 28px #193e3514}
+    .num{font:700 13px ui-monospace,monospace;color:var(--accent)}
+    .course h3{font-size:24px;line-height:1.22;letter-spacing:-.03em;margin:20px 0 8px}
+    .course p{font-size:14px;color:var(--muted);margin:0 0 22px}
+    .course .go{margin-top:auto;font-size:14px;color:var(--accent);font-weight:750}
+    .course.acc{border-top:5px solid #267a59}.course.eco{border-top:5px solid #b77b37}.course.math{border-top:5px solid #4d70b6}
+    .progress-panel{margin:24px 0;padding:24px;border:1px solid var(--border);border-radius:19px;background:var(--surface)}
+    button{font:inherit;cursor:pointer;color:var(--ink);background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-height:44px}
+    .plan-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+    .plan-form label{display:flex;flex-direction:column;gap:5px;font-size:14px}.plan-wide{grid-column:1/-1}
+    input,select{min-width:0;max-width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px;min-height:44px}
+    .plan-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+    .plan-discovery-details{margin:14px 0;border:1px solid var(--border);border-radius:12px;padding:12px 16px}
+    .plan-discovery-details summary{cursor:pointer;font-weight:650}
+    .plan-discovery-list{list-style:none;margin:12px 0 0;padding:0}
+    .plan-discovery-list li{margin:8px 0}
+    .plan-discovery-list button{display:block;width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere}
+    .plan-list{list-style:none;padding:0}.plan-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 0;border-top:1px solid var(--border)}
+    .plan-row label{display:flex;align-items:center;gap:10px;flex:1;min-width:180px;overflow-wrap:anywhere}.plan-row input{flex-shrink:0;width:22px;min-height:44px;margin:0}.plan-row a{font-size:14px}
+    [hidden]{display:none!important}
+    @media(max-width:500px){.plan-form{grid-template-columns:1fr}.progress-panel{padding:20px}.plan-row label{flex-basis:100%}}
+    .progress-row{padding:16px 0;border-top:1px solid var(--border)}
+    .progress-row h3{margin:0 0 6px}.progress-row p{margin:0;color:var(--muted);font-size:14px}
+    .note{margin:22px 0 46px;font-size:13px;color:var(--muted)}
+    .language{display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap;background:var(--soft);border:1px solid var(--border);border-radius:19px;padding:24px 27px}
+    .language h2{font-size:22px}.language p{color:var(--muted);font-size:14px;margin:7px 0 0;max-width:590px}
+    .language a{white-space:nowrap;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;border-radius:10px;padding:11px 17px;font-size:14px}
+    .legacy{margin:30px 0 45px;border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:14px 18px}
+    .legacy summary{cursor:pointer;font-weight:650;font-size:14px}
+    .legacy p{color:var(--muted);font-size:13px;margin:10px 0}
+    .legacy-links{display:flex;gap:20px;flex-wrap:wrap;font-size:14px}
+    footer{padding:20px 0 30px;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
+    @media(max-width:750px){.grid{grid-template-columns:1fr}.course{min-height:200px}.hero{padding-top:38px}.top-inner{align-items:flex-start}.course h3{margin-top:13px}}
+    @media(prefers-reduced-motion:reduce){.course{transition:none}.course:hover{transform:none}}
+    @media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#111c20;--surface:#1b292d;--ink:#e9f4f1;--muted:#abbfbc;--border:#33484b;--accent:#83d6b6;--soft:#223d3c}.language a{background:#dfefea;color:#152f35}}
+  </style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="brand" href="./">Study OS<span>Academic Learning</span></a>
+    <nav aria-label="การนำทางหลัก">
+      <a href="#planner">แผนการเรียน</a>
+      <a href="#courses">รายวิชา</a>
+      <a href="#languages">แอปฝึกภาษา</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero" aria-labelledby="hero-title">
+    <span class="eyebrow">Your academic workspace</span>
+    <h1 id="hero-title">เรียนอย่างเป็นระบบ<br>ทบทวนได้ทุกวัน</h1>
+    <p class="lead">พื้นที่รวมบทสรุป แฟลชการ์ด และแบบฝึกหัดสำหรับวิชาเรียนมหาวิทยาลัย เลือกรายวิชาเพื่อเริ่มต้นจากชุดบทเรียนเดิม</p>
+  </section>
+  <section class="progress-panel" id="planner" aria-labelledby="planner-title">
+    <div class="section-head"><div><h2 id="planner-title">แผนการเรียน</h2><p class="sub">เลือกวิชา วันที่ และเวลาที่ตั้งใจเรียน แล้วติ๊กเสร็จเมื่อเรียนจบ</p></div><button id="open-planner" type="button" hidden>เปิดแผนการเรียน</button></div>
+    <p class="sub">แผนบันทึกเฉพาะเบราว์เซอร์นี้ ยังไม่ซิงก์ข้ามอุปกรณ์ ดาวน์โหลดเก็บไว้ได้ เวลาที่แสดงคือเวลาตามแผน</p>
+    <p id="plan-status" role="status">เปิดแผนการเรียนเพื่อเริ่มวางแผน</p>
+    <div id="planner-content" hidden>
+      <div class="plan-tools"><label for="plan-view-date">แผนวันที่</label><input id="plan-view-date" type="date" required><button id="plan-today" type="button">วันนี้</button><button id="plan-refresh" type="button">อัปเดตรายการ</button></div>
+      <p id="plan-summary" class="sub"></p>
+      <p id="plan-discovery" class="sub" role="status" aria-live="polite"></p>
+      <div class="plan-tools" role="group" aria-label="นำทางแผนการเรียนตามกำหนด"><button id="plan-overdue" type="button" aria-controls="plan-list" aria-describedby="plan-discovery">ดูงานค้าง</button><button id="plan-upcoming" type="button" aria-controls="plan-list" aria-describedby="plan-discovery">ดูแผนถัดไป</button></div>
+      <details id="plan-discovery-details" class="plan-discovery-details">
+        <summary>ดูรายการงานค้างและแผนใน 7 วันข้างหน้า</summary>
+        <ul id="plan-discovery-list" class="plan-discovery-list" aria-label="รายการงานค้างและแผนถัดไป"></ul>
+      </details>
+      <ul id="plan-list" class="plan-list" tabindex="-1" aria-label="รายการแผนการเรียน"></ul>
+      <form id="plan-form" class="plan-form">
+        <label>วิชา<select id="plan-subject" required><option value="acc">Accounting</option><option value="eco">Economics</option><option value="math">Mathematics</option></select></label>
+        <label>วันที่เรียน<input id="plan-date" type="date" required></label>
+        <label class="plan-wide">หัวข้อที่ต้องการเรียน<input id="plan-title" type="text" maxlength="160" required placeholder="เช่น ทบทวน Adjusting Entries"></label>
+        <label>เวลาเรียนตามแผน (นาที)<input id="plan-minutes" type="number" min="1" max="240" step="1" value="30" required></label>
+        <div class="plan-tools"><button id="plan-save" type="submit">เพิ่มแผน</button><button id="plan-cancel" type="button" hidden>ยกเลิกการแก้ไข</button></div>
+      </form>
+      <div class="plan-tools"><button id="plan-export" type="button">ดาวน์โหลดแผนทั้งหมด</button><button id="plan-import" type="button">นำเข้าแผนจากไฟล์</button><input id="plan-file" type="file" accept=".json,application/json" aria-label="เลือกไฟล์แผนการเรียน" hidden></div>
+      <p class="sub">ก่อนนำเข้า ระบบจะตรวจไฟล์และให้ยืนยัน หากมีแผนที่ต่างจากรายการปัจจุบัน จะหยุดทั้งหมดโดยไม่เขียนทับข้อมูลเดิม กรุณาบันทึกหรือล้างแบบฟอร์มที่ยังแก้ไขค้างก่อนนำเข้า</p>
+    </div>
+    <noscript><p>เปิด JavaScript เพื่อบันทึกแผนการเรียน</p></noscript>
+  </section>
+  <section id="courses" aria-labelledby="courses-title">
+    <div class="section-head">
+      <div><h2 id="courses-title">วิชาของฉัน</h2><p class="sub">Accounting · Economics · Mathematics</p></div>
+    </div>
+    <div class="plan-tools"><label for="course-search">ค้นหารายวิชา</label><input id="course-search" type="search" placeholder="เช่น Accounting หรือบัญชี" aria-controls="course-list" autocomplete="off"></div>
+    <p id="course-search-status" class="sub" role="status" aria-live="polite">แสดงทั้งหมด 3 วิชา</p>
+    <div class="grid" id="course-list">
+      <a class="course acc" data-course="acc" data-search="accounting บัญชี การบัญชี" href="acc.html">
+        <span class="num">COURSE 01</span>
+        <h3>Accounting</h3>
+        <p>บันทึกรายการ ปรับปรุงบัญชี งบทดลอง งบการเงิน และสินค้าคงเหลือ</p>
+        <span class="go">เปิดวิชาบัญชี →</span>
+      </a>
+      <a class="course eco" data-course="eco" data-search="economics เศรษฐศาสตร์" href="eco.html">
+        <span class="num">COURSE 02</span>
+        <h3>Economics</h3>
+        <p>ทบทวนแนวคิดเศรษฐศาสตร์จุลภาคและมหภาค พร้อมแบบฝึกหัด</p>
+        <span class="go">เปิดวิชาเศรษฐศาสตร์ →</span>
+      </a>
+      <a class="course math" data-course="math" data-search="mathematics คณิตศาสตร์ math for life" href="math.html">
+        <span class="num">COURSE 03</span>
+        <h3>Mathematics</h3>
+        <p>ทบทวน Math for Life สูตรสำคัญ และฝึกโจทย์คณิตศาสตร์</p>
+        <span class="go">เปิดวิชาคณิตศาสตร์ →</span>
+      </a>
+    </div>
+    <p class="note">หน้ารายวิชายังคงใช้เนื้อหาและการบันทึกความคืบหน้าแบบเดิม การปรับหน้าแรกนี้ไม่ได้ย้ายคะแนนหรือข้อมูลเรียน</p>
+  </section>
+  <section class="progress-panel" aria-labelledby="progress-title">
+    <div class="section-head"><div><h2 id="progress-title">ความก้าวหน้าบนอุปกรณ์นี้</h2><p class="sub">ดูจำนวนข้อที่เคยตอบและการ์ดที่มีตารางทบทวนในเบราว์เซอร์นี้</p></div><button id="read-progress" type="button" hidden>อ่านความก้าวหน้า</button></div>
+    <p class="sub">ข้อมูลนี้ไม่รวมอุปกรณ์อื่น จำนวนที่แสดงยังไม่ใช่คะแนน ความเชี่ยวชาญ หรือการ์ดที่ครบกำหนดวันนี้</p>
+    <p id="progress-status" role="status">กดอ่านความก้าวหน้าเพื่อแสดงข้อมูลที่บันทึกไว้</p>
+    <div id="progress-results"></div>
+    <noscript><p>เปิด JavaScript เพื่อดูความก้าวหน้า หรือเปิดรายวิชาด้านบนได้ตามปกติ</p></noscript>
+  </section>
+  <aside class="language" id="languages" aria-labelledby="languages-title">
+    <div><h2 id="languages-title">เรียนภาษา? ไปที่ VocaBloom</h2>
+    <p>VocaBloom เป็นพื้นที่ฝึกภาษาแยกจาก Study OS โดยเริ่มจากภาษาอังกฤษ และเตรียมรองรับภาษาจีนในอนาคต</p></div>
+    <a href="vocabloom/">เปิด VocaBloom →</a>
+  </aside>
+  <details class="legacy">
+    <summary>เปิดหน้าเรียนภาษาแบบเดิม (Legacy)</summary>
+    <p>เก็บทางเข้าเดิมไว้ระหว่างการแยกสองผลิตภัณฑ์ ข้อมูลและความคืบหน้ายังไม่ถูกย้ายหรือลบ</p>
+    <div class="legacy-links">
+      <a href="eng.html">English Vocab (Legacy)</a>
+      <a href="zh.html">Chinese (Legacy)</a>
+    </div>
+  </details>
+</main>
+<footer><div class="wrap">Study OS · Academic Learning · ข้อมูลรายวิชาและความคืบหน้าเดิมยังอยู่</div></footer>
+<script src="lib/study-os-legacy-progress-reader.js" defer></script>
+<script src="lib/study-os-dashboard.js" defer></script>
+<script src="lib/study-os-course-search.js" defer></script>
+<script src="lib/study-os-planner.js" defer></script>
+<script src="lib/study-os-plan-discovery.js" defer></script>
+<script src="lib/study-os-planner-ui.js" defer></script>
+</body>
+</html>
