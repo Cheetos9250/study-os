@@ -168,5 +168,5 @@ test('Practice collapses whitespace-equivalent Thai meanings and headwords befor
  const questions=new Function('cards',`const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null};const uCards=()=>cards;${pure}return uPracticeQuestions({key:'eng'});`)(cards);
  assert.equal(questions.length,4);
  assert.ok(!questions.some(q=>q.q==='beta'||q.q.trim()==='ALPHA'));
- for(const q of questions)assert.equal(new Set(q.opts.map(x=>x.normalize('NFKC').replace(/\\s+/g,' ').trim())).size,4);
+ for(const q of questions)assert.equal(new Set(q.opts.map(x=>x.normalize('NFKC').replace(/\s+/g,' ').trim())).size,4);
 });
