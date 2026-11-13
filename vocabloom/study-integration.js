@@ -72,13 +72,21 @@ function uPracticeSenses(meaning){
 }
 function uPracticeSharesSense(a,b){return a.some(x=>b.includes(x));}
 function uPracticeStopSpeech(){
- if(typeof window!=='undefined'&&window.speechSynthesis&&typeof window.speechSynthesis.cancel==='function')window.speechSynthesis.cancel();
+ if(typeof window==='undefined'||typeof window.speechSynthesis?.cancel!=='function')return;
+ // A broken audio engine must never prevent a learner from answering or navigating.
+ try{window.speechSynthesis.cancel();}catch{}
 }
 function uPracticeSpeak(text){
- if(!String(text||'').trim()||typeof window==='undefined'||!window.speechSynthesis||typeof window.SpeechSynthesisUtterance!=='function')return false;
- const speech=new window.SpeechSynthesisUtterance(String(text));speech.lang='en-US';speech.rate=0.9;
- window.speechSynthesis.cancel();window.speechSynthesis.speak(speech);
- return true;
+ if(!String(text||'').trim()||typeof window==='undefined'||typeof window.SpeechSynthesisUtterance!=='function'||
+  typeof window.speechSynthesis?.cancel!=='function'||typeof window.speechSynthesis?.speak!=='function')return false;
+ try{
+  const speech=new window.SpeechSynthesisUtterance(String(text));speech.lang='en-US';speech.rate=0.9;
+  window.speechSynthesis.cancel();window.speechSynthesis.speak(speech);
+  return true;
+ }catch{
+  if(typeof toast==='function')toast('Speech is unavailable. You can continue practicing.');
+  return false;
+ }
 }
 function uPracticeQuestions(d){
  if(d.key!==UACTIVE_LANGUAGE)return [];
@@ -127,7 +135,7 @@ function uPracticeHTML(d){
  if(!all.length)return header+'<div class="u-empty">Need at least four English words with non-overlapping Thai meanings to start practice.</div>';
  USTATE.quizIndex=Math.max(0,Math.min(USTATE.quizIndex,all.length-1));
  const q=all[USTATE.quizIndex],ans=answers[q.id],done=ans!==undefined;
- const canSpeak=typeof window!=='undefined'&&!!window.speechSynthesis&&typeof window.SpeechSynthesisUtterance==='function';
+ const canSpeak=typeof window!=='undefined'&&typeof window.SpeechSynthesisUtterance==='function'&&typeof window.speechSynthesis?.cancel==='function'&&typeof window.speechSynthesis?.speak==='function';
  const summary=complete?`<div class="notice mt20" role="status" aria-live="polite"><b>Session complete</b> · ${correct}/${all.length} correct · ${missed} to review. ${missed?'Use Retry mistakes to review missed words.':'Use New set to practice again.'}</div>`:'';
  return header+summary+`<div class="panel"><div class="panel-header"><span class="badge">${USTATE.quizIndex+1} / ${all.length}</span><span class="question-number">Choose the Thai meaning</span></div><h2 id="u-practice-question" lang="en" style="line-height:1.6">${h(q.q)}</h2><button type="button" class="btn btn-outline" data-action="u-practice-speak" aria-label="Hear English word pronunciation" ${canSpeak?'':'disabled title="Speech unavailable on this device"'}>Listen</button>${q.opts.map((o,i)=>`<button class="u-option ${done?(i===q.right?'right':i===ans?'wrong':''):''}" data-action="u-practice-answer" data-answer="${i}" aria-describedby="u-practice-question" aria-pressed="${done&&i===ans?'true':'false'}" ${done?'disabled':''}>${'ABCD'[i]}. ${h(o)}</button>`).join('')}${done?`<div class="notice mt20" role="status" aria-live="polite">${ans===q.right?'Correct':'Correct answer: '+h(q.opts[q.right])}${q.context?.example?`<p class="u-meta"><b>Source example</b><br><span lang="en">${h(q.context.example)}</span><br><button type="button" class="btn btn-outline" data-action="u-practice-example-speak" aria-label="Hear source example pronunciation" ${canSpeak?'':'disabled title="Speech unavailable on this device"'}>Listen to example</button>${q.context.translation?`<br><span lang="th">${h(q.context.translation)}</span>`:''}${q.ref?`<br>Source: ${h(q.ref)}`:''}</p>`:''}</div>`:''}<div class="pill-row mt20" style="justify-content:space-between"><button class="btn btn-outline" data-action="u-q-prev" ${USTATE.quizIndex===0?'disabled':''}>Previous</button><button class="btn btn-primary" data-action="u-q-next" ${USTATE.quizIndex===all.length-1?'disabled':''}>Next</button></div></div>`;
 }
