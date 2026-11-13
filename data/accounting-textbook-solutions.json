@@ -4,12 +4,12 @@
     "scope": "Chapter 1–9 questions indexed in Study OS",
     "provenance": "Original study solutions, not a publisher answer key. Source-check status differs by question; do not treat all entries as verified.",
     "sourceFile": "Owner's Google Drive Acc textbook.pdf",
-    "reviewStatus": "58 drafted solutions; 29 newly source-reviewed in this turn against original PDF (Ch.1, pages 56–67). Earlier 29 drafts mostly need source verification.",
+    "reviewStatus": "65 draft answers, 36 newly source-reviewed against original PDF (29 Chapter 1 + 7 Chapter 2); older 29 drafts individually unverified unless previously labeled.",
     "storage": "Public answers only; no textbook question wording, PDF pages, private notes or user progress",
     "lastUpdated": "2026-11-13",
-    "reviewedCount": 58,
+    "reviewedCount": 65,
     "catalogQuestionCount": 403,
-    "sourceReviewedNewCount": 29,
+    "sourceReviewedNewCount": 36,
     "indexCaveat": "The 403-item catalog is not a complete or reliably numbered audit of the printed questions; some exercise identifiers are missing or misread. Do not claim every printed question has an answer."
   },
   "answers": {
@@ -452,6 +452,62 @@
       "explanation": "The exercise asks for the three major business activities in outline form and at least two representative transactions/events for each. Operating creates revenue and incurs normal costs; investing acquires/disposes of productive resources; financing obtains/returns capital.",
       "pages": [
         67
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "QS-2-5": {
+      "answer": "a Debit; b Debit; c Credit; d Credit; e Debit; f Credit; g Credit; h Debit; i Credit; j Debit; k Debit; l Credit.",
+      "explanation": "To decrease the normal balance of an account, post to the side opposite its normal balance. Liabilities/equity/revenue normally have credit balances, so debits decrease them. Assets/expenses/withdrawals normally have debit balances, so credits decrease them. Items in printed order: interest payable, service revenue, salaries expense, accounts receivable, owner capital, prepaid insurance, buildings, interest revenue, owner withdrawals, unearned revenue, accounts payable, land.",
+      "pages": [
+        94
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "QS-2-6": {
+      "answer": "May 15: Dr Cash $7,000; Dr Equipment $3,000; Cr D. Tyler, Capital $10,000. May 21: Dr Office Supplies $500; Cr Accounts Payable $500. May 25: Dr Cash $4,000; Cr Landscaping Revenue $4,000. May 30: Dr Cash $1,000; Cr Unearned Landscaping Revenue $1,000. Ledger ending: Cash debit $12,000; Office Supplies debit $500; Equipment debit $3,000; Accounts Payable credit $500; Unearned Landscaping Revenue credit $1,000; D. Tyler, Capital credit $10,000; Landscaping Revenue credit $4,000.",
+      "explanation": "The owner's initial cash and equipment are capital contributions, not revenue. Supplies received before payment create a payable. Cash for completed services is earned revenue. Cash received before the service is provided is a liability (unearned revenue). Ledger debits total $15,500 and credits total $15,500.",
+      "pages": [
+        94
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "QS-2-7": {
+      "answer": "a Debit; b Credit; c Credit; d Debit; e Debit; f Credit; g Credit; h Credit; i Credit; j Debit.",
+      "explanation": "An increase to assets such as land/store equipment or expenses is a debit; a decrease in assets such as cash, prepaid rent, or receivables is a credit. Increase to revenues, notes payable, or capital is a credit; reduction in unearned revenue is a debit.",
+      "pages": [
+        94
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "QS-2-8": {
+      "answer": "Correct choice: a.",
+      "explanation": "The trial balance has $4,500 more credits than debits. Posting a $2,250 debit as a $2,250 credit creates a $4,500 imbalance (debits understated $2,250, credits overstated $2,250). Posting to the wrong account but on the correct side, or omitting both sides of an entry, does not by itself unbalance the trial balance.",
+      "pages": [
+        95
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "QS-2-9": {
+      "answer": "a I; b B; c B; d I; e B; f B; g B; h I; i E; j B; k I; l I.",
+      "explanation": "Income statement (I) includes service/rental revenues and salaries, interest and insurance expenses. Balance sheet (B) includes payables, receivables, equipment, prepaid insurance, buildings and office supplies. Statement of owner's equity (E) includes withdrawals.",
+      "pages": [
+        95
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "E-2-5": {
+      "answer": "Dr Cash $10,000; Dr Equipment $80,000; Cr Notes Payable $28,000; Cr Revenue $62,000. Accounting equation effect: Assets +$90,000; Liabilities +$28,000; Equity +$62,000.",
+      "explanation": "The customer transfers cash and equipment and the company assumes the customer's equipment-related note. The net value earned for services is $10,000+$80,000-$28,000=$62,000. The compound journal entry balances: total debits $90,000 = total credits $90,000.",
+      "pages": [
+        96
+      ],
+      "verification": "source-reviewed-2026-11-13"
+    },
+    "E-2-6": {
+      "answer": "a. Cash paid on accounts payable during October = $300,500. b. Sales on account during October = $90,290.",
+      "explanation": "a: ending accounts payable = starting accounts payable + credit purchases - payments. $132,500 = $152,000 + $281,000 - payments; payments=$300,500. b: ending receivables = beginning receivables + credit sales - collections. $89,900 = $102,500 + credit sales - $102,890; sales=$90,290.",
+      "pages": [
+        96
       ],
       "verification": "source-reviewed-2026-11-13"
     }
