@@ -23,9 +23,13 @@ Last repository audit: 2026-11-13 UTC
 - Human review required for PR merge. Nothing is deployed.
 - Adds isolated unit tests and `docs/AUTO_AI_AGENT.md`.
 
-## Not yet verified or enabled
+## Verified CI evidence (2026-11-13 UTC)
 
-- Final PR workflow CI results for the new AI Coding Agent (check the GitHub run tied to the final commit).
+- AI Coding Agent PR #46: [workflow run 43363867049](https://github.com/Cheetos9250/study-os/actions/runs/43363867049) passed; the unit-test job passed **13/13** tests using a fake model, with provider/API and publisher jobs skipped on the PR event.
+- Read-only Runner on the same head: [workflow run 43363867064](https://github.com/Cheetos9250/study-os/actions/runs/43363867064) passed, including the runner safety unit tests and offline Node/Python regressions.
+- These results verify **test and workflow behavior only**, not live Gemini generation or PR writing.
+
+## Not yet verified or enabled
 - Live Gemini API generation (requires user's provider key and explicit opt-in).
 - Scheduled autonomous model calls (requires approved merge to default branch and opt-in).
 - A real AI-generated Draft PR (requires setup and successful verification).
