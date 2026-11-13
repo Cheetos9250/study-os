@@ -36,3 +36,8 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - Run `node vocabloom/scripts/audit-thai-distractors.cjs --all`, then review the candidates documented in `THAI-DISTRACTOR-REVIEW-2026-11-13.md`. The initial scan flagged 87 possible pairs but **not 87 confirmed mistakes**. Keep antonyms/grammatical contrasts unless separately proven ambiguous in a real question.
 - Audit/test SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00` passed [regression 43381193510](https://github.com/Cheetos9250/study-os/actions/runs/43381193510); check final browser [43381193520](https://github.com/Cheetos9250/study-os/actions/runs/43381193520).
 - Retain all earlier physical iPad Safari/VoiceOver, real historical backup, staging CAS and explicit deployment approval gates.
+
+### Audit parser parity gate
+
+- The audit parser parity regression SHA `c096dec49caaa99b8ead9a8750c5d01be957e9df` passed [regression 43381503376](https://github.com/Cheetos9250/study-os/actions/runs/43381503376). Verify browser [43381503455](https://github.com/Cheetos9250/study-os/actions/runs/43381503455), plus the exact latest documentation head before concluding CI.
+- Manual iPad QA still requires a separate authorized preview and disposable profile; no physical test was performed in this chat.
