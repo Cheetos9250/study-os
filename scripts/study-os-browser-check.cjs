@@ -47,6 +47,11 @@ async function main() {
             await courseSearch.fill("not-a-course");
             assert.equal(await page.locator('[data-course]:visible').count(),0);
             assert.match(await page.locator("#course-search-status").innerText(),/ไม่พบรายวิชา/);
+            await courseSearch.press("Escape");
+            assert.equal(await courseSearch.inputValue(),"");
+            assert.equal(await page.locator('[data-course]:visible').count(),3);
+            await courseSearch.fill("Mathematics");
+            assert.equal(await page.locator('[data-course]:visible').count(),1);
             await courseSearch.fill("");
             assert.equal(await page.locator('[data-course]:visible').count(),3);
             assert.equal(await page.locator('[data-course="math"]').getAttribute("href"),"math.html");
