@@ -19,7 +19,7 @@ This entry covers the course UI work on 2026-11-13, not a complete infrastructur
 - Initial 40-case run passed, but screenshot inspection found the practice tab outside the visible navigation at 320px. Added the layout fix and a visible-tab bounds assertion; final exact-head evidence is tracked in PR #56.
 
 ## Working branch
-`fix/study-os-mobile-sync-overlap-20261113`
+`feat/study-os-site-icons-20261113`
 
 ## Scope boundaries
 PR #44 remains untouched. No Notion sync dispatch, production data changes or backend deployment is included.
@@ -32,3 +32,10 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Backup export and file inspection are read-only. No restore or automatic upload is included. PR #53 remains separate.
 - Synthetic Chromium/WebKit journeys cover course navigation, card rating persistence after reload, download, credential exclusion and validation without storage mutation. Exact-head results and release status are recorded in PR #48.
 - Physical Safari/iPad export into Files/iCloud Drive still needs device verification. A downloadable copy is not proof of a tested restore.
+
+
+## Browser and Home Screen icons
+- Added shared Study OS book icons: scalable SVG favicon, 16/32/48px ICO fallback, and 180px Apple touch icon.
+- Linked icons from the home, all five course pages and backup page. VocaBloom retains its own icon.
+- Icon assets are local; no content, scripts, progress data or sync behavior changed.
+- Existing iOS Home Screen shortcuts may need to be re-added to refresh cached artwork; physical-device appearance remains unverified.
