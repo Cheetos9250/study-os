@@ -98,3 +98,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Verified the earlier daily-map code/test commit `ef260b87a69167a802fd61020ef84099db29a635`: regression [43369307639](https://github.com/Cheetos9250/study-os/actions/runs/43369307639) and browser [43369307661](https://github.com/Cheetos9250/study-os/actions/runs/43369307661) both **success**. The documentation head `4d288f6e3dc0963f963dc46353903a4598b0176e` also passed browser [43369380885](https://github.com/Cheetos9250/study-os/actions/runs/43369380885) and regression [43369380820](https://github.com/Cheetos9250/study-os/actions/runs/43369380820).
 - Added an actual-browser rejection check for same-device malformed `deviceDays` and `studyDays` maps using disposable storage, code/test SHA `2c8569bd9693d2998b3f5dd80749764637bc973a`. [Browser CI 43369918907](https://github.com/Cheetos9250/study-os/actions/runs/43369918907) and [regression CI 43369918882](https://github.com/Cheetos9250/study-os/actions/runs/43369918882) were **in progress** when documented; verify before claiming success.
+
+### Nested daily-row restore validation — pending CI
+
+- Verified previous malformed same-device daily-map browser tests at SHA `2c8569bd9693d2998b3f5dd80749764637bc973a`: [browser 43369918907](https://github.com/Cheetos9250/study-os/actions/runs/43369918907) and [regression 43369918882](https://github.com/Cheetos9250/study-os/actions/runs/43369918882) completed **success**.
+- Inspected actual `cLocalRecord` and `cStudyRecord` consumers. Added same-device Full Restore validation of nested daily rows: record-shaped entries, finite nonnegative numeric `answered`/`correct`, and string-array `ids` when present. Added synthetic tests rejecting malformed rows and preserving valid counters, code/test SHA `f5b6c75b2c6dc475e82dfcdaae909394a5c7c304`.
+- CI for this newest code/test SHA was still queued/running at documentation time. No live service or production storage changes.
