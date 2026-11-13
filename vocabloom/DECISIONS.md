@@ -41,3 +41,7 @@ Require record-shaped daily counter maps for same-device Full Restore, rather th
 ## 2026-11-13 — Nested daily counter safety
 
 Validate nested same-device daily rows before Full Restore writes. Preserve valid historical optional fields, require finite nonnegative counters and string-array IDs if supplied, and continue discarding cross-device counters. Do not silently normalize malformed backup statistics into learner progress.
+
+## 2026-11-13 — Full Restore failure atomicity
+
+On a failure after local backup writes, restore the cloud UI merged-day cache and remote-status label together with localStorage and in-memory progress. A successful restore still clears the merged-day cache and marks progress as restored locally; this does not trigger cloud sync.
