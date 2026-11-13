@@ -3,12 +3,13 @@ on:
   pull_request:
     paths:
       - '*.html'
+      - assets/study-course-icons.css
       - .github/workflows/study-course-fonts-qa.yml
 permissions:
   contents: read
 jobs:
   typography:
-    if: github.head_ref == 'feat/study-os-unified-type-20261113'
+    if: github.head_ref == 'feat/study-os-course-ui-icons-20261113'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,7 +43,7 @@ jobs:
                 const file=path.resolve(root,'.'+pathname);
                 if(!file.startsWith(root+path.sep)||req.method!=='GET'){res.writeHead(403).end();return;}
                 const body=await fs.readFile(file);
-                res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':'application/json'}).end(body);
+                res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.css')?'text/css':'application/json'}).end(body);
               }catch{res.writeHead(404).end();}
             });
             await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -63,6 +64,8 @@ jobs:
                 assert.match(fonts.body,/^"?DM Sans/);assert.match(fonts.heading,/^"?Outfit/);assert.match(fonts.card,/^"?Outfit/);
                 assert.ok(fonts.loaded.includes('DM Sans'));assert.ok(fonts.loaded.includes('Outfit'));
                 assert.match(fonts.body,/IBM Plex Sans Thai/);assert.match(fonts.heading,/Noto Sans Thai/);
+                const iconStyles=await page.locator('h1,.tabs button:not([hidden]),#dirBtn,#limBtn,#resetSrs,#syncBtn').evaluateAll(nodes=>nodes.map(n=>{const s=getComputedStyle(n,'::before');return {mask:s.maskImage||s.webkitMaskImage,width:parseFloat(s.width),content:s.content};}));
+                assert.ok(iconStyles.length>=6);assert.ok(iconStyles.every(s=>s.mask.includes('data:image/svg+xml')&&s.width>0&&s.content==='\"\"'),JSON.stringify(iconStyles));
                 const labelFonts=await page.locator('.chip .n,.count,.srs,.ref,.score .big,.cell').evaluateAll(nodes=>nodes.map(n=>getComputedStyle(n).fontFamily));
                 assert.ok(labelFonts.length>0);assert.ok(labelFonts.every(f=>f===fonts.body),JSON.stringify(labelFonts));
                 const overflow=()=>page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
