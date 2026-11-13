@@ -45,3 +45,25 @@ test('Active practice snapshot stays stable if source cards change mid-session',
  assert.notEqual(evaluate.saved,evaluate.fresh,'New session should reflect updated source data');
  assert.match(src,/case 'u-practice-restart':USTATE\.practiceOffset\+=10;USTATE\.practiceAnswers=\{\};USTATE\.practiceQuestions=null;/);
 });
+
+test('Practice answer actions are isolated from SRS and legacy quiz storage',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const result=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all',tab:'practice',flip:false,browse:0};const ui={page:'studymerge'};const localStorage={setItem(){throw Error('Practice must never write storage')},getItem(){throw Error('Practice must never read storage')}};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uDeck=()=>deck;let renders=0;const render=()=>{renders++};const toast=()=>{};${pure}${actions}
+ const first=uPracticeQuestions(deck)[0],right=first.right;
+ uAction({dataset:{action:'u-practice-answer',answer:String(right)}});
+ const once=USTATE.practiceAnswers[first.id];
+ uAction({dataset:{action:'u-practice-answer',answer:String((right+1)%4)}});
+ const twice=USTATE.practiceAnswers[first.id];
+ uAction({dataset:{action:'u-tab',tab:'cards'}});
+ uAction({dataset:{action:'u-tab',tab:'practice'}});
+ const afterTab=USTATE.practiceAnswers[first.id];
+ uAction({dataset:{action:'u-practice-restart'}});
+ return {once,twice,afterTab,right,afterRestart:Object.keys(USTATE.practiceAnswers).length,snapshotCleared:USTATE.practiceQuestions===null,renders};
+ `)(deck);
+ assert.equal(result.once,result.right);
+ assert.equal(result.twice,result.right,'Duplicate answer must not overwrite existing answer');
+ assert.equal(result.afterTab,result.right,'Switching tabs should preserve active practice answer');
+ assert.equal(result.afterRestart,0);
+ assert.equal(result.snapshotCleared,true);
+ assert.ok(result.renders>=3);
+});
