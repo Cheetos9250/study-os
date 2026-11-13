@@ -48,7 +48,9 @@ function uPracticeMeaning(back){
   return '';
  }
  const first=text.split(/\r?\n/)[0]||'';
- return first.replace(/^[^\n—–:]{1,35}\s*[—–:]\s*/,'').replace(/^(?:ชนิดคำ|ตัวอย่าง)\s*:.*/,'').trim();
+ const candidate=first.replace(/^[^\n—–:]{1,35}\s*[—–:]\s*/,'').replace(/^(?:ชนิดคำ|ตัวอย่าง)\s*:.*/,'').trim();
+ // Never turn an English-only source line into a Thai-meaning quiz answer.
+ return /[\u0E00-\u0E7F]/.test(candidate)?candidate:'';
 }
 function uPracticeContext(back){
  const text=String(back||'').replace(/\*\*/g,'').trim(),parts=text.split('|');
