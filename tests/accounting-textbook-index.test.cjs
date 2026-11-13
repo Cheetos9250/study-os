@@ -43,9 +43,9 @@ test('catalog record counts and source pages reconcile',()=>{
 test('study links use a separate local progress namespace',()=>{
   assert.match(html,/data\/accounting-textbook-index\.json/);
   assert.match(html,/studyos\.accounting\.textbook\.progress\.v1/);
-  assert.match(html,/Export progress/);
-  assert.match(html,/Import progress/);
-  assert.match(html,/The full questions and any diagrams remain inside your original PDF/);
+  assert.match(html,/Export answers/);
+  assert.match(html,/Import answers/);
+  assert.match(html,/The PDF is imported into this browser and is not uploaded to Study OS/);
   assert.match(accounting,/href="accounting-textbook\.html"/);
   assert.match(home,/href="accounting-textbook\.html"/);
   assert.match(home, /class="textbook-feature"/);
