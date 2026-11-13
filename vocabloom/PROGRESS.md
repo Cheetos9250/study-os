@@ -194,3 +194,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Built `scripts/audit-thai-distractors.cjs` and `tests/english-distractor-review.test.cjs` at test SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00`. The tool only reads committed English source data and reports approximate Thai substring/bigram candidates; it does not affect the app, SRS, cloud or source data.
 - Initial read-only scan over 582 Verified English rows flagged 87 *review candidates*, including opposite meanings (`unsaturated` / `saturated`) that must not be automatically excluded. See `THAI-DISTRACTOR-REVIEW-2026-11-13.md`.
 - [Regression 43381193510](https://github.com/Cheetos9250/study-os/actions/runs/43381193510) completed **success**; isolated browser [43381193520](https://github.com/Cheetos9250/study-os/actions/runs/43381193520) was **in progress** when recorded. Previous empty-state code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678` passed regression 43380708719 and browser 43380708685.
+
+### Verified source parser parity and iPad QA handoff
+
+- Added a regression comparing the read-only audit parser with the live English Practice `uPracticeMeaning` function on **every committed Verified English row**, SHA `c096dec49caaa99b8ead9a8750c5d01be957e9df`. This prevents the review tool from silently drifting away from live meaning extraction.
+- [Regression 43381503376](https://github.com/Cheetos9250/study-os/actions/runs/43381503376) completed **success**; [browser 43381503455](https://github.com/Cheetos9250/study-os/actions/runs/43381503455) was queued at documentation time. The previous read-only audit SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00` passed both regression 43381193510 and browser 43381193520.
+- Updated `SAFARI-RELEASE-QA.md` to explicitly inspect ambiguous Thai answer choices, while retaining the **NOT EXECUTED** physical iPad gate. No production reads/writes or deployments.
