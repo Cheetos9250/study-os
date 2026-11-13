@@ -57,3 +57,7 @@ All entries below describe an unmerged proposal, not a production release.
 
 - Restore now rolls back the in-memory cloud merged-day cache and remote-status label if an error occurs after the local backup write, alongside existing storage/progress rollback.
 - Added synthetic render-failure execution coverage. CI confirmation pending.
+
+## 2026-11-13 — English practice meaning validation
+
+- Multiline English practice answers now require actual Thai characters. English-only fallback text is skipped rather than presented as a Thai meaning; source records and learner progress are unchanged.
