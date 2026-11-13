@@ -115,3 +115,9 @@ Next action: editable academic course metadata while preserving stable subject I
 
 - Run [43368928342](https://github.com/Cheetos9250/study-os/actions/runs/43368928342): browser-qa **success**, static-contract **failure** because the newly added test itself contained an invalid regular expression (over-escaped `fetch\\s*\\(`). This was a test syntax error, not evidence of browser runtime failure.
 - Corrected regex escaping in `tests/study-os-home.test.cjs`, commit `e38f3db014d3d4090b5bce0193f8bb1fac29741b`. New CI verification pending; do not report it as passed until observed.
+
+## Autonomous continuation — 2026-11-13
+
+- CI run [43369282612](https://github.com/Cheetos9250/study-os/actions/runs/43369282612) for regex fix commit `e38f3db` completed **success** (static-contract and browser-qa). This evidence applies to that code checkpoint only.
+- Extended `scripts/study-os-planner-browser.cjs` to assert discovery counts in the existing Chromium/WebKit synthetic planner flows: empty planner, newly added today's plan, explicitly completed plan, and completed plan edited to tomorrow (must remain completed, **not** upcoming).
+- Browser test commits `63e55de` and correction `598771a`. New browser CI result pending; no physical iPad test or live sync. PR #44 stays draft and no production actions were performed.
