@@ -1,3 +1,9 @@
+## Accounting textbook follow-up (PR #68, current state 2026-11-14)
+1. **Do not publish prematurely.** New source-reviewed coverage is 50 questions and total draft coverage is 79/403 indexed IDs. Earlier drafts not uniformly verified; 324 indexed IDs still lack drafts. Original printed book has additional omitted/mislabeled question headings.
+2. **Fix remaining catalog omissions and numbering safely.** Chapter 2 QS 2-1..4 and E 2-1..4 crop/title pairs were repaired without changing local progress IDs. Several other Chapter 2 IDs remain misnumbered (automated labels such as QS-2-31..35), and printed QS 1-10/E 1-10/E 1-17 are missing. Before rekeying, design/export a local-progress migration or ID alias plan.
+3. **Continue verified batches.** Work from the owner's PDF and preserve problem page(s), figures, supporting calculations, and rubric. QS 2-3 needed Chart of Accounts appendix on PDF pages 1134–1135; do not assume all exercises fit only the chapter's page span.
+4. **Run exact-head QA before release.** Test solutions and geometry, perform isolated browser navigation/saved-answer regression, and inspect actual rendered private PDF on iPad. In-session data validation is not a substitute for GitHub Actions CI or device testing. No production-data or backend changes.
+
 ## Accounting textbook full-solution completion (PR #68; not yet published)
 1. **Repair the question catalog before assigning remaining answers.** The automated 403-ID catalog omits printed questions (e.g. QS-1-10, E-1-10, E-1-17) and assigns some Chapter 2 labels/crops to the wrong printed question (QS-2-1..4, E-2-1..4). Audit source pages and preserve/migrate user-local saved answers before renumbering.
 2. **Audit older draft solutions.** 65 draft entries currently exist; 36 added in the latest continuation are source-reviewed, and 29 earlier drafts have not been consistently verified. No draft equals an official answer key or automatic grader.
