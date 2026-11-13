@@ -111,3 +111,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Browser harness now runs `scripts/study-os-course-metadata-browser.cjs` for Chromium and WebKit, testing opt-in IndexedDB read/write, two-client CAS, invalid import rollback, reset and restore. Verify [CI 43378426163](https://github.com/Cheetos9250/study-os/actions/runs/43378426163) before marking this checkpoint green.
 - Next: resolve any browser test failures; then add explicit opt-in metadata editor UI and backup controls, with tests for blocked storage and no legacy-progress writes. Do not merge or deploy without approval.
+
+## Draft metadata editor — 2026-11-13
+
+- CI 43378426163 **success** for synthetic metadata-store CAS/rollback browser QA. New unlinked `course-metadata-draft.html` and `lib/study-os-course-metadata-editor.js` provide explicit opt-in Save/Reset and JSON import/export; browser script is `lib/study-os-course-metadata-store.js`. Verify [CI 43378984252](https://github.com/Cheetos9250/study-os/actions/runs/43378984252) before claiming draft editor browser QA success.
+- Next: test confirmation dialogs, stale-form conflict UI, corrupt import rollback, download/reimport and denied IndexedDB. Remove redundant legacy `.cjs` store after verifying canonical `.js` consumers; keep draft unlinked until QA and approval for any production exposure.
