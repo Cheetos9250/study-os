@@ -20,6 +20,7 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     await page.locator("#open-planner").click();
     await page.locator("#planner-content").waitFor({state:"visible"});
     const today = await page.locator("#plan-date").inputValue();
+    assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 0 · เสร็จแล้ว 0/);
     await page.locator("#plan-title").fill("   ");
     await page.locator("#plan-save").click();
     await page.locator("#plan-status").filter({hasText:"บันทึกหรืออ่านแผนไม่ได้"}).waitFor();
@@ -29,12 +30,14 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     await page.locator("#plan-save").click();
     await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
     assert.match(await page.locator("#plan-summary").innerText(),/1 รายการ · วางแผน 30 นาที · เสร็จแล้ว 0/);
+    assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 1 · 7 วันข้างหน้า 0 · เสร็จแล้ว 0/);
     await page.reload(); await page.locator("#open-planner").click();
     await page.locator("#planner-content").waitFor({state:"visible"});
     assert.match(await page.locator("#plan-list").innerText(),/Adjusting Entries/);
     await page.locator("#plan-list input[type=checkbox]").check();
     await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
     assert.match(await page.locator("#plan-summary").innerText(),/เสร็จแล้ว 1 รายการ/);
+    assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 0 · เสร็จแล้ว 1/);
     await page.locator("#plan-list button").click();
     await page.locator("#plan-title").fill("ทบทวน Demand and Supply");
     await page.locator("#plan-subject").selectOption("eco");
@@ -46,6 +49,7 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.equal(await page.locator("#plan-view-date").inputValue(),tomorrow);
     assert.equal(await page.locator("#plan-list a").getAttribute("href"),"eco.html");
     assert.match(await page.locator("#plan-summary").innerText(),/วางแผน 45 นาที · เสร็จแล้ว 1/);
+    assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 1 · เสร็จแล้ว 1/);
     // An empty date picker must not cause a render error.
     await page.locator("#plan-view-date").fill("");
     assert.match(await page.locator("#plan-summary").innerText(),/เลือกวันที่/);
