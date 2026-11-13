@@ -31,3 +31,8 @@ Status: design only; **not implemented**. Working branch: `feat/study-os-s1-acad
 - Pure model `lib/study-os-course-metadata.js` validates v1 metadata and supplies defaults. Strictly allows only `acc/eco/math`, `name`, `description`, and an exact course order permutation; rejects unknown fields, markup and control characters. It has no browser storage access or UI integration.
 - Node regression `tests/study-os-course-metadata.test.cjs` covers valid Thai names, reordered cards, invalid identities, duplicate order, overlength strings, extra fields and caller immutability. CI 43377242274 pending.
 - **Not yet implemented:** editing UI, persistent store, backup/import or reset. Do not treat this pure model as released functionality.
+
+## Isolated persistence prototype — 2026-11-13
+
+- `lib/study-os-course-metadata-store.cjs` (`e4034b3`) implements an **opt-in Node/CommonJS prototype** for a separate IndexedDB database `study-os-course-metadata-v1`, one settings record, revision-checked readwrite transactions, explicit save/reset/import/export and no legacy progress access. No homepage script imports or opens this store yet.
+- `tests/study-os-course-metadata-store.test.cjs` (`46b8cd1`) enforces the isolation contract and explicit opening. These are static/Node tests, **not** live IndexedDB browser behavior evidence. Before UI integration, add synthetic Chromium/WebKit transaction tests for stale writes, rollback on invalid import, denied storage and recovery.
