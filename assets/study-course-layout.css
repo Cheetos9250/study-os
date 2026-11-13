@@ -18,3 +18,7 @@ body .wrap{padding-block-end:24px}
   }
   .tabs button::before{margin:0;width:18px;height:18px}
 }
+
+.course-links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;margin-bottom:18px;font-size:14px}
+.course-links a{color:var(--accent);text-underline-offset:3px}
+.course-links a:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:3px}

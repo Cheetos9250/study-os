@@ -23,3 +23,12 @@ This entry covers the course UI work on 2026-11-13, not a complete infrastructur
 
 ## Scope boundaries
 PR #44 remains untouched. No Notion sync dispatch, production data changes or backend deployment is included.
+
+
+## Basic study workflow and read-only backup — PR #48
+- Reviewed the existing allowlist-based backup: only the five courses' quiz/SRS/typing settings and VocaBloom progress are included; sync credentials and content caches are excluded.
+- Added homepage links to backup and both existing language courses, plus Home/Backup navigation on all five course pages.
+- Aligned the backup page fonts and dark-mode button text with the current design; made the file picker keyboard-focusable with a visible label focus indicator.
+- Backup export and file inspection are read-only. No restore or automatic upload is included. PR #53 remains separate.
+- Synthetic Chromium/WebKit journeys cover course navigation, card rating persistence after reload, download, credential exclusion and validation without storage mutation. Exact-head results and release status are recorded in PR #48.
+- Physical Safari/iPad export into Files/iCloud Drive still needs device verification. A downloadable copy is not proof of a tested restore.

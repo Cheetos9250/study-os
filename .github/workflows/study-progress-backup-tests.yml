@@ -1,0 +1,75 @@
+name: Study OS local progress backup safety checks
+
+on:
+  push:
+    paths:
+      - "index.html"
+      - "acc.html"
+      - "eco.html"
+      - "math.html"
+      - "eng.html"
+      - "zh.html"
+      - "assets/study-course-layout.css"
+      - "tests/study-basic-browser.cjs"
+      - "progress-backup.html"
+      - "scripts/study-progress-backup.js"
+      - "tests/study-progress-backup.test.cjs"
+      - ".github/workflows/study-progress-backup-tests.yml"
+  pull_request:
+    paths:
+      - "index.html"
+      - "acc.html"
+      - "eco.html"
+      - "math.html"
+      - "eng.html"
+      - "zh.html"
+      - "assets/study-course-layout.css"
+      - "tests/study-basic-browser.cjs"
+      - "progress-backup.html"
+      - "scripts/study-progress-backup.js"
+      - "tests/study-progress-backup.test.cjs"
+      - ".github/workflows/study-progress-backup-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run read-only backup safety tests
+        run: |
+          node --test tests/study-progress-backup.test.cjs vocabloom/tests/*.test.cjs
+          python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'
+      - name: Confirm page has no auto-import or external network code
+        run: |
+          node -e "const fs=require('fs');const x=fs.readFileSync('progress-backup.html','utf8');const j=fs.readFileSync('scripts/study-progress-backup.js','utf8');if(/localStorage\.(?:setItem|removeItem)|fetch\(|XMLHttpRequest|navigator\.sendBeacon/.test(x+j))process.exit(1);if(!x.includes('scripts/study-progress-backup.js'))process.exit(1);"
+
+  basic-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser dependency
+        run: npm install --prefix "$RUNNER_TEMP/basic-browser" --no-save --ignore-scripts playwright@1.62.1
+      - name: Install Chromium and WebKit
+        run: '"$RUNNER_TEMP/basic-browser/node_modules/.bin/playwright" install --with-deps chromium webkit'
+      - name: Test synthetic study and backup journeys
+        env:
+          NODE_PATH: ${{ runner.temp }}/basic-browser/node_modules
+          QA_OUTPUT: ${{ runner.temp }}/study-basic-qa
+        run: node tests/study-basic-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: study-basic-synthetic-browser-qa
+          path: ${{ runner.temp }}/study-basic-qa
