@@ -311,3 +311,44 @@ test('Async content refresh preserves focused feedback/question without hijackin
  assert.doesNotThrow(()=>new Function('ui','USTATE','render','uPracticeRefocus',
   src.slice(start,end)+'return uPracticeRefreshRender;')(ui,USTATE,()=>{},()=>{})());
 });
+
+
+test('Practice Listen speaks the current English prompt without storage or score writes',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const source=[
+  "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0,tab:'practice'};",
+  "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4],ref:x[3]}));",
+  "const uDeck=()=>deck;",
+  "const localStorage={getItem(){throw Error('Unexpected read')},setItem(){throw Error('Unexpected write')}};",
+  "const ui={page:'studymerge'};const render=()=>{throw Error('Listen must not rerender')};",
+  "let cancels=0;const utterances=[];",
+  "const window={speechSynthesis:{cancel(){cancels++},speak(v){utterances.push({word:v.text,lang:v.lang,rate:v.rate})}},SpeechSynthesisUtterance:function(text){this.text=text;this.lang='';this.rate=1;}};",
+  "const h=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');",
+  pure,actions,
+  "const qs=uPracticeQuestions(deck);const html=uPracticeHTML(deck);",
+  "uAction({dataset:{action:'u-practice-speak'}});",
+  "USTATE.quizIndex=1;uAction({dataset:{action:'u-practice-speak'}});",
+  "return {qs:qs.slice(0,2),utterances,cancels,answers:USTATE.practiceAnswers,html};"
+ ].join('\n');
+ const out=new Function('deck',source)(deck);
+ assert.equal(out.cancels,2);
+ assert.deepEqual(out.utterances.map(x=>x.word),out.qs.map(x=>x.q));
+ assert.ok(out.utterances.every(x=>x.lang==='en-US'&&x.rate===0.9));
+ assert.deepEqual(out.answers,{});
+ assert.match(out.html,/data-action="u-practice-speak"/);
+ assert.match(out.html,/aria-label="Hear English word pronunciation"/);
+ assert.match(out.html,/id="u-practice-question" lang="en"/);
+});
+
+test('Practice Listen safely no-ops when speech synthesis is unavailable',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const source=[
+  "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};",
+  "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uDeck=()=>deck;const window={};",
+  "const localStorage={setItem(){throw Error('Unexpected write')},getItem(){throw Error('Unexpected read')}};",
+  ,pure,actions,
+  "uAction({dataset:{action:'u-practice-speak'}});return Object.keys(USTATE.practiceAnswers).length;"
+ ].join('\n');
+ const out=new Function('deck',source)(deck);
+ assert.equal(out,0);
+});
