@@ -224,3 +224,10 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - Implementation/test SHA `dd1cd111e18710390c581ea3922a30a3ba5911fa`; [regression 43382182948](https://github.com/Cheetos9250/study-os/actions/runs/43382182948) **success**; [browser 43382182871](https://github.com/Cheetos9250/study-os/actions/runs/43382182871) **success**.
 - Fixed repeated five/ten-card decks presenting identical distractor arrangements by seeding candidate and option rotation with the session offset's integer ten-step round. Deterministic source-grounded Node tests at SHA `8e3affa83f699309cb06793844e9eb20ee355893` passed [regression 43382305310](https://github.com/Cheetos9250/study-os/actions/runs/43382305310); [browser 43382305336](https://github.com/Cheetos9250/study-os/actions/runs/43382305336) was **in progress** when recorded.
 - Hosted Chromium/WebKit routes block real services; neither code/test change alters Study OS decks, learner keys, backups, endpoints, Notion, Worker/KV or live progress. No merge/deploy.
+
+### English Practice focus after DOM replacement
+
+- Added browser-only focus recovery for answer feedback and newly rendered question headings after Next/Previous, Retry mistakes and New set. Focus targets use `tabindex="-1"` and `preventScroll`; Node mock contexts without `document` no-op safely. No new local persistence or network code.
+- Code SHA `24ff169ecc82cbf8a7bb275ae8592d5f071806b0`; synthetic focus test SHA `fa2fc2f8fd06b65637b9cf20cb1a5c31037dae40`; hosted browser focus assertions SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533`.
+- [Regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) **success**; [hosted browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) **in progress** when this entry was written. The prior repeat-set variation SHA `8e3affa83f699309cb06793844e9eb20ee355893` passed both workflows.
+- Physical iPad Safari/VoiceOver, actual private backups and staging CAS remain unverified; no production, Notion, Worker, KV, migration or deployment activity.

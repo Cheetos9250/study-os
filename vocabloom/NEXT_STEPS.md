@@ -47,3 +47,9 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - Session completion summary and hosted full-round QA at SHA `dd1cd111e18710390c581ea3922a30a3ba5911fa` passed regression [43382182948](https://github.com/Cheetos9250/study-os/actions/runs/43382182948) and browser [43382182871](https://github.com/Cheetos9250/study-os/actions/runs/43382182871).
 - Deterministic New set variation for small five/ten-card chapters at SHA `8e3affa83f699309cb06793844e9eb20ee355893` passed regression [43382305310](https://github.com/Cheetos9250/study-os/actions/runs/43382305310); verify final browser [43382305336](https://github.com/Cheetos9250/study-os/actions/runs/43382305336).
 - Next low-risk improvement: verify nonvisual accessibility of the completion status (live updates, focus continuity after answering) in hosted browser and, separately, on a **physical iPad Safari + VoiceOver** with a disposable non-production preview.
+
+### Current practice focus gate
+
+- English Practice browser focus changes at SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533` passed regression [43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489); verify final [browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491). If failing, inspect the exact failing assertion/job log and correct source or test before documenting a pass.
+- On an authorized preview with a disposable physical iPad Safari profile, manually verify VoiceOver announcement of answer feedback, focus after navigating Practice, keyboard-only navigation, and 200% zoom. Do not assume hosted WebKit emulation is physical iPad evidence.
+- Keep remaining semantic distractor reviews, private backup readback and staging CAS verification separate; no production sync/deploy approvals are implied.

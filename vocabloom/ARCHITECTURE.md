@@ -56,3 +56,7 @@ Each eligible English Practice card now precomputes normalized Thai sense fragme
 English Practice displays an in-session completion notice only after **every frozen question has an answer**. It includes correct/total and missed counts and points to the existing Retry mistakes or New set actions. It is derived from `USTATE.practiceAnswers` and `USTATE.practiceQuestions` on render; no new storage keys, SRS/quiz scoring, cloud writes or backup schema changes.
 
 For New set, the existing increment-by-ten rotation is retained for broad content coverage. Its round number now also adjusts distractor start and option order, so a five- or ten-card chapter can change visible options even when ten-step question rotation revisits the same words. Active snapshots and exact Retry mistakes options are still frozen; new sessions remain deterministic for the same source and offset.
+
+## Practice focus continuity (2026-11-13)
+
+The browser-only `uPracticeRefocus` helper restores focus to the inserted answer-feedback status after a Practice response and to the next question heading after Previous/Next, Retry mistakes, or New set. Targets receive `tabindex="-1"` for programmatic focus without entering the regular Tab sequence, and focus requests use `preventScroll`. This is a presentation-level accessibility safeguard: it does not read or write user storage, alter question snapshots, change legacy quiz/SRS behavior or claim physical Safari/VoiceOver certification. A no-DOM guard keeps synthetic Node tests safe.

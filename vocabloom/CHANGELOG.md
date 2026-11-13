@@ -103,3 +103,9 @@ All entries below describe an unmerged proposal, not a production release.
 - Added a completion notice showing correct/total and missed questions after all current Practice questions are answered, with a reminder to use Retry mistakes or New set.
 - Updated deterministic option rotation by round number so repeated five- and ten-card sets vary answer placement/distractors while preserving learning identities and frozen Retry mistakes.
 - Added Node regressions for partial, imperfect and perfect rounds; five/ten-card replay; and hosted Chromium/WebKit full-session completion without persistent practice writes.
+
+## 2026-11-13 — Practice focus recovery (draft only)
+
+- Restore keyboard focus to the feedback notice after answering, and to the question heading after Practice Previous/Next, Retry mistakes or New set.
+- Preserve normal Tab order using programmatic `tabindex="-1"`, avoid scroll jumps where supported, and safely skip DOM focus in unit-test contexts.
+- Add Node focus-target checks and hosted Chromium/WebKit checks for answered, next, retry and new-set focus. This change is not a production VoiceOver certification.

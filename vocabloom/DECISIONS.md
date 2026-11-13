@@ -59,3 +59,7 @@ Automated Thai substring and character-bigram matches cannot reliably distinguis
 Expose a clear complete-round message only when all current frozen Practice questions have answers, without recording a persistent score. Preserve existing Retry mistakes and New set actions and their in-memory state.
 
 Retain ten-card offset rotation for coverage, but vary distractor starting positions and multiple-choice placement with the integer round count. This avoids an identical visible replay for five- and ten-word decks without random-state persistence or altering card IDs, source translations, previous answers, backups or SRS.
+
+## 2026-11-13 — Restore question/feedback focus after Practice rerender
+
+Practice replaces its DOM after answering or switching the current question, which can otherwise lose keyboard focus. Focus the newly inserted feedback status after answering and the new question heading after practice navigation/retry/restart. Do not alter the Verified Quiz navigation path or stored learning progress. Automated Chromium/WebKit focus checks are useful but a physical iPad VoiceOver pass remains required before release.

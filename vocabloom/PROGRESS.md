@@ -211,3 +211,10 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Changed the deterministic distractor start and choice placement by round in `uPracticeQuestions`, keeping the existing ten-card offset for card coverage. Added regressions covering repeated five- and ten-card English sets, correct answers and deterministic replay.
 - Final code/test SHA `8e3affa83f699309cb06793844e9eb20ee355893`: [Regression 43382305310](https://github.com/Cheetos9250/study-os/actions/runs/43382305310) completed **success**. [Browser 43382305336](https://github.com/Cheetos9250/study-os/actions/runs/43382305336) was **in progress** at documentation time; check its final conclusion before claiming browser verification of this newest change.
+
+### Practice keyboard focus — pending final browser gate
+
+- Fixed focus loss caused by English Practice DOM rerender: answer feedback and question navigation now receive programmatic focus without scrolling, including Retry mistakes and New set. Code SHA `24ff169ecc82cbf8a7bb275ae8592d5f071806b0`; Node regression SHA `fa2fc2f8fd06b65637b9cf20cb1a5c31037dae40`.
+- Extended hosted Chromium/WebKit to assert the active focus after answer, Next, Retry and New set. Final test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533`.
+- [Regression CI 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) completed **success**. [Browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) was **in progress** when documented. Verify its final result before declaring browser success. Physical Safari/VoiceOver has **not** been tested; no production migration/deploy or live data writes occurred.
+- The separate repeated-set code/test SHA `8e3affa83f699309cb06793844e9eb20ee355893` passed both [regression 43382305310](https://github.com/Cheetos9250/study-os/actions/runs/43382305310) and [browser 43382305336](https://github.com/Cheetos9250/study-os/actions/runs/43382305336).
