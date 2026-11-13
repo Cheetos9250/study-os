@@ -76,3 +76,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - The isolated browser test now rejects synthetic invalid Full Backup shapes (subjects array, progress array, missing English subject) without changing disposable localStorage. It also covers backup cancellation and accepted synthetic restore from prior rounds.
 - This verifies the mocked browser path, **not** a physical iPad Safari or live Cloudflare/KV write.
 - Documentation alignment is being updated in this branch; this note supersedes the earlier `in progress` browser status recorded above.
+
+### Documentation reconciliation and quota rollback browser test
+
+- Reconciled `CHANGELOG.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `NEXT_STEPS.md`, `PROJECT.md`, `PROGRESS.md` and the continuous audit with verified browser restore results. Created `AGENTS.md` for cross-agent continuation and release boundaries.
+- Added a one-shot synthetic `QuotaExceededError` in disposable browser Full Restore, then asserted that all localStorage values return to their pre-restore snapshot. Test code SHA: `e79267315c0f3d28286f8d1c8d7ae651b0d2383f`. CI runs [browser 43368381323](https://github.com/Cheetos9250/study-os/actions/runs/43368381323) and [regression 43368381319](https://github.com/Cheetos9250/study-os/actions/runs/43368381319) were **queued at time of writing**. Do not count this scenario as passed until both workflows complete.
+- No live progress writes, Worker/KV/Notion modifications, merge or deployment.
