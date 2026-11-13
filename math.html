@@ -3,13 +3,14 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* Layout: tabbed study sheet (cards / summary / practice) in one centred column. */
 :root{
   --paper:#f2f4f8; --surface:#ffffff; --ink:#1a2320; --muted:#5b6a64; --line:#d3dcd7;
   --accent:#2f5fb3; --accent-soft:#dbe5f6; --known:#e6f2d5; --ok:#1c7c4a; --ok-soft:#e2f3e9; --bad:#b3261e; --bad-soft:#fbe6e4;
-  --ui:"IBM Plex Sans Thai","Noto Sans Thai","Leelawadee UI",Tahoma,sans-serif;
+  --ui:"DM Sans","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
+  --heading:"Outfit","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   color-scheme:light;
 }
@@ -23,6 +24,7 @@
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16.5px;line-height:1.65}
 .wrap{max-width:800px;margin:0 auto;padding-block:26px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 header{display:flex;align-items:baseline;gap:6px 16px;flex-wrap:wrap;margin-bottom:18px}
+h1,h2,h3,h4,h5,h6,.front-t{font-family:var(--heading)}
 header h1{font-size:clamp(26px,6vw,36px);line-height:1.15;margin:0;font-weight:700;text-wrap:balance}
 header span{color:var(--muted);font-size:15px}
 .tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:20px;overflow-x:auto}
