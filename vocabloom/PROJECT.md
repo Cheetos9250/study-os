@@ -6,7 +6,7 @@ VocaBloom is a dedicated language-learning application. The first release focuse
 
 - Repository: `Cheetos9250/study-os` (shared legacy repository, not a separate VocaBloom repo).
 - Working proposal: `feat/vocabloom-p1-english-ui-20261113`, Draft PR #41.
-- Read `ARCHITECTURE.md`, `PROGRESS.md`, `NEXT_STEPS.md`, and `CONTINUOUS-AUDIT-2026-11-13.md` before continuing.
+- Read `AGENTS.md` first, then `ARCHITECTURE.md`, `PROGRESS.md`, `NEXT_STEPS.md`, `DECISIONS.md`, `CHANGELOG.md` and `CONTINUOUS-AUDIT-2026-11-13.md` before continuing.
 - Earlier Handoff v1.2 describes boundaries and historical infrastructure. Current branch files and live GitHub reads take precedence for implementation status.
 
 ## Priorities
