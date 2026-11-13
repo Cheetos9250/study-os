@@ -68,6 +68,33 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     assert.equal(await draft.locator("#name-acc").inputValue(),"บัญชีแก้ไข");
     assert.equal(await draft.locator("#metadata-order").inputValue(),"acc,eco,math");
     assert.equal(await draft.locator("#name-eco").inputValue(),"Economics");
+    // Cancel reset: preserve existing metadata and revision.
+    draft.once("dialog",dialog=>dialog.dismiss());
+    await draft.locator("#metadata-reset").click();
+    assert.equal(await draft.locator("#name-acc").inputValue(),"บัญชีแก้ไข");
+    // Accept reset: explicit user confirmation, no implicit writes.
+    draft.once("dialog",dialog=>dialog.accept());
+    await draft.locator("#metadata-reset").click();
+    await draft.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
+    assert.equal(await draft.locator("#name-acc").inputValue(),"Accounting");
+    // Stale editor cannot silently overwrite a second tab's changes.
+    const other=await context.newPage();
+    await other.goto(base+"/course-metadata-draft.html");
+    await other.locator("#metadata-open").click();
+    await other.locator("#editor").waitFor({state:"visible"});
+    await other.locator("#name-eco").fill("เศรษฐศาสตร์");
+    await other.locator("#metadata-form button[type=submit]").click();
+    await other.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
+    await draft.locator("#name-math").fill("คณิตศาสตร์");
+    await draft.locator("#metadata-form button[type=submit]").click();
+    await draft.locator("#metadata-status").filter({hasText:"ข้อมูลเปลี่ยนในแท็บอื่น"}).waitFor();
+    assert.equal(await draft.locator("#name-math").inputValue(),"คณิตศาสตร์");
+    // Explicit refresh can recover after conflict.
+    draft.once("dialog",dialog=>dialog.accept());
+    await draft.locator("#metadata-refresh").click();
+    await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
+    assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์");
+    assert.equal(await draft.locator("#name-math").inputValue(),"Mathematics");
     return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export, denied factory and opt-in editor reload"};
   }finally{await context.close();}
 };
