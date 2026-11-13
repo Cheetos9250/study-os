@@ -1,0 +1,47 @@
+name: Study OS Auto Runner (read-only pilot)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/auto-dev-pilot.yml'
+      - 'scripts/auto_dev_pilot.py'
+      - 'scripts/tests/test_auto_dev_pilot.py'
+      - 'NEXT_STEPS.md'
+      - 'PROJECT.md'
+      - 'PROGRESS.md'
+      - 'docs/AUTO_RUNNER_PILOT.md'
+  workflow_dispatch:
+  schedule:
+    # Weekdays 09:31 in Thailand (UTC+7); scheduling may be delayed by GitHub.
+    - cron: '31 2 * * 1-5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: study-os-readonly-pilot
+  cancel-in-progress: false
+
+jobs:
+  inspect-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit test the safe runner
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+      - name: Select next safe task and run offline regression
+        run: python3 scripts/auto_dev_pilot.py --root . --output-dir auto-runner-output
+      - name: Save run report (even when tests fail)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: study-os-auto-runner-report
+          path: auto-runner-output/
+          if-no-files-found: warn
+          retention-days: 14
