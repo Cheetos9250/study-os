@@ -214,6 +214,20 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       assert.equal(await disabledPage.locator("#metadata-open").isVisible(),false);
       assert.equal(await disabledPage.locator("#editor").isVisible(),false);
     }finally{await withoutScripts.close();}
+    // Small-screen keyboard/viewport contract, isolated from the tablet editor state.
+    const mobile=await browser.newContext({viewport:{width:390,height:844},colorScheme:"dark",hasTouch:true});
+    try{
+      await mobile.route("**/*",route=>new URL(route.request().url()).origin===base?route.continue():route.abort());
+      const mobilePage=await mobile.newPage();
+      await mobilePage.goto(base+"/course-metadata-draft.html");
+      assert.equal(await mobilePage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      await mobilePage.locator("#metadata-open").click();
+      await mobilePage.locator("#editor").waitFor({state:"visible"});
+      assert.equal(await mobilePage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      await mobilePage.locator("#name-acc").focus();
+      assert.equal(await mobilePage.evaluate(()=>document.activeElement.id),"name-acc");
+      assert.equal(await mobilePage.locator("label").count()>=7,true);
+    }finally{await mobile.close();}
     return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export, denied factory and opt-in editor reload"};
   }finally{await context.close();}
 };
