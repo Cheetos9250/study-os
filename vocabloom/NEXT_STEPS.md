@@ -25,3 +25,8 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - Code/test SHA `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7` rejects exact Thai sense collisions in distractors; regression [43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) passed. Verify the final conclusion of browser run [43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) before treating it as a completed browser gate.
 - Evaluate remaining semantic overlap not indicated by comma/semicolon/slash delimiters; do not auto-rewrite Verified source meanings. Check small chapter pools with fewer than four mutually disjoint Thai senses, ensuring a clear empty-state explanation.
 - Physical iPad Safari/VoiceOver, authorized historical backups and staging CAS remain separate unverified release gates. Do not merge/deploy or access production records.
+
+### Small-chapter fallback follow-up
+
+- The new empty-state wording and synthetic no-answer-button test at SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678` passed regression [43380708719](https://github.com/Cheetos9250/study-os/actions/runs/43380708719). Verify final browser [43380708685](https://github.com/Cheetos9250/study-os/actions/runs/43380708685).
+- Continue reviewing meanings with **semantic** overlaps that exact punctuation-delimited matching cannot detect, and ask for an approved private fixture before testing real historical backups. Physical Safari and staging CAS are still release-blocking.
