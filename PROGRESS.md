@@ -167,3 +167,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Live read-only verification after deployment: all five course HTML pages, versioned guard JS, save CSS and backup JS returned HTTP 200 and exactly matched tested files. Embedded learning content and sync callbacks were preserved.
 - Screenshots/results: https://github.com/Cheetos9250/study-os/actions/runs/43469468689/artifacts/14059384694 . Physical iPad/Files and exit prompts remain outside controlled QA; no guarantee of protection on app termination or automatic cloud sync.
 - No backend deployment, production-data mutation, Notion dispatch or changes to PR #44/#68 branches. Further source/solution work must preserve the new guards and inactive-face rules.
+
+
+## Study OS CI deduplication — 2026-11-14
+- Restricts push-triggered checks to main in five Study OS test workflows: course storage, backup/basic, restore, site icons and accounting answer checks. Existing pull_request paths, manual triggers, permissions and all job steps are preserved.
+- Adds concurrency scoped by workflow/event/PR number. Only superseded pull_request runs may be cancelled; non-PR groups use unique run IDs so main/manual checks do not share a pending queue. No Pages, Notion sync, Cloudflare or VocaBloom workflow changes.
+- Local: all five YAML files parsed with PyYAML; compared parsed jobs, permissions, PR paths and manual events to base main and confirmed unchanged. 239 Node tests, 3 Python tests and diff checks passed. No permanent mirror tests added for this configuration-only change.
+- Actual GitHub trigger/cancellation evidence and exact-head CI are tracked on the PR before release. App HTML, language features, learning data and progress storage are unchanged.
+- Branch: chore/study-os-ci-dedup-20261114. Product focus reaffirmed: academic study/shared infrastructure; legacy language regression remains compatibility only.

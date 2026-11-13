@@ -31,3 +31,6 @@ The backup file checker supports read-only comparison against this browser's all
 
 ## Course save failures
 The five course pages now provide explicit failed-save feedback, user-triggered retry and export of pending in-memory progress through the existing backup format (PR #73). Progress stays browser-local; downloads and exit prompts are not automatic cloud protection.
+
+## Current development focus
+Study OS development prioritizes Accounting, Economics, Mathematics and shared study infrastructure. English/Chinese routes remain legacy compatibility surfaces; deeper language-learning feature development belongs to VocaBloom. Regression testing existing language routes does not expand their product scope.

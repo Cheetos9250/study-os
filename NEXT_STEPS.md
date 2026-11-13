@@ -51,6 +51,11 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 
 
 ## Next independent engineering actions
-- Review duplicate push/pull_request browser CI execution and consider restricting push checks to main while retaining complete PR coverage; do not dispatch live sync or alter production automation as part of test-workflow maintenance.
+- CI deduplication is implemented on chore/study-os-ci-dedup-20261114. Verify actual PR trigger counts and superseded-run cancellation, then exact-head PR/main checks before release. Preserve every existing test job, path filter, permission and manual trigger; do not dispatch live sync.
 - Physical iPad remains the main verification gap for Files export/recovery, blocked storage and best-effort exit warnings. Use disposable profiles/data only.
 - Notion safety PRs #39/#50 and Worker/source recovery #57/#58 retain separate authorization requirements; live Cloudflare/Cron/source availability is not established by the frontend test results.
+
+
+## Scope reminder
+- Continue academic/shared Study OS infrastructure work. English/Chinese remain legacy compatibility routes; no new language-learning features in this work.
+- Keep protected PR #44 and separately active textbook-solution PR #68 branches untouched.
