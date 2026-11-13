@@ -69,3 +69,10 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Added isolated Chromium/WebKit browser checks to `tests/browser_smoke.py` that submit three synthetic invalid Full Backup structures (subjects array, progress array, missing English subject) to the actual restore handler and assert no browser storage changes or successful restore status.
 - Source commit: `f269d5f9514580f75785e71a430042a8db282c68`. Browser workflow: https://github.com/Cheetos9250/study-os/actions/runs/43367784703 . At documentation time the browser run was **in progress**, not yet verified as passed. Node regression run https://github.com/Cheetos9250/study-os/actions/runs/43367785010 completed **success**.
 - The test runs in a disposable mocked browser profile with no live Worker/Notion/KV requests. It does not exercise real Safari on iPad or real cross-device synchronization.
+
+### Browser malformed-backup gate — verified
+
+- Both CI runs for code/test SHA `f269d5f9514580f75785e71a430042a8db282c68` completed **success**: [regression 43367785010](https://github.com/Cheetos9250/study-os/actions/runs/43367785010), [isolated Chromium/WebKit browser 43367784703](https://github.com/Cheetos9250/study-os/actions/runs/43367784703).
+- The isolated browser test now rejects synthetic invalid Full Backup shapes (subjects array, progress array, missing English subject) without changing disposable localStorage. It also covers backup cancellation and accepted synthetic restore from prior rounds.
+- This verifies the mocked browser path, **not** a physical iPad Safari or live Cloudflare/KV write.
+- Documentation alignment is being updated in this branch; this note supersedes the earlier `in progress` browser status recorded above.
