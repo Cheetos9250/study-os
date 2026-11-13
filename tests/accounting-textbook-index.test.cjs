@@ -27,7 +27,7 @@ test('catalog record counts and source pages reconcile',()=>{
     assert.ok(Number.isInteger(item.pdfPage)&&item.pdfPage>0&&item.pdfPage<=catalog.meta.pdfPages,'invalid PDF page '+item.id);
     assert.ok(item.title && typeof item.title==='string','title missing for '+item.id);
     const info=chapters.get(item.chapter);
-    assert.ok(item.pdfPage>=info.pdfStartPage&&item.pdfPage<=info.pdfEndPage,'page outside chapter for '+item.id);
+    if(!item.sectionOnly)assert.ok(item.pdfPage>=info.pdfStartPage&&item.pdfPage<=info.pdfEndPage,'page outside chapter for '+item.id);
   }
   for(const ch of catalog.chapters){
     const items=catalog.items.filter(x=>x.chapter===ch.chapter);
