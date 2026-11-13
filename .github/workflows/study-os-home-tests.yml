@@ -6,6 +6,8 @@ on:
       - 'index.html'
       - 'tests/study-os-home.test.cjs'
       - 'tests/study-os-academic-content.test.cjs'
+      - 'tests/study-os-content-audit.test.cjs'
+      - 'scripts/study-os-content-audit.cjs'
       - 'vocabloom/study-decks.json'
       - 'acc.html'
       - 'eco.html'
@@ -18,6 +20,8 @@ on:
       - 'index.html'
       - 'tests/study-os-home.test.cjs'
       - 'tests/study-os-academic-content.test.cjs'
+      - 'tests/study-os-content-audit.test.cjs'
+      - 'scripts/study-os-content-audit.cjs'
       - 'vocabloom/study-decks.json'
       - 'acc.html'
       - 'eco.html'
@@ -40,4 +44,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run static home checks
-        run: node --test tests/study-os-home.test.cjs tests/study-os-academic-content.test.cjs
+        run: node --test tests/study-os-home.test.cjs tests/study-os-academic-content.test.cjs tests/study-os-content-audit.test.cjs
