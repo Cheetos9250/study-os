@@ -157,3 +157,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Cloud cache rollback test `3b2ad6d636dafa72816594cc26b6d6841807c35a` passed regression 43373593892 and browser 43373594003.
 - Added Thai-script requirement for multiline generated practice meanings at `af933c54817bb691ad8df8c73a918e7d2a2ade9d`; tests `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec`. CI pending at documentation time. No changes to production Notion, Worker or KV.
+
+### English meaning guard CI regression and fixture correction
+
+- [Regression 43374162891](https://github.com/Cheetos9250/study-os/actions/runs/43374162891) for test SHA `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec` **failed** the existing HTML escaping fixture: its malicious sample used English-only `Back` and was now correctly excluded from the Thai-meaning pool.
+- Updated the test fixture to contain Thai meaning text plus malicious HTML so it still tests output escaping without contradicting the new eligibility rule, SHA `ae12e71181274941cf264bee1353728058fab48c`. Fresh CI **pending**; failure is recorded, not hidden. No production changes.
