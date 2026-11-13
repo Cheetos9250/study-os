@@ -25,3 +25,9 @@ Status: design only; **not implemented**. Working branch: `feat/study-os-s1-acad
 
 ## Non-goals
 - Creating arbitrary new subjects, deleting existing courses, changing legacy progress keys, migrating databases, modifying production Notion, or enabling cross-device synchronization.
+
+## Implemented foundation — 2026-11-13
+
+- Pure model `lib/study-os-course-metadata.js` validates v1 metadata and supplies defaults. Strictly allows only `acc/eco/math`, `name`, `description`, and an exact course order permutation; rejects unknown fields, markup and control characters. It has no browser storage access or UI integration.
+- Node regression `tests/study-os-course-metadata.test.cjs` covers valid Thai names, reordered cards, invalid identities, duplicate order, overlength strings, extra fields and caller immutability. CI 43377242274 pending.
+- **Not yet implemented:** editing UI, persistent store, backup/import or reset. Do not treat this pure model as released functionality.
