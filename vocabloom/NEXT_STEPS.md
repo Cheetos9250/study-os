@@ -83,3 +83,9 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 
 - [Regression 43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942) passed **266/266 Node plus 3/3 Python**; [Browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) passed **4/4 Chromium/WebKit desktop/tablet** with zero live service requests for code/test SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32`. The previous pending note is superseded.
 - Remaining release blockers: **physical iPad Safari speaker playback/VoiceOver and interruption behaviour**, real authorized backup coverage, staging CAS/concurrency, and explicit owner approval for production sync/deployment.
+
+### Keyboard and nonblocking speech checks — hosted CI verified
+
+- Final application/test SHA `e26c326052f6803bf01e095317384f2d4e5840dd` passed [regression 43388801122](https://github.com/Cheetos9250/study-os/actions/runs/43388801122) (272 Node, 3 Python) and [isolated browser 43388801127](https://github.com/Cheetos9250/study-os/actions/runs/43388801127) (four Chromium/WebKit desktop/tablet passes, zero live requests).
+- In an approved non-production preview on a disposable physical iPad, verify hardware-keyboard number keys 1–4, screen-reader reading of numeric choices, correct answer focus, and that typing fields/sidebar/modal interactions are never hijacked. Also test Safari speaker playback failures and cancellation without losing answer state.
+- Continue source-grounded Thai semantic review, authorized private five-subject backups and staging CAS conflict/persistence verification as separate release gates. Do not merge/deploy or migrate production progress without explicit authorization.

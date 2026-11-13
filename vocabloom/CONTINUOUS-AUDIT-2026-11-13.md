@@ -262,3 +262,10 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Tested source SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32` passed regression [43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942), job `131758604584`: 266 Node pass / 0 fail, 3 Python exporter pass.
 - Hosted isolated browser [43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139), job `131758604737`: Chromium desktop/tablet and WebKit desktop/tablet all passed, each importing 581 words with zero live service calls. This is not physical iPad audio output testing.
+
+### Number-key answering and speech error containment
+
+- Added guarded `uPracticeKeydown` to map unmodified numeric keys 1–4 to the preexisting practice action for an unanswered question only; it ignores editable targets, open modal, out-of-main/sidebar focus, non-Practice context, modifiers, repeat and composition. Visible answer labels and `aria-keyshortcuts` now match 1–4.
+- Hardened `uPracticeStopSpeech` and `uPracticeSpeak` against browser synthesis exceptions. Node regressions simulate failed constructor, cancel and speak, and confirm answers/navigations still proceed; hosted browser QA exercises keyboard answering and numeric choice-label consistency.
+- Final code/test SHA `e26c326052f6803bf01e095317384f2d4e5840dd`. [Regression 43388801122](https://github.com/Cheetos9250/study-os/actions/runs/43388801122) **success**: inspected job `131763510011` shows 272 passed Node tests/0 failed and 3 Python exporter passes. [Browser 43388801127](https://github.com/Cheetos9250/study-os/actions/runs/43388801127) **success**: inspected job `131763510066` reports Chromium desktop/tablet and WebKit desktop/tablet passed; 581 imported English entries, zero live service requests in each case.
+- No physical iPad Safari/VoiceOver/hardware-keyboard audio QA, staging CAS proof, real private backups, merge, production release or Cloudflare/Notion writes in this round.

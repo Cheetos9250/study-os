@@ -77,3 +77,9 @@ Approximate Thai meaning matches are prioritized for human review only if they a
 ## 2026-11-13 — Pronunciation must not leak across questions
 
 A spoken source sentence should stop when the learner answers, moves to another question, retries, starts a new set, changes chapter or leaves Practice. Cancel browser speech synchronously before the state transition, without changing scores or SRS. Continuing audio across a question transition would be misleading. Keep real iPad Safari audio cancellation as a separate manual verification gate.
+
+## 2026-11-13 — Audio failures do not block learners; number-key answers stay scoped
+
+Browser Speech Synthesis availability does not guarantee that constructing, canceling or speaking succeeds. Catch runtime audio failures, show limited nonblocking feedback, and always allow answers/navigation to proceed. Do not change cloud, SRS or progress on an audio error.
+
+Use 1–4 as discoverable optional hardware-keyboard shortcuts only within the English Practice page, showing corresponding 1–4 option labels and `aria-keyshortcuts` in the UI. Do not intercept when a field is editable, a dialog is open, an unrelated navigation control has focus, modifier keys are held, or the current question is answered. Preserve mouse/touch operation and all original card IDs.

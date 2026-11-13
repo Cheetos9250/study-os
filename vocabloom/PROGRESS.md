@@ -252,3 +252,11 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - The speech-cancellation implementation/test SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32` passed [regression 43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942): inspected job `131758604584` logged **266 Node tests passed, 0 failed, plus 3 Python exporter tests passed**.
 - [Isolated browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) completed **success**: job `131758604737` logged Chromium/WebKit desktop/tablet **4/4 passes**, 581 imported English entries and **0 live service requests** per case.
 - This supersedes the earlier `in progress` browser line. Audible iPad Safari playback/VoiceOver and production CAS/private backups remain unverified. No merge or deployment.
+
+### Safe speech errors and keyboard answer navigation — verified
+
+- Hardened speech helpers so unexpected browser engine exceptions cannot interrupt answer submission, Previous/Next, Retry mistakes or New set. Synthetic regression cases simulate constructor, cancel and speak failures, including helpful fallback UI.
+- Added keyboard answering with 1–4 only for active unanswered English Practice. Guarded against modifiers, editable fields, composing, repeat, visible modals and navigation/sidebar focus. Options now visibly show 1–4 and use matching accessible keyboard shortcut attributes. Hosted browser QA performs an actual keyboard answer and verifies UI focus and local-only progress isolation.
+- Final application/test SHA `e26c326052f6803bf01e095317384f2d4e5840dd`: [Regression 43388801122](https://github.com/Cheetos9250/study-os/actions/runs/43388801122) **success**; inspected job `131763510011`: **272/272 Node tests passed**, **0 failed**, and **3 Python exporter tests passed**.
+- [Isolated browser 43388801127](https://github.com/Cheetos9250/study-os/actions/runs/43388801127) **success**; inspected job `131763510066`: **4/4 Chromium/WebKit desktop/tablet cases passed**, each with 581 imported English words and **0 live service requests**.
+- Hosted browser emulation does not establish physical iPad Safari hardware keyboard, VoiceOver or audible speaker behavior. Draft PR #41 remains unmerged and undeployed; no production Notion/Worker/KV writes or real progress migration.

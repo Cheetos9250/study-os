@@ -74,3 +74,9 @@ The generated English Practice panel now provides a source-word **Listen** actio
 ## Stop stale speech on Practice transitions (2026-11-13)
 
 The lightweight `uPracticeStopSpeech` guard cancels an active browser `speechSynthesis` utterance before recording a Practice answer, using Previous/Next, restarting or retrying a set, changing chapter, or leaving the Practice tab. It is a browser playback side effect only, not a progress write. The existing `uPracticeSpeak` cancels earlier speech before speaking a new current English prompt or post-answer example. Where the speech engine is absent, cancellation is a safe no-op.
+
+## Nonblocking speech errors and keyboard Practice answers (2026-11-13)
+
+`uPracticeStopSpeech` now catches failures from a browser speech engine's `cancel()` operation; a playback error must not stop answer recording, question navigation, retry or restart. `uPracticeSpeak` validates the required methods and catches construction/cancel/speak exceptions, returning false and showing a nonblocking toast when available. Listen controls are disabled when those browser capabilities are missing. None of these calls writes learning data.
+
+A single `uPracticeKeydown` listener installed with the VocaBloom integration maps unmodified number keys 1–4 to the existing 0-based `u-practice-answer` action only for unanswered English Vocabulary Practice. It ignores composition, key repeat, modifiers, editable fields, open modals, and focus outside the main content. Options visibly display 1–4 and advertise matching `aria-keyshortcuts`. This shares the existing in-memory scoring, screen-reader feedback and frozen-question boundaries; it does not affect legacy quizzes, flashcard SRS, storage or sync.

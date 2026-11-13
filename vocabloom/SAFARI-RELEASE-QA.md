@@ -48,3 +48,7 @@ Using an approved, disposable iPad Safari preview, verify that **Listen** speaks
 ### Additional physical iPad pronunciation transition checks (not executed)
 
 While a source example or English word is audibly playing, tap **Next**, **Previous**, **New set**, **Retry mistakes**, change chapters and leave Practice. Confirm the previous audio stops promptly and never continues under the next question. Re-enter Practice and confirm new playback works after a real user tap. Document Safari/iPadOS version and VoiceOver behaviour; automated headless tests cannot confirm audible output.
+
+### Physical iPad hardware keyboard and speech-failure QA (not executed)
+
+With a disposable approved preview and a paired keyboard, answer a new English Practice question using each number key 1–4; verify labels, announcement and focus. While typing in any editable field, with a modal open, or while the sidebar is focused, pressing those keys must not answer a question. Modifiers/repeated keys must not register unintended answers. Test when a question has already been answered and after changing chapter. With audio supported, test Listen and Listen to example; if speech fails or is unavailable, answers/navigation must continue and no progress should be lost. This checklist is **not** evidence of physical device execution.

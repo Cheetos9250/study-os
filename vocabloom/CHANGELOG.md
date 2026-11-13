@@ -127,3 +127,10 @@ All entries below describe an unmerged proposal, not a production release.
 
 - Cancel in-progress Practice audio on answer, Previous/Next, Retry mistakes, New set, chapter switching and leaving Practice, while preserving session-only scores and existing SRS.
 - Added synthetic Node tests of cancellation counts and ignored navigation outside Practice. No Cloudflare/Notion, backup, source or production configuration changes.
+
+## 2026-11-13 — Audio failure resilience and 1–4 keyboard answers (draft only)
+
+- Protect Practice answer recording and navigation from speech engine `cancel()` failures; speech playback construction/cancel/speak errors now fail safely with feedback, while unsupported engines disable Listen.
+- Add optional hardware-keyboard 1–4 answer shortcuts, matching visible numeric answer labels and accessible `aria-keyshortcuts` attributes.
+- Prevent shortcuts on other pages/tabs, in editable controls, dialogs, sidebar focus, with modifiers, key repeat or already answered questions.
+- Add actual-action Node tests, browser desktop/tablet keyboard answer and choice-label checks. No source translation, SRS identity, user progress, cloud, backup or production endpoint changes.
