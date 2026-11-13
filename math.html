@@ -3,7 +3,9 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/study-course-icons.css">
+<link rel="stylesheet" href="assets/study-course-layout.css">
 <style>
 /* Layout: tabbed study sheet (cards / summary / practice) in one centred column. */
 :root{
@@ -11,7 +13,6 @@
   --accent:#2f5fb3; --accent-soft:#dbe5f6; --known:#e6f2d5; --ok:#1c7c4a; --ok-soft:#e2f3e9; --bad:#b3261e; --bad-soft:#fbe6e4;
   --ui:"DM Sans","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
   --heading:"Outfit","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -34,9 +35,9 @@ button:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{font:inherit;font-size:14.5px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 13px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
-.chip .n{font-family:var(--mono);font-size:11.5px;opacity:.75;margin-left:5px}
+.chip .n{font-family:var(--ui);font-size:11.5px;opacity:.75;margin-left:5px}
 .controls{justify-content:space-between;margin:12px 0 16px}
-.count{color:var(--muted);font-size:14px;font-family:var(--mono)}
+.count{color:var(--muted);font-size:14px;font-family:var(--ui)}
 .stage{perspective:1400px}
 .card{position:relative;width:100%;height:clamp(300px,64vw,380px);cursor:pointer;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);border-radius:10px}
 .card.flipped{transform:rotateY(180deg)}
@@ -54,17 +55,17 @@ button:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline
 .btn.primary{background:var(--ink);color:var(--paper)}
 .btn.know[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn:disabled{opacity:.45;cursor:default}
-.ref{position:absolute;bottom:10px;left:0;right:0;font:500 12px var(--mono);color:var(--accent)}
+.ref{position:absolute;bottom:10px;left:0;right:0;font:500 12px var(--ui);color:var(--accent)}
 .btn.no{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
 .btn.yes{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
 .sync{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:10px;background:var(--accent-soft);margin-top:16px}
 .sync p{margin:0;font-size:15px}.sync .ok{color:var(--ok)}.sync .err{color:var(--bad)}
-.srs{gap:14px;font:600 14px var(--mono);margin:4px 0 12px}
+.srs{gap:14px;font:600 14px var(--ui);margin:4px 0 12px}
 .srs .n{color:#2f6fd0}.srs .l{color:var(--bad)}.srs .d{color:var(--ok)}
 .srs b{font-size:18px;margin-right:3px}
 .rate4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
 .rate4 .btn{display:flex;flex-direction:column;gap:2px;padding:9px 4px;min-width:0;font-size:15px}
-.rate4 .btn small{font:500 12px var(--mono);opacity:.85}
+.rate4 .btn small{font:500 12px var(--ui);opacity:.85}
 .rate4 .r1{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
 .rate4 .r2{border-color:var(--line);color:var(--ink)}
 .rate4 .r3{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
@@ -79,7 +80,7 @@ button:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline
 /* summary */
 .sec{margin:0 0 26px}
 .sec h2{font-size:20px;margin:0 0 8px;padding-left:12px;border-left:4px solid var(--accent);line-height:1.4}
-.sec .chtag{font-family:var(--mono);font-size:12px;color:var(--accent);display:block}
+.sec .chtag{font-family:var(--ui);font-size:12px;color:var(--accent);display:block}
 .tbl-wrap{overflow-x:auto}
 table{border-collapse:collapse;min-width:100%;background:var(--surface);font-size:15.5px}
 th,td{border:1px solid var(--line);padding:7px 11px;text-align:left;vertical-align:top;line-height:1.6}
@@ -91,12 +92,12 @@ td:first-child{font-weight:500;min-width:7.5em}
 .qbar{height:4px;background:var(--line);border-radius:2px;margin-bottom:14px}
 .qbar i{display:block;height:100%;background:var(--accent);width:0;border-radius:2px;transition:width .25s}
 .qmeta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13.5px;color:var(--muted);margin-bottom:8px}
-.qmeta b{font-family:var(--mono);color:var(--ink)}
+.qmeta b{font-family:var(--ui);color:var(--ink)}
 .qtext{font-size:18px;font-weight:500;margin:0 0 14px;line-height:1.6}
 .opts{display:flex;flex-direction:column;gap:8px}
 .opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:9px;padding:10px 13px;cursor:pointer}
 .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
-.opt .k{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--muted);min-width:16px;padding-top:2px}
+.opt .k{font-family:var(--ui);font-weight:600;font-size:13px;color:var(--muted);min-width:16px;padding-top:2px}
 .opt:disabled{cursor:default}
 .opt.right{border-color:var(--ok);background:var(--ok-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
@@ -106,16 +107,16 @@ td:first-child{font-weight:500;min-width:7.5em}
 .explain b.v{display:block;margin-bottom:2px}
 .qnav{display:flex;justify-content:space-between;gap:8px;margin-top:16px;align-items:center;flex-wrap:wrap}
 .score{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
-.score .big{font-family:var(--mono);font-size:30px;font-weight:600}
+.score .big{font-family:var(--ui);font-size:30px;font-weight:600}
 .cells{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0}
-.cell{width:28px;height:28px;border:1px solid var(--line);background:var(--surface);border-radius:5px;font:500 11px var(--mono);color:var(--muted);cursor:pointer;padding:0}
+.cell{width:28px;height:28px;border:1px solid var(--line);background:var(--surface);border-radius:5px;font:500 11px var(--ui);color:var(--muted);cursor:pointer;padding:0}
 .cell.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .cell.no{background:var(--bad);border-color:var(--bad);color:#fff}
 .cell.cur{outline:2px solid var(--ink);outline-offset:1px}
 @media (prefers-reduced-motion:reduce){.card,.qbar i{transition:none}}
 </style>
 <div class="wrap">
-  <header><h1>Math for Life</h1><span>สรุป · แฟลชการ์ด · แบบฝึก Ch05–07 (การเงิน · เซต · ความน่าจะเป็นและสถิติ)</span></header>
+  <header><h1 class="course-title course-math">Math for Life</h1><span>สรุป · แฟลชการ์ด · แบบฝึก Ch05–07 (การเงิน · เซต · ความน่าจะเป็นและสถิติ)</span></header>
   <nav class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="cards">แฟลชการ์ด</button>
     <button role="tab" aria-selected="false" data-tab="sum">สรุปบทเรียน</button>
@@ -612,6 +613,7 @@ window.__xs=(()=>{
   function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์ด้วยตนเอง':'☁ ตั้งรหัสซิงก์'; }
   function mount(){
     box=document.createElement('div');
+    box.className='cloud-sync-bar';
     box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:50;display:flex;gap:8px;align-items:center;background:var(--surface,#fff);color:var(--ink,#1c1c1c);border:1px solid var(--line,#bbb);border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12)';
     msgEl=document.createElement('span'); msgEl.setAttribute('role','status');
     btnEl=document.createElement('button'); btnEl.type='button'; btnEl.style.cssText='border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;font-weight:600;padding:2px 4px';
