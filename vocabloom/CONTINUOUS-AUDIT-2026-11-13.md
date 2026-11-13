@@ -177,3 +177,7 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Prior Verified source provenance test passed regression 43377373010 and browser 43377372983.
 - Whitespace-normalized question/distractor deduplication code SHA `9067a8a7c9266d273c3dea5f88215258021eacdf`; synthetic regression SHA `dd8f1e4a44dfa2cbf282e0d33934fa31f73f9a53`. CI pending: regression 43378205242 and browser 43378205248. No live Notion/Worker/KV access or real progress migration.
+
+### Correct whitespace assertion semantics
+
+- Whitespace fix passed regression 43378205242 and browser 43378205248. The synthetic assertion accidentally used a double-escaped `\\s` regex, making the normalized uniqueness check weaker than intended. Corrected at SHA `97c93f0435fb2c8de27115351237f28cdb6bd648`; regression 43378451795 and browser 43378451810 pending. No production changes.
