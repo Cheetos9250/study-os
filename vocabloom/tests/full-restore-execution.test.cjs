@@ -5,13 +5,13 @@ const decks=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../study-decks.js
 function extract(a,b){const i=src.indexOf(a),j=src.indexOf(b,i+a.length);assert.ok(i>=0&&j>i);return src.slice(i,j);}
 const restore=extract('async function cFullRestore(file){','async function cForgetKey(){');
 const valid=()=>{const subjects={};for(const d of decks){subjects['study-'+d.key]={ans:{},ats:{}};subjects[d.markKey+'-srs']={s:{},m:{day:0,newDone:0}};}return {type:'vocabloom-unified-study-backup',version:1,deviceId:'another-device',vocabloom:{progress:{},days:{},custom:[],settings:{}},subjects,deviceDays:{'2026-11-12':{answered:9}},studyDays:{'2026-11-12':{answered:5}}};};
-async function simulate(payload,{confirm=true,failAt=null,busy=false,busyDuringRead=false}={}){
+async function simulate(payload,{confirm=true,failAt=null,busy=false,busyDuringRead=false,fileSize=1000,rawText=null}={}){
  const store=new Map([['study-eng','ORIGINAL_ENG'],['vocabloom_mvp_v1','ORIGINAL_VOCAB']]);
  const original=[...store.entries()],calls={confirm:0,writes:0,network:0,notice:[],render:0};
  const localStorage={getItem:k=>store.has(k)?store.get(k):null,setItem(k,v){calls.writes++;if(calls.writes===failAt)throw Error('Quota exceeded');store.set(k,v)},removeItem:k=>store.delete(k)};
  const context={CLOUD:{busy,studyMergedDays:null,remoteStatus:''},CLOCAL:{device:'local-device',days:{old:1},studyDays:{old:2}},USTATE:{decks},STORAGE_KEY:'vocabloom_mvp_v1',CLOUD_LOCAL_DAYS:'local-days',CLOUD_STUDY_DAYS:'study-days',data:{original:true},window:{confirm:()=>{calls.confirm++;return confirm}},localStorage,cSafeGet:k=>localStorage.getItem(k),cSafeSet(k,v){try{localStorage.setItem(k,v);return true}catch{return false}},cCloudNotice:(msg,error)=>calls.notice.push({msg,error}),render:()=>calls.render++,structuredClone,fetch:()=>{calls.network++;throw Error('Unexpected network')}};
  const fn=new Function('ctx','file',`with(ctx){${restore};return cFullRestore(file)}`);
- await fn(context,{size:1000,text:async()=>{if(busyDuringRead)context.CLOUD.busy=true;return JSON.stringify(payload)}});
+ await fn(context,{size:fileSize,text:async()=>{if(busyDuringRead)context.CLOUD.busy=true;return rawText===null?JSON.stringify(payload):rawText}});
  return {calls,store:Object.fromEntries(store),original:Object.fromEntries(original),data:context.data,days:context.CLOCAL.days};
 }
 test('Full restore refuses incomplete five-deck backup before prompt and any write',async()=>{
@@ -115,4 +115,17 @@ test('Malformed daily maps from other devices cannot overwrite local counters',a
  assert.equal(r.calls.confirm,1);
  assert.deepEqual(JSON.parse(r.store['local-days']),{});
  assert.deepEqual(JSON.parse(r.store['study-days']),{});
+});
+
+test('Oversized backup fails before reading, confirming or writing',async()=>{
+ const r=await simulate(valid(),{fileSize:8*1024*1024+1});
+ assert.equal(r.calls.confirm,0);assert.equal(r.calls.writes,0);
+ assert.deepEqual(r.store,r.original);assert.equal(r.calls.network,0);
+ assert.ok(r.calls.notice.some(x=>x.error));
+});
+test('Invalid JSON backup cannot alter local progress',async()=>{
+ const r=await simulate(valid(),{rawText:'{"type":'});
+ assert.equal(r.calls.confirm,0);assert.equal(r.calls.writes,0);
+ assert.deepEqual(r.store,r.original);assert.equal(r.calls.network,0);
+ assert.ok(r.calls.notice.some(x=>x.error));
 });
