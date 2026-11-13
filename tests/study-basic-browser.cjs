@@ -32,7 +32,10 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           await page.goto(base+'/');
           for(const course of ['acc','eco','math','eng','zh']){
             const link=page.locator(`a[href="${course}.html"]`).first();
-            await link.click();await page.locator('.front-t').waitFor();
+            console.log('Course journey:',engine,width,course);
+            await Promise.all([page.waitForURL(base+'/'+course+'.html'),link.click()]);
+            await page.waitForLoadState('domcontentloaded');
+            try{await page.locator('.front-t').waitFor();}catch(error){console.error({engine,width,course,url:page.url(),errors,body:await page.locator('body').innerText()});await page.screenshot({path:path.join(output,'failure-'+engine+'-'+width+'-'+course+'.png'),fullPage:true});throw error;}
             await page.locator('.card').click();
             await page.locator('.rate4 .r3').click();
             const stored=await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs'));
@@ -40,6 +43,22 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
             await page.reload();await page.locator('.front-t').waitFor();
             assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'rating did not survive reload');
             assert.equal(await page.locator('.course-links a[href="progress-backup.html"]').count(),1);
+            if(await page.locator('[data-tab="prac"]').isVisible()){
+              await page.locator('[data-tab="prac"]').click();
+              const option=page.locator('#qBody .opt').first(),choice=Number(await option.getAttribute('data-oi'));
+              await option.click();await page.locator('.explain').waitFor();
+              const quiz=await page.evaluate(()=>localStorage.getItem('study-'+D.key));
+              assert.equal(JSON.parse(quiz).ans[0],choice);
+              page.once('dialog',dialog=>dialog.dismiss());await page.locator('#resetBtn').click();
+              assert.equal(await page.evaluate(()=>localStorage.getItem('study-'+D.key)),quiz,'cancel reset changed quiz history');
+              page.once('dialog',dialog=>dialog.accept());await page.locator('#resetBtn').click();
+              assert.deepEqual(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans,{});
+              assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'quiz reset changed flashcard progress');
+              await page.locator('#qBody .opt').first().click();await page.locator('.explain').waitFor();
+              await page.reload();await page.locator('.front-t').waitFor();
+              await page.locator('[data-tab="prac"]').click();await page.locator('.explain').waitFor();
+              assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans[0],choice,'quiz answer did not survive reload');
+            }
             await page.locator('.course-links a[href="./"]').click();
             await page.locator('#welcome-title').waitFor();
             evidence.push({engine,width,course,navigateRateReloadReturn:'passed'});

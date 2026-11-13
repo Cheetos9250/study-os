@@ -47,3 +47,6 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Added readable dataset/file preview and fixed asynchronous file-selection races so an older selection cannot re-enable restore.
 - Extended synthetic checks for cancellation, race handling, repeated restore, quota rollback and concurrent changes. No real user progress is read or restored by QA.
 - Exact-head CI/release evidence is tracked in PR #53. Physical iPad Safari/PWA storage and Files flow remain unverified.
+
+- Also added explicit confirmation before clearing course quiz answers; browser checks verify cancel preserves answers, confirmed reset leaves flashcard schedules intact, and a new answer persists after reload.
+- The first integrated browser run timed out navigating to a course in WebKit. Added explicit URL/load waits and failure diagnostics before repeating the full journey suite.
