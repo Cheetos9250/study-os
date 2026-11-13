@@ -73,3 +73,7 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — Invisible-separator deduplication
 
 - English practice duplicate detection now ignores invisible Unicode separators in headwords and Thai meanings. Original displayed content, Notion source rows and SRS are unchanged.
+
+## 2026-11-13 — Rotated option normalization audit
+
+- Added a regression ensuring generated English practice options remain distinct after Unicode and whitespace normalization across rotated sets. No runtime or source data change.
