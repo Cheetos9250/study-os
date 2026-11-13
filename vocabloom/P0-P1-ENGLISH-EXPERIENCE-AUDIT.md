@@ -70,3 +70,12 @@
 - Added regression assertions for current news entries including breakthrough, preservation, deluge, ambassador and pedestrian; original pipe-format regression still runs.
 - GitHub Actions CI: https://github.com/Cheetos9250/study-os/actions/runs/43352286978 at SHA `16a47bdd7c6db2e9759874be8b159dfdad2374e9` — **success**. This is GitHub CI, not deployed app behavior. No Notion writes or Worker/KV changes.
 - English Verified **quiz** records remain absent; this fix only increases imported vocabulary availability. Do not describe derived practice games as Notion Verified quizzes.
+
+## P2 English Vocabulary Practice — session-only proposal
+
+- Added a `Vocabulary Practice` tab to the English integrated panel. Questions are deterministically generated from existing English vocabulary cards, with four distinct Thai-meaning options and a ten-question session. `New set` rotates to the next ten vocabulary entries.
+- The tab is labeled **practice generated from existing English vocabulary**, explicitly distinct from the `Verified Quizzes (0)` tab. No Notion Quiz rows are invented or written.
+- Practice answers exist only in `USTATE.practiceAnswers` in memory. They do **not** write `study-eng`, `eng-vocab-v1-srs`, `vocabloom_mvp_v1`, or Cloudflare; existing flashcard SRS and Verified quiz answer handling are unchanged.
+- Added `vocabloom/tests/english-practice.test.cjs` for 10-question generation, deterministic answer options, both vocabulary meaning formats, and absence of persistence in practice action.
+- GitHub Actions CI for code SHA `836c17e695f7f401ac23005968b71de30bcc9133`: https://github.com/Cheetos9250/study-os/actions/runs/43352649466 — **success**. Earlier failing runs were caused by incorrect escaping in new tests/code and were fixed before this passing run.
+- This remains an **unmerged feature-branch proposal**, not a tested live iPad/Safari or deployed Production feature. Release gates from Handoff v1.2 remain open.
