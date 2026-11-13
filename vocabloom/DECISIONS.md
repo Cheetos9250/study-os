@@ -33,3 +33,7 @@ Rely on the existing normalized unique-meaning pool when choosing distractors; e
 ## 2026-11-13 — Reject malformed restore payloads before local writes
 
 Keep Full Restore fail-closed for invalid backup object types or missing subject keys. Exercise rejection against the actual browser restore handler using disposable fixtures, not real user backups. Do not interpret mock browser success as production CAS or iPad Safari verification. Preserve all five legacy subjects and rollback protections.
+
+## 2026-11-13 — Daily counter restore validation
+
+Require record-shaped daily counter maps for same-device Full Restore, rather than treating any JavaScript object (including arrays) as a valid map. Keep the existing cross-device rule: do not import source device counters. Reject malformed same-device input before confirmation and any local write; no production data migration is authorized.
