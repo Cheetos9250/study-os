@@ -51,3 +51,17 @@ test("the seven-day horizon includes its boundary and excludes day eight", () =>
   const outside = make("outside","2026-11-21");
   assert.deepEqual(discoverPlans([outside,boundary],"2026-11-13").upcoming.map(item => item.id),["boundary"]);
 });
+
+test("completed plans stay completed when their dates move across navigation windows", () => {
+  const done = reviseSession(make("done-moved","2026-11-11"),{done:true,date:"2026-11-16"},1,1001);
+  const result = discoverPlans([done],"2026-11-13");
+  assert.deepEqual(result.completed.map(item => item.id),["done-moved"]);
+  assert.equal(result.overdue.length,0);
+  assert.equal(result.upcoming.length,0);
+});
+
+test("same-day plans are not included in upcoming navigation", () => {
+  const result = discoverPlans([make("same-day","2026-11-13"),make("tomorrow","2026-11-14")],"2026-11-13");
+  assert.deepEqual(result.today.map(item => item.id),["same-day"]);
+  assert.deepEqual(result.upcoming.map(item => item.id),["tomorrow"]);
+});
