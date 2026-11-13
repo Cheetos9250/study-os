@@ -42,3 +42,5 @@ All entries below describe an unmerged proposal, not a production release.
 
 - Validate per-date restore records before same-device Full Restore: nonnegative finite numeric counters and string-array IDs where present. Reject malformed rows before any local writes.
 - Added disposable mock tests for invalid and valid daily-row payloads; CI verification remains pending in `PROGRESS.md`.
+
+- Extended hosted browser QA with direct rejection cases for malformed nested daily counters (negative, nonnumeric and invalid IDs), without writing to live services.
