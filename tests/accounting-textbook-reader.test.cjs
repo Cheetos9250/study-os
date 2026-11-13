@@ -8,7 +8,9 @@ const geo=JSON.parse(fs.readFileSync(path.join(dir,'data/accounting-textbook-geo
 
 test('every individually indexed exercise has a render location',()=>{
  const items=data.items.filter(x=>!x.sectionOnly);
- assert.ok(items.length>1300);
+ assert.equal(items.length,403);
+ assert.deepEqual(data.chapters.map(x=>x.chapter),['1','2','3','4','5','6','7','8','9']);
+ assert.ok(items.every(x=>Number(x.chapter)>=1&&Number(x.chapter)<=9));
  assert.equal(geo.meta.pdfPages,1210);
  assert.equal(Object.keys(geo.items).length,items.length);
  for(const q of items){
@@ -17,7 +19,10 @@ test('every individually indexed exercise has a render location',()=>{
   assert.equal(part.page,q.pdfPage,'Unexpected PDF page for '+q.id);
   assert.ok(part.top>=0&&part.top<part.bottom&&part.bottom<=783,'Invalid crop for '+q.id);
  }
- assert.ok(geo.meta.matched>1200,'Geometry coverage dropped');
+ assert.equal(geo.meta.matched+geo.meta.fallback,items.length,'Geometry coverage dropped');
+ assert.equal(geo.meta.matched,401);
+ assert.equal(geo.meta.fallback,2);
+ assert.ok(Object.values(geo.items).every(x=>x.page>=51&&x.page<=410));
 });
 
 test('web reader renders the user-imported source PDF inside the question panel',()=>{
@@ -29,6 +34,8 @@ test('web reader renders the user-imported source PDF inside the question panel'
  assert.match(html,/Export answers/);
  assert.match(html,/Import answers/);
  assert.match(html,/bookDelete\(\)/);
+ assert.match(html,/requestedPage>=chapterEnd/);
+ assert.match(html,/records=catalog\.items\.filter\(x=>!x\.sectionOnly&&/);
  assert.doesNotMatch(html,/fetch\(catalog\.meta\.sourceUrl/);
  assert.doesNotMatch(html,/localStorage\.clear\(/);
 });
