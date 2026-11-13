@@ -33,9 +33,9 @@ test('no answers are invented for incomplete catalog coverage',()=>{
  assert.equal(Object.hasOwn(bank.answers,'E-1-10'),false);
  assert.equal(Object.hasOwn(bank.answers,'QS-6-2'),false);
  assert.equal(Object.hasOwn(bank.answers,'QS-6-1'),true);
- assert.equal(bank.meta.reviewedCount,45);
- assert.equal(bank.meta.sourceReviewedNewCount,16);
- for(const id of ['E-1-11','E-1-13','E-1-15','E-1-16','E-1-18','P-1-1A','P-1-2A','P-1-3A','P-1-4A','P-1-5A','P-1-6A','P-1-7A','P-1-8A','P-1-9A','P-1-11A','P-1-12A']){
+ assert.equal(bank.meta.reviewedCount,58);
+ assert.equal(bank.meta.sourceReviewedNewCount,29);
+ for(const id of ['E-1-11','E-1-13','E-1-15','E-1-16','E-1-18','P-1-1A','P-1-2A','P-1-3A','P-1-4A','P-1-5A','P-1-6A','P-1-7A','P-1-8A','P-1-9A','P-1-11A','P-1-12A','P-1-1B','P-1-2B','P-1-3B','P-1-4B','P-1-5B','P-1-6B','P-1-7B','P-1-8B','P-1-9B','P-1-11B','P-1-12B','P-1-13B','P-1-14B']){
   assert.equal(bank.answers[id]?.verification,'source-reviewed-2026-11-13',id+' must be source checked');
  }
  assert.equal(bank.answers['P-1-2A']?.pages.includes(60),true);
