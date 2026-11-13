@@ -41,3 +41,10 @@
 - Current candidate has a separate unlinked local course metadata editor. Do not silently expose it, migrate planner/progress stores, or merge/deploy.
 - Physical iPad Safari checklist: docs/study-os-course-metadata-ipad-qa-2026-11-13.md. This is an unexecuted manual checklist, not successful hardware QA.
 - Preserve exact-head CI verification and no Production writes for every subsequent change.
+
+
+## Latest planner list handoff — 2026-11-13
+
+- Candidate homepage includes a collapsed chronological overdue/upcoming read-only list that selects dates and focuses the daily plan list without completing a session. CI 43383830130 and mobile CI 43384050769 passed; completion/edit/reload CI 43384365182 passed synthetic Chromium/WebKit + Node.
+- Accessibility relationship and cross-tab refresh changes 6741afd/c0154f0/0654f37 need exact-head CI review, not inferred success from old runs. Inspect PROGRESS.md, NEXT_STEPS.md and PR #44 before edits; avoid overlapping live branch writes when another agent changes head.
+- Real iPad Safari/VoiceOver, production KV/CAS/cloud and user data restoration remain unverified and approval-gated.
