@@ -47,3 +47,11 @@
 - [ ] Owner approval for future merge or deploy (not requested or implied here).
 
 **Status:** P0 repository/Notion audit complete with remaining live-environment limitations; P1 implemented in a feature branch and GitHub CI passed. Real iPad browser and Cloudflare read-only QA are still outstanding. **No merge, no Production deploy, no data migration.**
+
+## Follow-up P1 verification — Handoff v1.2 (13 Nov 2026)
+
+- Handoff v1.2 now explicitly separates VocaBloom (language-first) and Study OS (academic subjects). This feature branch remains a **UI-only proposal** with no merge/deploy/migration.
+- Added `vocabloom/tests/english-entrypoint-contract.test.cjs` to check desktop and mobile/iPad navigation source, viewport declaration, English-only Verified import parser, stable historical Notion word IDs, deduplication, original five deck identities, and unchanged production content endpoint. Tests compile the pure parser without loading the application; **no network, storage or live Worker actions**.
+- Found and corrected two test assumptions during CI: the mobile navigation legitimately includes Settings, and the historical Notion word ID retains the last 40 alphanumeric characters. These were **test fixture errors**, not app defects.
+- Final CI for code commit `2e53db1cfe59183877d16d79bf26d1a6b2f8086d`: GitHub Actions run https://github.com/Cheetos9250/study-os/actions/runs/43351838716 — **success**. This confirms the branch's offline test suite, not real Safari or Cloudflare Production behavior.
+- Still blocked for release: actual iPad Safari interaction, full local backup/restore on disposable profile, read-only live Cloudflare/KV validation, and explicit owner approval for any merge or deployment.
