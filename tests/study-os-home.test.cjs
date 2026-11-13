@@ -28,7 +28,9 @@ test("Language experience is separate but existing links are preserved", () => {
 });
 test("Home uses local academic scripts and preserves progress read-only behavior", () => {
   assert.doesNotMatch(html, /\blocalStorage\b|\bsessionStorage\b|\bfetch\s*\(|\/progress\/|SYNC_KEY|NOTION_TOKEN/i);
-  assert.deepEqual([...html.matchAll(/<script src="([^"]+)" defer><\/script>/g)].map(m => m[1]), ["lib/study-os-legacy-progress-reader.js", "lib/study-os-dashboard.js", "lib/study-os-planner.js", "lib/study-os-planner-ui.js"]);
+  assert.deepEqual([...html.matchAll(/<script src="([^"]+)" defer><\/script>/g)].map(m => m[1]), ["lib/study-os-legacy-progress-reader.js", "lib/study-os-dashboard.js", "lib/study-os-planner.js", "lib/study-os-plan-discovery.js", "lib/study-os-planner-ui.js"]);
+  const discovery = fs.readFileSync(path.join(root, "lib/study-os-plan-discovery.js"), "utf8");
+  assert.doesNotMatch(discovery, /localStorage|sessionStorage|indexedDB|fetch\\s*\\(|XMLHttpRequest|setItem|deleteDatabase/);
   const dashboard = fs.readFileSync(path.join(root, "lib/study-os-dashboard.js"), "utf8");
   assert.doesNotMatch(dashboard, /setItem|removeItem|clear\s*\(|fetch\s*\(|XMLHttpRequest|innerHTML/);
   assert.match(html, /<html lang="th">/);
