@@ -70,3 +70,19 @@ test('P1 language isolation does not change five legacy decks or content endpoin
  assert.match(progress,/function cOriginalCardFor\(w\)/);
  assert.match(progress,/function cCloudStorageKey\(\)/);
 });
+
+test('P2 imports current Verified multiline news entries without changing legacy IDs',()=>{
+ const parse=getParser();
+ const news=verified.rows.filter(x=>x.Status==='Verified'&&x.Subject==='English Vocab'&&/^\\s*Example\\s*:/im.test(String(x.Back||'')));
+ assert.ok(news.length>0,'Expected multiline Verified news data in repository');
+ const parsed=parse(verified);
+ assert.ok(parsed.words.length>=570,'Unexpected Verified English import regression');
+ const known=new Set(parsed.words.map(w=>w.en.toLowerCase()));
+ for(const word of ['breakthrough','preservation','deluge','ambassador','pedestrian']){
+  assert.ok(known.has(word),'Missing multiline English word: '+word);
+ }
+ const b=parsed.words.find(w=>w.en==='breakthrough');
+ assert.equal(b.th,'ความคืบหน้าครั้งสำคัญ');
+ assert.equal(b.example,'The talks ended without a breakthrough.');
+ assert.equal(new Set(parsed.words.map(w=>w.id)).size,parsed.words.length);
+});
