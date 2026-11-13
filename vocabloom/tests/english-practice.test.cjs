@@ -5,7 +5,7 @@ const deck=JSON.parse(fs.readFileSync(path.join(root,'vocabloom/study-decks.json
 function extract(a,b){let i=src.indexOf(a),j=src.indexOf(b,i+a.length);assert.ok(i>=0&&j>i);return src.slice(i,j);}
 const pure=extract('function uPracticeMeaning(back){','function uHome(){');
 function run(offset=0,cat='all'){
- return new Function('deck','offset','cat',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:offset,practiceAnswers:{},quizIndex:0,cat};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));${pure};return {questions:uPracticeQuestions(deck),meaning:uPracticeMeaning};`)(deck,offset,cat);
+ return new Function('deck','offset','cat',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:offset,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));${pure};return {questions:uPracticeQuestions(deck),meaning:uPracticeMeaning};`)(deck,offset,cat);
 }
 test('Generated practice produces ten answerable English-only questions with unique meanings',()=>{
  const {questions}=run();assert.equal(questions.length,10);
@@ -37,4 +37,11 @@ test('Chapter filter limits generated practice to the chosen English category',(
  assert.ok(all.some(q=>q.cat!=='e1')||all.length===10);
  assert.deepEqual(run(0,'not-a-category').questions,[]);
  assert.match(src,/USTATE\.practiceAnswers=\{\};USTATE\.practiceOffset=0;render\(\)/);
+});
+
+test('Active practice snapshot stays stable if source cards change mid-session',()=>{
+ const evaluate=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all'};let cards=deck.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uCards=()=>cards;${pure};const first=uPracticeQuestions(deck);const saved=JSON.stringify(first);cards=cards.slice().reverse().map(c=>({...c,f:'UPDATED '+c.f,b:'changed'}));const stable=uPracticeQuestions(deck);USTATE.practiceQuestions=null;const fresh=uPracticeQuestions(deck);return {saved,stable:JSON.stringify(stable),fresh:JSON.stringify(fresh)};`)(deck);
+ assert.equal(evaluate.saved,evaluate.stable,'Question text/options must not change during active session');
+ assert.notEqual(evaluate.saved,evaluate.fresh,'New session should reflect updated source data');
+ assert.match(src,/case 'u-practice-restart':USTATE\.practiceOffset\+=10;USTATE\.practiceAnswers=\{\};USTATE\.practiceQuestions=null;/);
 });
