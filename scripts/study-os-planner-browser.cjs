@@ -26,6 +26,16 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.match(await page.locator("#plan-status").innerText(),/ไม่มีแผนค้าง/);
     await page.locator("#plan-upcoming").click();
     assert.match(await page.locator("#plan-status").innerText(),/ไม่มีแผนใน 7 วันข้างหน้า/);
+    // Export cannot silently omit an unsaved new plan; explicit form reset preserves stored data.
+    await page.locator("#plan-title").fill("Unsaved planner export QA");
+    assert.equal(await page.locator("#plan-cancel").isVisible(),true);
+    await page.locator("#plan-export").click();
+    await page.locator("#plan-status").filter({hasText:"มีข้อมูลแผนที่ยังไม่บันทึก"}).waitFor();
+    assert.equal(await page.locator("#plan-title").inputValue(),"Unsaved planner export QA");
+    await page.locator("#plan-cancel").click();
+    assert.equal(await page.locator("#plan-title").inputValue(),"");
+    assert.equal(await page.locator("#plan-cancel").isVisible(),false);
+    assert.match(await page.locator("#plan-summary").innerText(),/0 รายการ/);
     await page.locator("#plan-title").fill("   ");
     await page.locator("#plan-save").click();
     await page.locator("#plan-status").filter({hasText:"บันทึกหรืออ่านแผนไม่ได้"}).waitFor();
