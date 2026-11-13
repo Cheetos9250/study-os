@@ -71,3 +71,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - Run 43370327132 failed browser-qa: `innerText()` returned empty despite a preceding `textContent` wait. Commit `b0ef9a1` switches the synthetic navigation assertion to `textContent()`; monitor [CI 43370697293](https://github.com/Cheetos9250/study-os/actions/runs/43370697293). If still red, inspect visibility, page state and test data rather than masking a product issue.
 
 - CI 43370697293 failure localized to **post-reload** assertion at browser test line 196. Commit `37dcad4` waits for planner visibility and persisted discovery after reopening; verify [CI 43371040880](https://github.com/Cheetos9250/study-os/actions/runs/43371040880). If green, update AGENTS.md handoff and continue planner usability/accessibility checks. No production release authorization.
+
+## Verified green navigation checkpoint — 2026-11-13
+
+- CI 43371040880 **success** for both static-contract and browser-qa at `37dcad4` (synthetic Chromium/WebKit). The post-reload test race is resolved.
+- Next priorities: improve planner date-navigation accessibility and test chronological selection across multiple overdue/upcoming dates; evaluate course-management requirements without migrating or modifying existing data. Physical iPad Safari remains unverified. Keep PR #44 draft and do not deploy or merge without approval.
