@@ -26,8 +26,11 @@ test("Language experience is separate but existing links are preserved", () => {
     assert.ok(fs.existsSync(path.join(root, file)), file + " must still exist");
   }
 });
-test("Academic home is static: no token, storage, network, or score writes", () => {
-  assert.doesNotMatch(html, /<script\b|<form\b|\blocalStorage\b|\bsessionStorage\b|\bfetch\s*\(|\/progress\/|SYNC_KEY|NOTION_TOKEN/i);
+test("Academic home loads only local read-only dashboard scripts", () => {
+  assert.doesNotMatch(html, /<form\b|\blocalStorage\b|\bsessionStorage\b|\bfetch\s*\(|\/progress\/|SYNC_KEY|NOTION_TOKEN/i);
+  assert.deepEqual([...html.matchAll(/<script src="([^"]+)" defer><\/script>/g)].map(m => m[1]), ["lib/study-os-legacy-progress-reader.js", "lib/study-os-dashboard.js"]);
+  const dashboard = fs.readFileSync(path.join(root, "lib/study-os-dashboard.js"), "utf8");
+  assert.doesNotMatch(dashboard, /setItem|removeItem|clear\s*\(|fetch\s*\(|XMLHttpRequest|innerHTML/);
   assert.match(html, /<html lang="th">/);
   assert.match(html, /viewport/);
 });

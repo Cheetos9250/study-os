@@ -18,7 +18,7 @@ Date: 2026-11-13. Source: existing `acc.html`, `eco.html`, `math.html` on draft 
 
 ## Added safe adapter
 
-`lib/study-os-legacy-progress-reader.cjs` accepts an explicitly supplied snapshot object with only the two academic progress keys. It parses in memory, validates JSON shapes and returns counts plus observation flags. It **does not** read localStorage itself, mutate data, make network requests or derive accuracy/coverage without reliable mappings.
+`lib/study-os-legacy-progress-reader.js` (with a `.cjs` compatibility wrapper) accepts an explicitly supplied snapshot object with only the two academic progress keys. It parses in memory, validates JSON shapes and returns counts plus observation flags. It **does not** read localStorage itself, mutate data, make network requests or derive accuracy/coverage without reliable mappings.
 
 Missing keys return `null` for unknown counts; malformed JSON fails closed. `quizAccuracyPercent` and `reviewCoveragePercent` remain `null` because existing quiz-answer maps and SRS keys need verified mapping to question/card identities before deriving reliable values.
 
@@ -33,3 +33,7 @@ Missing keys return `null` for unknown counts; malformed JSON fails closed. `qui
 ## Verification
 
 Static source audit: completed. Unit tests: added to non-deploy GitHub Actions. Browser runtime and live data: **not tested**. No production merge or deployment.
+
+## Dashboard continuation — 2026-11-13
+
+The candidate homepage now calls this adapter on explicit user request and displays only answered-map and scheduled-card counts. It reads six allowlisted academic keys, with no storage writes or network requests. Browser QA is tracked in PROGRESS.md; this does not establish cross-device correctness or release approval.

@@ -29,3 +29,12 @@ test("reject malformed snapshots and unsupported subjects", () => {
   assert.throws(() => parseLegacyProgress("acc", {"study-acc":"[]"}), TypeError);
   assert.throws(() => parseLegacyProgress("acc", {"study-acc":JSON.stringify({known:"yes"})}), TypeError);
 });
+
+test("malformed stored answers and SRS records fail closed", () => {
+  for (const ans of [{q1:null},{q1:-1},{q1:1.5},{q1:"0"}]) {
+    assert.throws(() => parseLegacyProgress("acc", {"study-acc":JSON.stringify({ans})}), TypeError);
+  }
+  for (const s of [{c1:null},{c1:[]},{c1:3}]) {
+    assert.throws(() => parseLegacyProgress("acc", {"acc-flashcards-v1-srs":JSON.stringify({s})}), TypeError);
+  }
+});

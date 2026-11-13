@@ -11,7 +11,7 @@
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Thai",Tahoma,sans-serif;line-height:1.65}
     a{color:inherit}
-    a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:6px}
+    button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:6px}
     .wrap{max-width:1080px;margin:auto;padding:0 22px}
     .top{background:var(--surface);border-bottom:1px solid var(--border)}
     .top-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-block:17px}
@@ -35,6 +35,10 @@
     .course p{font-size:14px;color:var(--muted);margin:0 0 22px}
     .course .go{margin-top:auto;font-size:14px;color:var(--accent);font-weight:750}
     .course.acc{border-top:5px solid #267a59}.course.eco{border-top:5px solid #b77b37}.course.math{border-top:5px solid #4d70b6}
+    .progress-panel{margin:24px 0;padding:24px;border:1px solid var(--border);border-radius:19px;background:var(--surface)}
+    button{font:inherit;cursor:pointer;color:var(--ink);background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-height:44px}
+    .progress-row{padding:16px 0;border-top:1px solid var(--border)}
+    .progress-row h3{margin:0 0 6px}.progress-row p{margin:0;color:var(--muted);font-size:14px}
     .note{margin:22px 0 46px;font-size:13px;color:var(--muted)}
     .language{display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap;background:var(--soft);border:1px solid var(--border);border-radius:19px;padding:24px 27px}
     .language h2{font-size:22px}.language p{color:var(--muted);font-size:14px;margin:7px 0 0;max-width:590px}
@@ -91,6 +95,13 @@
     </div>
     <p class="note">หน้ารายวิชายังคงใช้เนื้อหาและการบันทึกความคืบหน้าแบบเดิม การปรับหน้าแรกนี้ไม่ได้ย้ายคะแนนหรือข้อมูลเรียน</p>
   </section>
+  <section class="progress-panel" aria-labelledby="progress-title">
+    <div class="section-head"><div><h2 id="progress-title">ความก้าวหน้าบนอุปกรณ์นี้</h2><p class="sub">ดูจำนวนข้อที่เคยตอบและการ์ดที่มีตารางทบทวนในเบราว์เซอร์นี้</p></div><button id="read-progress" type="button" hidden>อ่านความก้าวหน้า</button></div>
+    <p class="sub">ข้อมูลนี้ไม่รวมอุปกรณ์อื่น จำนวนที่แสดงยังไม่ใช่คะแนน ความเชี่ยวชาญ หรือการ์ดที่ครบกำหนดวันนี้</p>
+    <p id="progress-status" role="status">กดอ่านความก้าวหน้าเพื่อแสดงข้อมูลที่บันทึกไว้</p>
+    <div id="progress-results"></div>
+    <noscript><p>เปิด JavaScript เพื่อดูความก้าวหน้า หรือเปิดรายวิชาด้านบนได้ตามปกติ</p></noscript>
+  </section>
   <aside class="language" id="languages" aria-labelledby="languages-title">
     <div><h2 id="languages-title">เรียนภาษา? ไปที่ VocaBloom</h2>
     <p>VocaBloom เป็นพื้นที่ฝึกภาษาแยกจาก Study OS โดยเริ่มจากภาษาอังกฤษ และเตรียมรองรับภาษาจีนในอนาคต</p></div>
@@ -106,5 +117,7 @@
   </details>
 </main>
 <footer><div class="wrap">Study OS · Academic Learning · ข้อมูลรายวิชาและความคืบหน้าเดิมยังอยู่</div></footer>
+<script src="lib/study-os-legacy-progress-reader.js" defer></script>
+<script src="lib/study-os-dashboard.js" defer></script>
 </body>
 </html>

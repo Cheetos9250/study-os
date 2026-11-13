@@ -4,6 +4,13 @@ on:
   push:
     paths:
       - 'index.html'
+      - 'scripts/study-os-browser-check.cjs'
+      - 'scripts/study-os-source-overlap.cjs'
+      - 'tests/study-os-dashboard.test.cjs'
+      - 'tests/study-os-source-overlap.test.cjs'
+      - 'data/quiz.json'
+      - 'lib/study-os-dashboard.js'
+      - 'lib/study-os-legacy-progress-reader.js'
       - 'tests/study-os-home.test.cjs'
       - 'tests/study-os-academic-content.test.cjs'
       - 'tests/study-os-content-audit.test.cjs'
@@ -22,6 +29,13 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'scripts/study-os-browser-check.cjs'
+      - 'scripts/study-os-source-overlap.cjs'
+      - 'tests/study-os-dashboard.test.cjs'
+      - 'tests/study-os-source-overlap.test.cjs'
+      - 'data/quiz.json'
+      - 'lib/study-os-dashboard.js'
+      - 'lib/study-os-legacy-progress-reader.js'
       - 'tests/study-os-home.test.cjs'
       - 'tests/study-os-academic-content.test.cjs'
       - 'tests/study-os-content-audit.test.cjs'
@@ -52,4 +66,28 @@ jobs:
         with:
           node-version: '22'
       - name: Run static home checks
-        run: node --test tests/study-os-home.test.cjs tests/study-os-academic-content.test.cjs tests/study-os-content-audit.test.cjs tests/study-os-learning-analytics.test.cjs tests/study-os-legacy-progress-reader.test.cjs
+        run: node --test tests/*.test.cjs
+
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser test dependency
+        run: npm install --prefix "$RUNNER_TEMP/study-os-browser" --no-save --ignore-scripts playwright@1.62.1
+      - name: Install Chromium and WebKit
+        run: '"$RUNNER_TEMP/study-os-browser/node_modules/.bin/playwright" install --with-deps chromium webkit'
+      - name: Exercise dashboard and five legacy subjects with synthetic storage
+        env:
+          NODE_PATH: ${{ runner.temp }}/study-os-browser/node_modules
+          STUDY_OS_QA_OUTPUT: ${{ runner.temp }}/study-os-browser-qa
+        run: node scripts/study-os-browser-check.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: study-os-browser-qa
+          path: ${{ runner.temp }}/study-os-browser-qa
+          if-no-files-found: ignore
