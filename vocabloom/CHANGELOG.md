@@ -20,3 +20,10 @@ All entries below describe an unmerged proposal, not a production release.
 - Add eligibility/security regression tests and browser scenarios for active content refresh, Full Backup download and cancelled/accepted disposable Full Restore.
 - Removed redundant nested distractor deduplication and added a 1,000-card correctness regression; local Node suite now 233 passing tests.
 - Verified optimized generation with 233 Node tests, 3 Python tests and all four extended hosted browser cases; narrowed browser push path triggers to relevant app/test/data files.
+
+## 2026-11-13 — Backup safety browser regression (unmerged)
+
+- Extended isolated Chromium/WebKit desktop/tablet QA to reject three malformed Full Backup variants: invalid subjects array, invalid VocaBloom progress array, and missing English subject key.
+- Verified each rejection leaves browser storage unchanged; tests use synthetic fixtures and block live services.
+- Both CI workflows passed for implementation SHA `f269d5f9514580f75785e71a430042a8db282c68`: regression run `43367785010` and browser run `43367784703`.
+- No production data, Worker, Notion, site configuration or existing learner progress changed.
