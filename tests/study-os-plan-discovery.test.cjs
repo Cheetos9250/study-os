@@ -30,3 +30,24 @@ test("invalid records and unreasonable horizons fail closed", () => {
   assert.throws(() => discoverPlans([],"2026-11-13",91),TypeError);
   assert.throws(() => discoverPlans([{id:"broken"}],"2026-11-13"),TypeError);
 });
+
+test("navigation groups sort by date and never treat completed plans as pending", () => {
+  const later = make("later","2026-11-17");
+  const earlier = make("earlier","2026-11-15");
+  const overdueOld = make("overdue-old","2026-11-09");
+  const overdueRecent = make("overdue-recent","2026-11-12");
+  const doneFuture = reviseSession(make("done-future","2026-11-14"),{done:true},1,1001);
+  const result = discoverPlans([later,overdueRecent,doneFuture,earlier,overdueOld],"2026-11-13");
+  assert.deepEqual(result.overdue.map(item => item.id),["overdue-old","overdue-recent"]);
+  assert.deepEqual(result.upcoming.map(item => item.id),["earlier","later"]);
+  assert.deepEqual(result.completed.map(item => item.id),["done-future"]);
+  assert.equal(result.today.length,0);
+  assert.ok(Object.isFrozen(result.overdue));
+  assert.ok(Object.isFrozen(result.upcoming));
+});
+
+test("the seven-day horizon includes its boundary and excludes day eight", () => {
+  const boundary = make("boundary","2026-11-20");
+  const outside = make("outside","2026-11-21");
+  assert.deepEqual(discoverPlans([outside,boundary],"2026-11-13").upcoming.map(item => item.id),["boundary"]);
+});
