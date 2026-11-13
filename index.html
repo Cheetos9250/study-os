@@ -115,6 +115,8 @@
     </div>
     <div class="plan-tools"><label for="course-search">ค้นหารายวิชา</label><input id="course-search" type="search" placeholder="เช่น Accounting หรือบัญชี" aria-controls="course-list" autocomplete="off"></div>
     <p id="course-search-status" class="sub" role="status" aria-live="polite">แสดงทั้งหมด 3 วิชา</p>
+    <div class="plan-tools"><button id="course-metadata-apply" type="button" aria-describedby="course-metadata-status">แสดงชื่อรายวิชาที่บันทึกไว้</button><button id="course-metadata-default" type="button" hidden>แสดงชื่อเริ่มต้น</button></div>
+    <p id="course-metadata-status" class="sub" role="status" aria-live="polite">ชื่อที่แก้ไขในหน้าจัดการรายวิชาจะแสดงเมื่อกดปุ่มนี้ และบันทึกไว้เฉพาะเบราว์เซอร์นี้</p>
     <div class="grid" id="course-list">
       <a class="course acc" data-course="acc" data-search="accounting บัญชี การบัญชี" href="acc.html">
         <span class="num">COURSE 01</span>
@@ -163,6 +165,9 @@
 <script src="lib/study-os-legacy-progress-reader.js" defer></script>
 <script src="lib/study-os-dashboard.js" defer></script>
 <script src="lib/study-os-course-search.js" defer></script>
+<script src="lib/study-os-course-metadata.js" defer></script>
+<script src="lib/study-os-course-metadata-store.js" defer></script>
+<script src="lib/study-os-course-metadata-home.js" defer></script>
 <script src="lib/study-os-planner.js" defer></script>
 <script src="lib/study-os-plan-discovery.js" defer></script>
 <script src="lib/study-os-planner-ui.js" defer></script>
