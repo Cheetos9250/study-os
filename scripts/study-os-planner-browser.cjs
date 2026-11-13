@@ -21,6 +21,10 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     await page.locator("#planner-content").waitFor({state:"visible"});
     const today = await page.locator("#plan-date").inputValue();
     assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 0 · เสร็จแล้ว 0/);
+    await page.locator("#plan-overdue").click();
+    assert.match(await page.locator("#plan-status").innerText(),/ไม่มีแผนค้าง/);
+    await page.locator("#plan-upcoming").click();
+    assert.match(await page.locator("#plan-status").innerText(),/ไม่มีแผนใน 7 วันข้างหน้า/);
     await page.locator("#plan-title").fill("   ");
     await page.locator("#plan-save").click();
     await page.locator("#plan-status").filter({hasText:"บันทึกหรืออ่านแผนไม่ได้"}).waitFor();
