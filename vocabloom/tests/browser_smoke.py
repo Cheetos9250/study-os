@@ -125,6 +125,18 @@ def run_case(browser, engine, tablet):
         page.locator("#fullRestoreInput").set_input_files(upload)
     dialog_event.value.dismiss()
     assert page.evaluate("JSON.stringify({...localStorage})") == before_restore, "Cancelled restore changed data"
+    # Invalid backup structures must fail before confirmation and preserve all browser data.
+    for malformed in (
+        {**backup, "subjects": []},
+        {**backup, "vocabloom": {**backup["vocabloom"], "progress": []}},
+        {**backup, "subjects": {k: v for k, v in backup["subjects"].items() if k != "study-eng"}},
+    ):
+        stable = page.evaluate("JSON.stringify({...localStorage})")
+        page.evaluate("""async payload => {
+          await cFullRestore({size:1024,text:async()=>JSON.stringify(payload)});
+        }""", malformed)
+        assert page.evaluate("JSON.stringify({...localStorage})") == stable, "Invalid backup modified browser storage"
+        assert page.evaluate("CLOUD.remoteStatus") != "restored locally", "Invalid backup was accepted"
     # Mutate a synthetic record, then restore through the real file input and confirmation.
     page.evaluate("localStorage.setItem('study-acc',JSON.stringify({ans:{changed:2}}))")
     with page.expect_event("dialog") as dialog_event:
