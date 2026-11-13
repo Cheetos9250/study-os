@@ -184,3 +184,8 @@ Next action: editable academic course metadata while preserving stable subject I
 
 - Verified [CI 43378426163](https://github.com/Cheetos9250/study-os/actions/runs/43378426163) **success** for synthetic Chromium/WebKit metadata CAS/rollback tests.
 - Added **unlinked** `course-metadata-draft.html` (`8a549c6`) and explicit Save/Reset/Import/Export editor (`fec0760`), canonical browser-compatible store `lib/study-os-course-metadata-store.js` (`eee561a`), and browser reload/persistence QA (`ae14471`). Draft opens a separate local IndexedDB database only after user clicks Open. Does not alter homepage, legacy course IDs, planner data, Notion or production. New CI pending; physical iPad Safari unverified.
+
+## Draft editor conflict and reset QA — 2026-11-13
+
+- CI [43378984252](https://github.com/Cheetos9250/study-os/actions/runs/43378984252): static-contract **success**, browser-qa still in progress at inspection; do not claim complete success yet.
+- Expanded synthetic Chromium/WebKit editor QA (`9cf2ed6`) for reset cancel/confirm, stale editor rejection after another tab saves, unsaved field retention and explicit refresh recovery. New CI pending. No homepage exposure, merge, deploy or production writes.
