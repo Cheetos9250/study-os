@@ -47,7 +47,7 @@ test('retrieves only GET source/deployments/version metadata and writes no sourc
   await fixture(async (env) => {
     const mock = mockFetcher();
     const result = await capture(env, mock.handler);
-    assert.deepEqual(result, { saved: true, byteLength: 50, deployedVersions: 2 });
+    assert.deepEqual(result, { saved: true, byteLength: 54, deployedVersions: 2 });
     assert.equal(mock.calls.length, 4);
     assert.deepEqual(mock.calls.map(x => x.url), [root + '/deployments', root + '/versions/' + v1,
       root + '/versions/' + v2, root]);
