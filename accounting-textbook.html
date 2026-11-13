@@ -77,17 +77,18 @@ function resetSolution(){
  const box=$('solutionContent'),button=$('showSolution');box.hidden=true;button.setAttribute('aria-expanded','false');button.textContent='Show worked solution';
  const solution=current&&solutions[current.id];button.disabled=!solution;
  const total=Object.keys(solutions).length;
- $('solutionScope').textContent=!current?'Select a question.':solution?'Source-reviewed worked solution available. Reveal after attempting the question. The answer is not an official publisher key.':solutionsLoadError?'The worked-solution library could not load. Your saved answers are unchanged.':`No source-reviewed solution yet for this question · ${total} of ${records.length} available. You can still save your own work.`;
+ const sourceChecked=!!(solution&&typeof solution.verification==='string'&&solution.verification.startsWith('source-reviewed-'));
+ $('solutionScope').textContent=!current?'Select a question.':solution?(sourceChecked?'PDF-checked worked solution available.':'Draft worked solution available — source verification incomplete.')+' Reveal after attempting the question. Not a publisher answer key.':solutionsLoadError?'The worked-solution library could not load. Your saved answers are unchanged.':`No worked solution yet for this question · ${total} of ${records.length} available. You can still save your own work.`;
  $('solutionAnswer').textContent='';$('solutionExplanation').textContent='';$('solutionSource').textContent='';
 }
 $('showSolution').addEventListener('click',()=>{
  const item=current&&solutions[current.id];if(!item)return;const show=$('solutionContent').hidden;
- if(show){$('solutionAnswer').textContent=item.answer;$('solutionExplanation').textContent=item.explanation;$('solutionSource').textContent='Worked from the owner’s original textbook PDF page'+(item.pages.length>1?'s ':' ')+item.pages.join(', ')+'. Not a publisher answer key and not an automatic grade.';}
+ if(show){$('solutionAnswer').textContent=item.answer;$('solutionExplanation').textContent=item.explanation;const checked=typeof item.verification==='string'&&item.verification.startsWith('source-reviewed-');$('solutionSource').textContent=(checked?'Compared with original PDF':'Draft; source verification incomplete')+' · textbook PDF page'+(item.pages.length>1?'s ':' ')+item.pages.join(', ')+'. Not a publisher answer key or automatic grade.';}
  $('solutionContent').hidden=!show;$('showSolution').textContent=show?'Hide worked solution':'Show worked solution';$('showSolution').setAttribute('aria-expanded',String(show));
 });
 async function loadSolutions(){
  try{
-  const response=await fetch('data/accounting-textbook-solutions.json?v=20261113',{cache:'no-cache'});
+  const response=await fetch('data/accounting-textbook-solutions.json?v=20261114',{cache:'no-cache'});
   if(!response.ok)throw new Error('Solution library unavailable');
   const bank=await response.json();
   if(!bank||!bank.answers||typeof bank.answers!=='object'||Array.isArray(bank.answers))throw new Error('Invalid solution library');
