@@ -48,7 +48,7 @@ test('Active practice snapshot stays stable if source cards change mid-session',
  const evaluate=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all'};let cards=deck.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uCards=()=>cards;${pure};const first=uPracticeQuestions(deck);const saved=JSON.stringify(first);cards=cards.slice().reverse().map(c=>({...c,f:'UPDATED '+c.f,b:'changed'}));const stable=uPracticeQuestions(deck);USTATE.practiceQuestions=null;const fresh=uPracticeQuestions(deck);return {saved,stable:JSON.stringify(stable),fresh:JSON.stringify(fresh)};`)(deck);
  assert.equal(evaluate.saved,evaluate.stable,'Question text/options must not change during active session');
  assert.notEqual(evaluate.saved,evaluate.fresh,'New session should reflect updated source data');
- assert.match(src,/case 'u-practice-restart':USTATE\.practiceOffset\+=10;USTATE\.practiceAnswers=\{\};USTATE\.practiceQuestions=null;/);
+ assert.match(src,/case 'u-practice-restart':uPracticeStopSpeech\(\);USTATE\.practiceOffset\+=10;USTATE\.practiceAnswers=\{\};USTATE\.practiceQuestions=null;/);
 });
 
 test('Practice answer actions are isolated from SRS and legacy quiz storage',()=>{
@@ -380,4 +380,32 @@ test('Source-example Listen is gated by answered status and speaks only frozen s
  assert.doesNotMatch(result.empty,/data-action="u-practice-example-speak"/);
  assert.equal(result.afterEmpty,1);
  assert.equal(Object.keys(result.answers).length,1);
+});
+
+
+test('Practice stops ongoing speech on answer, navigation, restart and leaving the practice tab',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const code=[
+  "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0,tab:'practice'};",
+  "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4],ref:x[3]}));const uDeck=()=>deck;",
+  "const localStorage={setItem(){throw Error('Unexpected write')},getItem(){throw Error('Unexpected read')}};",
+  "const ui={page:'studymerge'},render=()=>{};",
+  "let cancelled=0,spoken=0;const window={speechSynthesis:{cancel(){cancelled++},speak(){spoken++}},SpeechSynthesisUtterance:function(text){this.text=text;}};",
+  pure,actions,
+  "const first=uPracticeQuestions(deck)[0];",
+  "uAction({dataset:{action:'u-practice-speak'}});",
+  "uAction({dataset:{action:'u-practice-answer',answer:String(first.right)}});",
+  "uAction({dataset:{action:'u-q-next'}});",
+  "uAction({dataset:{action:'u-q-prev'}});",
+  "uAction({dataset:{action:'u-practice-restart'}});",
+  "uAction({dataset:{action:'u-practice-speak'}});",
+  "uAction({dataset:{action:'u-tab',tab:'cards'}});",
+  "uAction({dataset:{action:'u-q-next'}});",
+  "return {cancelled,spoken,tab:USTATE.tab,answers:USTATE.practiceAnswers};"
+ ].join('\n');
+ const result=new Function('deck',code)(deck);
+ assert.equal(result.cancelled,7);
+ assert.equal(result.spoken,2);
+ assert.equal(result.tab,'cards');
+ assert.deepEqual(result.answers,{});
 });
