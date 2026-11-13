@@ -147,6 +147,7 @@ def run_case(browser, engine, tablet):
     assert page.evaluate("id=>uReadSrs(uDeck('eng')).s[id]", card_id) == schedule
     # One-shot synthetic quota error during Full Restore must roll back earlier writes.
     before_quota = page.evaluate("JSON.stringify({...localStorage})")
+    before_quota_memory = page.evaluate("JSON.stringify({data,CLOCAL:{days:CLOCAL.days,studyDays:CLOCAL.studyDays}})")
     page.evaluate("""() => {
       window.__qaOriginalSetItem = Storage.prototype.setItem;
       window.__qaQuotaFailed = false;
@@ -170,6 +171,7 @@ def run_case(browser, engine, tablet):
           delete window.__qaOriginalSetItem;
         }""")
     assert page.evaluate("JSON.stringify({...localStorage})") == before_quota, "Quota failure did not roll back browser storage"
+    assert page.evaluate("JSON.stringify({data,CLOCAL:{days:CLOCAL.days,studyDays:CLOCAL.studyDays}})") == before_quota_memory, "Quota failure did not restore in-memory progress"
     assert not errors, errors
     assert not unexpected, unexpected
     context.close()
