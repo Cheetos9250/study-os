@@ -182,3 +182,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Implemented a conservative source-preserving answer/distractor guard at `study-integration.js`; synthetic collision and rotated real-data regression assertions were added at code/test SHA `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7`.
 - [Regression CI 43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) completed **success**. [Isolated browser CI 43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) was **in progress** when this entry was written; do not claim a pass without inspecting the final result.
 - Exact punctuation-separated senses only; broader linguistic ambiguity still needs human review. No merge, deploy, private backup inspection, Notion edits or Worker/KV calls.
+
+### Safe small-chapter fallback
+
+- Improved the English Practice empty-state text for a four-word pool whose two meanings share the same Thai sense. A new synthetic execution test verifies zero misleading questions and no answer buttons. Code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678`.
+- Earlier exact-sense guard browser [43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) and regression [43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) both completed **success**.
+- For the new small-pool code/test SHA, [regression 43380708719](https://github.com/Cheetos9250/study-os/actions/runs/43380708719) completed **success**; [browser 43380708685](https://github.com/Cheetos9250/study-os/actions/runs/43380708685) was **in progress** at documentation time. No production service was accessed.
