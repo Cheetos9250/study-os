@@ -16,8 +16,8 @@ test('Generated practice produces ten answerable English-only questions with uni
 test('Practice meaning extracts both legacy and news vocabulary formats',()=>{
  const {meaning}=run();
  assert.equal(meaning('n | ความหมาย | A sample sentence.'),'ความหมาย');
- assert.equal(meaning('n — การอนุรักษ์\\nExample: Preservation protects buildings.'),'การอนุรักษ์');
- assert.equal(meaning('**ความผิดพลาด**\\nชนิดคำ: n.\\nตัวอย่าง: A mistake.'),'ความผิดพลาด');
+ assert.equal(meaning('n — การอนุรักษ์'+String.fromCharCode(10)+'Example: Preservation protects buildings.'),'การอนุรักษ์');
+ assert.equal(meaning('**ความผิดพลาด**'+String.fromCharCode(10)+'ชนิดคำ: n.'+String.fromCharCode(10)+'ตัวอย่าง: A mistake.'),'ความผิดพลาด');
 });
 test('Practice is session-only and never uses legacy quiz or SRS write actions',()=>{
  assert.match(src,/practiceAnswers:\{\},practiceOffset:0/);
