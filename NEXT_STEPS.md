@@ -67,3 +67,5 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 ## Browser QA failure checkpoint — 2026-11-13
 
 - Run 43370021313 failed browser-qa at non-empty navigation discovery text; static-contract passed. Commit `208c135` adds explicit asynchronous render waits in the synthetic browser test; CI 43370327132 pending. If it fails, inspect browser job logs and DOM/console before changing application code. Do not infer a production defect from a test-only failure.
+
+- Run 43370327132 failed browser-qa: `innerText()` returned empty despite a preceding `textContent` wait. Commit `b0ef9a1` switches the synthetic navigation assertion to `textContent()`; monitor [CI 43370697293](https://github.com/Cheetos9250/study-os/actions/runs/43370697293). If still red, inspect visibility, page state and test data rather than masking a product issue.
