@@ -28,5 +28,5 @@
 ## Current handoff
 - The homepage has an academic planner with local add/edit/complete, conflict-safe IndexedDB persistence and planner-only backup/import.
 - Pure plan discovery groups overdue/today/upcoming/completed. Draft homepage displays counts only.
-- CI run 43369282612 succeeded for the prior regex-fix checkpoint; the newer discovery browser assertions require their own exact-head CI verification.
+- CI run 43369814606 passed the overdue/upcoming navigation empty-state checkpoint. Subsequent non-empty navigation browser tests were added in commit `3271476`; verify their own CI before claiming success.
 - Read `PROGRESS.md` and `NEXT_STEPS.md` for subsequent updates; these take precedence over this handoff snapshot.
