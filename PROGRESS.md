@@ -139,3 +139,5 @@ Next action: editable academic course metadata while preserving stable subject I
 - CI [43370021313](https://github.com/Cheetos9250/study-os/actions/runs/43370021313): **static-contract success, browser-qa failure** at non-empty navigation assertion (`plan-discovery` returned empty text). Added an explicit wait for asynchronous discovery rendering after each save, commit `208c135`; root cause not yet proven and new CI must be checked.
 
 - CI 43370327132: static-contract **success**; browser-qa still in progress at last inspection. Added independent pure discovery tests for completed date edits and same-day vs upcoming partition, commit `2fb864f`; exact-head CI pending.
+
+- CI [43370327132](https://github.com/Cheetos9250/study-os/actions/runs/43370327132) completed **failure**: static-contract passed; browser-qa again observed empty `innerText()` at navigation discovery assertion, despite successful `textContent` wait. Switched the synthetic assertion to `textContent()` to test DOM contents independently of visibility/CSS, commit `b0ef9a1`; verify exact-head CI. Root cause of empty `innerText()` is not yet confirmed.
