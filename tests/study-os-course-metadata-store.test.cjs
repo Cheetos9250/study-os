@@ -16,3 +16,12 @@ test("metadata persistence remains an isolated, opt-in database",()=>{
 test("metadata store never opens browser storage without explicit caller factory",async()=>{
   await assert.rejects(openCourseMetadata(),TypeError);
 });
+
+test("metadata stores are identical and reject malformed existing records",()=>{
+  const browser=fs.readFileSync(path.join(__dirname,"../lib/study-os-course-metadata-store.js"),"utf8");
+  const common=fs.readFileSync(path.join(__dirname,"../lib/study-os-course-metadata-store.cjs"),"utf8");
+  assert.equal(common,browser,"two entrypoints must not diverge");
+  assert.match(browser,/record===undefined/);
+  assert.match(browser,/exists=existing!==undefined/);
+  assert.match(browser,/Number\.isSafeInteger\(existing\.revision\)/);
+});
