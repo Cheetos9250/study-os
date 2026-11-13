@@ -1,9 +1,10 @@
-name: Sync Notion to data files
+name: Sync Notion to draft PR (review required)
 
+# Existing schedule remains, but new questions are never pushed to main.
 on:
   schedule:
-    - cron: "*/15 * * * *"   # every 15 minutes
-  workflow_dispatch:         # lets you press "Run workflow" by hand
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
 
 concurrency:
   group: notion-data-sync
@@ -11,36 +12,45 @@ concurrency:
 
 permissions:
   contents: write
-  pages: write
+  pull-requests: write
 
 jobs:
   sync:
+    # Do not run an unreviewed sync when invoked from a feature branch.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Pull Verified rows from Notion
+      - name: Pull Verified rows from Notion into the working tree only
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: python3 scripts/sync_notion.py
 
-      - name: Commit changes
-        id: commit
-        run: |
-          if git diff --quiet -- data; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No changes"
-          else
-            git config user.name "study-sync"
-            git config user.email "study-sync@users.noreply.github.com"
-            git add data
-            git commit -m "Sync verified data from Notion"
-            git push
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Propose content changes in a draft PR (no main push or Pages build)
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/notion-verified-content
+          base: main
+          draft: true
+          title: "data: review latest Verified Notion learning content"
+          body: |
+            Automatically generated content proposal from Notion's Verified items.
 
-      - name: Rebuild the Pages site
-        if: steps.commit.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || true
+            Review the new/changed quiz answers and explanations, run the
+            safety and content tests, and approve a separate merge.
+            **No automatic merge, release, production sync, or Pages build.**
+
+            If this job fails to create a PR, check the repository's
+            Settings > Actions > General > Workflow permissions:
+            "Allow GitHub Actions to create and approve pull requests".
+            Do not bypass that check by pushing directly to main.
+          commit-message: "data: propose latest Verified Notion content"
+          add-paths: |
+            data/cards.json
+            data/quiz.json
+          delete-branch: false
