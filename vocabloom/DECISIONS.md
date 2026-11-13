@@ -53,3 +53,9 @@ A read-only audit of 582 Verified English rows identified a source collision: `h
 ## 2026-11-13 — Fuzzy similarity is review-only
 
 Automated Thai substring and character-bigram matches cannot reliably distinguish synonym ambiguity from grammatical contrast, related meanings or antonyms. A separate offline report/CLI will list candidates; **do not automatically reject vocabulary or distractors** based solely on fuzzy scores. Exact punctuation-delimited sense overlap retains its narrowly scoped runtime guard.
+
+## 2026-11-13 — Session feedback is local and repeat sets vary deterministically
+
+Expose a clear complete-round message only when all current frozen Practice questions have answers, without recording a persistent score. Preserve existing Retry mistakes and New set actions and their in-memory state.
+
+Retain ten-card offset rotation for coverage, but vary distractor starting positions and multiple-choice placement with the integer round count. This avoids an identical visible replay for five- and ten-word decks without random-state persistence or altering card IDs, source translations, previous answers, backups or SRS.
