@@ -130,3 +130,11 @@
 - Verified: new split endpoint disables inherited Auto Sync; exact previously approved URL retains its own opt-in; mismatched endpoint token is rejected; legacy endpoint continues using legacy credential without consent migration; non-HTTPS endpoint fails closed.
 - CI passed at SHA `f98c96d3fac12814c538e8492431579433c3e408`: https://github.com/Cheetos9250/study-os/actions/runs/43355108180 .
 - No actual Cloudflare Worker, credentials, KV, browser storage, or production endpoint was accessed or modified. Backend CAS atomicity and Safari behavior remain unverified.
+
+## P2 extended hardening and release gate
+
+- Fixed `u-practice-answer` in `vocabloom/study-integration.js` to reject missing, empty, negative, non-integer and out-of-range choice values before converting to Number; avoids JavaScript treating an empty string as option zero. No SRS or storage key change.
+- Extended `vocabloom/tests/english-practice.test.cjs` with executable action tests for invalid answers, chapter switching/reset and HTML escaping of hostile vocabulary strings. CI passed at SHA `d70687f1ebd0502fc892c1301907f8201c196ed5`: https://github.com/Cheetos9250/study-os/actions/runs/43355345421 .
+- Added `vocabloom/tests/full-backup-execution.test.cjs`, exercising the actual export function with disposable in-memory browser mocks. It verifies all ten subject/SRS keys, backup schema and filename, fake credential exclusion and object-URL cleanup. CI passed at SHA `056acfa82d269aa851f6f6bcad85d4fabce517b8`: https://github.com/Cheetos9250/study-os/actions/runs/43355387657 .
+- Added `vocabloom/SAFARI-RELEASE-QA.md` with explicit physical Safari, disposable restore, accessibility and staging CAS backend release criteria. These manual criteria have **not** been executed and remain BLOCKED.
+- No production Cloudflare/Notion changes, live backup/restore, merge, deploy or automatic sync.
