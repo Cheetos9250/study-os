@@ -86,3 +86,10 @@
 - Changing chapter clears the in-memory practice answers, resets the practice offset, and returns to question one. No persistent progress keys, Notion records, or Cloudflare/KV data were modified.
 - Extended `english-practice.test.cjs` with chapter filtering, missing-chapter empty state, and session-reset checks. GitHub Actions CI passed at SHA `d5bb29a9f22f0afa80497d4d52e54a4c796bbd70`, run https://github.com/Cheetos9250/study-os/actions/runs/43352826565 .
 - Browser/iPad Safari, live Cloudflare, backup/restore and cross-device concurrency remain unverified. No merge/deployment authorized.
+
+## P2 practice snapshot consistency — offline QA
+
+- Discovered a correctness risk: `uPracticeQuestions` regenerated its questions on every render. A Verified content refresh while the learner was answering could replace question text, options or answer indexes mid-session.
+- Added an in-memory `USTATE.practiceQuestions` snapshot. The first valid practice set is frozen until the learner explicitly selects `New set` or changes chapter; then answers and snapshot are cleared. This does not write to SRS, `study-eng`, Notion, KV, or any other persistent progress store.
+- Extended `english-practice.test.cjs` with a simulated content change during an active session and an explicit reset/reload check. CI: https://github.com/Cheetos9250/study-os/actions/runs/43353516522 — **success** at SHA `5d9ed1f87023cf9c1d51f58deb37c6856d19fe80`. Earlier intermediate CI failures were corrected by updating the new test contract.
+- Limitation: this is a source-level/offline regression test, not a real iPad Safari/browser test. Cross-device legacy KV last-writer-wins safety remains unverified. No merge, deployment or production data mutation authorized.
