@@ -5,6 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/study-course-icons.css">
+<link rel="stylesheet" href="assets/study-course-layout.css">
 <style>
 /* Layout: tabbed study sheet (cards / summary / practice) in one centred column. */
 :root{
@@ -115,6 +116,7 @@ td:first-child{font-weight:500;min-width:7.5em}
 @media (prefers-reduced-motion:reduce){.card,.qbar i{transition:none}}
 </style>
 <div class="wrap">
+  <nav class="course-links" aria-label="Study navigation"><a href="./">← Study OS</a><a href="progress-backup.html">Back up progress</a></nav>
   <header><h1 class="course-title course-eco">Economics</h1><span>สรุป · แฟลชการ์ด · แบบฝึก — Micro (002–003) + Macro</span></header>
   <nav class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="cards">แฟลชการ์ด</button>
@@ -612,6 +614,7 @@ window.__xs=(()=>{
   function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์ด้วยตนเอง':'☁ ตั้งรหัสซิงก์'; }
   function mount(){
     box=document.createElement('div');
+    box.className='cloud-sync-bar';
     box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:50;display:flex;gap:8px;align-items:center;background:var(--surface,#fff);color:var(--ink,#1c1c1c);border:1px solid var(--line,#bbb);border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12)';
     msgEl=document.createElement('span'); msgEl.setAttribute('role','status');
     btnEl=document.createElement('button'); btnEl.type='button'; btnEl.style.cssText='border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;font-weight:600;padding:2px 4px';
