@@ -177,3 +177,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Branch: chore/study-os-ci-dedup-20261114. Product focus reaffirmed: academic study/shared infrastructure; legacy language regression remains compatibility only.
 
 - Real GitHub observation for PR #75: the branch push produced zero runs before PR creation. Opening the PR produced exactly one pull_request run for each of the five affected workflows (43472558146, 43472558183, 43472558270, 43472558275, 43472558173), without duplicate push runs. A documentation follow-up while those checks are running exercises the superseded-PR cancellation policy; final results and exact head are recorded on PR #75.
+
+
+## Published CI deduplication checkpoint — PR #75
+- Released as `fabdd5c3c7380cc83b5b4b67239f9f9e8e7c30ab`, tested PR head `04f1c99a4a61f083e9530e4bd0e848ba02095173`.
+- Actual GitHub evidence: zero feature-push runs before PR creation, then exactly five pull_request runs for each tested head, one per changed workflow. The follow-up commit cancelled four obsolete runs (43472558146, 43472558183, 43472558173, 43472558275); the completed icon run retained success. Latest PR checks all passed.
+- Exact-main verification: five push runs, one per workflow, all successful: Node/icon 43473234789, course storage 43473234834, restore 43473234845, accounting 43473235024, backup/basic 43473234966. Pages 43473232907 succeeded. No main run was cancelled in this check.
+- Preserved suite results: 239 Node tests, 3 Python tests, and existing synthetic browser suites (30 course-save / 48 basic-backup / 15 reader / 12 recovery). Runtime source and test job definitions are unchanged; this is test scheduling, not new app functionality.
+- Local semantic checks parsed five YAMLs and proved jobs, permissions, PR paths and manual events unchanged. Final source/diff checks passed. No production automation dispatch, backend deployment, learning-data mutation or language-feature work. Physical iPad and live backend gaps remain as previously recorded.

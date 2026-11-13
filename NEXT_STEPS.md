@@ -51,7 +51,7 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 
 
 ## Next independent engineering actions
-- CI deduplication is implemented on chore/study-os-ci-dedup-20261114. Verify actual PR trigger counts and superseded-run cancellation, then exact-head PR/main checks before release. Preserve every existing test job, path filter, permission and manual trigger; do not dispatch live sync.
+- CI deduplication is released in PR #75 (`fabdd5c`): real branch/PR trigger counts, superseded-run cancellation and all five exact-main checks verified. Preserve the unchanged test jobs, PR paths, permissions and manual triggers; keep production sync separate.
 - Physical iPad remains the main verification gap for Files export/recovery, blocked storage and best-effort exit warnings. Use disposable profiles/data only.
 - Notion safety PRs #39/#50 and Worker/source recovery #57/#58 retain separate authorization requirements; live Cloudflare/Cron/source availability is not established by the frontend test results.
 
@@ -59,3 +59,8 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 ## Scope reminder
 - Continue academic/shared Study OS infrastructure work. English/Chinese remain legacy compatibility routes; no new language-learning features in this work.
 - Keep protected PR #44 and separately active textbook-solution PR #68 branches untouched.
+
+
+## Next code review
+- Review queued local course-save retries for conflicting updates from another tab. First reproduce with synthetic academic progress; retain unsaved export and existing no-overwrite recovery rules. Do not claim browser-local writes are atomic across tabs.
+- Continue source/automation recovery reviews only within their existing authorization gates; keep independent active PR #68 and protected PR #44 branches untouched.
