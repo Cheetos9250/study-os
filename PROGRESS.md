@@ -175,3 +175,7 @@ Next action: editable academic course metadata while preserving stable subject I
 
 - Verified [CI 43377242274](https://github.com/Cheetos9250/study-os/actions/runs/43377242274) **success** for pure metadata model/tests (static-contract and browser-qa).
 - Added opt-in CommonJS IndexedDB metadata store (`e4034b3`) with revision-checked transactions and explicit read/save/reset/import/export; separate database from planner/progress. Added static/Node isolation tests (`46b8cd1`) and design notes (`72c2713`). No homepage integration or production writes; browser concurrency/rollback tests pending.
+
+## Metadata store browser verification — 2026-11-13
+
+- Added browser-loadable isolated store wrapper (`bf3f525`, `7f549bc`) and dedicated synthetic Chromium/WebKit test (`b9a0bc3`) covering two-tab stale revision rejection, invalid import rollback, export, reset and valid restore. Integrated test in CI browser harness (`46ea370`). CI pending; these are isolated browser profiles, **not** physical iPad Safari or production data. No homepage feature activation.
