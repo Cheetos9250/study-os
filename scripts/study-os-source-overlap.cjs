@@ -7,12 +7,12 @@ function auditSourceOverlap(bundle, exported) {
   return Object.entries(SUBJECTS).map(([subject, label]) => {
     const deck = bundle.decks.find(item => item.key === subject);
     if (!deck || !Array.isArray(deck.quiz)) throw new TypeError("missing academic quiz deck");
-    const rows = exported.rows.filter(row => row.Subject === label);
-    if (rows.some(row => row.Status !== "Verified" || typeof row.Question !== "string" || !row.Question.trim() || typeof row.Correct !== "string" || !row.Correct.trim())) throw new TypeError("invalid Verified quiz export");
+    const rows = exported.rows.map((row, exportIndex) => ({row, exportIndex})).filter(item => item.row.Subject === label);
+    if (rows.some(({row}) => row.Status !== "Verified" || typeof row.Question !== "string" || !row.Question.trim() || typeof row.Correct !== "string" || !row.Correct.trim())) throw new TypeError("invalid Verified quiz export");
     const matches = [];
     for (const [bundledIndex, quiz] of deck.quiz.entries()) {
       if (!Array.isArray(quiz) || typeof quiz[1] !== "string" || !quiz[1].trim() || !Array.isArray(quiz[2]) || !Number.isInteger(quiz[3]) || typeof quiz[2][quiz[3]] !== "string") throw new TypeError("invalid bundled quiz");
-      for (const [exportIndex, row] of rows.entries()) {
+      for (const {exportIndex, row} of rows) {
         if (normalize(quiz[1]) === normalize(row.Question)) matches.push({
           bundledIndex, exportIndex, question: quiz[1],
           answerTextMatches: normalize(quiz[2][quiz[3]]) === normalize(row.Correct),

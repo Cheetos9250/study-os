@@ -44,3 +44,11 @@ Updated: 2026-11-13 (Asia/Bangkok). Branch: `feat/study-os-s1-academic-home-2026
 ## Next action
 
 Complete exact-head CI, fix browser failures if any, and record final evidence. Then follow NEXT_STEPS.md. No release approval is inferred.
+
+## Browser QA correction
+
+- First isolated CI run 43360698530 at remote commit `e09dbbbb44181db1ee053b908c848c38788a0321`: static contracts passed; browser job failed waiting for the intentionally hidden summary tab in the English legacy page. This was an incorrect test expectation: English/Chinese legacy decks have no summaries/quizzes. No production/course bug was inferred.
+- Corrected QA to exercise academic summary/practice tabs while asserting that language-only legacy tabs remain hidden, and verify card flip on all five subjects. Rerun pending.
+- Remote changes are published through authenticated GitHub API because local git push lacks credentials. Local checkpoint commits `fd8f33e`/`32492f5` were combined into remote commit `e09dbbb`; they are not remote PR SHAs.
+- Live `/cards`, `/quiz` and scheduler probes returned 403 with Cloudflare `error code: 1010`; no application health or Cron success is inferred.
+- Cross-source report now preserves original JSON row indices even when subject rows are interleaved.

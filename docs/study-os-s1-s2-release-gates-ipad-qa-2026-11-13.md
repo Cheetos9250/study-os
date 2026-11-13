@@ -46,3 +46,7 @@ Until Gate C is complete, **do not** cut over production progress, enable CAS, i
 ## Data provenance / limitations
 
 `vocabloom/study-decks.json` is a read-only legacy bundle. Its counts are not the same as Notion Verified counts. Bundled and Notion quiz counts may overlap. Static tests only establish that the current structure conforms to the observed baseline. No live iPad browser session, Notion writes, KV changes, Cloudflare deployment or production data test was performed in this QA plan.
+
+## Continuation QA scope
+
+PR #44 now adds an explicit read-only progress count panel. The original no-script homepage description applies to the earlier baseline only. Isolated browser QA now runs in GitHub Actions with synthetic profiles and blocked external API calls. Record run outcomes in PROGRESS.md; this does not authorize release or establish physical iPad/CAS behavior.

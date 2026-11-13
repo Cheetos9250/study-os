@@ -20,8 +20,8 @@ Date: 2026-11-13. Draft PR #44. **Not connected to production or existing user p
 - Existing per-subject storage format adapters; need a read-only schema audit and sample data with secrets removed.
 - Merging cross-device progress, Notion events, or Cloudflare KV; needs independent backup, rollback and approval.
 - SRS due count and streaks; require verified timestamps, timezone and recurrence semantics.
-- Dashboard integration and iPad runtime testing; current module is Node-only and is not bundled into browser pages.
+- Accuracy/coverage dashboard integration remains pending: this pure analytics module is not bundled into browser pages. The separate read-only legacy count adapter is now wired to the candidate homepage. Physical iPad Safari remains unverified.
 - Any claim that offline test fixtures represent live learner performance.
 
 ## Next safe action
-Audit the existing per-subject localStorage data formats and identify a read-only adapter with explicit version handling. Keep production keys, backend endpoints, and source data untouched.
+The legacy schema audit and conservative count adapter are implemented. Next verify stable content identity mappings before connecting accuracy or coverage. Keep production keys, backend endpoints, and source data untouched.

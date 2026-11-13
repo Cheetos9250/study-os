@@ -73,13 +73,19 @@ async function main() {
           const errors = [];
           page.on("pageerror", error => errors.push(error.message));
           await page.goto(`${base}/${subject}.html`);
+          if (["acc","eco","math"].includes(subject)) {
           await page.locator('[data-tab="sum"]').click();
           assert.ok((await page.locator("#sumBody").innerText()).trim().length > 0);
           await page.locator('[data-tab="prac"]').click();
           await page.locator(".opt").first().click();
           assert.equal(await page.locator(".explain").count(),1);
+          } else {
+            assert.equal(await page.locator('[data-tab="sum"]').isVisible(),false);
+            assert.equal(await page.locator('[data-tab="prac"]').isVisible(),false);
+          }
           await page.locator('[data-tab="cards"]').click();
           await page.locator("#stage .card").click();
+          assert.equal(await page.locator("#stage .card.flipped").count(),1);
           assert.deepEqual(errors,[],`${engine} ${subject} runtime errors`);
           evidence.push({engine,subject,legacyCourse:"passed; external APIs blocked; synthetic answers only"});
           await context.close();
