@@ -1,5 +1,13 @@
 # Study OS progress
 
+## Accounting textbook reader usability improvements (2026-11-13; PR #64)
+- The reader defaults to all four question types, and its search finds questions by identifier/title across all studied Chapters 1–9 even if another chapter/type is selected (e.g. P-6-2B).
+- Remembers the last question separately from the previous answer/status storage and reopens it after reload.
+- On mobile, question selection collapses the picker and scrolls to the exercise. Previous/next controls are disabled at the ends; an empty search clears old answer text.
+- Node tests exercise the actual global filter function, selected type behavior, question-number search, and resume wiring. No textbook pages are published; PDF remains imported locally in the browser.
+- Browser-local progress and PDF caching still need hands-on Safari/iPad testing. No cross-device syncing was added.
+
+
 ## Accounting textbook in-page practice reader — chapters 1–9 (2026-11-13; PR #63)
 - Restricted the new in-page textbook reader to exactly **Chapters 1–9**, ending at **Accounting for Receivables**, matching the currently studied course scope. The catalog now contains **403 numbered question references** and **36 section-level metadata references**; none of chapters 10–26 or appendices appear in the interface or published catalog/geometry JSON.
 - Replaced the directory-plus-Drive-link interface with a responsive one-question-at-a-time workspace: chapter/type/search filters, original question image, answer/working field, progress status and previous/next controls on one page.
