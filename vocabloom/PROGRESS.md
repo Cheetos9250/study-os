@@ -145,3 +145,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - [Regression 43374162891](https://github.com/Cheetos9250/study-os/actions/runs/43374162891) for test SHA `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec` **failed** the existing HTML escaping fixture: its malicious sample used English-only `Back` and was now correctly excluded from the Thai-meaning pool.
 - Updated the test fixture to contain Thai meaning text plus malicious HTML so it still tests output escaping without contradicting the new eligibility rule, SHA `ae12e71181274941cf264bee1353728058fab48c`. Fresh CI **pending**; failure is recorded, not hidden. No production changes.
+
+### Verified source provenance across rotated English practice questions
+
+- Previous English meaning guard fixture fix SHA `ae12e71181274941cf264bee1353728058fab48c` passed [regression 43374289061](https://github.com/Cheetos9250/study-os/actions/runs/43374289061) and [isolated browser 43374289044](https://github.com/Cheetos9250/study-os/actions/runs/43374289044).
+- Added a source-grounding regression over rotated English practice sets: every displayed Thai option must match a committed Verified English vocabulary meaning and the correct answer must match its source headword. Test SHA `410c109dff6e6db7efee9e80d72b02062bbdd18e`; [regression 43377262906](https://github.com/Cheetos9250/study-os/actions/runs/43377262906) and [browser 43377262767](https://github.com/Cheetos9250/study-os/actions/runs/43377262767) queued at documentation time. This structural provenance test is not a human linguistic review.
