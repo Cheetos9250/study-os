@@ -45,3 +45,9 @@ Status: **unlinked and unreleased opt-in draft**; local-only metadata editing an
 - Shared store parity is checked by Node tests; CommonJS and browser entrypoints must not silently diverge.
 - Corruption guard CI 43379924786 completed success at 485c11a. Later UI download/restore and parity CI must be verified at the exact head.
 - The draft remains unlinked. No homepage activation, merge, deployment, Notion/KV writes or schema migration. Real iPad Safari and cross-device sync are still unverified.
+
+## Verified fallback/recovery QA checkpoint — 2026-11-13
+
+- Synthetic browser tests for JSON downloads/restore and invalid-import protection passed CI 43380014201 and 43380131840.
+- No-JavaScript warning and hidden inert Open button passed CI 43380434836; corrupted saved metadata produces a clear Thai warning and never automatically resets, confirmed in CI 43380640662.
+- This evidence is limited to isolated Chromium/WebKit profiles on CI. Physical iPad Safari, actual browser eviction/recovery and live cross-device sync remain untested. The editor stays unlinked and unreleased.
