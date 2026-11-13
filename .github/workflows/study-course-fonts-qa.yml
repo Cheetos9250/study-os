@@ -73,6 +73,8 @@ jobs:
                 const overlaps=await page.evaluate(()=>{const a=document.querySelector('.cloud-sync-bar').getBoundingClientRect(),b=document.querySelector('#syncBtn').getBoundingClientRect();return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;});
                 assert.equal(overlaps,false,course+' sync toolbar covers save action');
                 await page.evaluate(()=>window.scrollTo(0,0));
+                const tabsFit=await page.locator('.tabs').evaluate(nav=>{const box=nav.getBoundingClientRect();return [...nav.querySelectorAll('button:not([hidden])')].every(button=>{const b=button.getBoundingClientRect();return b.left>=box.left-1&&b.right<=box.right+1;});});
+                assert.equal(tabsFit,true,course+' study tab is outside navigation bounds');
                 const iconStyles=await page.locator('h1,.tabs button:not([hidden]),#dirBtn,#limBtn,#resetSrs,#syncBtn').evaluateAll(nodes=>nodes.map(n=>{const s=getComputedStyle(n,'::before');return {mask:s.maskImage||s.webkitMaskImage,width:parseFloat(s.width),content:s.content};}));
                 assert.ok(iconStyles.length>=6);assert.ok(iconStyles.every(s=>s.mask.includes('data:image/svg+xml')&&s.width>0&&s.content==='\"\"'),JSON.stringify(iconStyles));
                 const labelFonts=await page.locator('.chip .n,.count,.srs,.ref,.score .big,.cell').evaluateAll(nodes=>nodes.map(n=>getComputedStyle(n).fontFamily));
