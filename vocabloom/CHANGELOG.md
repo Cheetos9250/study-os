@@ -77,3 +77,8 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — Rotated option normalization audit
 
 - Added a regression ensuring generated English practice options remain distinct after Unicode and whitespace normalization across rotated sets. No runtime or source data change.
+
+## 2026-11-13 — Thai sense overlap guard (draft PR only)
+
+- Changed English Practice distractor generation to avoid exact shared Thai senses in comma-, semicolon-, and slash-separated meanings, including the Verified `hinge on` / `contingent on` case.
+- Added synthetic and actual Verified-export regression coverage across rotated question sets. No source translations, IDs, user progress, backup format, cloud settings, or production state changed.
