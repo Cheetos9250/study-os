@@ -191,3 +191,10 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Invisible separator fix passed regression 43379006639 and browser 43379006644.
 - New test SHA `6775d45b667e12298409b3557f9ca6081d8916af` checks normalized uniqueness of generated Verified English practice options over rotated sets. CI regression 43379340424 and browser 43379338387 pending. No production access; human semantic review remains open.
+
+### Explicit Thai sense collision — branch-only development
+
+- Source: committed `data/cards.json`, 582 Verified English rows; a local read-only JavaScript scan of normalized meanings found one exact punctuation-delimited overlap, `hinge on` ↔ `contingent on` (`ขึ้นอยู่กับ`). It is an exact-format screening result, not a full semantic audit.
+- Implemented `uPracticeSenses` and `uPracticeSharesSense` in `study-integration.js`; distractors now avoid any shared explicit Thai sense with each other or the answer. An ambiguous small pool can yield fewer than ten practice questions rather than misleading options.
+- Added synthetic overlap fixtures and rotated real Verified data assertions in `tests/english-practice.test.cjs` and `tests/english-content-quality.test.cjs`.
+- Implementation/test head `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7`; regression [43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) **success**; isolated browser [43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) **in progress** when recorded. All existing service calls stay blocked within hosted browser tests. No merge, production writes or migration.
