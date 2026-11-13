@@ -1,0 +1,91 @@
+name: Study OS course typography QA (isolated)
+on:
+  pull_request:
+    paths:
+      - '*.html'
+      - .github/workflows/study-course-fonts-qa.yml
+permissions:
+  contents: read
+jobs:
+  typography:
+    if: github.head_ref == 'feat/study-os-course-fonts-20261113'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regression tests
+        run: |
+          node --test vocabloom/tests/*.test.cjs
+          python3 -m unittest discover -s vocabloom/tests -p 'test_*.py'
+      - name: Install isolated Chromium
+        run: |
+          npm install --prefix "$RUNNER_TEMP/font-qa" --no-save --ignore-scripts playwright@1.62.1
+          "$RUNNER_TEMP/font-qa/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Check course fonts and responsive study views
+        env:
+          NODE_PATH: ${{ runner.temp }}/font-qa/node_modules
+          QA_OUTPUT: ${{ runner.temp }}/course-fonts-qa
+        run: |
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs/promises'),http=require('node:http'),path=require('node:path');
+          (async()=>{
+            const root=process.cwd(),output=process.env.QA_OUTPUT;
+            await fs.mkdir(output,{recursive:true});
+            const server=http.createServer(async(req,res)=>{
+              try{
+                const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+                const file=path.resolve(root,'.'+pathname);
+                if(!file.startsWith(root+path.sep)||req.method!=='GET'){res.writeHead(403).end();return;}
+                const body=await fs.readFile(file);
+                res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':'application/json'}).end(body);
+              }catch{res.writeHead(404).end();}
+            });
+            await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+            const base='http://127.0.0.1:'+server.address().port;
+            let browser;
+            try{
+              browser=await chromium.launch();const evidence=[];
+              for(const course of ['acc','eco','math','eng','zh'])for(const width of [390,820,1280])for(const colorScheme of ['light','dark']){
+                const context=await browser.newContext({viewport:{width,height:1000},colorScheme});
+                await context.route('**/*',route=>{
+                  const request=route.request(),url=new URL(request.url());
+                  return request.method()==='GET'&&(url.origin===base||['fonts.googleapis.com','fonts.gstatic.com'].includes(url.hostname))?route.continue():route.abort();
+                });
+                const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+                await page.goto(base+'/'+course+'.html');
+                await page.locator('.front-t').waitFor();await page.evaluate(()=>document.fonts.ready);
+                const fonts=await page.evaluate(()=>({body:getComputedStyle(document.body).fontFamily,heading:getComputedStyle(document.querySelector('h1')).fontFamily,card:getComputedStyle(document.querySelector('.front-t')).fontFamily,loaded:[...document.fonts].filter(f=>f.status==='loaded').map(f=>f.family)}));
+                assert.match(fonts.body,/^"?DM Sans/);assert.match(fonts.heading,/^"?Outfit/);assert.match(fonts.card,/^"?Outfit/);
+                assert.ok(fonts.loaded.includes('DM Sans'));assert.ok(fonts.loaded.includes('Outfit'));
+                assert.match(fonts.body,/IBM Plex Sans Thai/);assert.match(fonts.heading,/Noto Sans Thai/);
+                const overflow=()=>page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
+                assert.equal(await overflow(),false,course+' cards overflow');
+                await page.screenshot({path:path.join(output,`${course}-${width}-${colorScheme}.png`),fullPage:true});
+                await page.locator('.card').click();assert.match(await page.locator('.card').getAttribute('class'),/flipped/);
+                const availableTabs=[];
+                const hasSummary=await page.evaluate(()=>D.sum.length>0);
+                for(const tab of ['sum','prac']){
+                  assert.equal(await page.locator(`[data-tab="${tab}"]`).isVisible(),hasSummary);
+                  if(!hasSummary)continue;
+                  await page.locator(`[data-tab="${tab}"]`).click();
+                  assert.equal(await page.locator('#tab-'+tab).isVisible(),true);
+                  assert.equal(await overflow(),false,course+' '+tab+' overflow');
+                  availableTabs.push(tab);
+                }
+                assert.deepEqual(errors,[]);evidence.push({course,width,colorScheme,fonts,cardFlip:'passed',availableTabs});await context.close();
+              }
+              await fs.writeFile(path.join(output,'results.json'),JSON.stringify({scope:'isolated localhost; external API and all writes blocked; disposable browser storage',evidence},null,2));
+              console.log('PASS: 30 course/viewport/theme cases, card flips, summaries and practice tabs');
+            }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
+          })().catch(error=>{console.error(error);process.exitCode=1;});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: study-course-fonts-qa
+          path: ${{ runner.temp }}/course-fonts-qa
