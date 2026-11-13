@@ -46,7 +46,7 @@ test('Generated English practice answers and distractors retain Verified source 
    assert.equal(new Set(q.opts).size,4);
    for(const option of q.opts){
     assert.ok(canonical.has(option),'Option not grounded in a Verified meaning: '+option);
-    assert.match(option,/[\\u0E00-\\u0E7F]/,'Option lacks Thai meaning');
+    assert.match(option,/[\u0E00-\u0E7F]/,'Option lacks Thai meaning');
    }
    const row=verified.find(r=>r.Front===q.q);
    assert.ok(row,'Question headword not found in Verified source: '+q.q);
