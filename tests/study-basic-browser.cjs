@@ -65,12 +65,13 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           }
           const textbookKey='studyos.accounting.textbook.progress.v1';
           const notes='SYNTHETIC-TEXTBOOK-ANSWER\nDr Cash / Cr Capital · คำตอบทดสอบ';
-          await page.goto(base+'/accounting-textbook.html');await page.locator('.q-item').first().waitFor();
+          // The question list is collapsed on phones; wait for loaded records, then exercise the visible answer form.
+          await page.goto(base+'/accounting-textbook.html');await page.locator('.q-item').first().waitFor({state:'attached'});
           const textbookId=await page.evaluate(()=>current.id);
           await page.locator('#answer').fill(notes);await page.locator('#questionStatus').selectOption('doing');
           await page.waitForFunction(({key,id,notes})=>{const saved=JSON.parse(localStorage.getItem(key)||'{}');return saved[id]?.notes===notes&&saved[id]?.status==='doing';},{key:textbookKey,id:textbookId,notes});
           const textbookSaved=await page.evaluate(key=>localStorage.getItem(key),textbookKey);
-          await page.reload();await page.locator('.q-item').first().waitFor();
+          await page.reload();await page.locator('.q-item').first().waitFor({state:'attached'});
           assert.equal(await page.locator('#answer').inputValue(),notes);assert.equal(await page.locator('#questionStatus').inputValue(),'doing');
           await page.locator('.topnav a[href="index.html"]').click();await page.locator('#welcome-title').waitFor();
           evidence.push({engine,width,textbookAnswerPersistence:'passed',pdfSelected:false});
@@ -104,7 +105,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           await restored.locator('#status').getByText(/Restored/).waitFor();
           for(const [key,value] of Object.entries(payload.entries))assert.equal(await restored.evaluate(k=>localStorage.getItem(k),key),value);
           await restored.reload();assert.equal(await restored.evaluate(()=>localStorage.getItem('study-sync-key')),null);
-          await restored.goto(base+'/accounting-textbook.html');await restored.locator('.q-item').first().waitFor();
+          await restored.goto(base+'/accounting-textbook.html');await restored.locator('.q-item').first().waitFor({state:'attached'});
           assert.equal(await restored.locator('#answer').inputValue(),notes);assert.equal(await restored.locator('#questionStatus').inputValue(),'doing');
           evidence.push({engine,width,nativeCourseBackupRestore:'passed',textbookAnswersRestored:true,pdfIncluded:false});await recovered.close();
           await context.close();
