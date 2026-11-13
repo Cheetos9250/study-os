@@ -50,6 +50,20 @@ function uPracticeMeaning(back){
  const first=text.split(/\r?\n/)[0]||'';
  return first.replace(/^[^\n—–:]{1,35}\s*[—–:]\s*/,'').replace(/^(?:ชนิดคำ|ตัวอย่าง)\s*:.*/,'').trim();
 }
+function uPracticeContext(back){
+ const text=String(back||'').replace(/\*\*/g,'').trim(),parts=text.split('|');
+ let example='',translation='';
+ if(parts.length>=3){
+  const pair=parts.slice(2).join('|').split(' = ');
+  example=pair[0].replace(/^\s*(?:Example|ตัวอย่าง)\s*:\s*/i,'').trim();
+  translation=pair.slice(1).join(' = ').trim();
+ }else{
+  const lines=text.split(/\r?\n/),en=lines.find(x=>/^\s*(?:Example|ตัวอย่าง)\s*:/i.test(x)),th=lines.find(x=>/^\s*แปล\s*:/.test(x));
+  example=en?en.replace(/^\s*(?:Example|ตัวอย่าง)\s*:\s*/i,'').trim():'';
+  translation=th?th.replace(/^\s*แปล\s*:\s*/,'').trim():'';
+ }
+ return {example:example.slice(0,500),translation:translation.slice(0,500)};
+}
 function uPracticeQuestions(d){
  if(d.key!==UACTIVE_LANGUAGE)return [];
  // Freeze question/answer pairs for an active session even when Verified data refreshes.
@@ -63,7 +77,7 @@ function uPracticeQuestions(d){
   const wk=word.normalize('NFKC').toLowerCase(),mk=meaning.normalize('NFKC').toLowerCase();
   if(seenWords.has(wk)||seenMeanings.has(mk))continue;
   seenWords.add(wk);seenMeanings.add(mk);
-  pool.push({word,meaning,cat:c.cat,id:c.mid});
+  pool.push({word,meaning,cat:c.cat,id:c.mid,context:uPracticeContext(c.b),ref:String(c.ref||'')});
  }
  if(pool.length<4)return [];
  const eligible=USTATE.cat==='all'?pool:pool.filter(x=>x.cat===USTATE.cat);
@@ -74,7 +88,7 @@ function uPracticeQuestions(d){
   if(wrong.length<3)return null;
   const options=[c.meaning,...wrong.map(x=>x.meaning)],shift=i%4;
   const opts=options.slice(shift).concat(options.slice(0,shift));
-  return {id:'practice-'+c.id,cat:c.cat,q:c.word,opts,right:opts.indexOf(c.meaning)};
+  return {id:'practice-'+c.id,cat:c.cat,q:c.word,opts,right:opts.indexOf(c.meaning),context:c.context,ref:c.ref};
  }).filter(Boolean);
  if(questions.length)USTATE.practiceQuestions=questions;
  return questions;
@@ -88,7 +102,7 @@ function uPracticeHTML(d){
  if(!all.length)return header+'<div class="u-empty">Need at least four distinct English vocabulary meanings to start practice.</div>';
  USTATE.quizIndex=Math.max(0,Math.min(USTATE.quizIndex,all.length-1));
  const q=all[USTATE.quizIndex],ans=answers[q.id],done=ans!==undefined;
- return header+`<div class="panel"><div class="panel-header"><span class="badge">${USTATE.quizIndex+1} / ${all.length}</span><span class="question-number">Choose the Thai meaning</span></div><h2 id="u-practice-question" style="line-height:1.6">${h(q.q)}</h2>${q.opts.map((o,i)=>`<button class="u-option ${done?(i===q.right?'right':i===ans?'wrong':''):''}" data-action="u-practice-answer" data-answer="${i}" aria-describedby="u-practice-question" aria-pressed="${done&&i===ans?'true':'false'}" ${done?'disabled':''}>${'ABCD'[i]}. ${h(o)}</button>`).join('')}${done?`<div class="notice mt20" role="status" aria-live="polite">${ans===q.right?'Correct':'Correct answer: '+h(q.opts[q.right])}</div>`:''}<div class="pill-row mt20" style="justify-content:space-between"><button class="btn btn-outline" data-action="u-q-prev" ${USTATE.quizIndex===0?'disabled':''}>Previous</button><button class="btn btn-primary" data-action="u-q-next" ${USTATE.quizIndex===all.length-1?'disabled':''}>Next</button></div></div>`;
+ return header+`<div class="panel"><div class="panel-header"><span class="badge">${USTATE.quizIndex+1} / ${all.length}</span><span class="question-number">Choose the Thai meaning</span></div><h2 id="u-practice-question" style="line-height:1.6">${h(q.q)}</h2>${q.opts.map((o,i)=>`<button class="u-option ${done?(i===q.right?'right':i===ans?'wrong':''):''}" data-action="u-practice-answer" data-answer="${i}" aria-describedby="u-practice-question" aria-pressed="${done&&i===ans?'true':'false'}" ${done?'disabled':''}>${'ABCD'[i]}. ${h(o)}</button>`).join('')}${done?`<div class="notice mt20" role="status" aria-live="polite">${ans===q.right?'Correct':'Correct answer: '+h(q.opts[q.right])}${q.context?.example?`<p class="u-meta"><b>Source example</b><br><span lang="en">${h(q.context.example)}</span>${q.context.translation?`<br><span lang="th">${h(q.context.translation)}</span>`:''}${q.ref?`<br>Source: ${h(q.ref)}`:''}</p>`:''}</div>`:''}<div class="pill-row mt20" style="justify-content:space-between"><button class="btn btn-outline" data-action="u-q-prev" ${USTATE.quizIndex===0?'disabled':''}>Previous</button><button class="btn btn-primary" data-action="u-q-next" ${USTATE.quizIndex===all.length-1?'disabled':''}>Next</button></div></div>`;
 }
 
 function uHome(){if(!USTATE.ready)return `<div class="panel u-highlight"><h3>🃏 English Flashcards</h3><p>${USTATE.error?'ยังโหลดฐานการ์ดไม่ได้':'กำลังโหลดแฟลชการ์ดภาษาอังกฤษ...'}</p><button class="btn btn-primary" data-page="studymerge">Open cards →</button></div>`;const visible=uVisibleDecks();const total=visible.reduce((n,d)=>n+uStats(d).total,0);return `<div class="section-header"><div><h2>English Flashcards</h2><p class="subheading">${total} English cards · Original SRS history</p></div><button class="text-link" data-page="studymerge">Open cards →</button></div><div class="u-subjects">${visible.map(d=>{const t=uStats(d);return `<button class="u-subject" data-action="u-subject" data-subject="${d.key}"><span class="u-icon">${UICONS[d.key]}</span><b>${h(d.name)}</b><small>${t.total} cards · ${t.seen} studied · ${t.due} due</small></button>`}).join('')}</div>`;}

@@ -231,6 +231,30 @@ async function importData(file){if(!file)return;try{const parsed=JSON.parse(awai
 const NOTION_EXPORT_URL='https://raw.githubusercontent.com/Cheetos9250/study-os/main/data/cards.json';
 function parseNotionExport(payload){
  if(!Array.isArray(payload?.rows))throw Error('Bad export');
+ // Whole-token matching with bounded regular inflections, guided by source POS.
+ // This is an eligibility check, not a stemmer or a rewrite of source examples.
+ const tokens=s=>String(s).normalize('NFKC').toLowerCase().match(/[a-z]+(?:['’][a-z]+)*/g)||[];
+ function hasExampleWord(en,example,back){
+  const head=tokens(en),sentence=tokens(example);
+  if(!head.length)return false;
+  const fields=back.includes('|')?back.split('|').slice(0,2):[back.split(/\r?\n/)[0].split(/[—–:]/)[0]];
+  const pos=fields.filter(x=>!/[\u0E00-\u0E7F]/.test(x)).join(' ').match(/\b[nv]\b/gi)||[];
+  const noun=pos.some(x=>x.toLowerCase()==='n'),verb=pos.some(x=>x.toLowerCase()==='v');
+  const phrasal=verb&&head.length>1&&['out','up','on','for','in','off','away','over','down','into','through','back','with','to'].includes(head[1]);
+  const index=phrasal?0:head.length-1,base=head[index],forms=new Set([base]);
+  if(noun||verb){
+   forms.add(/[^aeiou]y$/.test(base)?base.slice(0,-1)+'ies':/(?:s|x|z|ch|sh)$/.test(base)?base+'es':base+'s');
+  }
+  if(verb){
+   // Audited doubled-consonant forms. Avoid guessing stress-dependent spellings.
+   if(['admit','flop'].includes(base)){forms.add(base+base.slice(-1)+'ed');forms.add(base+base.slice(-1)+'ing');}
+   else{
+    forms.add(/[^aeiou]y$/.test(base)?base.slice(0,-1)+'ied':base.endsWith('e')?base+'d':base+'ed');
+    forms.add(base.endsWith('ie')?base.slice(0,-2)+'ying':/[^e]e$/.test(base)?base.slice(0,-1)+'ing':base+'ing');
+   }
+  }
+  return sentence.some((_,start)=>head.every((word,j)=>j===index?forms.has(sentence[start+j]):sentence[start+j]===word));
+ }
  const words=[],seen=new Set();
  for(const row of payload.rows){
   if(row?.Status!=='Verified'||row?.Subject!=='English Vocab')continue;
@@ -248,7 +272,7 @@ function parseNotionExport(payload){
    const line=lines.find(x=>/^\s*Example\s*:/i.test(x));
    example=line?line.replace(/^\s*Example\s*:\s*/i,'').trim():'';
   }
-  if(!en||!th||!example||en.length>85||!example.toLowerCase().includes(en.toLowerCase())||seen.has(en.toLowerCase()))continue;
+  if(!en||!th||!example||en.length>85||!hasExampleWord(en,example,back)||seen.has(en.toLowerCase()))continue;
   seen.add(en.toLowerCase());
   // Preserve the exact historical word ID while exposing no explicit URL in new exports.
   const legacyIdSource=/^[0-9a-f]{32}$/i.test(String(row.page_id||''))?'httpsappnotioncomp'+row.page_id:String(row.url||en);

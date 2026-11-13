@@ -131,3 +131,18 @@ test('Retry mistakes freezes only incorrect answered questions and never touches
  assert.deepEqual(out.remaining,out.retry,'No mistakes in retry must not reset the round');
  assert.equal(Object.keys(out.answers).length,1);
 });
+
+test('Practice feedback uses source examples/translation from all three legacy formats',()=>{
+ const context=new Function(pure+'return uPracticeContext')();
+ assert.deepEqual(context('v | ปรับตัว | Example: We adapt quickly. = เราปรับตัวเร็ว'),{example:'We adapt quickly.',translation:'เราปรับตัวเร็ว'});
+ assert.deepEqual(context('n — ข่าว\nExample: Read the news.\nแปล: อ่านข่าว'),{example:'Read the news.',translation:'อ่านข่าว'});
+ assert.deepEqual(context('**ความผิดพลาด**\nชนิดคำ: n.\nตัวอย่าง: I made a mistake.'),{example:'I made a mistake.',translation:''});
+ assert.deepEqual(context('No example supplied'),{example:'',translation:''});
+});
+test('Source context is hidden before answering and escaped in feedback afterwards',()=>{
+ const out=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4],ref:x[3]}));const h=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');${pure}const before=uPracticeHTML(deck),q=uPracticeQuestions(deck)[0];q.context={example:'<img src=x onerror=alert(1)>',translation:'<script>แปล</script>'};q.ref='<svg onload=alert(1)>';USTATE.practiceAnswers[q.id]=q.right;return {before,after:uPracticeHTML(deck)};`)(deck);
+ assert.doesNotMatch(out.before,/Source example/);
+ assert.match(out.after,/Source example/);assert.match(out.after,/lang="en"/);assert.match(out.after,/lang="th"/);
+ assert.match(out.after,/&lt;img/);assert.match(out.after,/&lt;script/);assert.match(out.after,/&lt;svg/);
+ assert.doesNotMatch(out.after,/<img|<script|<svg/);
+});

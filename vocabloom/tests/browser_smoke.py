@@ -23,6 +23,7 @@ def run_case(browser, engine, tablet):
     )
     unexpected = []
     errors = []
+    content = {"refresh": False}
 
     def route_request(route):
         request = route.request
@@ -46,7 +47,13 @@ def run_case(browser, engine, tablet):
                 unexpected.append(request.method + " " + url.netloc + url.path)
             route.abort()
             return
-        if target.is_file():
+        if target.name == "study-decks.json" and content["refresh"]:
+            fixture = json.loads(target.read_text())
+            english = next(d for d in fixture["decks"] if d["key"] == "eng")
+            english["cards"][0][1] = "changed-word"
+            english["cards"][0][2] = "n | เปลี่ยนแล้ว | A changed-word example."
+            route.fulfill(body=json.dumps(fixture), content_type="application/json")
+        elif target.is_file():
             route.fulfill(body=target.read_bytes(), content_type=mimetypes.guess_type(target)[0] or "application/octet-stream")
         else:
             route.fulfill(status=404, body="Not found in QA checkout")
@@ -72,6 +79,13 @@ def run_case(browser, engine, tablet):
     first = page.evaluate("uPracticeQuestions(uDeck('eng'))[0]")
     page.locator(f'[data-action="u-practice-answer"][data-answer="{(first["right"] + 1) % 4}"]').click()
     assert page.get_by_role("button", name="Retry mistakes (1)").is_enabled()
+    assert page.get_by_text("Source example", exact=True).is_visible()
+    content["refresh"] = True
+    page.evaluate("async()=>{await uBoot()}")
+    assert page.evaluate("uPracticeQuestions(uDeck('eng'))[0]") == first, "Refresh changed the active question or source explanation"
+    content["refresh"] = False
+    page.evaluate("async()=>{await uBoot()}")
+    assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Refresh changed learner storage after original content was restored"
     page.locator('[data-action="u-q-next"]').click()
     second = page.evaluate("uPracticeQuestions(uDeck('eng'))[1]")
     page.locator(f'[data-action="u-practice-answer"][data-answer="{second["right"]}"]').click()
@@ -98,6 +112,27 @@ def run_case(browser, engine, tablet):
     page.wait_for_function("USTATE.ready && !notionBusy")
     assert page.evaluate("id=>uReadSrs(uDeck('eng')).s[id]", card_id) == schedule
     assert page.evaluate("keys=>Object.fromEntries(keys.map(k=>[k,localStorage.getItem(k)]))", ACADEMIC_KEYS) == academic
+    # Full backup and restore use only this disposable browser profile.
+    page.locator('[data-page="settings"]:visible').first.click()
+    with page.expect_download() as exported:
+        page.locator('[data-action="cloud-backup"]').click()
+    backup = json.loads(Path(exported.value.path()).read_text())
+    assert backup["type"] == "vocabloom-unified-study-backup"
+    assert len(backup["subjects"]) == 10
+    before_restore = page.evaluate("JSON.stringify({...localStorage})")
+    upload = {"name": "synthetic-full-backup.json", "mimeType": "application/json", "buffer": json.dumps(backup).encode()}
+    with page.expect_event("dialog") as dialog_event:
+        page.locator("#fullRestoreInput").set_input_files(upload)
+    dialog_event.value.dismiss()
+    assert page.evaluate("JSON.stringify({...localStorage})") == before_restore, "Cancelled restore changed data"
+    # Mutate a synthetic record, then restore through the real file input and confirmation.
+    page.evaluate("localStorage.setItem('study-acc',JSON.stringify({ans:{changed:2}}))")
+    with page.expect_event("dialog") as dialog_event:
+        page.locator("#fullRestoreInput").set_input_files(upload)
+    dialog_event.value.accept()
+    page.wait_for_function("CLOUD.remoteStatus === 'restored locally'")
+    assert page.evaluate("JSON.parse(localStorage.getItem('study-acc'))") == backup["subjects"]["study-acc"]
+    assert page.evaluate("id=>uReadSrs(uDeck('eng')).s[id]", card_id) == schedule
     assert not errors, errors
     assert not unexpected, unexpected
     context.close()
