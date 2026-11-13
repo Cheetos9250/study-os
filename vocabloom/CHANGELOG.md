@@ -27,3 +27,9 @@ All entries below describe an unmerged proposal, not a production release.
 - Verified each rejection leaves browser storage unchanged; tests use synthetic fixtures and block live services.
 - Both CI workflows passed for implementation SHA `f269d5f9514580f75785e71a430042a8db282c68`: regression run `43367785010` and browser run `43367784703`.
 - No production data, Worker, Notion, site configuration or existing learner progress changed.
+
+## 2026-11-13 — Restore daily-counter validation (unmerged)
+
+- Reject arrays, nulls and scalar `deviceDays` / `studyDays` maps when restoring a same-device Full Backup, before any local writes.
+- Continue discarding cross-device daily counters without validating or importing them, preserving the existing device-isolation rule.
+- Added executable regression tests. CI status is tracked in `PROGRESS.md` and the continuous audit; no production restore was attempted.
