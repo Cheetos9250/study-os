@@ -65,3 +65,7 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — English practice source provenance test
 
 - Added a regression checking rotated generated question answers and distractors against committed Verified Thai vocabulary meanings. No user-facing behavior or source data changed.
+
+## 2026-11-13 — Practice distractor normalization
+
+- Generated English practice now treats headwords and Thai meanings differing only in internal whitespace as duplicates for question/option selection. Source content is unchanged.
