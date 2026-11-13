@@ -145,6 +145,39 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await draft.locator("#metadata-status").filter({hasText:"โหลดข้อมูลล่าสุดแล้ว"}).waitFor();
     assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์");
     assert.equal(await draft.locator("#name-math").inputValue(),"Mathematics");
+    // Real browser download / restore uses only synthetic metadata, never user files.
+    const [download]=await Promise.all([
+      draft.waitForEvent("download"),
+      draft.locator("#metadata-export").click()
+    ]);
+    assert.equal(download.suggestedFilename(),"study-os-course-metadata.json");
+    const backup=JSON.parse(await fs.readFile(await download.path(),"utf8"));
+    assert.equal(backup.courses.eco.name,"เศรษฐศาสตร์");
+    const beforeImport=await draft.locator("#name-eco").inputValue();
+    await draft.locator("#metadata-file").setInputFiles({
+      name:"invalid-course-metadata.json",mimeType:"application/json",
+      buffer:Buffer.from(JSON.stringify({version:999}))
+    });
+    await draft.locator("#metadata-status").filter({hasText:"นำเข้าไม่ได้"}).waitFor();
+    assert.equal(await draft.locator("#name-eco").inputValue(),beforeImport);
+    await draft.locator("#name-acc").fill("บัญชีชั่วคราว");
+    await draft.locator("#metadata-form button[type=submit]").click();
+    await draft.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
+    assert.equal(await draft.locator("#name-acc").inputValue(),"บัญชีชั่วคราว");
+    draft.once("dialog",dialog=>dialog.accept());
+    await draft.locator("#metadata-file").setInputFiles({
+      name:"study-os-course-metadata.json",mimeType:"application/json",
+      buffer:Buffer.from(JSON.stringify(backup))
+    });
+    await draft.waitForFunction(()=>document.getElementById("name-acc").value==="Accounting");
+    assert.equal(await draft.locator("#name-eco").inputValue(),"เศรษฐศาสตร์");
+    // An unavailable IndexedDB must not open the editor or trigger any implicit reset.
+    const blockedEditor=await context.newPage();
+    await blockedEditor.addInitScript(()=>Object.defineProperty(window,"indexedDB",{configurable:true,value:undefined}));
+    await blockedEditor.goto(base+"/course-metadata-draft.html");
+    await blockedEditor.locator("#metadata-open").click();
+    await blockedEditor.locator("#metadata-status").filter({hasText:"เปิดเครื่องมือไม่ได้"}).waitFor();
+    assert.equal(await blockedEditor.locator("#editor").isVisible(),false);
     return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export, denied factory and opt-in editor reload"};
   }finally{await context.close();}
 };
