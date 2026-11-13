@@ -106,3 +106,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Pure metadata model CI 43377242274 passed both jobs. Added CommonJS IndexedDB prototype `e4034b3` and isolation tests `46b8cd1`. Check [CI 43378166800](https://github.com/Cheetos9250/study-os/actions/runs/43378166800) before marking the prototype tests verified.
 - Next: browser-exercise the store in isolated Chromium/WebKit profiles (CAS conflict, atomic invalid-import rollback, reset, denied IndexedDB), then adapt to a browser module and add explicit Save/Reset UI with backup flow. Do not expose the feature or migrate data until these checks pass.
+
+## Metadata browser QA — 2026-11-13
+
+- Browser harness now runs `scripts/study-os-course-metadata-browser.cjs` for Chromium and WebKit, testing opt-in IndexedDB read/write, two-client CAS, invalid import rollback, reset and restore. Verify [CI 43378426163](https://github.com/Cheetos9250/study-os/actions/runs/43378426163) before marking this checkpoint green.
+- Next: resolve any browser test failures; then add explicit opt-in metadata editor UI and backup controls, with tests for blocked storage and no legacy-progress writes. Do not merge or deploy without approval.
