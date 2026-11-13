@@ -104,3 +104,9 @@ Next action: editable academic course metadata while preserving stable subject I
 - Existing planner UI now displays counts for overdue, today, next 7 days, and explicitly completed sessions from the **already loaded local planner records**. No new storage keys, network requests, automatic completion, migration or backend writes.
 - Code commits `8d3e4eb`, `2baa73b`, `3c2ad8b`, `5fa42b8`, workflow update `dc836b0`. CI for this new integration must be checked separately; prior passing run 43367779307 covered the earlier pure helper only.
 - UI has not been verified on a physical iPad. Do not treat this draft as production-ready until exact-head Chromium/WebKit tests and relevant screenshots are reviewed.
+
+## CI regression fix — 2026-11-13
+
+- Integration CI run [43368332244](https://github.com/Cheetos9250/study-os/actions/runs/43368332244) **failed**: static-contract 44/45 passed, browser-qa **success**. Static failure was the homepage script allowlist not yet including the new read-only `lib/study-os-plan-discovery.js`.
+- Updated `tests/study-os-home.test.cjs` to expect the new script in its actual load order and assert that the discovery module contains no browser storage/network writes. Fix commit `eeaba6c8d5f1ba332d03ffef4152510ed5938ee8`.
+- **Verification pending:** check exact-head CI for fix and do not infer success from prior browser job. No merge/deploy.
