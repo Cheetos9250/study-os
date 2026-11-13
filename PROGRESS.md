@@ -159,3 +159,9 @@ Next action: editable academic course metadata while preserving stable subject I
 - CI 43371847878 static-contract **failed** because the strict homepage script inventory omitted new `lib/study-os-course-search.js`; corrected the expected list in commit `08f8717`. This was a test contract update, not a change to the legacy progress storage. Browser-qa was in progress at diagnosis; verify subsequent CI before claiming success.
 
 - **Verified course-search baseline:** CI [43371919159](https://github.com/Cheetos9250/study-os/actions/runs/43371919159) **success** after strict homepage script inventory fix `08f8717` (static-contract and browser-qa). Added new synthetic Chromium/WebKit browser assertions for Thai/English search, no-match empty state and clearing query across four viewport sizes, commit `0bd4922`; new CI pending. No production writes.
+
+## Course search keyboard usability and metadata design — 2026-11-13
+
+- Verified [CI 43373533213](https://github.com/Cheetos9250/study-os/actions/runs/43373533213) **success** (static-contract + browser-qa) for multilingual course-search regression `0bd4922`.
+- Added Escape-to-clear course search (`d582ecf`) and Chromium/WebKit keyboard regression (`a75d89b`); new CI pending.
+- Added design-only `COURSE_METADATA_DESIGN.md` (`dc28c05`) defining immutable subject IDs/routes, isolated browser-local presentation overrides, atomic backups, test gates and no production mutation. Editable metadata is not yet implemented.
