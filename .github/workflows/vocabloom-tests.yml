@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "vocabloom/**"
+      - "index.html"
       - "acc.html"
       - "eco.html"
       - "math.html"
@@ -15,6 +16,7 @@ on:
       - ".github/workflows/vocabloom-tests.yml"
   pull_request:
     paths:
+      - "index.html"
       - "vocabloom/**"
       - "data/cards.json"
       - "data/quiz.json"

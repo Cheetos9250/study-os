@@ -1,0 +1,95 @@
+name: SOS-005a isolated visual QA (no deployment)
+on:
+  pull_request:
+    paths:
+      - index.html
+      - .github/workflows/sos005a-visual-qa.yml
+permissions:
+  contents: read
+jobs:
+  visual-qa:
+    if: github.head_ref == 'feat/study-os-academic-home-20261113'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser dependency
+        run: npm install --prefix "$RUNNER_TEMP/sos005a-browser" --no-save --ignore-scripts playwright@1.62.1
+      - name: Install Chromium
+        run: '"$RUNNER_TEMP/sos005a-browser/node_modules/.bin/playwright" install --with-deps chromium'
+      - name: Check six viewport/theme combinations without production requests
+        env:
+          NODE_PATH: ${{ runner.temp }}/sos005a-browser/node_modules
+          QA_OUTPUT: ${{ runner.temp }}/sos005a-visual-qa
+        run: |
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs/promises');
+          const http=require('node:http');
+          const path=require('node:path');
+          (async()=>{
+            const root=process.cwd(),output=process.env.QA_OUTPUT;
+            await fs.mkdir(output,{recursive:true});
+            const server=http.createServer(async(req,res)=>{
+              try {
+                const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+                const file=path.resolve(root,'.'+(pathname.endsWith('/')?pathname+'index.html':pathname));
+                if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
+                const body=await fs.readFile(file);
+                res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':'text/plain'}).end(body);
+              }catch{res.writeHead(404).end();}
+            });
+            await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+            const base='http://127.0.0.1:'+server.address().port;
+            let browser;
+            try {
+              browser=await chromium.launch({headless:true});
+              const evidence=[];
+              for(const width of [390,820,1280])for(const colorScheme of ['light','dark']){
+                const context=await browser.newContext({viewport:{width,height:1000},colorScheme});
+                await context.route('**/*',route=>{
+                  const url=new URL(route.request().url());
+                  return url.origin===base||['fonts.googleapis.com','fonts.gstatic.com'].includes(url.hostname)?route.continue():route.abort();
+                });
+                const page=await context.newPage(),errors=[];
+                page.on('pageerror',error=>errors.push(error.message));
+                await page.goto(base);await page.evaluate(()=>document.fonts.ready);
+                assert.equal(await page.locator('.subject').count(),3);
+                assert.deepEqual(await page.locator('.subject').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('href'))),['acc.html','eco.html','math.html']);
+                assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+                const fonts=await page.evaluate(()=>({body:getComputedStyle(document.body).fontFamily,heading:getComputedStyle(document.querySelector('h1')).fontFamily,loaded:[...document.fonts].filter(font=>font.status==='loaded').map(font=>font.family)}));
+                assert.match(fonts.body,/DM Sans/);assert.match(fonts.heading,/Outfit/);
+                const contrasts=await page.evaluate(()=>{
+                  const rgb=color=>color.match(/[\d.]+/g).slice(0,3).map(Number);
+                  const luminance=color=>rgb(color).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+                  const background=element=>{for(let node=element;node;node=node.parentElement){const color=getComputedStyle(node).backgroundColor;if(!color.startsWith('rgba')||!color.endsWith(', 0)'))return color;}return 'rgb(255,255,255)';};
+                  return [...document.querySelectorAll('h1,h2,h3,.lead,.eyebrow,.brand span,.top-link,.subject p,.go,.symbol,.note,footer span,.secondary')].map(element=>{
+                    const foreground=getComputedStyle(element).color,bg=background(element),values=[luminance(foreground),luminance(bg)].sort((a,b)=>a-b);
+                    return {selector:element.className||element.tagName,ratio:(values[1]+.05)/(values[0]+.05)};
+                  });
+                });
+                assert.ok(contrasts.every(item=>item.ratio>=4.5),JSON.stringify(contrasts));
+                assert.deepEqual(errors,[]);
+                await page.screenshot({path:path.join(output,`${width}-${colorScheme}.png`),fullPage:true});
+                evidence.push({width,colorScheme,fonts,minimumTextContrast:Math.min(...contrasts.map(item=>item.ratio))});await context.close();
+              }
+              const destinations=[];
+              for(const target of ['acc.html','eco.html','math.html','eng.html','zh.html','vocabloom/']){
+                const response=await browser.newPage();
+                const request=await response.request.get(base+'/'+target);assert.equal(request.status(),200);
+                destinations.push({target,status:request.status()});await response.close();
+              }
+              await fs.writeFile(path.join(output,'results.json'),JSON.stringify({scope:'isolated localhost; no production calls or data writes',evidence,destinations},null,2));
+              console.log('PASS: six viewport/theme combinations and six local destinations');
+            }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
+          })().catch(error=>{console.error(error);process.exitCode=1;});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sos005a-visual-qa
+          path: ${{ runner.temp }}/sos005a-visual-qa
