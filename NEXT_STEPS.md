@@ -165,3 +165,10 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - Verify the exact-head CI for new cross-tab refresh behavior (code 0654f3737, run 43384672610); inspect browser job logs if failing. If green, run one independent source review of PR #44 for static/service isolation, mobile/keyboard semantics and no implicit planner mutation.
 - Before any live release: physically verify iPad Safari, VoiceOver, real browser storage retention and user-owned backup restore using an isolated preview. Preserve all existing acc/eco/math identities, legacy pages, Notion/Worker/KV config, and all explicit production approval gates.
 - Do not merge, deploy, turn on notifications or cross-device sync, or activate data migrations without separate authorization.
+
+
+## Verified planner draft-backup guard — 2026-11-13
+
+- **Verified:** CI 43385562926 and 43385558513 completed success for unsaved new/editing plan export warnings and reset of the explicit draft form; static and Chromium/WebKit browser checks passed at `5080f8b3f`.
+- **Next priority:** independent source review of draft PR #44 for stale cross-tab UX, keyboard/VoiceOver semantics, data safety and CSS layout; then physical iPad Safari and backup restore in an isolated preview. Do not call simulated WebKit evidence physical hardware QA.
+- **Safety:** no deployment, merge, Notion/KV/Worker write, change to existing subject pages, content sync or progress CAS cutover without explicit owner authorization.

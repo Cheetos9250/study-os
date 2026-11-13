@@ -243,3 +243,13 @@ Next action: editable academic course metadata while preserving stable subject I
 - Synthetic browser QA extended to explicit checkbox completion/undo and topic rename, verifying proper discovery counts, removal/reappearance and persistence across reload (38a854d), [CI 43384365182](https://github.com/Cheetos9250/study-os/actions/runs/43384365182) **success**. Read-only buttons now explicitly identify the controlled plan list; c0154f0 passed [CI 43384557733](https://github.com/Cheetos9250/study-os/actions/runs/43384557733).
 - An additional test checks explicit "อัปเดตรายการ" after another local tab marks a session complete and later incomplete (0654f3737). Check [CI 43384672610](https://github.com/Cheetos9250/study-os/actions/runs/43384672610) before marking this newest test passed.
 - Evidence is static and isolated Chromium/WebKit with synthetic records, **not** real iPad Safari, external service or production data. Draft PR #44 remains unmerged and unlinked metadata editor remains unreleased.
+
+
+## Planner draft backup safety — 2026-11-13
+
+- Study Planner now tracks unsaved local form input/change events and exposes a visible explicit "ล้างแบบฟอร์ม" action for a new unsaved plan; successful save/cancel clears the draft marker. Existing edit mode continues to use "ยกเลิกการแก้ไข".
+- A planner JSON Export from the academic homepage refuses to silently omit unsaved new or edited form values, prompting the learner to save or clear their form. Only persisted planner sessions can be backed up; no backup schema or IndexedDB schema changed.
+- Implementation `9fa86fd78b5c05463b7d1081f911afab9a5d24b2`; synthetic Chromium/WebKit new-plan, editing-form and static regressions at `bf5bafebe`, `0138fea17`, and `5080f8b3f`.
+- [CI 43385562926](https://github.com/Cheetos9250/study-os/actions/runs/43385562926) and [43385558513](https://github.com/Cheetos9250/study-os/actions/runs/43385558513) both completed **success** at exact implementation/test head `5080f8b3f` (static-contract and browser-qa). Tests use isolated synthetic profiles and block external requests.
+- The previous read-only overdue/upcoming list cross-tab refresh regression at `0654f3737` passed [CI 43384672610](https://github.com/Cheetos9250/study-os/actions/runs/43384672610); no automatic completion was introduced.
+- Study OS remains in **draft PR #44 only**. No merge, production deployment, Notion/Worker/KV writes, scheduler changes, schema migration or real data restore. Physical iPad Safari, VoiceOver and browser/OS storage eviction remain unverified.

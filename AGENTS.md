@@ -56,3 +56,10 @@
 - CI 43383837816, 43384056492, 43384365182, 43384557733 all passed Node and isolated Chromium/WebKit browser jobs. The cross-tab refresh test at 0654f3737 requires exact-head CI verification before claiming success; see PROGRESS.md.
 - Course display metadata editor is a separate, unlinked local-only draft; do not attach its settings to the homepage, migrate legacy progress or enable production release.
 - Continue from current PR head and PROGRESS.md/NEXT_STEPS.md. Real iPad Safari and live systems remain unverified. No merge/production write without explicit approval.
+
+
+## Verified Study Planner draft-backup checkpoint — 2026-11-13
+
+- Latest app/test head `5080f8b3f` adds a guard against exporting planner backups while new/edited form data is unsaved, plus an explicit clear-form action. CI 43385562926 and 43385558513 both completed success (static and isolated Chromium/WebKit browser QA).
+- Earlier date discovery list, keyboard focus, explicit completion, edits, cross-tab refresh and responsive tests passed by CI 43384672610. No implicit completion/storage writes were added by read-only navigation.
+- For subsequent tasks, inspect exact current PR #44 head and PROGRESS.md/NEXT_STEPS.md before editing. Keep PR draft, avoid production merge/deploy and all existing production/Notion/Worker/KV writes. Physical iPad Safari remains untested.
