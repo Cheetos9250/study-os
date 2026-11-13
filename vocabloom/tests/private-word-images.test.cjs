@@ -28,7 +28,7 @@ test('Reject non-images, SVG, spoofed media headers, empty or oversized images',
 test('Image UI is read-only in flashcards, lessons, games and library until user picks a local file',()=>{
  assert.match(html,/private-word-images\.js/);
  assert.ok(html.indexOf('private-word-images.js')<html.indexOf('study-integration.js'));
- assert.match(html,/class="word-thumb" data-private-word-image="/);
+ assert.match(html,/class="word-thumb" type="button" data-private-word-image="/);
  assert.match(html,/class="voca-personal-lesson" data-private-word-image="/);
  assert.match(html,/class="game-visual" data-private-word-image="/);
  assert.match(html,/data-private-image-pick=/);
