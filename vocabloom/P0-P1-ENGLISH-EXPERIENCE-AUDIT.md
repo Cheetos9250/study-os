@@ -93,3 +93,11 @@
 - Added an in-memory `USTATE.practiceQuestions` snapshot. The first valid practice set is frozen until the learner explicitly selects `New set` or changes chapter; then answers and snapshot are cleared. This does not write to SRS, `study-eng`, Notion, KV, or any other persistent progress store.
 - Extended `english-practice.test.cjs` with a simulated content change during an active session and an explicit reset/reload check. CI: https://github.com/Cheetos9250/study-os/actions/runs/43353516522 — **success** at SHA `5d9ed1f87023cf9c1d51f58deb37c6856d19fe80`. Earlier intermediate CI failures were corrected by updating the new test contract.
 - Limitation: this is a source-level/offline regression test, not a real iPad Safari/browser test. Cross-device legacy KV last-writer-wins safety remains unverified. No merge, deployment or production data mutation authorized.
+
+## P2 practice action isolation — executable offline test
+
+- Added a Node.js test that invokes the actual `uAction` handler with mock deck and in-memory session, while mocking `localStorage.getItem/setItem` to throw if accessed.
+- Verified: first answer records the selected option; a second answer cannot overwrite it; switching to Flashcards and back preserves the active session; `New set` clears answers and frozen question snapshot.
+- This is stronger than source-string checks, but still not an end-to-end browser/iPad test. It does not exercise live Notion, Cloudflare KV, cross-device CAS, or Production storage.
+- GitHub Actions CI passed for SHA `6660bfb734a9903c1f3064bd7e460f5b1fc5ae65`: https://github.com/Cheetos9250/study-os/actions/runs/43353704504 .
+- PR #41 remains draft; no merge or deployment.
