@@ -95,7 +95,9 @@ function hydrate(){
  const main=document.getElementById('mainContent');
  if(!main)return;
  main.querySelectorAll('[data-private-word-image]:not([data-private-image-state])').forEach(node=>{
-  if(root.IntersectionObserver){
+  // Hidden placeholders never intersect: populate card/lesson images directly.
+  if(node.classList.contains('voca-integrated-photo')||node.classList.contains('voca-personal-lesson'))hydrateNode(node);
+  else if(root.IntersectionObserver){
    if(!observer)observer=new root.IntersectionObserver(entries=>{
     for(const entry of entries)if(entry.isIntersecting){observer.unobserve(entry.target);hydrateNode(entry.target);}
    },{rootMargin:'240px'});
