@@ -1,0 +1,184 @@
+{
+  "meta": {
+    "book": "Fundamental Accounting Principles, 24th Edition",
+    "scope": "Chapter 1–9 questions indexed in Study OS",
+    "provenance": "Original worked answers independently prepared from the user's private textbook PDF; not a publisher answer key.",
+    "sourceFile": "Owner's Google Drive Acc textbook.pdf",
+    "reviewStatus": "source-reviewed (not publisher verified)",
+    "storage": "Public answers only; no textbook question wording, PDF pages, private notes or user progress",
+    "lastUpdated": "2026-11-13",
+    "reviewedCount": 24,
+    "catalogQuestionCount": 403
+  },
+  "answers": {
+    "QS-1-1": {
+      "answer": "1. f — Technology; 2. a — Accounting; 3. h — Recordkeeping (bookkeeping).",
+      "explanation": "Technology reduces clerical work; accounting encompasses identifying, measuring, recording, and communicating financial information; bookkeeping is the act of logging events.",
+      "pages": [
+        51
+      ]
+    },
+    "QS-1-2": {
+      "answer": "a E; b E; c E; d E; e I; f E; g E; h E; i I; j E; k E; l I.",
+      "explanation": "Managers, controllers, and directors use accounting from within the organization; customers, vendors, auditors, investors, lenders, regulators, press, and consumer groups are outside users.",
+      "pages": [
+        51
+      ]
+    },
+    "QS-1-3": {
+      "answer": "1 A — Opportunity; 2 B — Pressure; 3 C — Rationalization; 4 A — Opportunity; 5 B — Pressure; 6 C — Rationalization.",
+      "explanation": "Weak safeguards create opportunity; performance or job threats create pressure; normalizing others' dishonesty is rationalization.",
+      "pages": [
+        51
+      ]
+    },
+    "QS-1-4": {
+      "answer": "1 a — Principle; 2 b — Assumption; 3 b — Assumption; 4 a — Principle.",
+      "explanation": "Full disclosure and revenue recognition guide reporting; time period and going concern are underlying assumptions.",
+      "pages": [
+        51
+      ]
+    },
+    "QS-1-6": {
+      "answer": "1 D — Revenue recognition; 2 B — Measurement (cost); 3 C — Business entity.",
+      "explanation": "Recognize advance payments as revenue when work is performed; initially measure land at the actual paid cost; keep each business's transactions separate.",
+      "pages": [
+        52
+      ]
+    },
+    "QS-1-7": {
+      "answer": "a. Liabilities = $280,000. b. Liabilities = $250,000; Equity = $250,000.",
+      "explanation": "Assets = Liabilities + Equity. a: $700,000 − $420,000 = $280,000. b: each equal component is $500,000 ÷ 2.",
+      "pages": [
+        52
+      ]
+    },
+    "QS-1-8": {
+      "answer": "Part 1: (a) $35,000 liabilities; (b) $95,000 assets; (c) $65,000 equity. Part 2: (a) $12,000 revenues; (b) $2,000 owner withdrawals.",
+      "explanation": "Part 1: $75,000−$40,000=$35,000; $25,000+$70,000=$95,000; $85,000−$20,000=$65,000. Part 2: Assets = Liabilities + Capital − Withdrawals + Revenues − Expenses. Company 1: $40,000=$16,000+$20,000−$0+R−$8,000, so R=$12,000. Company 2: $80,000=$32,000+$44,000−W+$24,000−$18,000, so W=$2,000.",
+      "pages": [
+        52
+      ]
+    },
+    "QS-1-11": {
+      "answer": "a. Cash +$15,000; Capital +$15,000. b. Cash −$500; Supplies +$500. c. Equipment +$10,000; Capital +$10,000. d. Supplies +$200; Accounts payable +$200. e. Cash −$9,000; Land +$9,000.",
+      "explanation": "Owner contributions increase assets and owner's capital; asset exchanges do not change total assets; purchases on credit increase an asset and liability.",
+      "pages": [
+        53
+      ]
+    },
+    "QS-1-12": {
+      "answer": "a B; b CF; c B; d I; e B; f CF; g I; h B.",
+      "explanation": "Balance sheet (B) reports assets, liabilities and equity. Income statement (I) reports revenues and expenses. Statement of cash flows (CF) reports operating cash and changes in cash.",
+      "pages": [
+        53
+      ]
+    },
+    "QS-1-13": {
+      "answer": "1 EX; 2 R; 3 EX; 4 W; 5 EX; 6 R; 7 EX; 8 R.",
+      "explanation": "Costs, wages, rent and insurance are expenses; service, rental and consulting income are revenues; a withdrawal is an owner distribution, not an expense.",
+      "pages": [
+        53
+      ]
+    },
+    "QS-1-14": {
+      "answer": "1 A; 2 EQ; 3 A; 4 L; 5 A; 6 A.",
+      "explanation": "Land, equipment, receivables, and supplies are assets; owner capital is equity; accounts payable is a liability.",
+      "pages": [
+        53
+      ]
+    },
+    "QS-1-15": {
+      "answer": "Hawkin — Income Statement (December): Services revenue $16,000; Wages expense $8,000; Rent expense $1,500; Utilities expense $700; Total expenses $10,200; Net income $5,800.",
+      "explanation": "$16,000 − ($8,000 + $1,500 + $700) = $5,800. Equipment, receivables, cash, and accounts payable do not belong on the income statement.",
+      "pages": [
+        53
+      ]
+    },
+    "QS-1-16": {
+      "answer": "Return on assets = 19.05% (about 19.0%).",
+      "explanation": "Net income ÷ average total assets = $8 billion ÷ $42 billion × 100 = 19.0476%. This is about 8.05 percentage points above the stated 11.0% competitor average.",
+      "pages": [
+        53
+      ]
+    },
+    "E-1-2": {
+      "answer": "Part A (1–7): I, E, I, E, I, E, I. Part B (1–8): I, I, E, E, I, E, I, I.",
+      "explanation": "Stock/inventory, manufacturing costs, redesign and service costs are management questions; loans, investing and comparison of firms are external-user questions.",
+      "pages": [
+        54
+      ]
+    },
+    "E-1-3": {
+      "answer": "1 B; 2 A; 3 B; 4 B; 5 C; 6 C; 7 A; 8 A.",
+      "explanation": "A = financial accounting, B = managerial accounting, C = tax accounting. Internal audit, cost accounting and budgeting support management; external audit and financial reports concern financial accounting; tax enforcement and tax planning concern tax accounting.",
+      "pages": [
+        54
+      ]
+    },
+    "E-1-4": {
+      "answer": "1 A — Audit; 2 G — Net income; 3 D — FASB; 4 F — Public accountants; 5 C — Ethics.",
+      "explanation": "An audit assesses financial reporting; net income is revenues less expenses; FASB sets U.S. financial accounting standards; public accountants work for clients; ethics addresses right and wrong conduct.",
+      "pages": [
+        54
+      ]
+    },
+    "E-1-5": {
+      "answer": "1 G — Dodd-Frank Act; 2 F — Audit; 3 E — Sarbanes-Oxley Act; 4 D — Internal controls; 5 C — Prevention; 6 B — Fraud triangle; 7 A — Ethics.",
+      "explanation": "Map the descriptions to regulatory whistleblower rules, audit assurance, control-documentation requirements, controls, preventive measures, fraud conditions, and ethical norms.",
+      "pages": [
+        54,
+        55
+      ]
+    },
+    "E-1-6": {
+      "answer": "a C; b P; c SP; d SP; e C; f SP; g C; h LLC.",
+      "explanation": "C = corporation: separate legal existence, limited liability and business-level income tax. P = partnership: multiple owners with personal liability. SP = sole proprietorship: one owner and unlimited personal liability. LLC = separate legal entity with limited liability, often pass-through taxation.",
+      "pages": [
+        55
+      ]
+    },
+    "E-1-7": {
+      "answer": "1 H; 2 G; 3 F; 4 A; 5 C; 6 D; 7 E; 8 B.",
+      "explanation": "H full disclosure; G going concern; F matching; A general accounting principle; C business entity; D revenue recognition; E specific accounting principle; B cost measurement.",
+      "pages": [
+        55
+      ]
+    },
+    "E-1-8": {
+      "answer": "(a) $65,000 assets; (b) $66,000 equity; (c) $114,000 liabilities.",
+      "explanation": "Assets = Liabilities + Equity. a: $20,000 + $45,000. b: $100,000 − $34,000. c: $154,000 − $40,000.",
+      "pages": [
+        55
+      ]
+    },
+    "E-1-9": {
+      "answer": "a. Ending equity = $130,000. b. Equity = $76,000. c. Beginning equity = $60,000; ending equity = $125,000.",
+      "explanation": "a: beginning liabilities $200,000; ending assets $380,000 and ending liabilities $250,000. b: $123,000−$47,000=$76,000. c: beginning assets $190,000−$60,000=$130,000, less beginning liabilities $70,000 gives $60,000; ending liabilities $70,000−$5,000=$65,000, so ending equity $190,000−$65,000=$125,000.",
+      "pages": [
+        55
+      ]
+    },
+    "E-1-12": {
+      "answer": "a 3; b 2; c 5; d 1; e 4; f 5.",
+      "explanation": "a: paying payable reduces asset and liability (3); b: credit equipment purchase raises asset/liability (2); c: investment raises assets/equity (5); d: withdrawal reduces assets/equity (1); e: cash purchase swaps assets (4); f: earned cash revenue raises assets/equity (5).",
+      "pages": [
+        57
+      ]
+    },
+    "E-1-14": {
+      "answer": "Return on assets = 16.0%, above the 11.0% competitor average by 5.0 percentage points.",
+      "explanation": "Average assets = ($200,000 + $300,000) / 2 = $250,000. $40,000 net income / $250,000 average assets = 16.0%.",
+      "pages": [
+        57
+      ]
+    },
+    "QS-6-1": {
+      "answer": "1,710 units.",
+      "explanation": "1,300 − 20 + 350 + 80 = 1,710 units. Exclude 20 unsaleable damaged units; include 350 units under FOB destination and 80 consigned units that remain owned by Emma. This is the existing source-reviewed final quantity only, not a complete publisher solution.",
+      "pages": [
+        268
+      ]
+    }
+  }
+}
