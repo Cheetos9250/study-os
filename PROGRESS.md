@@ -1,23 +1,39 @@
 # Study OS Progress
 
-Last audited: 2026-11-13 UTC (GitHub repository read-only inspection)
+Last repository audit: 2026-11-13 UTC
 
 ## Verified baseline
 
-- `main` includes 4 GitHub Actions workflows: Notion sync, CAS tests (two), and VocaBloom regression.
-- Existing Notion sync workflow is scheduled every 15 minutes and writes exported `data/` files to `main`. This pilot does not modify that workflow.
-- On `main`, `PROJECT.md`, `PROGRESS.md`, `NEXT_STEPS.md`, and `ARCHITECTURE.md` were not present at audit time.
-- Draft PR #39 fixes Notion export safety; #41 handles VocaBloom English-only rendering; #44 covers the academic-first Study OS homepage. Their PR state and CI may change; check GitHub when resuming.
+- `main` has four GitHub Actions workflows, including scheduled Notion export every 15 minutes.
+- The read-only Auto Runner pilot exists on Draft PR #45. Its first GitHub CI run (43360809549) passed, including 5 Python tests and existing Node/Python offline suites.
+- Existing VocaBloom and academic Study OS development PRs are separate; do not merge or overwrite them.
 
-## Pilot implementation (this PR)
+## Read-only pilot — PR #45 (pending review)
 
-- Add independent scheduled/manual read-only GitHub Actions pilot.
-- Add allowlisted NEXT_STEPS parser and fixed offline regression suite with unit tests.
-- Generate `AUTO_RUNNER_STATUS.md` and JSON artifact **inside each workflow run**, not as a direct commit to `main`.
-- No AI model or paid API key is configured.
+- Selects allowlisted NEXT_STEPS items and runs fixed offline regressions.
+- Saves GitHub Actions Markdown/JSON artifacts with read-only repository permissions.
+- Does not run an AI model, modify the repository, or touch Production.
 
-## Not yet verified
+## AI Coding Agent — stacked draft PR (under review)
 
-- End-to-end scheduled execution (requires approved merge; scheduled workflows only execute from default branch).
-- PR CI run at final head SHA (check in Actions).
-- Optional autonomous AI code generation, PR creation and automated Markdown commits (not implemented).
+- Adds `scripts/auto_ai_agent.py`, Gemini model `gemini-2.5-flash-lite`, hardcoded task and strict editable-file allowlist.
+- Limits each AI generation to one HTTP request with no retries, 4096 requested output tokens, and at most two edited files.
+- Adds a GitHub Actions workflow separating model calls, secret-free test execution and Draft PR publishing.
+- Requires `STUDY_OS_AUTO_AI_ENABLED=true` and repository secret `GEMINI_API_KEY`; disabled by default.
+- Human review required for PR merge. Nothing is deployed.
+- Adds isolated unit tests and `docs/AUTO_AI_AGENT.md`.
+
+## Verified CI evidence (2026-11-13 UTC)
+
+- AI Coding Agent PR #46: [workflow run 43363867049](https://github.com/Cheetos9250/study-os/actions/runs/43363867049) passed; the unit-test job passed **13/13** tests using a fake model, with provider/API and publisher jobs skipped on the PR event.
+- Read-only Runner on the same head: [workflow run 43363867064](https://github.com/Cheetos9250/study-os/actions/runs/43363867064) passed, including the runner safety unit tests and offline Node/Python regressions.
+- These results verify **test and workflow behavior only**, not live Gemini generation or PR writing.
+
+## Not yet verified or enabled
+- Live Gemini API generation (requires user's provider key and explicit opt-in).
+- Scheduled autonomous model calls (requires approved merge to default branch and opt-in).
+- A real AI-generated Draft PR (requires setup and successful verification).
+- Automatic Markdown commits after generated PRs (not implemented; workflow artifacts preserve evidence instead).
+- Any extension of AI edit scope to Study OS academic UI (deliberately excluded from this first safety-limited pilot).
+
+Production Deploy, KV, Notion mutations and Cloudflare changes remain prohibited.
