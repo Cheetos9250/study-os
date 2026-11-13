@@ -71,6 +71,7 @@ test("Planner discovery details navigate by date without mutating stored session
   assert.match(section,/discoveryList\.replaceChildren/);
   assert.match(section,/row\.dataset\.planGroup=group/);
   assert.match(section,/button\.setAttribute\("aria-label"/);
+  assert.match(section,/button\.setAttribute\("aria-controls","plan-list"\)/);
   assert.match(section,/get\("plan-list"\)\.focus\(\)/);
   assert.doesNotMatch(section,/client\.(?:add|update|reset|importBackup)\(/);
   assert.doesNotMatch(section,/innerHTML/);
