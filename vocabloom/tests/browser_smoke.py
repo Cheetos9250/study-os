@@ -86,7 +86,19 @@ def run_case(browser, engine, tablet):
     assert first_word.locator('[data-private-image-pick]').count() == 1
     first_word.locator('.word-thumb[data-private-image-pick]').click()
     page.locator('#voca-private-image-picker').set_input_files(image)
-    page.wait_for_function("document.querySelector('.word-row .word-thumb img')?.complete === true")
+    try:
+        page.wait_for_function("document.querySelector('.word-row .word-thumb img')?.complete === true", timeout=12000)
+    except Exception:
+        # Only synthetic test metadata; never log bytes, real images or credentials.
+        debug = page.evaluate("""async word => {
+          let record = null, readError = null;
+          try { const b = await VocaPersonalImages.read(word); record = b ? {type:b.type,size:b.size} : null; }
+          catch(e){readError=String(e);}
+          return {record,readError,marker:document.querySelector('.word-row .word-thumb')?.outerHTML,
+                  pickerType:document.querySelector('#voca-private-image-picker')?.files?.[0]?.type || null};
+        }""", library_word)
+        print(json.dumps({"image_debug":debug,"engine":engine,"tablet":tablet}))
+        raise
     assert page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", library_word)
     assert page.evaluate("JSON.stringify({...localStorage})") == pre_image_storage, "Private picture changed progress storage"
     # A reload must fetch the same image directly from the local IndexedDB.
