@@ -146,3 +146,10 @@ test('Source context is hidden before answering and escaped in feedback afterwar
  assert.match(out.after,/&lt;img/);assert.match(out.after,/&lt;script/);assert.match(out.after,/&lt;svg/);
  assert.doesNotMatch(out.after,/<img|<script|<svg/);
 });
+
+test('Large practice pools retain correct distinct options after deterministic distractor rotation',()=>{
+ const out=new Function(`const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null};const cards=Array.from({length:1000},(_,i)=>({f:'word'+i,b:'n | ความหมาย'+i+' | Example '+i,cat:'large',mid:'large-'+i}));const uCards=()=>cards;${pure}const first=uPracticeQuestions({key:'eng'});USTATE.practiceOffset=10;USTATE.practiceQuestions=null;return {first,next:uPracticeQuestions({key:'eng'})};`)();
+ assert.equal(out.first.length,10);assert.equal(out.next.length,10);
+ for(const q of [...out.first,...out.next]){assert.equal(q.opts.length,4);assert.equal(new Set(q.opts).size,4);assert.equal(q.opts[q.right],'ความหมาย'+q.q.slice(4));}
+ assert.ok(out.next.every(q=>!out.first.some(old=>old.id===q.id)));
+});

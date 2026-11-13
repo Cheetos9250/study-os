@@ -84,7 +84,9 @@ function uPracticeQuestions(d){
  if(eligible.length<4)return [];
  const rotated=eligible.slice(USTATE.practiceOffset%eligible.length).concat(eligible.slice(0,USTATE.practiceOffset%eligible.length));
  const questions=rotated.slice(0,Math.min(10,eligible.length)).map((c,i)=>{
-  const wrong=eligible.filter(x=>x.meaning.toLocaleLowerCase()!==c.meaning.toLocaleLowerCase()).slice((i*7)%eligible.length).concat(eligible).filter((x,j,a)=>x.id!==c.id&&a.findIndex(y=>y.meaning.toLocaleLowerCase()===x.meaning.toLocaleLowerCase())===j).slice(0,3);
+  // The pool already has unique normalized meanings; no nested duplicate scan is needed.
+  const candidates=eligible.filter(x=>x.id!==c.id),start=(i*7)%candidates.length;
+  const wrong=candidates.slice(start).concat(candidates.slice(0,start)).slice(0,3);
   if(wrong.length<3)return null;
   const options=[c.meaning,...wrong.map(x=>x.meaning)],shift=i%4;
   const opts=options.slice(shift).concat(options.slice(0,shift));
