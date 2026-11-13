@@ -43,7 +43,7 @@ Updated: 2026-11-13 (Asia/Bangkok). Branch: `feat/study-os-s1-academic-home-2026
 
 ## Next action
 
-Complete exact-head CI, fix browser failures if any, and record final evidence. Then follow NEXT_STEPS.md. No release approval is inferred.
+Browser QA at code commit c1392bd passed; proceed with isolated study planning and course metadata contracts in NEXT_STEPS.md. No release approval is inferred.
 
 ## Browser QA correction
 
@@ -52,3 +52,11 @@ Complete exact-head CI, fix browser failures if any, and record final evidence. 
 - Remote changes are published through authenticated GitHub API because local git push lacks credentials. Local checkpoint commits `fd8f33e`/`32492f5` were combined into remote commit `e09dbbb`; they are not remote PR SHAs.
 - Live `/cards`, `/quiz` and scheduler probes returned 403 with Cloudflare `error code: 1010`; no application health or Cron success is inferred.
 - Cross-source report now preserves original JSON row indices even when subject rows are interleaved.
+
+## Final verified code checkpoint
+
+- Remote code SHA `c1392bdae4ead7ed9449f9e3fb3969f202d03d88`; CI run https://github.com/Cheetos9250/study-os/actions/runs/43361053043 completed **success** (static-contract and browser-qa both success).
+- Browser log: `Passed 26 browser scenarios plus JavaScript-disabled checks`. Scope: Chromium and WebKit; home at 390×844, 820×1180, 1180×820, 1440×900 in light/dark themes; academic summary/practice, all five legacy card flips; synthetic answers/storage, external APIs blocked. This is neither live progress sync nor physical iPad Safari.
+- Artifact `study-os-browser-qa`, ID `14008860543`, SHA256 `7d46d928ead5981bd143a7dd477b5d3225dfec83c3a83da5e0eaae3d292ed632`: screenshots and machine-readable results. Chromium 820 light and 390 dark screenshots visually inspected; no clipping/overlap observed. WebKit 820 light and 390 dark screenshots also visually inspected with no clipping/overlap observed; extracted results.json contains 26 scenarios.
+- Final local full Node regression repeated after audit-index fix: **271/271 passed**. No legacy course source, VocaBloom source/data, production API config, exporter or scheduled sync workflow changed (diff checked against main).
+- Subsequent documentation-only commit records this evidence. Use the PR Checks tab for its own exact-head CI status; test evidence above is tied to the named code SHA, not inferred for production.

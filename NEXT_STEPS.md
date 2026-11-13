@@ -2,8 +2,8 @@
 
 ## Immediate
 
-1. Inspect latest PR #44 exact-head CI, especially browser-qa. If installation/runtime/assertion fails, fix on the same working branch and rerun.
-2. Inspect Chromium/WebKit screenshots for responsive layout and course controls. Record physical iPad Safari as unverified until actually tested.
+1. Code checkpoint c1392bd passed static and browser QA (run 43361053043). Recheck exact-head CI after future changes; fix failures on the same working branch.
+2. Use CI screenshot artifacts for future layout comparisons; physical iPad Safari remains unverified until actually tested.
 3. Add study planning with an isolated, versioned storage schema; test malformed-state preservation and same-browser tab concurrency before persisting user plans. Never reuse existing quiz/SRS/secret keys. Mark done only on explicit user action.
 4. Add editable academic course metadata after defining stable subject identities and restore behavior. Keep original acc/eco/math/eng/zh pages and shared content intact.
 5. Validate bundled/external question and card identity mapping before deriving accuracy, coverage, due counts or streaks from real progress.
