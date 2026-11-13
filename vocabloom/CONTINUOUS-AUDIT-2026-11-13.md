@@ -172,3 +172,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - [Regression 43377262906](https://github.com/Cheetos9250/study-os/actions/runs/43377262906) **failed** in the new test because the Thai Unicode regex was double-escaped; a valid Thai option `ความคืบหน้าครั้งสำคัญ` was incorrectly rejected. This was a test assertion bug, not evidence of incorrect vocabulary.
 - Corrected the regex at SHA `9aa646bf7afc40777e5ef30928afa94b724368d1`. Fresh CI requires verification. No production or content changes.
+
+### Whitespace-equivalent English practice distractors
+
+- Prior Verified source provenance test passed regression 43377373010 and browser 43377372983.
+- Whitespace-normalized question/distractor deduplication code SHA `9067a8a7c9266d273c3dea5f88215258021eacdf`; synthetic regression SHA `dd8f1e4a44dfa2cbf282e0d33934fa31f73f9a53`. CI pending: regression 43378205242 and browser 43378205248. No live Notion/Worker/KV access or real progress migration.
