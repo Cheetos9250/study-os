@@ -336,12 +336,12 @@ async function cFullRestore(file){
   const payload=JSON.parse(await file.text());
   if(payload?.type!=='vocabloom-unified-study-backup'||payload.version!==1)throw Error('ไม่ใช่ไฟล์ Full backup ของ VocaBloom');
   const v=payload.vocabloom,subs=payload.subjects;
-  if(!v||!v.progress||!v.days||!Array.isArray(v.custom)||!v.settings||!subs||typeof subs!=='object')throw Error('โครงสร้างข้อมูลสำรองไม่ครบ');
+  const record=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+  if(!record(v)||!record(v.progress)||!record(v.days)||!Array.isArray(v.custom)||!record(v.settings)||!record(subs))throw Error('โครงสร้างข้อมูลสำรองไม่ครบ');
   const writes={};
   for(const d of USTATE.decks){
    const k1='study-'+d.key,k2=d.markKey+'-srs',a=subs[k1],b=subs[k2];
    const owns=(key)=>Object.prototype.hasOwnProperty.call(subs,key);
-   const record=(value)=>value!==null&&typeof value==='object'&&!Array.isArray(value);
    if(!owns(k1)||!owns(k2)||!record(a)||!record(b)||
       (a.ans!==undefined&&!record(a.ans))||(a.ats!==undefined&&!record(a.ats))||
       (b.s!==undefined&&!record(b.s))||(b.m!==undefined&&!record(b.m))||
@@ -355,6 +355,8 @@ async function cFullRestore(file){
   const importedStudyDays=!otherDevice&&payload.studyDays&&typeof payload.studyDays==='object'?payload.studyDays:{};
   writes[CLOUD_LOCAL_DAYS]=JSON.stringify(importedDays);
   writes[CLOUD_STUDY_DAYS]=JSON.stringify(importedStudyDays);
+  // Reading the backup file is asynchronous; a cloud sync may have started meanwhile.
+  if(CLOUD.busy)throw Error('มีการซิงก์เริ่มขึ้นระหว่างอ่านไฟล์สำรอง กรุณารอให้เสร็จก่อน');
   if(!window.confirm('นำเข้า Full backup แล้วเขียนทับคะแนนในเบราว์เซอร์นี้ทั้ง 5 วิชาใช่หรือไม่? ควรดาวน์โหลด Full backup ปัจจุบันก่อน'))return;
   saved=Object.fromEntries(Object.keys(writes).map(key=>[key,cSafeGet(key)]));
   oldData=structuredClone(data);oldDays=structuredClone(CLOCAL.days);oldStudyDays=structuredClone(CLOCAL.studyDays);
