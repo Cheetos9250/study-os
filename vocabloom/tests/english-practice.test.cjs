@@ -36,7 +36,7 @@ test('Chapter filter limits generated practice to the chosen English category',(
  assert.ok(selected.every(q=>q.cat==='e1'));
  assert.ok(all.some(q=>q.cat!=='e1')||all.length===10);
  assert.deepEqual(run(0,'not-a-category').questions,[]);
- assert.match(src,/USTATE\.practiceAnswers=\{\};USTATE\.practiceOffset=0;render\(\)/);
+ assert.ok(src.includes("USTATE.practiceAnswers={};USTATE.practiceQuestions=null;USTATE.practiceOffset=0;render();"));
 });
 
 test('Active practice snapshot stays stable if source cards change mid-session',()=>{
