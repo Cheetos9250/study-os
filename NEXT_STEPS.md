@@ -45,6 +45,12 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 
 
 ## Course save reliability handoff
-- Finish exact-head CI and screenshot review for the five-course save guard, then publish under standing frontend authorization. Preserve quiz/SRS/typing schemas, sync callbacks and existing backup allowlist.
+- Five-course save guard is released in PR #73 (`f1b4b96`) with exact-main CI, final WebKit screenshot review and live file verification. Preserve quiz/SRS/typing schemas, sync callbacks, backup allowlist and inactive-face CSS in future changes.
 - Rehearse warning → unsaved backup → retry with disposable progress on physical iPad; never deliberately fill/block the owner's real storage for QA. A browser exit prompt is not guaranteed.
 - Keep separate PR #68's textbook solutions and protected PR #44 branch untouched.
+
+
+## Next independent engineering actions
+- Review duplicate push/pull_request browser CI execution and consider restricting push checks to main while retaining complete PR coverage; do not dispatch live sync or alter production automation as part of test-workflow maintenance.
+- Physical iPad remains the main verification gap for Files export/recovery, blocked storage and best-effort exit warnings. Use disposable profiles/data only.
+- Notion safety PRs #39/#50 and Worker/source recovery #57/#58 retain separate authorization requirements; live Cloudflare/Cron/source availability is not established by the frontend test results.
