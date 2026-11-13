@@ -75,6 +75,11 @@ def run_case(browser, engine, tablet):
     page.locator('[data-page="studymerge"]:visible').first.click()
     page.locator('[data-action="u-tab"][data-tab="practice"]').click()
     page.wait_for_selector('[data-action="u-practice-answer"]')
+    options = page.locator('[data-action="u-practice-answer"]')
+    assert options.count() == 4
+    for i in range(4):
+        assert options.nth(i).get_attribute("aria-keyshortcuts") == str(i + 1)
+        assert options.nth(i).inner_text().startswith(f"{i + 1}. ")
     snapshot = page.evaluate("JSON.stringify({...localStorage})")
     first = page.evaluate("uPracticeQuestions(uDeck('eng'))[0]")
     listen = page.get_by_role("button", name="Hear English word pronunciation")
