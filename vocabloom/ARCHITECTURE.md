@@ -60,3 +60,7 @@ For New set, the existing increment-by-ten rotation is retained for broad conten
 ## Practice focus continuity (2026-11-13)
 
 The browser-only `uPracticeRefocus` helper restores focus to the inserted answer-feedback status after a Practice response and to the next question heading after Previous/Next, Retry mistakes, or New set. Targets receive `tabindex="-1"` for programmatic focus without entering the regular Tab sequence, and focus requests use `preventScroll`. This is a presentation-level accessibility safeguard: it does not read or write user storage, alter question snapshots, change legacy quiz/SRS behavior or claim physical Safari/VoiceOver certification. A no-DOM guard keeps synthetic Node tests safe.
+
+## Async content-refresh focus preservation (2026-11-13)
+
+`uBoot` can render the Study Merge view before and after its asynchronous Verified content reads. The `uPracticeRefreshRender` wrapper captures whether the active focus is on the current Practice question heading or answer-feedback status, renders, then reuses the existing `uPracticeRefocus` helper to restore the corresponding element without scrolling. It deliberately avoids stealing focus from unrelated buttons, pages and modes. This changes presentation only; the existing frozen question/session and local-only score boundaries remain unchanged.

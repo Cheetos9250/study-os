@@ -237,3 +237,10 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - Final code/test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533` passed [regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489): job `131744353930` log shows 258 Node tests passed / 0 failed and 3 Python exporter tests passed.
 - [Browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) completed success; inspected job `131744354214` logs show Chromium desktop, Chromium tablet, WebKit desktop and WebKit tablet each passed with 581 imported words and **0 live service requests**.
 - This verifies the synthetic hosted focus and practice completion flows only. No physical Safari/VoiceOver verification, private backup recovery, staging CAS proof, production deployment or data migration is claimed.
+
+### Async Verified-content refresh — focus continuity verified in hosted QA
+
+- The existing `uBoot` code renders twice when reading Verified content. Added a narrow wrapper that preserves keyboard focus on Practice feedback or question heading through these rerenders, while ignoring unrelated focus and non-Practice pages. Code/test final SHA `159ecb5d0e890fc18e0ea3a22b35e81d194cddcf`.
+- [Regression 43383655509](https://github.com/Cheetos9250/study-os/actions/runs/43383655509) **success**: inspected log shows 259 Node passed, 0 failed, and 3 Python exporter tests passed.
+- [Isolated browser 43383655513](https://github.com/Cheetos9250/study-os/actions/runs/43383655513) **success**: inspected log reports all four Chromium/WebKit desktop/tablet cases passed with 581 imported words, zero live service requests.
+- No physical iPad Safari/VoiceOver testing, production Worker/KV/Notion access, live data restore/migration, merge or deployment was performed.

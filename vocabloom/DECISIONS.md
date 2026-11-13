@@ -63,3 +63,7 @@ Retain ten-card offset rotation for coverage, but vary distractor starting posit
 ## 2026-11-13 — Restore question/feedback focus after Practice rerender
 
 Practice replaces its DOM after answering or switching the current question, which can otherwise lose keyboard focus. Focus the newly inserted feedback status after answering and the new question heading after practice navigation/retry/restart. Do not alter the Verified Quiz navigation path or stored learning progress. Automated Chromium/WebKit focus checks are useful but a physical iPad VoiceOver pass remains required before release.
+
+## 2026-11-13 — Async refresh should preserve focus but not hijack it
+
+Preserve the active Practice question or feedback status through both renders in an asynchronous `uBoot` refresh. Restore focus only when it originated from those two recognized elements within the active Practice content; leave unrelated controls and pages alone. Keep the existing read-only source refresh and in-memory frozen snapshot semantics. Hosted browser checks do not certify physical Safari/VoiceOver.

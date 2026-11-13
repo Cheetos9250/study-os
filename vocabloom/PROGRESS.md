@@ -224,3 +224,10 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Final focus code/browser test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533`: [regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) completed **success**, with **258 Node tests passed, 0 failed, and 3 Python exporter tests passed** in the inspected job log.
 - [Isolated browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) completed **success**. Inspected job `131744354214`: Chromium desktop/tablet and WebKit desktop/tablet **all passed**, each importing 581 words and reporting zero live service requests. The focus assertions and full-session DOM QA were part of that hosted run.
 - The earlier `in progress` entry above is a historical snapshot and is superseded by this verified result. This does **not** validate physical iPad Safari/VoiceOver, production CAS, private backups or live progress writes. App and tests at SHA `b991ac24` remain unmerged and undeployed.
+
+### Verified asynchronous content refresh focus
+
+- Added `uPracticeRefreshRender` to preserve focus on Practice feedback or question heading across the two asynchronous `uBoot` renders, without hijacking unrelated focus. Code SHA `c484c0a99de43bd829d1debf3eed93794caabf74`; Node focus/non-interference test SHA `a6067c497e49b905787a156b7bb947cf7453f8cb`; browser refresh focus assertion SHA `159ecb5d0e890fc18e0ea3a22b35e81d194cddcf`.
+- [Regression CI 43383655509](https://github.com/Cheetos9250/study-os/actions/runs/43383655509) completed **success**, with **259/259 Node tests and 3/3 Python exporter tests passed** (job log checked).
+- [Isolated browser CI 43383655513](https://github.com/Cheetos9250/study-os/actions/runs/43383655513) completed **success**: Chromium desktop/tablet and WebKit desktop/tablet **all four passed**, with 581 imported English words and zero live service requests each (job log checked).
+- Physical iPad Safari/VoiceOver, live cross-device persistence and production backup/cutover remain unverified. No merge, deploy, or live Notion/Worker/KV writes.

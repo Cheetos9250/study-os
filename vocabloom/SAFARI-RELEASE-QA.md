@@ -16,7 +16,7 @@ Status: **NOT EXECUTED on physical iPad Safari**. This is a reproducible manual 
 3. Open English Flashcards and Vocabulary Practice. Verify four unique choices per question, immediate answer feedback, score, Previous/Next, and New set. Also inspect meaning-list distractors for repeated Thai senses (for example, `hinge on` versus `contingent on`); do not treat mere substring similarity as proof of duplicate meanings because antonyms such as `unsaturated` and `saturated` may be useful contrasts.
 4. Switch tabs and return: active practice answers should remain; switch chapter: answers and session snapshot should reset. Test a chapter with fewer than four meanings and verify a helpful empty state.
 5. With Safari developer tools or a disposable browser profile, verify practice answers do **not** change `study-eng`, English SRS keys, or the unified progress key.
-6. Refresh Verified content during a practice session: questions and correct options should remain frozen; New set should use refreshed content.
+6. Refresh Verified content during a practice session: questions and correct options should remain frozen; New set should use refreshed content. With keyboard or VoiceOver focus on the current question heading or answer feedback, verify it remains on the equivalent element after refresh; focus on unrelated controls must not be hijacked.
 7. Test VoiceOver focus order, 200% text zoom, touch target sizes, keyboard tab navigation (when available), and reduced-motion settings. Record issues without claiming automatic compliance.
 
 ## Disposable local backup/restore acceptance

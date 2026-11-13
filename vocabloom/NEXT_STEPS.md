@@ -59,3 +59,9 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - The focus test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533` passed [regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) (**258/258 Node, 3/3 Python**) and [browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) (**4/4 hosted Chromium/WebKit desktop/tablet**, no live service requests). Earlier pending notes are superseded.
 - Next: inspect actual keyboard/VoiceOver announcement and focus on a **physical iPad Safari** with disposable data in an approved non-production preview; document browser/iPadOS versions and any failed steps. Do not merge/deploy on the strength of hosted QA alone.
 - Continue human review of Thai-meaning ambiguities, authoritative private backup/readback and synthetic staging CAS concurrency only in their separate authorized environments.
+
+### Async refresh focus verification and remaining gates
+
+- The latest application/test SHA `159ecb5d0e890fc18e0ea3a22b35e81d194cddcf` passed [regression 43383655509](https://github.com/Cheetos9250/study-os/actions/runs/43383655509) (259 Node + 3 Python) and [isolated browser 43383655513](https://github.com/Cheetos9250/study-os/actions/runs/43383655513) (four Chromium/WebKit desktop/tablet cases, zero live requests).
+- On a separately approved non-production preview and disposable physical iPad Safari session, check VoiceOver announcement and focus persistence during Verified content refresh, Previous/Next, Retry mistakes, New set, portrait/landscape and 200% zoom.
+- Continue manual review of semantic distractor candidates and separate staging CAS/backups only under the existing release gates. Do not merge/deploy or migrate real progress without explicit authorization.

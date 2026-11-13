@@ -109,3 +109,9 @@ All entries below describe an unmerged proposal, not a production release.
 - Restore keyboard focus to the feedback notice after answering, and to the question heading after Practice Previous/Next, Retry mistakes or New set.
 - Preserve normal Tab order using programmatic `tabindex="-1"`, avoid scroll jumps where supported, and safely skip DOM focus in unit-test contexts.
 - Add Node focus-target checks and hosted Chromium/WebKit checks for answered, next, retry and new-set focus. This change is not a production VoiceOver certification.
+
+## 2026-11-13 — Focus continuity through Verified content refresh (draft)
+
+- Preserve answer-feedback/question-heading keyboard focus while `uBoot` reloads Verified content and rerenders Practice.
+- Add a no-DOM/other-controls guard to avoid focus theft outside Practice and Node regressions for the new wrapper.
+- Extend the isolated browser refresh scenario to verify focus remains on the feedback after a source update. No data, sync, SRS, source-identity or backup change.
