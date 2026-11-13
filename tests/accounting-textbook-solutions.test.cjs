@@ -57,7 +57,10 @@ test('solution reveal is independent from auto-checking and student progress',()
  assert.match(html,/textContent=item\.answer/);
  assert.match(html,/textContent=item\.explanation/);
  assert.match(html,/solutionsLoadError/);
- assert.match(html,/No source-reviewed solution yet/);
+ assert.match(html,/No worked solution yet/);
+ assert.match(html,/PDF-checked worked solution available/);
+ assert.match(html,/Draft worked solution available/);
+ assert.match(html,/source verification incomplete/);
  assert.match(html,/StudyAccountingCheck/);
  assert.match(html,/studyos\.accounting\.textbook\.progress\.v1/);
  assert.doesNotMatch(html,/localStorage\.clear\(/);
