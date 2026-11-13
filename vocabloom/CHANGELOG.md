@@ -37,3 +37,8 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — Browser-level daily-map regression (unmerged)
 
 - Added disposable Chromium/WebKit QA for rejecting malformed same-device `deviceDays` and `studyDays` maps without modifying localStorage. No new production behavior beyond the prior daily-map validation fix.
+
+## 2026-11-13 — Nested daily-row validation (unmerged)
+
+- Validate per-date restore records before same-device Full Restore: nonnegative finite numeric counters and string-array IDs where present. Reject malformed rows before any local writes.
+- Added disposable mock tests for invalid and valid daily-row payloads; CI verification remains pending in `PROGRESS.md`.
