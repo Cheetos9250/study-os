@@ -63,3 +63,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Final application/test SHA `20f27cc8656296d55840bec2fff5208571b4145c`: regression https://github.com/Cheetos9250/study-os/actions/runs/43364282209 and browser https://github.com/Cheetos9250/study-os/actions/runs/43364281981 completed **success**. All four extended browser cases passed with 581 imported words and zero live service requests.
 - Browser workflow path filters now track app HTML/JS/JSON, tests, data exports and the workflow itself, so documentation-only push commits do not reinstall browsers. The job's permissions and isolated execution are unchanged.
+
+### Browser malformed-backup regression extension
+
+- Added isolated Chromium/WebKit browser checks to `tests/browser_smoke.py` that submit three synthetic invalid Full Backup structures (subjects array, progress array, missing English subject) to the actual restore handler and assert no browser storage changes or successful restore status.
+- Source commit: `f269d5f9514580f75785e71a430042a8db282c68`. Browser workflow: https://github.com/Cheetos9250/study-os/actions/runs/43367784703 . At documentation time the browser run was **in progress**, not yet verified as passed. Node regression run https://github.com/Cheetos9250/study-os/actions/runs/43367785010 completed **success**.
+- The test runs in a disposable mocked browser profile with no live Worker/Notion/KV requests. It does not exercise real Safari on iPad or real cross-device synchronization.
