@@ -90,9 +90,10 @@ function uPracticeQuestions(d){
  const eligible=USTATE.cat==='all'?pool:pool.filter(x=>x.cat===USTATE.cat);
  if(eligible.length<4)return [];
  const rotated=eligible.slice(USTATE.practiceOffset%eligible.length).concat(eligible.slice(0,USTATE.practiceOffset%eligible.length));
+ const round=Math.floor(USTATE.practiceOffset/10);
  const questions=rotated.slice(0,Math.min(10,eligible.length)).map((c,i)=>{
   // Distinct whole translations can still share a Thai sense ("ขึ้นอยู่กับ" vs "ขึ้นอยู่กับ; ...").
-  const candidates=eligible.filter(x=>x.id!==c.id),start=(i*7)%candidates.length;
+  const candidates=eligible.filter(x=>x.id!==c.id),start=(i*7+round)%candidates.length;
   const wrong=[];
   for(const option of candidates.slice(start).concat(candidates.slice(0,start))){
    if(uPracticeSharesSense(c.senses,option.senses)||wrong.some(x=>uPracticeSharesSense(x.senses,option.senses)))continue;
@@ -100,7 +101,7 @@ function uPracticeQuestions(d){
    if(wrong.length===3)break;
   }
   if(wrong.length<3)return null;
-  const options=[c.meaning,...wrong.map(x=>x.meaning)],shift=i%4;
+  const options=[c.meaning,...wrong.map(x=>x.meaning)],shift=(i+round)%4;
   const opts=options.slice(shift).concat(options.slice(0,shift));
   return {id:'practice-'+c.id,cat:c.cat,q:c.word,opts,right:opts.indexOf(c.meaning),context:c.context,ref:c.ref};
  }).filter(Boolean);
