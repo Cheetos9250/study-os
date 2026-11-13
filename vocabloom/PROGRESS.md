@@ -140,3 +140,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Prior populated cloud-cache rollback test SHA `3b2ad6d636dafa72816594cc26b6d6841807c35a` passed [regression 43373593892](https://github.com/Cheetos9250/study-os/actions/runs/43373593892) and [isolated browser 43373594003](https://github.com/Cheetos9250/study-os/actions/runs/43373594003).
 - Inspected `uPracticeMeaning` and tightened the multiline fallback so English-only text cannot be displayed as a Thai answer. Implementation SHA `af933c54817bb691ad8df8c73a918e7d2a2ade9d`, synthetic examples test SHA `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec`. Fresh CI pending. This does not modify source vocabulary, quiz records or SRS.
+
+### English meaning guard CI regression and fixture correction
+
+- [Regression 43374162891](https://github.com/Cheetos9250/study-os/actions/runs/43374162891) for test SHA `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec` **failed** the existing HTML escaping fixture: its malicious sample used English-only `Back` and was now correctly excluded from the Thai-meaning pool.
+- Updated the test fixture to contain Thai meaning text plus malicious HTML so it still tests output escaping without contradicting the new eligibility rule, SHA `ae12e71181274941cf264bee1353728058fab48c`. Fresh CI **pending**; failure is recorded, not hidden. No production changes.
