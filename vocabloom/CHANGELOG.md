@@ -82,3 +82,8 @@ All entries below describe an unmerged proposal, not a production release.
 
 - Changed English Practice distractor generation to avoid exact shared Thai senses in comma-, semicolon-, and slash-separated meanings, including the Verified `hinge on` / `contingent on` case.
 - Added synthetic and actual Verified-export regression coverage across rotated question sets. No source translations, IDs, user progress, backup format, cloud settings, or production state changed.
+
+## 2026-11-13 — Ambiguous small-pool empty-state UX (unmerged)
+
+- If a chapter has too few mutually non-overlapping Thai meanings to generate four distinct answer choices, Practice now explains that requirement instead of implying that four different whole-string translations are sufficient.
+- Added a regression with four source-shaped words and a shared explicit Thai sense; the resulting empty state contains no answer buttons. No SRS or cloud behavior changed.
