@@ -116,3 +116,10 @@
 - Five scenarios passed: incomplete five-subject backup rejected before prompt/writes; user cancellation preserves storage; successful mock restore writes all five subject pairs and excludes foreign-device daily counters; injected quota failure rolls back original records; busy cloud sync blocks restore.
 - CI passed at SHA `d26b82aa3e97a37bd8198a509414959ef7598568`: https://github.com/Cheetos9250/study-os/actions/runs/43354479003 .
 - The tests do not establish safety of actual Safari quota/eviction, file-picker behavior, browser profile persistence, Cloudflare KV concurrency or live restore. No production restore, sync, merge or deployment authorized.
+
+## P2 Cloud Sync client-side sandbox CAS regression
+
+- Added `vocabloom/tests/cloud-sync-sandbox.test.cjs` to execute the actual `cCloudSync` and `cCloudRevision` logic with mock HTTP responses, fake credentials and disposable local state. No real network requests, Worker, KV or user storage are touched.
+- Six tests pass: revisioned `If-Match` write, retry on two HTTP 412 conflicts, stop at six retries without applying stale state, reject weak/malformed revisions, refuse unversioned Legacy Auto Sync and require explicit manual consent, and reject stale local application when answers keep changing during PUT.
+- Initial test incorrectly expected zero local application after only one concurrent edit; the client correctly retried and applied after stabilization. Updated the test to model a fresh edit during *each* PUT. Final CI passed at SHA `fbdea4607ad1001d897d84c29a624e3571bee8f2`: https://github.com/Cheetos9250/study-os/actions/runs/43354762158 .
+- CAS backend atomicity, true multi-device interleavings, iPad Safari and production Worker remain unverified. Legacy KV remains unsafe for concurrent writes. No merge, production deployment or Cloudflare mutation authorized.
