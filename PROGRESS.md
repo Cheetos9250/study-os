@@ -279,3 +279,13 @@ Next action: editable academic course metadata while preserving stable subject I
 - Added responsive text wrapping for 80-character editable course names (`a1d98ef`) and a browser regression (`89de60b`) for deliberate refresh after a second revision plus 390px viewport overflow safety. CI evidence for these exact code commits still pending; JavaScript syntax was checked for the earlier home/static/browser files but that alone does not prove browser behavior.
 
 - Additional direct in-memory smoke check of the committed home script with mock DOM and mocked storage: **passed** applying saved labels/order, dispatching search refresh, closing the storage connection, and restoring original display. This is **mock only**, not a Chromium/WebKit CI success. GitHub commit workflow lookup for code SHA `89de60b` returned no PR-triggered runs at final inspection; exact-head CI remains unverified.
+
+
+## Opt-in course labels: runtime QA and CI trigger correction — 2026-11-13
+
+- Confirmed current Draft PR #44 head and safety restrictions; `main` remains separate and no production releases or migrations were made.
+- Updated academic CI workflow `push` and `pull_request` path filters (`6bf155c`) to include course-metadata model/store/editor/home code, draft HTML, unit tests and synthetic browser harness. This closes a missing-trigger gap for these new source files.
+- Added `tests/study-os-course-metadata-home.test.cjs` (`48ffc31`) to verify the dashboard does not read metadata before the user clicks, loads validated names/order without changing stable subject URLs, restores the original display only, and rejects corrupt or denied storage without modifying cards.
+- Executed all three new cases in a JavaScript V8 mock-context test shim using the committed source: **3/3 passed (mock only)**. This is not a Node CI run, Chromium/WebKit browser result, physical Safari QA or live backend check.
+- Updated `PROJECT.md` (`03b1ee0`) to remove obsolete "editor unlinked" language. At last inspection the GitHub connector's PR-triggered commit-run lookup returned **no CI runs** for exact new commits; do not report GitHub CI success until jobs can be independently inspected.
+- No merge, deployment, live Notion/Worker/KV, GitHub production content, scheduler or cross-device CAS changes.
