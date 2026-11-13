@@ -235,6 +235,8 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     await tab.locator("#planner-content").waitFor({state:"visible"});
     await tab.waitForFunction(() => document.querySelector("#plan-discovery")?.textContent?.includes("7 วันข้างหน้า 2"));
     assert.match(await tab.locator("#plan-discovery").textContent(),/งานค้าง 2 · วันนี้ 0 · 7 วันข้างหน้า 2 · เสร็จแล้ว 0/);
+    assert.match(await tab.locator("#plan-discovery-list").textContent(),/Upcoming edited QA/);
+    assert.doesNotMatch(await tab.locator("#plan-discovery-list").textContent(),/Upcoming navigation QA/);
   } finally { await navigation.close(); }
   return {engine,planner:"passed; synthetic IndexedDB: persistence, editing, explicit completion, dates, concurrent tabs, stale draft, export/import, idempotency, atomic rollback, denied/corrupt storage, loaded-page offline"};
 };
