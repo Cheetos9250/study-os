@@ -29,7 +29,15 @@ async function read(word){
  const database=await db(),key=keyFor(word);
  return new Promise((resolve,reject)=>{
   const request=database.transaction(STORE,'readonly').objectStore(STORE).get(key);
-  request.onsuccess=()=>resolve(request.result||null);
+  request.onsuccess=()=>{
+   const stored=request.result;
+   // Older local Blob values still load; newer records use WebKit-safe byte arrays.
+   if(stored instanceof Blob&&TYPES.has(stored.type)){resolve(stored);return;}
+   if(stored?.bytes instanceof ArrayBuffer&&TYPES.has(stored.type)){
+    resolve(new Blob([stored.bytes],{type:stored.type}));return;
+   }
+   resolve(null);
+  };
   request.onerror=()=>reject(request.error||Error('อ่านภาพไม่สำเร็จ'));
  });
 }
@@ -37,10 +45,11 @@ async function write(word,file){
  await validateImage(file);
  if(!keyFor(word).slice(3))throw Error('ไม่พบคำศัพท์');
  const database=await db(),key=keyFor(word);
+ // ArrayBuffer is supported by WebKit IndexedDB even when persisting Blob/File fails.
+ const bytes=await file.arrayBuffer();
  await new Promise((resolve,reject)=>{
   const tx=database.transaction(STORE,'readwrite');
-  // Persist the image bytes as a Blob, not a File object with browser-specific metadata.
-  tx.objectStore(STORE).put(new Blob([file],{type:file.type}),key);
+  tx.objectStore(STORE).put({bytes,type:file.type},key);
   tx.oncomplete=resolve;
   tx.onerror=()=>reject(tx.error||Error('บันทึกภาพไม่สำเร็จ'));
   tx.onabort=()=>reject(tx.error||Error('พื้นที่เก็บภาพไม่เพียงพอ'));
