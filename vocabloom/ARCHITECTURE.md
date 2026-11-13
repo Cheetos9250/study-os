@@ -50,3 +50,9 @@ Each eligible English Practice card now precomputes normalized Thai sense fragme
 ## Read-only semantic review utility
 
 `scripts/audit-thai-distractors.cjs` inspects committed Verified English rows offline and lists potential Thai-meaning collisions using exact substring containment and character-bigram similarity. The output is **review-only** JSON; the utility is not imported by the live application, never mutates Notion/source/progress, and does not suppress runtime choices. `tests/english-distractor-review.test.cjs` verifies stable output and explicitly retains the valid `unsaturated` / `saturated` contrast for human review.
+
+## Session-completion feedback and repeated small-deck variety (2026-11-13)
+
+English Practice displays an in-session completion notice only after **every frozen question has an answer**. It includes correct/total and missed counts and points to the existing Retry mistakes or New set actions. It is derived from `USTATE.practiceAnswers` and `USTATE.practiceQuestions` on render; no new storage keys, SRS/quiz scoring, cloud writes or backup schema changes.
+
+For New set, the existing increment-by-ten rotation is retained for broad content coverage. Its round number now also adjusts distractor start and option order, so a five- or ten-card chapter can change visible options even when ten-step question rotation revisits the same words. Active snapshots and exact Retry mistakes options are still frozen; new sessions remain deterministic for the same source and offset.
