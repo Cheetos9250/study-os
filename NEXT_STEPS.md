@@ -14,4 +14,4 @@ The basic study, local backup and missing-only recovery workflow is published in
 - No production learning-data write, deletion, cloud migration or Notion sync dispatch is part of UI QA.
 
 ## Current textbook workspace
-The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workflow and the 403-question scope. Its answer data has its own backup today; include it in the main backup before claiming one export protects every study module. Do not modify the original PDF or catalog data during backup integration.
+The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workflow and the 403-question scope. Its answer data is now included in the main backup. Rehearse that round trip on a disposable physical iPad context; the original PDF is not part of the backup. Do not modify the original PDF or catalog data during backup integration.

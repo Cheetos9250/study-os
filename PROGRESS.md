@@ -35,7 +35,7 @@ This entry covers the course UI work on 2026-11-13, not a complete infrastructur
 - Initial 40-case run passed, but screenshot inspection found the practice tab outside the visible navigation at 320px. Added the layout fix and a visible-tab bounds assertion; final exact-head evidence is tracked in PR #56.
 
 ## Working branch
-`docs/study-os-basic-readiness-20261113`
+`feat/study-os-textbook-progress-backup-20261113`
 
 ## Scope boundaries
 PR #44 remains untouched. No Notion sync dispatch, production data changes or backend deployment is included.
@@ -74,3 +74,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Local: 206 Node tests, 3 Python tests and diff checks passed. Chromium/WebKit synthetic evidence covers 28 study/backup/native-recovery journeys plus 12 recovery scenarios (40 total).
 - Live read-only checks: home, five courses, backup, restore and restore JS returned HTTP 200 and matched tested source. No real user progress was exported, reset or restored by the agent.
 - Physical iPad Safari/PWA/Files behavior remains unverified. No automatic cloud backup, production cloud-data recovery or complete Study Planner is claimed.
+
+
+## Main backup coverage for textbook answers
+- Added the reader's existing `studyos.accounting.textbook.progress.v1` data to the main allowlist; saved answer text, status and timestamps are preserved unchanged.
+- Missing-only recovery validates textbook record types and blocks differing existing textbook progress for the entire restore, using the existing no-overwrite behavior.
+- Preview names the dataset Accounting textbook answers. Backup/recovery pages explicitly exclude the original PDF; no IndexedDB/PDF, catalog, geometry, reader source or production data changes are included.
+- Synthetic Chromium/WebKit tests save an answer in the actual reader UI without selecting a PDF, reload it, export it through the main backup, recover into a clean browser context, and reopen the reader to verify exact notes/status.
+- Physical iPad/PDF rendering and storage retention are still unverified; this change only covers answer-progress backup.

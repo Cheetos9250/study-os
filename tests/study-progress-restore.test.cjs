@@ -125,3 +125,30 @@ test("rollback preserves an added key subsequently changed by another tab", () =
   assert.throws(()=>recovery.restoreMissing(storage,snapshot(),ORIGIN),/attempted rollback/);
   assert.deepEqual(storage.snapshot(),{'study-acc':'OTHER-TAB'});
 });
+
+test("textbook answer notes and status round-trip without touching other history", () => {
+  const key='studyos.accounting.textbook.progress.v1';
+  const raw=JSON.stringify({'E 1-1':{notes:'คำตอบ\n1,234.50',status:'done',updated:'2026-11-13T14:00:00Z'},'QS 1-2':{notes:'Unfinished work'}});
+  const saved=createStorage({'study-acc':ACC,'study-sync-key':'KEEP'});
+  assert.deepEqual(recovery.plan(saved,snapshot({[key]:raw}),ORIGIN).missing,[key]);
+  assert.deepEqual(saved.counts(),{writes:0,deletes:0});
+  assert.deepEqual(recovery.restoreMissing(saved,snapshot({[key]:raw}),ORIGIN),{restored:1,alreadyPresent:0});
+  assert.equal(saved.getItem(key),raw);assert.equal(saved.getItem('study-acc'),ACC);assert.equal(saved.getItem('study-sync-key'),'KEEP');
+  assert.deepEqual(recovery.restoreMissing(saved,snapshot({[key]:raw}),ORIGIN),{restored:0,alreadyPresent:1});
+});
+
+test("malformed textbook answer records refuse every write", () => {
+  const key='studyos.accounting.textbook.progress.v1';
+  for(const raw of ['[]','{"E 1-1":null}','{"E 1-1":{"status":"invalid"}}','{"E 1-1":{"notes":123}}','{"E 1-1":{"updated":{}}}','{"__proto__":{"notes":"bad"}}']){
+    const saved=createStorage();assert.throws(()=>recovery.restoreMissing(saved,snapshot({'study-acc':ACC,[key]:raw}),ORIGIN),/Malformed|Invalid/);
+    assert.deepEqual(saved.counts(),{writes:0,deletes:0});
+  }
+});
+
+test("conflicting textbook answers block the full restore instead of overwriting", () => {
+  const key='studyos.accounting.textbook.progress.v1';
+  const raw=JSON.stringify({'E 1-1':{notes:'Backup version'}}),current=JSON.stringify({'E 1-1':{notes:'Current work'}});
+  const saved=createStorage({[key]:current});
+  assert.throws(()=>recovery.restoreMissing(saved,snapshot({'study-acc':ACC,[key]:raw}),ORIGIN),/Refusing to overwrite/);
+  assert.deepEqual(saved.snapshot(),{[key]:current});assert.deepEqual(saved.counts(),{writes:0,deletes:0});
+});

@@ -55,7 +55,7 @@
     <h2>2. Restore missing data</h2>
     <p>Close other Study OS tabs before restoring. Use only a backup you created and trust. Review the file summary above, then confirm the action.</p>
     <button type="button" id="restore" disabled>Restore missing progress</button>
-    <p>This operation does not touch Notion, Cloudflare, Study Planner IndexedDB, or any stored sync keys. It does not restore data that was never in the backup file.</p>
+    <p>This operation does not touch Notion, Cloudflare, Study Planner IndexedDB, or any stored sync keys. It does not restore data that was never in the backup file. The original textbook PDF is not included; select it again in the reader if needed.</p>
   </div>
 </main>
 <script src="scripts/study-progress-backup.js"></script>
@@ -72,6 +72,7 @@
   var preview = document.getElementById("preview");
   function datasetName(key) {
     if (key === "vocabloom_mvp_v1") return "VocaBloom learning history";
+    if (key === "studyos.accounting.textbook.progress.v1") return "Accounting textbook answers";
     var courses = {acc:"Accounting",eco:"Economics",math:"Mathematics",eng:"English",zh:"Chinese"};
     if (key.startsWith("study-")) return courses[key.slice(6)] + " quiz history";
     var prefix = key.replace(/-(srs|typ)$/, "");

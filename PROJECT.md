@@ -18,4 +18,4 @@ Study OS provides course flashcards, lesson summaries, practice questions and lo
 Read `PROGRESS.md` for code release SHAs and CI runs, and `NEXT_STEPS.md` for remaining work. GitHub is the source of truth. Do not use real progress for destructive QA or dispatch Notion sync as a frontend test.
 
 ## Accounting textbook workspace
-`accounting-textbook.html` supports the published chapters 1–9 reader. The user selects the original PDF privately in the browser. Textbook answers currently have a separate local export; the main backup does not yet include them. Question crop completeness and physical iPad PDF persistence remain unverified.
+`accounting-textbook.html` supports the published chapters 1–9 reader. The user selects the original PDF privately in the browser. Saved textbook answers/status are included in the main backup/recovery alongside the reader's separate export. The original PDF is excluded and must be selected separately. Question crop completeness and physical iPad PDF persistence remain unverified.

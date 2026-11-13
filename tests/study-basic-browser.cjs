@@ -63,6 +63,17 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
             await page.locator('#welcome-title').waitFor();
             evidence.push({engine,width,course,navigateRateReloadReturn:'passed'});
           }
+          const textbookKey='studyos.accounting.textbook.progress.v1';
+          const notes='SYNTHETIC-TEXTBOOK-ANSWER\nDr Cash / Cr Capital · คำตอบทดสอบ';
+          await page.goto(base+'/accounting-textbook.html');await page.locator('.q-item').first().waitFor();
+          const textbookId=await page.evaluate(()=>current.id);
+          await page.locator('#answer').fill(notes);await page.locator('#questionStatus').selectOption('doing');
+          await page.waitForFunction(({key,id,notes})=>{const saved=JSON.parse(localStorage.getItem(key)||'{}');return saved[id]?.notes===notes&&saved[id]?.status==='doing';},{key:textbookKey,id:textbookId,notes});
+          const textbookSaved=await page.evaluate(key=>localStorage.getItem(key),textbookKey);
+          await page.reload();await page.locator('.q-item').first().waitFor();
+          assert.equal(await page.locator('#answer').inputValue(),notes);assert.equal(await page.locator('#questionStatus').inputValue(),'doing');
+          await page.locator('.topnav a[href="index.html"]').click();await page.locator('#welcome-title').waitFor();
+          evidence.push({engine,width,textbookAnswerPersistence:'passed',pdfSelected:false});
           await page.evaluate(()=>{localStorage.setItem('study-sync-key','SYNTHETIC-SECRET');localStorage.setItem('study-sync-progress-key-v1','SYNTHETIC-SECRET');});
           await page.getByRole('link',{name:'Back up progress',exact:true}).click();
           const before=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
@@ -70,6 +81,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           await page.locator('#download').click();const download=await downloadPromise;
           const file=await download.path();const payload=JSON.parse(await fs.readFile(file,'utf8'));
           assert.equal(payload.format,'study-os-progress-local-backup');
+          assert.equal(payload.entries[textbookKey],textbookSaved);
           assert.ok(Object.keys(payload.entries).length>=5);assert.ok(!JSON.stringify(payload).includes('SYNTHETIC-SECRET'));
           await page.locator('#backupFile').setInputFiles(file);
           await page.getByText('File structure is valid:',{exact:false}).waitFor();
@@ -87,11 +99,14 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           const restored=await recovered.newPage();await restored.goto(base+'/progress-restore.html');
           await restored.locator('#file').setInputFiles(file);
           await restored.locator('#status').getByText(/missing data sets can be restored/).waitFor();
+          await restored.locator('#preview').getByText('Missing: Accounting textbook answers',{exact:true}).waitFor();
           restored.once('dialog',dialog=>dialog.accept());await restored.locator('#restore').click();
           await restored.locator('#status').getByText(/Restored/).waitFor();
           for(const [key,value] of Object.entries(payload.entries))assert.equal(await restored.evaluate(k=>localStorage.getItem(k),key),value);
           await restored.reload();assert.equal(await restored.evaluate(()=>localStorage.getItem('study-sync-key')),null);
-          evidence.push({engine,width,nativeCourseBackupRestore:'passed'});await recovered.close();
+          await restored.goto(base+'/accounting-textbook.html');await restored.locator('.q-item').first().waitFor();
+          assert.equal(await restored.locator('#answer').inputValue(),notes);assert.equal(await restored.locator('#questionStatus').inputValue(),'doing');
+          evidence.push({engine,width,nativeCourseBackupRestore:'passed',textbookAnswersRestored:true,pdfIncluded:false});await recovered.close();
           await context.close();
         }
       }finally{await browser.close();}
