@@ -155,3 +155,18 @@ test('Large practice pools retain correct distinct options after deterministic d
  for(const q of [...out.first,...out.next]){assert.equal(q.opts.length,4);assert.equal(new Set(q.opts).size,4);assert.equal(q.opts[q.right],'ความหมาย'+q.q.slice(4));}
  assert.ok(out.next.every(q=>!out.first.some(old=>old.id===q.id)));
 });
+
+test('Practice collapses whitespace-equivalent Thai meanings and headwords before choosing distractors',()=>{
+ const cards=[
+  {cat:'e1',f:'alpha',b:'n | การ พัฒนา',mid:'a'},
+  {cat:'e1',f:'beta',b:'n | การ  พัฒนา',mid:'b'},
+  {cat:'e1',f:'gamma',b:'n | ความรู้',mid:'c'},
+  {cat:'e1',f:'delta',b:'n | ความเข้าใจ',mid:'d'},
+  {cat:'e1',f:'epsilon',b:'n | ความสำเร็จ',mid:'e'},
+  {cat:'e1',f:'  ALPHA  ',b:'n | ความแตกต่าง',mid:'f'}
+ ];
+ const questions=new Function('cards',`const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null};const uCards=()=>cards;${pure}return uPracticeQuestions({key:'eng'});`)(cards);
+ assert.equal(questions.length,4);
+ assert.ok(!questions.some(q=>q.q==='beta'||q.q.trim()==='ALPHA'));
+ for(const q of questions)assert.equal(new Set(q.opts.map(x=>x.normalize('NFKC').replace(/\\s+/g,' ').trim())).size,4);
+});
