@@ -134,3 +134,11 @@ All entries below describe an unmerged proposal, not a production release.
 - Add optional hardware-keyboard 1–4 answer shortcuts, matching visible numeric answer labels and accessible `aria-keyshortcuts` attributes.
 - Prevent shortcuts on other pages/tabs, in editable controls, dialogs, sidebar focus, with modifiers, key repeat or already answered questions.
 - Add actual-action Node tests, browser desktop/tablet keyboard answer and choice-label checks. No source translation, SRS identity, user progress, cloud, backup or production endpoint changes.
+
+
+## 2026-11-13 — Personal anime/vocabulary pictures (draft-only)
+
+- Added a user-selected image button to the English word library and integrated Flashcards; PNG, JPEG and WebP images up to 2 MiB are stored in browser-only IndexedDB.
+- A saved image replaces the word emoji in library thumbnails and picture/type exercises, and appears on the first step of lessons and the front of integrated Flashcards. Users can remove the image without changing vocabulary, SRS or quiz history.
+- No anime assets are bundled. Pictures do not sync or enter existing backups; they are subject to browser site-data deletion.
+- Added validation Node tests and isolated browser smoke covering upload, reload persistence, Flashcard front/back and removal. Hosted browser CI discovered and prompted fixes for hidden placeholders and test dialog handling; current final CI status must be checked separately.
