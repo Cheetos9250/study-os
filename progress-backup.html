@@ -29,6 +29,7 @@
     button:focus-visible,.file-label:focus-within,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
     input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
     .notice{padding:12px 14px;border-left:3px solid var(--accent);background:var(--bg);border-radius:6px}
+    #comparison{overflow-wrap:anywhere}#comparison ul{padding-left:20px}#compareAgain{margin-top:10px}button:disabled{opacity:.5;cursor:not-allowed}
     #status,#checkStatus{min-height:1.5em;overflow-wrap:anywhere;margin-top:12px}
     code{font-size:0.9em;overflow-wrap:anywhere}
   </style>
@@ -47,11 +48,14 @@
     </div>
     <div class="panel">
       <h2>2. Check your downloaded file</h2>
-      <p>Select the JSON file you just saved to check its structure, date, and number of saved data sets. This does not change your progress.</p>
+      <p>Select the JSON file you saved to check its structure and compare it with the progress in this browser now. Nothing is restored, uploaded or changed.</p>
       <label class="file-label" for="backupFile">Choose file to check
         <input id="backupFile" type="file" accept=".json,application/json">
       </label>
       <p id="checkStatus" role="status" aria-live="polite"></p>
+      <div id="comparison" hidden></div>
+      <button id="compareAgain" type="button" disabled>Compare with this browser again</button>
+      <p class="muted">Comparison checks exact saved data at this moment; it cannot tell which differing copy is newer or prove that a backup can be restored. Close other Study OS tabs while checking. The textbook PDF is not included.</p>
     </div>
     <div class="panel">
       <h2>Recover missing progress</h2>
@@ -65,7 +69,7 @@
       <p>Before clearing Safari, changing devices, or upgrading, save and check the file in Files/iCloud Drive. Do not delete your original progress. If you use an iPad Home Screen app, launch this page from that same app: its storage may be separate from Safari.</p>
     </div>
   </main>
-  <script src="scripts/study-progress-backup.js?v=20261113-textbook"></script>
+  <script src="scripts/study-progress-backup.js?v=20261113-compare"></script>
   <script>
     (function(){
       "use strict";
@@ -90,17 +94,55 @@
           status.textContent = "Cannot create a backup: " + error.message;
         }
       });
+      var comparison = document.getElementById("comparison");
+      var compareAgain = document.getElementById("compareAgain");
+      var selection = 0, selectedText = null;
+      function clearComparison() { comparison.replaceChildren(); comparison.hidden = true; }
+      function renderComparison(json) {
+        var result = core.compareSnapshot(json, window.localStorage, location.origin);
+        clearComparison();
+        var summary = document.createElement("p");
+        summary.className = "notice";
+        summary.textContent = result.exactMatch ? "Matches this browser now: all " + result.matched.length + " data sets are identical." :
+          "This file and this browser differ. Keep both copies; this check cannot tell which is newer. Do not clear your original data.";
+        comparison.appendChild(summary);
+        var list = document.createElement("ul");
+        for (var group of [["matched", "Identical"], ["different", "Different saved data"], ["localOnly", "In this browser, missing from file"], ["backupOnly", "In file, missing from this browser"]]) {
+          if (!result[group[0]].length) continue;
+          var item = document.createElement("li");
+          item.textContent = group[1] + " (" + result[group[0]].length + "): " + result[group[0]].map(core.labelForKey).join(", ");
+          list.appendChild(item);
+        }
+        comparison.appendChild(list); comparison.hidden = false;
+        return result.info;
+      }
       document.getElementById("backupFile").addEventListener("change", async function(event){
+        var request = ++selection;
+        selectedText = null; compareAgain.disabled = true; clearComparison();
         var file = event.target.files && event.target.files[0];
+        checkStatus.textContent = file ? "Checking selected file…" : "No file selected.";
         if (!file) return;
         try {
           if (file.size > core.MAX_BYTES) throw new Error("File exceeds 6 MB");
           var json = await file.text();
-          var info = core.inspectSnapshot(json, location.origin);
+          if (request !== selection) return;
+          var info = renderComparison(json);
+          selectedText = json; compareAgain.disabled = false;
           checkStatus.textContent = "File structure is valid: " + info.count + " data sets · Created " + info.createdAt +
             " · Site " + info.origin + " (no progress has been restored or modified)";
         } catch (error) {
-          checkStatus.textContent = "File check failed: " + error.message;
+          if (request !== selection) return;
+          clearComparison(); checkStatus.textContent = "File check failed: " + error.message;
+        }
+      });
+      compareAgain.addEventListener("click", function(){
+        if (!selectedText) return;
+        try { renderComparison(selectedText); checkStatus.textContent = "Compared again with this browser now. No progress was changed."; }
+        catch (error) { clearComparison(); checkStatus.textContent = "Comparison failed: " + error.message; }
+      });
+      window.addEventListener("storage", function(event){
+        if (selectedText && (event.key === null || core.keys.includes(event.key))) {
+          clearComparison(); checkStatus.textContent = "Browser progress changed in another tab. Compare again before relying on this result.";
         }
       });
     })();

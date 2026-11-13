@@ -20,7 +20,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
     for(const [engine,type] of Object.entries({chromium,webkit})){
       const browser=await type.launch();
       try{
-        for(const width of [390,820]){
+        for(const width of [390,820,1280]){
           const context=await browser.newContext({viewport:{width,height:1000},acceptDownloads:true});
           const writeAttempts=[];
           await context.route('**/*',route=>{
@@ -86,6 +86,30 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           assert.ok(Object.keys(payload.entries).length>=5);assert.ok(!JSON.stringify(payload).includes('SYNTHETIC-SECRET'));
           await page.locator('#backupFile').setInputFiles(file);
           await page.getByText('File structure is valid:',{exact:false}).waitFor();
+          await page.locator('#comparison').getByText(/Matches this browser now/).waitFor();
+          assert.match(await page.locator('#comparison').innerText(),/Accounting textbook answers/);
+          await page.locator('#backupFile').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{')});
+          await page.locator('#checkStatus').getByText(/File check failed/).waitFor();
+          assert.equal(await page.locator('#comparison').isHidden(),true);assert.equal(await page.locator('#compareAgain').isDisabled(),true);
+          await page.evaluate(async json=>{
+            const input=document.getElementById('backupFile');let finish;
+            const older=new Promise(resolve=>{finish=resolve;});
+            Object.defineProperty(input,'files',{configurable:true,value:[{size:json.length,text:()=>older}]});input.dispatchEvent(new Event('change'));
+            Object.defineProperty(input,'files',{configurable:true,value:[{size:1,text:async()=>'{'}]});input.dispatchEvent(new Event('change'));
+            await new Promise(resolve=>setTimeout(resolve,0));finish(json);await new Promise(resolve=>setTimeout(resolve,0));delete input.files;
+          },JSON.stringify(payload));
+          assert.match(await page.locator('#checkStatus').innerText(),/File check failed/);
+          assert.equal(await page.locator('#comparison').isHidden(),true);assert.equal(await page.locator('#compareAgain').isDisabled(),true,'older file must not re-enable compare');
+          await page.locator('#backupFile').setInputFiles(file);await page.locator('#comparison').getByText(/Matches this browser now/).waitFor();
+          const other=await context.newPage();await other.goto(base+'/progress-backup.html');
+          await other.evaluate(key=>localStorage.setItem(key,JSON.stringify({'QS-1-1':{notes:'DIFFERENT-SYNTHETIC-ANSWER',status:'doing'}})),textbookKey);
+          await page.locator('#checkStatus').getByText(/Browser progress changed/).waitFor();assert.equal(await page.locator('#comparison').isHidden(),true);
+          const changed=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
+          await page.locator('#compareAgain').click();await page.locator('#comparison').getByText(/This file and this browser differ/).waitFor();
+          assert.match(await page.locator('#comparison').innerText(),/Different saved data \(1\): Accounting textbook answers/);
+          assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),changed,'comparison changed the differing answers');
+          await other.evaluate(({key,value})=>localStorage.setItem(key,value),{key:textbookKey,value:before[textbookKey]});
+          await page.locator('#checkStatus').getByText(/Browser progress changed/).waitFor();await page.locator('#compareAgain').click();await page.locator('#comparison').getByText(/Matches this browser now/).waitFor();await other.close();
           assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),before,'backup or file check mutated storage');
           assert.deepEqual(writeAttempts,[],'unexpected network write');assert.deepEqual(errors,[]);
           for(const colorScheme of ['light','dark']){
@@ -94,10 +118,13 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
             await page.screenshot({path:path.join(output,`${engine}-${width}-${colorScheme}-backup.png`),fullPage:true});
           }
           await page.locator('a[href="./"]').click();await page.locator('#welcome-title').waitFor();
-          evidence.push({engine,width,backupDownloadCheck:'passed',credentialsExcluded:true,storageUnchanged:true,networkWrites:0});
+          evidence.push({engine,width,backupDownloadCheck:'passed',comparisonAndFileRace:'passed',crossTabInvalidation:'passed',credentialsExcluded:true,storageUnchanged:true,networkWrites:0});
           const recovered=await browser.newContext({viewport:{width,height:1000}});
           await recovered.route('**/*',route=>{const u=new URL(route.request().url());return route.request().method()==='GET'&&u.origin===base?route.continue():route.abort();});
-          const restored=await recovered.newPage();await restored.goto(base+'/progress-restore.html');
+          const restored=await recovered.newPage();await restored.goto(base+'/progress-backup.html');
+          await restored.locator('#backupFile').setInputFiles(file);await restored.locator('#comparison').getByText(/In file, missing from this browser/).waitFor();
+          assert.doesNotMatch(await restored.locator('#comparison').innerText(),/Matches this browser now/);assert.equal(await restored.evaluate(()=>localStorage.length),0,'file comparison restored progress without consent');
+          await restored.goto(base+'/progress-restore.html');
           await restored.locator('#file').setInputFiles(file);
           await restored.locator('#status').getByText(/missing data sets can be restored/).waitFor();
           await restored.locator('#preview').getByText('Missing: Accounting textbook answers',{exact:true}).waitFor();
