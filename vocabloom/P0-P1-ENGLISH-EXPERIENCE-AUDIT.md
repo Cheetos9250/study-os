@@ -101,3 +101,11 @@
 - This is stronger than source-string checks, but still not an end-to-end browser/iPad test. It does not exercise live Notion, Cloudflare KV, cross-device CAS, or Production storage.
 - GitHub Actions CI passed for SHA `6660bfb734a9903c1f3064bd7e460f5b1fc5ae65`: https://github.com/Cheetos9250/study-os/actions/runs/43353704504 .
 - PR #41 remains draft; no merge or deployment.
+
+## P2 real-export integration data contract
+
+- Added `vocabloom/tests/english-integration-data.test.cjs`, executing the real integrated `uCards`, `uQuiz`, and `uPracticeQuestions` functions against the committed `study-decks.json`, `data/cards.json`, and `data/quiz.json` exports.
+- Verified English integrated cards exceed the original 51-card deck, retain unique card IDs, and generate ten local practice questions; English Verified quiz count remains zero and no practice content is presented as a Notion Verified quiz.
+- Verified a simulated Draft English row is excluded without changing the original deck or existing quiz data. Legacy deck quiz counts remain `[42,60,34,0,0]`, and the committed Notion quiz export contains 222 rows, none English.
+- GitHub Actions CI passed at SHA `b89cf5543748fce29bf63ba85d51367f0c6b6270`: https://github.com/Cheetos9250/study-os/actions/runs/43353863921 .
+- Tests are repository-data and offline runtime tests only; not live Notion/Worker/KV, actual iPad Safari or production cross-device sync tests. No deployment or merge authorized.
