@@ -184,3 +184,10 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Draft homepage now links to `course-metadata-draft.html`; saved metadata is shown as linked course preview in that editor. Browser regression `5192b45` checks preview and homepage link. Verify exact-head CI before claiming success. Production remains untouched.
 - Next: confirm static and browser CI, test preview after custom order/reload, and consider explicit opt-in read-only application of custom labels to homepage cards without altering subject IDs or legacy progress. Physical iPad Safari/VoiceOver remains unverified. No merge/deploy without explicit approval.
+
+
+## Basic opt-in dashboard course labels — 2026-11-13
+
+- Implemented the deliberate read-only `#course-metadata-apply` / `#course-metadata-default` controls on the draft academic homepage (`eb179da`, `a6c1d75`); linked editor has a return-to-Dashboard action (`c339015`). Names/descriptions/order are loaded only after an explicit click and shown safely; no stable href/subject identity/progress or planner writes.
+- Static guards (`a77df5b`) and synthetic Chromium/WebKit tests (`9817c91`) assert course search refresh, stable links, no progress change, restoring display and denied storage. **Verify CI for these exact code commits before calling the feature tested.**
+- Remaining release gate: manually run iPad Safari/VoiceOver with a disposable local profile and backup rehearsal. PR #44 remains Draft; no merge, deploy, Notion/Worker/KV/scheduler changes or cloud progress sync without approval.
