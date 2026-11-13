@@ -38,10 +38,10 @@ function uQuiz(d){const qs=d.quiz.map((x,i)=>({id:i,cat:x[0],q:x[1],opts:x[2],ri
 // Local-only vocabulary practice generated from existing English cards.
 // These questions are NOT Notion Verified quizzes; answers never write to Study OS/SRS.
 function uPracticeMeaning(back){
- const text=String(back||'').replace(/\\*\\*/g,'').trim();
+ const text=String(back||'').replace(/\*\*/g,'').trim();
  if(text.includes('|'))return (text.split('|')[1]||'').trim();
- const first=text.split(/\\r?\\n/)[0]||'';
- return first.replace(/^[^\\n—–:]{1,35}\\s*[—–:]\\s*/,'').replace(/^(?:ชนิดคำ|ตัวอย่าง)\\s*:.*/,'').trim();
+ const first=text.split(/\r?\n/)[0]||'';
+ return first.replace(/^[^\n—–:]{1,35}\s*[—–:]\s*/,'').replace(/^(?:ชนิดคำ|ตัวอย่าง)\s*:.*/,'').trim();
 }
 function uPracticeQuestions(d){
  if(d.key!==UACTIVE_LANGUAGE)return [];
