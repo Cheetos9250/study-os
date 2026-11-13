@@ -53,6 +53,56 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       });
       assert.equal(rejected,true);
     }finally{await denied.close();}
+    // Fail closed when IndexedDB already contains a malformed record: never treat null
+    // or revision zero as an empty database and overwrite it. Synthetic profile only.
+    const corruptContext=await browser.newContext();
+    try{
+      await corruptContext.route("**/*",route=>new URL(route.request().url()).origin===base?route.continue():route.abort());
+      const corruptPage=await corruptContext.newPage();
+      await corruptPage.goto(base);
+      await corruptPage.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata.js"),"utf8")});
+      await corruptPage.addScriptTag({content:await fs.readFile(path.join(root,"lib/study-os-course-metadata-store.js"),"utf8")});
+      const corruptionProtected=await corruptPage.evaluate(async()=>{
+        const {openCourseMetadata,DATABASE}=globalThis.StudyOSCourseMetadataStore;
+        const defaults=globalThis.StudyOSCourseMetadata.defaultMetadata();
+        const store=await openCourseMetadata(indexedDB);
+        const connection=await new Promise((resolve,reject)=>{
+          const req=indexedDB.open(DATABASE,1);
+          req.onsuccess=()=>resolve(req.result);
+          req.onerror=()=>reject(req.error);
+        });
+        function raw(mode,value){
+          return new Promise((resolve,reject)=>{
+            const tx=connection.transaction("settings",mode);
+            const request=mode==="readwrite" ?
+              tx.objectStore("settings").put(value,"academic") :
+              tx.objectStore("settings").get("academic");
+            let result;
+            request.onsuccess=()=>{result=request.result;};
+            tx.oncomplete=()=>resolve(result);
+            tx.onabort=()=>reject(tx.error);
+            tx.onerror=()=>reject(tx.error);
+          });
+        }
+        try{
+          for(const [record,revision] of [
+            [null,0],
+            [{revision:0,metadata:defaults},0],
+            [{revision:1,metadata:{version:999}},1]
+          ]){
+            await raw("readwrite",record);
+            let readRejected=false,writeRejected=false;
+            try{await store.read();}catch(error){readRejected=error instanceof TypeError;}
+            try{await store.save(defaults,revision);}catch(error){writeRejected=error instanceof TypeError;}
+            if(!readRejected||!writeRejected) throw new Error("corrupt metadata was accepted");
+            const unchanged=await raw("readonly");
+            if(JSON.stringify(unchanged)!==JSON.stringify(record)) throw new Error("corrupt metadata was overwritten");
+          }
+          return true;
+        }finally{connection.close();store.close();}
+      });
+      assert.equal(corruptionProtected,true);
+    }finally{await corruptContext.close();}
     const draft=await context.newPage();
     await draft.goto(base+"/course-metadata-draft.html");
     assert.equal(await draft.locator("#editor").isVisible(),false);
