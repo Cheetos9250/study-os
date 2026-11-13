@@ -167,3 +167,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Prior Thai meaning guard fix passed regression 43374289061 and browser 43374289044.
 - New rotated question source-provenance regression SHA `410c109dff6e6db7efee9e80d72b02062bbdd18e` checks Thai options against committed Verified rows and answer/headword mapping. CI queued: regression 43377262906, browser 43377262767. No source content or production writes. This does not establish semantic quality of distractors.
+
+### Source provenance test CI failure corrected
+
+- [Regression 43377262906](https://github.com/Cheetos9250/study-os/actions/runs/43377262906) **failed** in the new test because the Thai Unicode regex was double-escaped; a valid Thai option `ความคืบหน้าครั้งสำคัญ` was incorrectly rejected. This was a test assertion bug, not evidence of incorrect vocabulary.
+- Corrected the regex at SHA `9aa646bf7afc40777e5ef30928afa94b724368d1`. Fresh CI requires verification. No production or content changes.
