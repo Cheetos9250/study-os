@@ -85,6 +85,7 @@
     <div id="planner-content" hidden>
       <div class="plan-tools"><label for="plan-view-date">แผนวันที่</label><input id="plan-view-date" type="date" required><button id="plan-today" type="button">วันนี้</button><button id="plan-refresh" type="button">อัปเดตรายการ</button></div>
       <p id="plan-summary" class="sub"></p>
+      <p id="plan-discovery" class="sub" role="status" aria-live="polite"></p>
       <ul id="plan-list" class="plan-list" aria-label="รายการแผนการเรียน"></ul>
       <form id="plan-form" class="plan-form">
         <label>วิชา<select id="plan-subject" required><option value="acc">Accounting</option><option value="eco">Economics</option><option value="math">Mathematics</option></select></label>
@@ -149,6 +150,7 @@
 <script src="lib/study-os-legacy-progress-reader.js" defer></script>
 <script src="lib/study-os-dashboard.js" defer></script>
 <script src="lib/study-os-planner.js" defer></script>
+<script src="lib/study-os-plan-discovery.js" defer></script>
 <script src="lib/study-os-planner-ui.js" defer></script>
 </body>
 </html>
