@@ -120,3 +120,8 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Synthetic legacy backup compatibility tests at SHA `7b7f66a1fc5b40cf4f5ad60fa56920b54ec87076` passed [regression 43371209483](https://github.com/Cheetos9250/study-os/actions/runs/43371209483) and [isolated browser 43371209508](https://github.com/Cheetos9250/study-os/actions/runs/43371209508). Documentation head `4676985e21eb4985bfa97e640260d2cd9185da65` also passed browser 43371264483 and regression 43371264339.
 - Extended disposable Full Restore execution harness to test oversized file rejection and invalid JSON without confirmation, writes or network calls, test SHA `743619988c916903d44fc2c74c15924771a3700a`. [Regression 43371443779](https://github.com/Cheetos9250/study-os/actions/runs/43371443779) and [browser 43371443800](https://github.com/Cheetos9250/study-os/actions/runs/43371443800) **in progress** at writing time. No production changes.
+
+### Full Restore cloud UI rollback — CI pending
+
+- Verified prior oversized-file/invalid-JSON test SHA `743619988c916903d44fc2c74c15924771a3700a`: [regression 43371443779](https://github.com/Cheetos9250/study-os/actions/runs/43371443779) and [isolated browser 43371443800](https://github.com/Cheetos9250/study-os/actions/runs/43371443800) both **success**.
+- Inspected `cFullRestore` exception handling and found that post-write `render()` failure could roll back storage and progress but leave `CLOUD.studyMergedDays` and `CLOUD.remoteStatus` changed. Added snapshot/rollback for both fields at SHA `5555154e547b840b72c6c99a65daeba16141bf9c`, and a synthetic render-failure execution regression at SHA `a535b1babdde470e13ea07dd40a0c89d83df28be`. **New CI not yet verified**. No production writes.
