@@ -83,10 +83,15 @@ def run_case(browser, engine, tablet):
     listen.click()
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Listen modified learning storage"
     assert page.evaluate("Object.keys(USTATE.practiceAnswers).length") == 0, "Listen recorded an answer"
+    assert page.locator('[data-action="u-practice-example-speak"]').count() == 0, "Source example must stay hidden before answer"
     page.locator(f'[data-action="u-practice-answer"][data-answer="{(first["right"] + 1) % 4}"]').click()
     assert page.evaluate("document.activeElement?.classList.contains('notice')"), "Answer feedback lost keyboard focus"
     assert page.get_by_role("button", name="Retry mistakes (1)").is_enabled()
     assert page.get_by_text("Source example", exact=True).is_visible()
+    example_listen = page.get_by_role("button", name="Hear source example pronunciation")
+    assert example_listen.is_visible()
+    example_listen.click()
+    assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Listening to source example changed progress"
     content["refresh"] = True
     page.evaluate("async()=>{await uBoot()}")
     assert page.evaluate("uPracticeQuestions(uDeck('eng'))[0]") == first, "Refresh changed the active question or source explanation"
