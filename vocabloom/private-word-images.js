@@ -97,9 +97,10 @@ function hydrateNode(node){
 function hydrate(){
  const main=document.getElementById('mainContent');
  if(!main)return;
- main.querySelectorAll('[data-private-word-image]:not([data-private-image-state])').forEach(node=>{
-  // Hidden placeholders never intersect: populate card/lesson images directly.
-  if(node.classList.contains('voca-integrated-photo')||node.classList.contains('voca-personal-lesson'))hydrateNode(node);
+ main.querySelectorAll('[data-private-word-image]:not([data-private-image-state])').forEach((node,index)=>{
+  // Safari/WebKit can delay IntersectionObserver delivery after dynamic page renders.
+  // Hydrate the first visible library items immediately; lazy-load the remainder.
+  if(index<20||node.classList.contains('voca-integrated-photo')||node.classList.contains('voca-personal-lesson'))hydrateNode(node);
   else if(root.IntersectionObserver){
    if(!observer)observer=new root.IntersectionObserver(entries=>{
     for(const entry of entries)if(entry.isIntersecting){observer.unobserve(entry.target);hydrateNode(entry.target);}
