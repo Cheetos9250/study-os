@@ -88,3 +88,12 @@ Remaining: editable course metadata, real iPad Safari, browser storage eviction/
 - Subsequent documentation-only commit records this checkpoint. Its exact-head CI is checked separately; no additional implementation change is inferred from documentation.
 
 Next action: editable academic course metadata while preserving stable subject IDs and legacy storage; then upcoming/overdue plan discovery. Physical iPad Safari, OS/browser-triggered storage eviction and cloud synchronization remain unverified. No production release authorized or performed.
+
+## Plan discovery continuation — 2026-11-13
+
+- Implemented pure, read-only `lib/study-os-plan-discovery.cjs` for overdue, today, upcoming (default next 7 days), and completed planner sessions. Date comparisons use caller-provided Bangkok calendar date; no auto-completion, storage/network writes, or inference of actual study time.
+- Added `tests/study-os-plan-discovery.test.cjs` covering classification, horizon boundaries, malformed data, and nonmutation. Added both files to GitHub Actions workflow path filters.
+- Code checkpoint `b66f187555f46561a96174d815e293d44ab32994`: GitHub Actions run [43367779307](https://github.com/Cheetos9250/study-os/actions/runs/43367779307) completed **success**. This is CI evidence for that code commit, not a physical iPad test.
+- Documentation contract: `docs/study-os-plan-discovery-contract-2026-11-13.md` at `b0eb7642b4f894a47a78f45c31805c8a8649118a`.
+- **Not yet integrated into homepage planner UI.** Existing planner, backup/import and browser tests remain unchanged in this checkpoint. No production Merge/Deploy/Notion/Worker/KV changes.
+- Next: integrate discovery into homepage planner with explicit action only, retain IndexedDB revision safety, extend Chromium/WebKit QA, and verify exact-head CI. Physical iPad Safari remains unverified.
