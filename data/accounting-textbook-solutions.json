@@ -504,8 +504,8 @@
       "verification": "source-reviewed-2026-11-13"
     },
     "E-2-6": {
-      "answer": "a. Cash paid on accounts payable during October = $300,500. b. Sales on account during October = $90,290.",
-      "explanation": "a: ending accounts payable = starting accounts payable + credit purchases - payments. $132,500 = $152,000 + $281,000 - payments; payments=$300,500. b: ending receivables = beginning receivables + credit sales - collections. $89,900 = $102,500 + credit sales - $102,890; sales=$90,290.",
+      "answer": "a. Cash paid on accounts payable during October = $300,500. b. Sales on account during October = $89,390.",
+      "explanation": "a: ending accounts payable = starting accounts payable + credit purchases - payments. $132,500 = $152,000 + $281,000 - payments; payments=$300,500. b: ending receivables = beginning receivables + credit sales - collections. $89,000 = $102,500 + credit sales - $102,890; sales=$89,390.",
       "pages": [
         96
       ],
