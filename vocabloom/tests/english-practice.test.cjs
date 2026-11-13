@@ -285,3 +285,29 @@ test('Practice refocus targets new feedback and the next question without scroll
  const noDocument=new Function('document',pure+'return uPracticeRefocus;')(undefined);
  assert.doesNotThrow(()=>noDocument('answer'));
 });
+
+
+test('Async content refresh preserves focused feedback/question without hijacking other controls',()=>{
+ const start=src.indexOf('function uPracticeRefreshRender(){'),end=src.indexOf('async function uBoot(){',start);
+ assert.ok(start>=0&&end>start);
+ const events=[],ui={page:'studymerge'},USTATE={tab:'practice'};
+ const document={activeElement:null,getElementById(){return {contains(el){return Boolean(el)}}}};
+ const refresh=new Function('document','ui','USTATE','render','uPracticeRefocus',src.slice(start,end)+'return uPracticeRefreshRender;')
+  (document,ui,USTATE,()=>events.push('render'),mode=>events.push(mode));
+ document.activeElement={id:'',classList:{contains:name=>name==='notice'}};
+ refresh();
+ assert.deepEqual(events,['render','answer']);
+ events.length=0;
+ document.activeElement={id:'u-practice-question',classList:{contains:()=>false}};
+ refresh();
+ assert.deepEqual(events,['render','question']);
+ events.length=0;
+ document.activeElement={id:'other-button',classList:{contains:()=>false}};
+ refresh();
+ assert.deepEqual(events,['render'],'Do not steal focus from unrelated buttons');
+ events.length=0;
+ ui.page='home';refresh();
+ assert.deepEqual(events,['render']);
+ assert.doesNotThrow(()=>new Function('ui','USTATE','render','uPracticeRefocus',
+  src.slice(start,end)+'return uPracticeRefreshRender;')(ui,USTATE,()=>{},()=>{})());
+});
