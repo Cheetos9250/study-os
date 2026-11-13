@@ -2,9 +2,9 @@
 
 ## Immediate
 
-1. Code checkpoint c1392bd passed static and browser QA (run 43361053043). Recheck exact-head CI after future changes; fix failures on the same working branch.
+1. Planner code checkpoint 18dd843 passed static and Chromium/WebKit QA (run 43364009951). Recheck exact-head CI after future changes; fix failures on the same working branch.
 2. Use CI screenshot artifacts for future layout comparisons; physical iPad Safari remains unverified until actually tested.
-3. Complete exact-head browser verification for the implemented IndexedDB planner and backup/import path; inspect mobile/tablet screenshots. Keep plan completion explicit, preserve unknown data, and never reuse legacy quiz/SRS/secret keys.
+3. Planner, atomic tab edits, backup/restore/idempotency/conflict rollback and mobile/tablet screenshots are verified with synthetic browser profiles. Next improve upcoming/overdue plan discovery; retain explicit completion and isolated storage.
 4. Add editable academic course metadata after defining stable subject identities and restore behavior. Keep original acc/eco/math/eng/zh pages and shared content intact.
 5. Validate bundled/external question and card identity mapping before deriving accuracy, coverage, due counts or streaks from real progress.
 

@@ -48,7 +48,7 @@ Browser QA at code commit c1392bd passed; proceed with isolated study planning a
 ## Browser QA correction
 
 - First isolated CI run 43360698530 at remote commit `e09dbbbb44181db1ee053b908c848c38788a0321`: static contracts passed; browser job failed waiting for the intentionally hidden summary tab in the English legacy page. This was an incorrect test expectation: English/Chinese legacy decks have no summaries/quizzes. No production/course bug was inferred.
-- Corrected QA to exercise academic summary/practice tabs while asserting that language-only legacy tabs remain hidden, and verify card flip on all five subjects. Rerun pending.
+- Corrected QA to exercise academic summary/practice tabs while asserting that language-only legacy tabs remain hidden, and verify card flip on all five subjects. Rerun passed at c1392bd (evidence below).
 - Remote changes are published through authenticated GitHub API because local git push lacks credentials. Local checkpoint commits `fd8f33e`/`32492f5` were combined into remote commit `e09dbbb`; they are not remote PR SHAs.
 - Live `/cards`, `/quiz` and scheduler probes returned 403 with Cloudflare `error code: 1010`; no application health or Cron success is inferred.
 - Cross-source report now preserves original JSON row indices even when subject rows are interleaved.
@@ -70,9 +70,21 @@ Completed implementation:
 - Export planner-only JSON; import adds missing IDs, skips identical records, rejects conflicting/unsupported records and rolls back the entire import transaction.
 - Extend browser QA for persistence after reload, date filtering, completion/editing, concurrent add/edit, stale drafts, safe text rendering, backup/restore, idempotency, atomic rollback, blocked/corrupt storage and operations in an already-loaded offline page.
 
-Verification in progress:
+Verification evidence:
 - First planner code commit `3130748450d5c552a1a7f947eff2b3f3695c0a7f`; local Node 280/280 and Python exporter 3/3 passed before backup import additions.
 - CI run 43363512916: static contracts passed; browser failed because clearing the view date left stale summary text. The change listener now renders the explicit select-date state; regression remains in the browser suite.
-- Academic local suite after import additions: 42/42 passed (including 10 planner model tests). Exact-head browser rerun pending.
+- Academic local suite after import additions: 42/42 passed (including 10 planner model tests). Planner code checkpoint and browser evidence are below.
 
 Remaining: editable course metadata, real iPad Safari, browser storage eviction/restore rehearsal, notification scheduling and cross-device plan sync. Production release still requires explicit approval. No Merge, Deploy, Notion/KV/Worker/config changes in this round.
+
+## Verified planner checkpoint
+
+- Remote code SHA `18dd8436cfb5d0fc8bf9f7e16b920924c9c08f32`; [CI run 43364009951](https://github.com/Cheetos9250/study-os/actions/runs/43364009951) **success**: static-contract and browser-qa both passed.
+- Full local Node regression after import/date fix: **281/281 passed**. Python exporter remained unchanged; its 3/3 tests passed this round before the import-only extension.
+- Browser log: `Passed 28 browser scenarios plus JavaScript-disabled checks`. This includes the existing 26 scenarios plus one full planner flow per Chromium/WebKit engine, each covering persistence, user completion/editing, Bangkok date handling, empty-date UI, concurrent tabs, stale draft preservation, text rendering, planner-only download/import, repeated import, conflict rollback, unsupported/corrupt/denied storage, and an already-loaded offline page. Calendar midnight validation is also covered by Node tests.
+- Fresh-profile UI restore imported all 4 exported synthetic records; repeating the import added 0/skipped 4. A conflicting import with an additional new ID aborted without adding that ID or replacing the changed record. Future-version file was rejected. No live data was used.
+- Artifact ID `14009228239`, SHA256 `ff7b4747c8dba1fff13b5f5837954050521be626cfdf0a743524250ce226512c`: 20 screenshots plus results.json. JSON confirmed 28 scenarios and passed planner flows for both engines. Chromium mobile 390 and WebKit tablet 820 planner screenshots visually inspected; no clipping/overlap observed.
+- Remote files compared with local working files after fetch. Legacy course files, VocaBloom, `data/config.json`, exporter and sync workflow remain unchanged against main.
+- Subsequent documentation-only commit records this checkpoint. Its exact-head CI is checked separately; no additional implementation change is inferred from documentation.
+
+Next action: editable academic course metadata while preserving stable subject IDs and legacy storage; then upcoming/overdue plan discovery. Physical iPad Safari, OS/browser-triggered storage eviction and cloud synchronization remain unverified. No production release authorized or performed.

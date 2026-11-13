@@ -10,8 +10,8 @@ Implemented candidate: device-local study planner (add/edit, explicit completion
 
 ## Priorities
 
-1. Verify browser behavior and responsive layout on the exact draft build.
-2. Complete planner browser verification and editable course metadata, with an independently versioned namespace and no legacy progress migration.
+1. Preserve passing Chromium/WebKit planner QA and verify physical iPad Safari before release.
+2. Add editable course metadata and upcoming/overdue plan discovery while retaining stable subject IDs and isolated storage.
 3. Verified question/card identity adapters for accurate learning analytics.
 4. Reliable cross-device progress only after independent backup, restore rehearsal and explicit release authorization.
 
