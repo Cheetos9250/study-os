@@ -70,3 +70,16 @@ test("planner never references legacy storage, secrets, cloud APIs or database d
     assert.doesNotMatch(fs.readFileSync(path.join(root,file),"utf8"),/localStorage|sessionStorage|SYNC_KEY|NOTION_TOKEN|fetch\s*\(|XMLHttpRequest|deleteDatabase|innerHTML/);
   }
 });
+
+test("backup validation copies records and rejects duplicate identities, future versions and unexpected fields", () => {
+  const record = planner.createSession(input,"one",1000);
+  const backup = {format:"study-os-planner",version:1,sessions:[record]};
+  const restored = planner.validateBackup(backup);
+  assert.deepEqual(restored,[record]);
+  assert.notEqual(restored[0],record);
+  assert.ok(Object.isFrozen(restored[0]));
+  for (const invalid of [{...backup,version:2},{...backup,sessions:[record,record]},{...backup,sessions:[{...record,unexpected:"value"}]},{...backup,sessions:[{...record,done:null}]}]) {
+    assert.throws(() => planner.validateBackup(invalid),TypeError);
+  }
+  assert.throws(() => planner.validateBackup({format:"other",version:1,sessions:[]}),TypeError);
+});

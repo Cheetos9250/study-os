@@ -4,7 +4,7 @@
 
 1. Code checkpoint c1392bd passed static and browser QA (run 43361053043). Recheck exact-head CI after future changes; fix failures on the same working branch.
 2. Use CI screenshot artifacts for future layout comparisons; physical iPad Safari remains unverified until actually tested.
-3. Add study planning with an isolated, versioned storage schema; test malformed-state preservation and same-browser tab concurrency before persisting user plans. Never reuse existing quiz/SRS/secret keys. Mark done only on explicit user action.
+3. Complete exact-head browser verification for the implemented IndexedDB planner and backup/import path; inspect mobile/tablet screenshots. Keep plan completion explicit, preserve unknown data, and never reuse legacy quiz/SRS/secret keys.
 4. Add editable academic course metadata after defining stable subject identities and restore behavior. Keep original acc/eco/math/eng/zh pages and shared content intact.
 5. Validate bundled/external question and card identity mapping before deriving accuracy, coverage, due counts or streaks from real progress.
 
@@ -23,3 +23,7 @@
 - `node scripts/study-os-content-audit.cjs`
 - `node scripts/study-os-source-overlap.cjs`
 - `node scripts/study-os-browser-check.cjs` (requires Playwright Chromium/WebKit; isolated localhost/synthetic data only)
+
+## Planner follow-up
+
+After current QA passes: add editable course display metadata with stable subject IDs; extend planner discovery to upcoming/overdue plans; verify iPad Safari and restore from downloaded plan backup after browser storage loss in an isolated profile. Future cross-device plan sync needs its own reviewed schema/authorization; do not attach it to legacy progress KV automatically. Reminders are not implemented or scheduled.

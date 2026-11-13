@@ -96,6 +96,35 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.equal(backup.format,"study-os-planner"); assert.equal(backup.sessions.length,4);
     assert.doesNotMatch(JSON.stringify(backup),/SYNTHETIC-DO-NOT-EXPORT|study-sync-key/);
     assert.equal(await page.evaluate(() => localStorage.getItem("study-sync-key")),"SYNTHETIC-DO-NOT-EXPORT");
+    // Restore in a fresh isolated browser profile, repeat idempotently, then prove
+    // conflicting imports abort all writes (including a new record queued first).
+    const restored = await browser.newContext({viewport:{width:820,height:1180}});
+    await restored.route("**/*",route => new URL(route.request().url()).origin === base ? route.continue() : route.abort());
+    try {
+      const target = await restored.newPage(); await target.goto(base);
+      await target.locator("#open-planner").click();
+      await target.locator("#planner-content").waitFor({state:"visible"});
+      const upload = payload => ({name:"planner-backup.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(payload))});
+      await target.locator("#plan-file").setInputFiles(upload(backup));
+      await target.getByText("นำเข้าเพิ่ม 4 รายการ · มีอยู่แล้ว 0 รายการ",{exact:true}).waitFor();
+      await target.locator("#plan-file").setInputFiles(upload(backup));
+      await target.getByText("นำเข้าเพิ่ม 0 รายการ · มีอยู่แล้ว 4 รายการ",{exact:true}).waitFor();
+      await target.evaluate(async () => { window.__restored = await StudyOSPlanner.openPlanner(indexedDB); });
+      const persisted = await target.evaluate(() => window.__restored.list());
+      assert.deepEqual(persisted.map(item => item.id).sort(),backup.sessions.map(item => item.id).sort());
+      await target.evaluate(async id => {
+        const current = (await window.__restored.list()).find(item => item.id === id);
+        await window.__restored.update(id,{title:"Updated since export"},current.revision);
+      },backup.sessions[0].id);
+      const newRecord = require("../lib/study-os-planner.js").createSession({subject:"acc",title:"Must roll back",date:tomorrow,minutes:10},"rollback-candidate",1000);
+      await target.locator("#plan-file").setInputFiles(upload({...backup,sessions:[newRecord,...backup.sessions]}));
+      await target.locator("#plan-status").filter({hasText:"จึงไม่นำเข้าหรือเขียนทับ"}).waitFor();
+      assert.equal(await target.evaluate(async () => (await window.__restored.list()).length),4);
+      assert.equal(await target.evaluate(async () => (await window.__restored.list()).some(item => item.id === "rollback-candidate")),false);
+      await target.locator("#plan-file").setInputFiles(upload({...backup,version:99}));
+      await target.locator("#plan-status").filter({hasText:"บันทึกหรืออ่านแผนไม่ได้"}).waitFor();
+      assert.equal(await target.evaluate(async () => (await window.__restored.list()).length),4);
+    } finally { await restored.close(); }
     // Operations in an already loaded page do not require network access.
     await context.setOffline(true);
     await page.locator("#plan-title").fill("Offline loaded-page plan");
@@ -129,5 +158,5 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     await tab.locator("#plan-status").filter({hasText:"ยังเปิดแผนไม่ได้"}).waitFor();
     assert.equal(await tab.locator("#planner-content").isVisible(),false);
   } finally { await denied.close(); }
-  return {engine,planner:"passed; synthetic IndexedDB: persistence, editing, explicit completion, dates, concurrent tabs, stale draft, export, denied/corrupt storage, loaded-page offline"};
+  return {engine,planner:"passed; synthetic IndexedDB: persistence, editing, explicit completion, dates, concurrent tabs, stale draft, export/import, idempotency, atomic rollback, denied/corrupt storage, loaded-page offline"};
 };

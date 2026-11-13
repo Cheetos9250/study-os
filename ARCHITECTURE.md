@@ -25,3 +25,15 @@ No storage enumeration, key/secret access, network request or storage write occu
 `tests/*.test.cjs`: source, parser, analytics, simulated DOM, content audit and overlap contracts. `scripts/study-os-browser-check.cjs`: localhost server, fresh synthetic profiles, blocked external routes, Chromium/WebKit, mobile/tablet/desktop viewports, both color schemes, course tab/quiz/card checks and no-JavaScript navigation. No production API/storage writes. WebKit automation is not physical iPad Safari verification.
 
 `study-os-source-overlap.cjs` compares normalized question text within academic subjects across bundled and exported snapshots. Different chapters do not hide exact text matches. Text differences in correct answers are flagged for review, not automatically resolved. This is not semantic deduplication or proof of content correctness.
+
+## Device-local study planner (unreleased)
+
+`lib/study-os-planner.js` supplies validation/model logic and an IndexedDB adapter; `lib/study-os-planner-ui.js` wires the academic home UI. The database `study-os-planner-v1` (version 1), store `sessions`, is opened only after an explicit click. No existing score/SRS/localStorage data is read, migrated, reset or written by the planner.
+
+Each record has schemaVersion, immutable id/createdAt, subject (`acc/eco/math`), title, date (calendar YYYY-MM-DD), planned minutes, explicit Boolean done, revision and updatedAt. Bangkok midnight determines the default date. Only a user's checkbox action marks done; completed planned minutes are not measured study duration.
+
+Readwrite transactions serialize writes across same-browser tabs. Edits compare expected revision inside the transaction; a stale form is rejected, preserving its typed draft. Concurrent additions have independent IDs. This is browser-local concurrency protection, not Cloudflare CAS or cross-device synchronization.
+
+Backup export includes only planner records. Import validates the entire file before mutation, accepts missing IDs, skips identical IDs, and aborts the entire transaction for changed/unsupported records. No blind overwrite, database reset, deletion or cloud call is available. A malformed existing record prevents normal loading and is preserved for diagnosis. Browser storage can still be cleared/evicted by the browser; downloadable backups are user-managed. Physical iPad Safari and browser-eviction recovery remain unverified.
+
+Tests: model/validation in `tests/study-os-planner.test.cjs`; actual Chromium/WebKit persistence, concurrent tabs, stale forms, export/import/idempotency/rollback, malformed/blocked storage and already-loaded offline operation in `scripts/study-os-planner-browser.cjs`. Existing legacy course checks remain enabled.

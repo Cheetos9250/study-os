@@ -33,7 +33,7 @@ Updated: 2026-11-13 (Asia/Bangkok). Branch: `feat/study-os-s1-academic-home-2026
 - Local Playwright bundled Chromium/WebKit executables absent. Installed Chromium fails to launch because process singleton socket creation is denied (`Operation not permitted`). Connected cloud browser cannot reach local preview (`ERR_CONNECTION_REFUSED`). CI browser QA is the isolated fallback; physical iPad Safari remains a manual release gate.
 - No access established to Cloudflare administrative deployment/KV/Cron evidence. No cloud progress writes attempted.
 - Accurate coverage/quiz accuracy require stable mappings across bundled and external records. Counts are not mastery or percentages.
-- Study planning and editable course management are pending; current course management is navigation to existing courses.
+- Editable course management remains pending. The device-local planner candidate is implemented; see continuation evidence below. Current course management is navigation to existing courses.
 - PR #1 remains old/nonmergeable; #39 exporter fail-closed and #41 language changes remain separate drafts. #42/#43 overlap earlier audit/home work; no PR closed automatically.
 
 ## Commits and PRs
@@ -60,3 +60,19 @@ Browser QA at code commit c1392bd passed; proceed with isolated study planning a
 - Artifact `study-os-browser-qa`, ID `14008860543`, SHA256 `7d46d928ead5981bd143a7dd477b5d3225dfec83c3a83da5e0eaae3d292ed632`: screenshots and machine-readable results. Chromium 820 light and 390 dark screenshots visually inspected; no clipping/overlap observed. WebKit 820 light and 390 dark screenshots also visually inspected with no clipping/overlap observed; extracted results.json contains 26 scenarios.
 - Final local full Node regression repeated after audit-index fix: **271/271 passed**. No legacy course source, VocaBloom source/data, production API config, exporter or scheduled sync workflow changed (diff checked against main).
 - Subsequent documentation-only commit records this evidence. Use the PR Checks tab for its own exact-head CI status; test evidence above is tied to the named code SHA, not inferred for production.
+
+## Planner continuation — 2026-11-13 (unreleased)
+
+Completed implementation:
+- Add and edit academic study plans by subject/date/topic/planned minutes; mark complete/undo only through explicit user action. Default date uses Asia/Bangkok day boundaries.
+- Store plans in isolated IndexedDB schema; compare revisions atomically for same-browser tabs. No localStorage/score/secret/cloud accesses by planner modules.
+- Preserve drafts on failed/stale edits and distinguish unavailable/corrupt storage. No reset/delete/migration fallback.
+- Export planner-only JSON; import adds missing IDs, skips identical records, rejects conflicting/unsupported records and rolls back the entire import transaction.
+- Extend browser QA for persistence after reload, date filtering, completion/editing, concurrent add/edit, stale drafts, safe text rendering, backup/restore, idempotency, atomic rollback, blocked/corrupt storage and operations in an already-loaded offline page.
+
+Verification in progress:
+- First planner code commit `3130748450d5c552a1a7f947eff2b3f3695c0a7f`; local Node 280/280 and Python exporter 3/3 passed before backup import additions.
+- CI run 43363512916: static contracts passed; browser failed because clearing the view date left stale summary text. The change listener now renders the explicit select-date state; regression remains in the browser suite.
+- Academic local suite after import additions: 42/42 passed (including 10 planner model tests). Exact-head browser rerun pending.
+
+Remaining: editable course metadata, real iPad Safari, browser storage eviction/restore rehearsal, notification scheduling and cross-device plan sync. Production release still requires explicit approval. No Merge, Deploy, Notion/KV/Worker/config changes in this round.
