@@ -1,5 +1,13 @@
 # Study OS progress
 
+## Accounting textbook exercise index (feature branch, not yet released)
+- Added a source-linked **reference index**, not an unauthorized public copy of the textbook exercises, for *Fundamental Accounting Principles* (24th edition) from the owner's Google Drive.
+- Automatic PDF extraction created 1,361 individual Quick Study / Exercise / Problem references and 104 broader section references spanning chapters 1–26 and selected appendices. These are **candidate references, not an audited guarantee of every question**; some PDF text has nonstandard glyph encodings, so manual reconciliation is required.
+- Added `accounting-textbook.html` to search and filter the references, jump to the owner's original PDF, track per-question status, write personal notes, and export/import a backup of this catalog's progress.
+- The catalog uses a new local-only key (`studyos.accounting.textbook.progress.v1`), separate from existing accounting quiz/flashcard progress and from the main Study OS backup/sync tools; it is not synced across devices.
+- This change preserves existing content and does not upload source text to the public repository. Physical iPad Safari and live deployment unverified.
+
+
 This entry covers the course UI work on 2026-11-13, not a complete infrastructure audit.
 
 ## Completed
