@@ -98,3 +98,12 @@ test("Planner import validates backups and requires deliberate user confirmation
   assert.match(source,/ยกเลิกการนำเข้าแล้ว ไม่มีข้อมูลเปลี่ยนแปลง/);
   assert.doesNotMatch(source,/removeItem\(|deleteDatabase\(/);
 });
+
+test("Study Planner warns on navigation only while a form draft is uncommitted",()=>{
+  const source=fs.readFileSync(path.join(root,"lib","study-os-planner-ui.js"),"utf8");
+  assert.match(source,/window\.addEventListener\("beforeunload",event =>/);
+  assert.match(source,/if \(!dirty\) return/);
+  assert.match(source,/event\.preventDefault\(\)/);
+  assert.match(source,/event\.returnValue=""/);
+  assert.match(source,/dirty = false; title\.value = ""/);
+});
