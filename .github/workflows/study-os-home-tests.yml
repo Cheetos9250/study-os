@@ -10,6 +10,8 @@ on:
       - 'scripts/study-os-content-audit.cjs'
       - 'lib/study-os-learning-analytics.cjs'
       - 'tests/study-os-learning-analytics.test.cjs'
+      - 'lib/study-os-legacy-progress-reader.cjs'
+      - 'tests/study-os-legacy-progress-reader.test.cjs'
       - 'vocabloom/study-decks.json'
       - 'acc.html'
       - 'eco.html'
@@ -26,6 +28,8 @@ on:
       - 'scripts/study-os-content-audit.cjs'
       - 'lib/study-os-learning-analytics.cjs'
       - 'tests/study-os-learning-analytics.test.cjs'
+      - 'lib/study-os-legacy-progress-reader.cjs'
+      - 'tests/study-os-legacy-progress-reader.test.cjs'
       - 'vocabloom/study-decks.json'
       - 'acc.html'
       - 'eco.html'
@@ -48,4 +52,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run static home checks
-        run: node --test tests/study-os-home.test.cjs tests/study-os-academic-content.test.cjs tests/study-os-content-audit.test.cjs tests/study-os-learning-analytics.test.cjs
+        run: node --test tests/study-os-home.test.cjs tests/study-os-academic-content.test.cjs tests/study-os-content-audit.test.cjs tests/study-os-learning-analytics.test.cjs tests/study-os-legacy-progress-reader.test.cjs
