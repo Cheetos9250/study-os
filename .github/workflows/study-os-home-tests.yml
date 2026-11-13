@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - 'index.html'
+      - 'course-metadata-draft.html'
+      - 'lib/study-os-course-metadata*.js'
+      - 'lib/study-os-course-metadata-store.cjs'
+      - 'tests/study-os-course-metadata*.test.cjs'
+      - 'scripts/study-os-course-metadata-browser.cjs'
       - 'lib/study-os-planner*.js'
       - 'tests/study-os-planner.test.cjs'
       - 'lib/study-os-plan-discovery.cjs'
@@ -35,6 +40,11 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'course-metadata-draft.html'
+      - 'lib/study-os-course-metadata*.js'
+      - 'lib/study-os-course-metadata-store.cjs'
+      - 'tests/study-os-course-metadata*.test.cjs'
+      - 'scripts/study-os-course-metadata-browser.cjs'
       - 'lib/study-os-planner*.js'
       - 'tests/study-os-planner.test.cjs'
       - 'lib/study-os-plan-discovery.cjs'
