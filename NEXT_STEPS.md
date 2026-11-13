@@ -26,5 +26,5 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 ## Current handoff
 - QS-6-2/final-line/reveal work: branch `feat/textbook-money-answer-check-20261113`, PR #67, code commit `44364bf`. CI 43457836485 passed all 13 synthetic browser scenarios plus 225 Node / 3 Python tests; full Node/icon CI 43457836637 passed. Release state must be checked on the PR.
 - Live Worker content checks are blocked by HTTP 403 (`1010` response on `/quiz`) from this environment; do not label live APIs verified. Cloudflare Cron/source/KV need an authorized connector/session.
-- Next infrastructure action: reconcile the existing Notion exporter safety drafts #39/#50 and review their failure/pagination behavior without dispatching sync or editing production data.
+- Notion safety drafts #39/#50 apply together cleanly on main `8334892`; disposable combined tests passed 5 workflow checks / 6 Python fixtures. Next: verify Actions permission for draft-PR creation and review invalid-pagination/Verified filtering evidence before a separately authorized automation release. Do not dispatch sync or edit production data as QA.
 - Next grading action: obtain/review source questions and expected results for additional exercises; no verified bulk answer key is present. Never advertise all 403 as automatically graded.
