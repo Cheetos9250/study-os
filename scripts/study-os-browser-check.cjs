@@ -35,6 +35,21 @@ async function main() {
             page.on("pageerror", error => errors.push(error.message));
             await page.goto(base);
             assert.equal(await page.locator('[data-course]').count(),3);
+            // Course search is a read-only view filter across Thai/English names.
+            const courseSearch = page.locator("#course-search");
+            await courseSearch.fill("บัญชี");
+            assert.equal(await page.locator('[data-course]:visible').count(),1);
+            assert.equal(await page.locator('[data-course="acc"]').isVisible(),true);
+            assert.match(await page.locator("#course-search-status").innerText(),/แสดง 1 จาก 3 วิชา/);
+            await courseSearch.fill("ECONOMICS");
+            assert.equal(await page.locator('[data-course]:visible').count(),1);
+            assert.equal(await page.locator('[data-course="eco"]').isVisible(),true);
+            await courseSearch.fill("not-a-course");
+            assert.equal(await page.locator('[data-course]:visible').count(),0);
+            assert.match(await page.locator("#course-search-status").innerText(),/ไม่พบรายวิชา/);
+            await courseSearch.fill("");
+            assert.equal(await page.locator('[data-course]:visible').count(),3);
+            assert.equal(await page.locator('[data-course="math"]').getAttribute("href"),"math.html");
             await page.locator("#read-progress").click();
             assert.match(await page.locator("#progress-results").innerText(),/ยังไม่มีข้อมูล/);
             assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true,`${engine} ${width} overflow`);
