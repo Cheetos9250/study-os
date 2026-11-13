@@ -94,10 +94,12 @@ def run_case(browser, engine, tablet):
     page.get_by_role("button", name="Retry mistakes (1)").click()
     retry = page.evaluate("uPracticeQuestions(uDeck('eng'))")
     assert retry == [first], "Retry must preserve exact mistaken prompt/options only"
+    assert page.evaluate("document.activeElement?.id === 'u-practice-question'"), "Retry should focus its first question"
     assert page.locator("#u-practice-question").inner_text() == first["q"]
     assert page.get_by_role("button", name="Retry mistakes (0)").is_disabled()
     page.get_by_role("button", name="New set", exact=True).click()
     assert page.evaluate("uPracticeQuestions(uDeck('eng')).length") == 10
+    assert page.evaluate("document.activeElement?.id === 'u-practice-question'"), "New set should focus its first question"
     page.locator('[data-action="u-cat"][data-cat="e1"]').click()
     assert page.evaluate("uPracticeQuestions(uDeck('eng')).every(q=>q.cat==='e1')")
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Practice changed persistent storage"
