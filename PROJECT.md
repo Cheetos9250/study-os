@@ -22,3 +22,6 @@ Read `PROGRESS.md` for code release SHAs and CI runs, and `NEXT_STEPS.md` for re
 
 ## Reviewed textbook answer checks
 The reader has a released local final-quantity checker for QS-6-1 (PR #66). A monetary-answer expansion for QS-6-2 is under review (2/403 questions total). It compares a final numeric answer with a reviewed calculation and explains the result. The expansion accepts an explicit final-answer line after saved working and offers a reviewed-answer reveal. It does not grade written reasoning, journal entries or unsupported questions, and does not change completion status. No answer/PDF upload or new storage key is involved.
+
+## Frontend release authorization
+The owner authorized completed, tested Study OS website changes to be merged and published without asking for release approval again (2026-11-13, Asia/Bangkok). Check the exact PR head, relevant CI, screenshots and live published files. Preserve existing user data and keep PR #44/its branch untouched. This standing frontend authorization does not authorize production database mutations, real-data deletion, backend/cloud migration or changing production sync automation; those retain their separate approval gates.
