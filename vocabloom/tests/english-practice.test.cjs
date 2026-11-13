@@ -353,3 +353,31 @@ test('Practice Listen safely no-ops when speech synthesis is unavailable',()=>{
  assert.equal(out.answers,0);
  assert.match(out.html,/disabled title="Speech unavailable on this device"/);
 });
+
+
+test('Source-example Listen is gated by answered status and speaks only frozen supplied text',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const source=[
+  "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0,tab:'practice'};",
+  "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4],ref:x[3]}));const uDeck=()=>deck;",
+  "const localStorage={getItem(){throw Error('Unexpected read')},setItem(){throw Error('Unexpected write')}};",
+  "const h=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');",
+  "const ui={page:'studymerge'},render=()=>{throw Error('Audio must not rerender')};",
+  "const utterances=[];const window={speechSynthesis:{cancel(){},speak(v){utterances.push(v.text)}},SpeechSynthesisUtterance:function(text){this.text=text;this.lang='';this.rate=1;}};",
+  pure,actions,
+  "const q=uPracticeQuestions(deck)[0];q.context={example:'They adapted quickly.',translation:'พวกเขาปรับตัวอย่างรวดเร็ว'};",
+  "const before=uPracticeHTML(deck);uAction({dataset:{action:'u-practice-example-speak'}});const preAnswer=utterances.length;",
+  "USTATE.practiceAnswers[q.id]=q.right;const after=uPracticeHTML(deck);uAction({dataset:{action:'u-practice-example-speak'}});",
+  "const played=utterances.slice();q.context.example='';const empty=uPracticeHTML(deck);uAction({dataset:{action:'u-practice-example-speak'}});",
+  "return {preAnswer,played,after,before,empty,afterEmpty:utterances.length,answers:USTATE.practiceAnswers};"
+ ].join('\n');
+ const result=new Function('deck',source)(deck);
+ assert.equal(result.preAnswer,0,'Forged pre-answer click must never reveal source audio');
+ assert.deepEqual(result.played,['They adapted quickly.']);
+ assert.match(result.after,/data-action="u-practice-example-speak"/);
+ assert.match(result.after,/aria-label="Hear source example pronunciation"/);
+ assert.doesNotMatch(result.before,/data-action="u-practice-example-speak"/);
+ assert.doesNotMatch(result.empty,/data-action="u-practice-example-speak"/);
+ assert.equal(result.afterEmpty,1);
+ assert.equal(Object.keys(result.answers).length,1);
+});
