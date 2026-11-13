@@ -458,3 +458,34 @@ test('Incomplete browser speech interface disables Listen and never throws',()=>
  assert.equal(out.spoken,false);
  assert.match(out.html,/disabled title="Speech unavailable on this device"/);
 });
+
+
+test('Keyboard 1–4 answers only active unanswered Practice and ignores editable fields or modifiers',()=>{
+ const fn=extract('function uPracticeKeydown(event){','function uInstall(){');
+ const ui={page:'studymerge'},state={tab:'practice',quizIndex:0,practiceAnswers:{}},calls=[];
+ const q={id:'practice-demo',opts:['หนึ่ง','สอง','สาม','สี่'],right:2};
+ const keydown=new Function('ui','USTATE','uDeck','UACTIVE_LANGUAGE','uPracticeQuestions','uAction',
+  fn+'return uPracticeKeydown;')(ui,state,()=>({key:'eng'}),'eng',()=>[q],el=>calls.push(el.dataset.answer));
+ const fire=(key,overrides={})=>{
+  let stopped=false;
+  const event={key,defaultPrevented:false,isComposing:false,repeat:false,ctrlKey:false,altKey:false,
+   metaKey:false,shiftKey:false,target:{closest:()=>null},preventDefault(){stopped=true},...overrides};
+  keydown(event);return stopped;
+ };
+ assert.equal(fire('3'),true);
+ assert.deepEqual(calls,['2']);
+ for(const key of ['0','5','a','ArrowRight'])assert.equal(fire(key),false);
+ for(const modifier of ['ctrlKey','altKey','metaKey','shiftKey','repeat','isComposing','defaultPrevented'])
+  assert.equal(fire('2',{[modifier]:true}),false,modifier);
+ assert.equal(fire('2',{target:{closest:()=>({tagName:'INPUT'})}}),false);
+ assert.deepEqual(calls,['2']);
+ state.practiceAnswers[q.id]=q.right;
+ assert.equal(fire('1'),false,'Already answered question must not be overwritten');
+ state.practiceAnswers={};state.tab='cards';
+ assert.equal(fire('4'),false,'Shortcuts must not affect flashcards');
+ state.tab='practice';ui.page='home';
+ assert.equal(fire('4'),false,'Shortcuts must not affect other pages');
+ assert.deepEqual(calls,['2']);
+ assert.match(src,/document\.addEventListener\('keydown',uPracticeKeydown\)/);
+ assert.match(src,/Keyboard: press 1–4 to choose an answer/);
+});
