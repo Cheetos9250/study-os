@@ -142,3 +142,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Oversized/invalid JSON backup guard SHA `743619988c916903d44fc2c74c15924771a3700a` passed [regression 43371443779](https://github.com/Cheetos9250/study-os/actions/runs/43371443779) and [browser 43371443800](https://github.com/Cheetos9250/study-os/actions/runs/43371443800).
 - Fixed post-write render-error cloud UI cache/status rollback at `5555154e547b840b72c6c99a65daeba16141bf9c`; regression harness test at `a535b1babdde470e13ea07dd40a0c89d83df28be`. **New CI pending**; synthetic test only, no production restore.
+
+### CI failure found and corrected — awaiting rerun
+
+- Regression run [43371899898](https://github.com/Cheetos9250/study-os/actions/runs/43371899898) for SHA `a535b1babdde470e13ea07dd40a0c89d83df28be` **failed** 1/243: BR-08 actual Full Backup round-trip. Root cause: the new snapshot called `structuredClone(undefined)` when a legacy test fixture omitted `CLOUD.studyMergedDays`.
+- Corrected snapshot to preserve an undefined cache without cloning it, fix SHA `cc1bcaf9bbdf5c1f584d15b0096d03b652a30f2d`. This is a compatibility correction, not evidence of passing tests. Verify fresh regression and browser CI before release consideration.
