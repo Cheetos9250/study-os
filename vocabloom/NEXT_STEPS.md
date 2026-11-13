@@ -4,9 +4,9 @@ Updated: 2026-11-13
 
 ## Allowed on feature branch without production access
 
-1. Define morphology-aware example eligibility for the nine excluded English entries listed in `CONTINUOUS-AUDIT-2026-11-13.md`; keep `securities filing` partial-headword handling explicit. Preserve imported IDs and do not edit Notion records.
-2. Extend session-only practice with sentence context/explanations after auditing ambiguous senses and distractors. Retry mistakes and cross-chapter duplicate handling are implemented and regression-tested; keep SRS isolation intact.
-3. Extend the existing Chromium/WebKit browser harness with disposable backup/restore and content-refresh interactions. Four desktop/tablet learning flows already pass; physical Safari and live cross-device behavior remain separate.
+1. Review the remaining `securities filing` partial-headword example and evaluate explicit irregular forms only when source examples require them. Bounded regular matching now imports 581 entries with all 573 previous IDs preserved. Do not edit Notion records or invent examples.
+2. Audit ambiguous senses and overlapping Thai distractors before adding new question types. Source example/translation feedback and Retry mistakes are implemented; keep context frozen and SRS isolation intact.
+3. Add browser-level invalid-backup/quota-recovery scenarios where needed; these already have offline function-level coverage. The extended content-refresh and disposable Full Backup/Restore flows passed all four Chromium/WebKit viewport cases in round 2. Physical Safari and live cross-device behavior remain separate gates.
 4. Keep project/architecture/decision/changelog documents and the current evidence in `CONTINUOUS-AUDIT-2026-11-13.md` aligned. Older P0/P1 audits are historical snapshots; do not replace their recorded results with assumptions.
 
 ## Requires a real test environment or user approval

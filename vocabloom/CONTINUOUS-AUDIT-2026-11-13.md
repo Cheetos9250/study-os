@@ -54,3 +54,33 @@ Added `tests/browser_smoke.py` and `.github/workflows/vocabloom-browser-tests.ym
 At code/workflow SHA `17aaf38ada559e4f4ea5849360980fb70ed0f145`, browser run [43360796688](https://github.com/Cheetos9250/study-os/actions/runs/43360796688) and duplicate push run [43360785239](https://github.com/Cheetos9250/study-os/actions/runs/43360785239) completed **success**. Job `131673559726` logs explicitly report four passed cases: Chromium desktop, Chromium tablet, WebKit desktop, WebKit tablet. Each imported 573 English words and reported zero live service requests. Regression run [43360796750](https://github.com/Cheetos9250/study-os/actions/runs/43360796750) also completed **success** at that SHA.
 
 The browser harness exercised actual DOM clicks for wrong/correct answers, Retry mistakes, New set, chapter selection and flashcard rating, verified Practice left browser storage unchanged, and confirmed the synthetic English SRS schedule survived reload while academic fixture records remained unchanged. This is hosted Linux browser emulation using disposable synthetic progress and mocked content/services, **not** physical iPad Safari/VoiceOver or live cross-device/Cloudflare validation. The final documentation commit does not change tested application code or the browser harness.
+
+## Continuous round 2 — English examples, explanations and browser recovery QA
+
+Baseline `fb1caf114cd5bd8dac094fcd9fa5db12994abdbe`; implementation `bd4135fa15dc336910e4f4f77e250288d466b2ef` on the same PR #41 branch. Repository/PR refreshed; no new live Worker/KV/Notion claim is made in this round.
+
+### Import eligibility and preservation
+
+Replaced arbitrary substring eligibility with complete English token sequences. POS is read from the existing source Back field. Regular noun plural and verb inflection rules are bounded; multiword noun phrases vary the last token, and recognized phrasal verbs vary their first token while retaining their particles. `admit` and `flop` have explicitly audited doubled-consonant forms. This is not a general lemmatizer, irregular-verb engine or semantic validator.
+
+Committed export: **573 -> 581 imported words**. Newly accepted: `hollow out`, `modify`, `hinge on`, `ramp up`, `authority`, `edge up`, `account for`, `rally`. Before/after comparison finds **zero lost previous IDs**. `securities filing` remains excluded; its sentence only says `filing`. No content was edited to manufacture a match.
+
+New tests cover positive regular forms, POS restrictions, phrasal-particle preservation, substring false positives (`art` in `quarter`, `port` in `report`), unsupported derivations, malformed doubled forms, case/NFKC matching and canonical IDs. Existing 573 words with legitimate inflected examples remain eligible.
+
+### Practice source context
+
+Added parsing for legacy Thai-labeled examples, pipe-separated examples/translations, and multiline English/Thai examples. Feedback appears only after answering, uses supplied text, includes source metadata when present, and HTML-escapes examples, translations and references. It is part of the existing frozen question snapshot and Retry mistakes reuses it unchanged. It never writes Practice scores or SRS.
+
+### Verification scope
+
+- Local Node regression: **232 passed**, zero failures.
+- Local Python exporter: **3 passed**.
+- Browser harness expanded to perform mocked content/deck refresh during an answered question and verify frozen prompt/options/context, unchanged learner storage after restoring fixtures, Full Backup download, cancelled restore with no writes, and accepted restore from a disposable JSON file after changing a synthetic academic record.
+- Source/data/config/legacy course pages and sync implementation remain outside this implementation diff. No production backup/restore or remote data writes are performed.
+- Hosted browser/CI results are recorded after completion below. The previous round's success does not prove the extended harness passes.
+
+### Round 2 hosted result — verified
+
+At `bd4135fa15dc336910e4f4f77e250288d466b2ef`, [regression 43363405764](https://github.com/Cheetos9250/study-os/actions/runs/43363405764) and [browser 43363405759](https://github.com/Cheetos9250/study-os/actions/runs/43363405759) returned **success**. Browser job `131681983704` logs were inspected: Chromium desktop/tablet and WebKit desktop/tablet each passed, imported **581** words, and reported **0 live service requests**. Each case completed the expanded refresh, backup-download and cancelled/accepted synthetic restore assertions before printing passed.
+
+Final diff checks confirmed no changes in `data/`, `scripts/sync_notion.py`, `unified-progress.js`, `study-decks.json` or any of the five legacy subject pages. No merge, production deployment, live import/restore, Notion/KV/Worker mutation, secret change or Auto Sync activation occurred. Documentation follows this tested implementation without changing its application or test code.

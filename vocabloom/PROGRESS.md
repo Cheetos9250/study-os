@@ -39,3 +39,16 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - **Four browser cases passed**: Chromium and WebKit, each desktop and tablet viewport. Real DOM interaction, practice storage isolation, synthetic SRS persistence after reload, and academic fixture preservation were verified with all services mocked.
 - Tested code/workflow SHA: `17aaf38ada559e4f4ea5849360980fb70ed0f145`. Browser CI: https://github.com/Cheetos9250/study-os/actions/runs/43360796688 ; Node/Python regression CI: https://github.com/Cheetos9250/study-os/actions/runs/43360796750 — both **success**, logs inspected.
 - This closes the hosted browser automation gap only. Physical Safari/VoiceOver, actual production progress and staging CAS persistence remain open release gates. No production release or merge occurred.
+
+## Continuous round 2 — inflected examples and source feedback
+
+- Baseline: `fb1caf114cd5bd8dac094fcd9fa5db12994abdbe`, existing PR #41; implementation `bd4135fa15dc336910e4f4f77e250288d466b2ef`.
+- English importer now checks whole token sequences and POS-guided regular inflections. Eight previously excluded entries are usable, increasing the committed-data import from **573 to 581**. All previous 573 IDs remain present; source examples, source rows and persistent IDs are unchanged. `securities filing` remains excluded because its example omits `securities`.
+- Practice feedback now displays the source example after answering, with a translated example and source label when available. Context is frozen with the question snapshot, escaped for HTML and omitted when not supplied. No generated examples, SRS updates or persistent Practice scores.
+- Local regression: **232 Node tests and 3 Python exporter tests passed**. Hosted Chromium/WebKit coverage now additionally checks source refresh during an active answer and disposable Full Backup/Restore including cancellation. Hosted browser results are verified below.
+
+### Round 2 CI evidence
+
+- Implementation `bd4135fa15dc336910e4f4f77e250288d466b2ef`: regression run https://github.com/Cheetos9250/study-os/actions/runs/43363405764 and browser run https://github.com/Cheetos9250/study-os/actions/runs/43363405759 both completed **success**.
+- Browser job `131681983704` logs show **4 passed** cases (Chromium/WebKit, desktop/tablet), each importing 581 words and reporting zero live service requests. The extended content-refresh and disposable download/cancelled-restore/accepted-restore assertions executed as part of each case.
+- Data/config, five legacy course pages, shared decks, Notion exporter and unified-progress code were unchanged in this round. Hosted browser emulation remains distinct from physical iPad/Safari and actual cross-device KV tests.

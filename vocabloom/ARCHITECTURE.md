@@ -24,3 +24,9 @@ Continue language-only adapters/navigation first. Do not remove academic/Chinese
 ## Browser QA boundary
 
 `tests/browser_smoke.py` creates disposable Chromium/WebKit profiles. A route handler serves app files and the English export from the checked-out tree, blocks external services and all non-GET requests, and checks that Practice leaves persistent storage unchanged. It then exercises a synthetic flashcard schedule and reload without altering academic fixture records. The dedicated CI uses Ubuntu 24.04 with a pinned Playwright dependency; it does not deploy or use application secrets. Tablet emulation is not physical iPad evidence.
+
+## Round 2 eligibility and answer context
+
+The English importer checks complete normalized English token sequences. POS-guided regular noun/verb forms allow reviewed examples with inflections; phrasal-verb particles remain mandatory. General irregular forms and partial-headword matches remain unsupported. Existing imported IDs are derived exactly as before; the original 573-word set is preserved and eight eligible entries are added.
+
+`uPracticeContext` reads supplied examples/translations from the same Back field used for meanings. Frozen question objects now carry that context and their source reference. Answer feedback escapes every text field; no example is synthesized. Context is withheld until the learner answers, then remains stable through source refresh and Retry mistakes.

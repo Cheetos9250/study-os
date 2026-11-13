@@ -6,7 +6,7 @@ English B1–B2 first, multilingual later. Hide academic subjects from VocaBloom
 
 ## 2026-11-13 — Importer translation fields
 
-Verified pipe rows occur as both `meaning | POS | example` and `POS | meaning | example`. Select the Thai-containing field from the first two fields; reject rows without a usable Thai meaning rather than displaying a POS tag. Strip an optional Example prefix. Preserve exact imported word IDs and the existing example eligibility rule.
+Verified pipe rows occur as both `meaning | POS | example` and `POS | meaning | example`. Select the Thai-containing field from the first two fields; reject rows without a usable Thai meaning rather than displaying a POS tag. Strip an optional Example prefix. Preserve exact imported word IDs. The example eligibility rule was subsequently refined in round 2 below.
 
 ## 2026-11-13 — Practice personalization without progress migration
 
@@ -14,8 +14,14 @@ Offer Retry mistakes using only answered incorrect items in the frozen practice 
 
 ## Deferred
 
-Do not relax exact-headword example checks in this patch: inflected examples need a deliberate morphology/content policy. Do not alter production Notion deduplication for multi-sense `rebound` (issue #40), Chinese/Pinyin content, sync endpoints or CAS rollout.
+Do not alter production Notion deduplication for multi-sense `rebound` (issue #40), Chinese/Pinyin content, sync endpoints or CAS rollout. Partial-headword examples and general irregular forms still require a separate policy.
 
-## Proposed next acceptance criteria — example matching (not implemented)
+## Original example matching acceptance criteria (implemented in round 2)
 
-Evaluate whole English tokens rather than arbitrary substring inclusion. Permit explicitly supported inflections (`modify`/`modified`, `rally`/`rallied`, `authority`/`authorities`) and inflect only the verb token in phrasal verbs (`ramp up`/`ramped up`). Tests must reject substring false positives and sentences that omit a required token (`securities filing` versus only `filing`). Preserve source text and existing IDs; report uncertain cases for review rather than inventing examples. This proposal does not authorize production content edits or alter current import eligibility.
+Evaluate whole English tokens rather than arbitrary substring inclusion. Permit explicitly supported inflections (`modify`/`modified`, `rally`/`rallied`, `authority`/`authorities`) and inflect only the verb token in phrasal verbs (`ramp up`/`ramped up`). Tests must reject substring false positives and sentences that omit a required token (`securities filing` versus only `filing`). Preserve source text and existing IDs; report uncertain cases for review rather than inventing examples. This acceptance criterion does not authorize production content edits. Round 2 changes only branch-side import eligibility using the rules below.
+
+## Round 2 — bounded POS-guided matching and supplied feedback
+
+Use whole token sequences and source POS to permit regular plural/conjugated forms. Inflect the first token of recognized phrasal verbs and the last token of other phrases; do not accept missing/reordered particles or arbitrary derivations. Doubled-consonant handling is explicit for audited `admit`/`flop`, rather than guessing word stress. This retains all 573 previous IDs and adds eight reviewed entries; it is not a full morphology engine.
+
+Show only source-supplied examples/translations after a practice answer, frozen with its questions/options and HTML-escaped. Do not invent text, reveal the answer through context before answering, or turn session-only Practice into persisted SRS scoring.
