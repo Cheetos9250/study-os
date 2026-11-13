@@ -1,10 +1,14 @@
 # Next steps
 
-1. Confirm Safari on a physical iPad when available, especially safe-area spacing and the sync settings footer. Automated Chromium coverage does not replace this check.
-2. Check PR #48 for the current read-only backup release evidence. Verify export/download and file selection on physical iPad Safari using the same browser or Home Screen app as study progress.
-3. Check PR #53 for recovery release evidence. Verify backup → restore on a disposable physical iPad profile before using recovery on valuable data. Never overwrite real progress during QA.
+## Highest priority
+1. Rehearse the published backup → file check → restore flow on physical iPad Safari using disposable data. Repeat for Home Screen/PWA context if used. Chromium/WebKit simulations passed but do not establish real-device behavior.
+2. Confirm the actual study browser has a privately saved backup before clearing browser storage or changing devices. The agent has not accessed or backed up real user progress.
+3. Perform a separate read-only audit of the live Cloudflare/Notion/scheduler state and backend source availability before claiming automatic or cross-device protection.
 
-## Release gate for the current fix
-Require successful exact-head CI and inspect 320/390px screenshots. After the authorized UI release, verify live HTML/CSS match tested source. The working-branch PR records the live status, release SHA and deployment run so a later agent can check the current state without repeating a release.
+## Product work
+The basic study, local backup and missing-only recovery workflow is published in PR #53. Keep PR #44 and its branch untouched under the existing instruction; its broader dashboard/planner is separate.
 
-Do not touch PR #44 or write production learning data as part of UI verification.
+## Verification rules
+- Use synthetic data and isolated browser profiles for reset/restore tests.
+- For future UI changes, require relevant exact-head CI, inspect responsive screenshots and verify published files after an authorized release.
+- No production learning-data write, deletion, cloud migration or Notion sync dispatch is part of UI QA.

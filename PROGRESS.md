@@ -19,7 +19,7 @@ This entry covers the course UI work on 2026-11-13, not a complete infrastructur
 - Initial 40-case run passed, but screenshot inspection found the practice tab outside the visible navigation at 320px. Added the layout fix and a visible-tab bounds assertion; final exact-head evidence is tracked in PR #56.
 
 ## Working branch
-`safety/study-progress-restore-missing-only-20261113`
+`docs/study-os-basic-readiness-20261113`
 
 ## Scope boundaries
 PR #44 remains untouched. No Notion sync dispatch, production data changes or backend deployment is included.
@@ -50,3 +50,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 
 - Also added explicit confirmation before clearing course quiz answers; browser checks verify cancel preserves answers, confirmed reset leaves flashcard schedules intact, and a new answer persists after reload.
 - The first integrated browser run timed out navigating to a course in WebKit. Added explicit URL/load waits and failure diagnostics before repeating the full journey suite.
+
+
+## Published basic readiness checkpoint — 2026-11-13
+- Code release: `617b7d79f7de63c988d9da7edad09a8a4ea3c7b6`, PR #53. It includes local backup/recovery, readable file preview, latest-selection protection and confirmation before clearing quiz answers.
+- Exact code-head CI on main: all successful. Pages 43418073049; full Node/icon 43418073485; regression 43418073560; basic/backup 43418073460; recovery 43418073589.
+- Local: 206 Node tests, 3 Python tests and diff checks passed. Chromium/WebKit synthetic evidence covers 28 study/backup/native-recovery journeys plus 12 recovery scenarios (40 total).
+- Live read-only checks: home, five courses, backup, restore and restore JS returned HTTP 200 and matched tested source. No real user progress was exported, reset or restored by the agent.
+- Physical iPad Safari/PWA/Files behavior remains unverified. No automatic cloud backup, production cloud-data recovery or complete Study Planner is claimed.
