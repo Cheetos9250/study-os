@@ -87,3 +87,22 @@ test("academic summaries have valid headings, category references and table rows
     }
   }
 });
+
+
+test("all five legacy course pages retain their existing progress storage namespaces", () => {
+  for (const deck of source.decks) {
+    const html = fs.readFileSync(path.join(root, deck.key + ".html"), "utf8");
+    assert.ok(typeof deck.markKey === "string" && deck.markKey.trim(), deck.key + " missing progress namespace");
+    assert.ok(html.includes(deck.markKey), deck.key + " page no longer references " + deck.markKey);
+  }
+});
+
+test("academic course pages retain their three learning modes", () => {
+  for (const key of ["acc", "eco", "math"]) {
+    const html = fs.readFileSync(path.join(root, key + ".html"), "utf8");
+    for (const tab of ["cards", "sum", "prac"]) {
+      assert.ok(html.includes('data-tab="' + tab + '"'), key + " missing " + tab + " tab");
+      assert.ok(html.includes('id="tab-' + tab + '"'), key + " missing " + tab + " panel");
+    }
+  }
+});
