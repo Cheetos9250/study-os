@@ -1,3 +1,9 @@
+## Accounting textbook full-solution completion (PR #68; not yet published)
+1. **Repair the question catalog before assigning remaining answers.** The automated 403-ID catalog omits printed questions (e.g. QS-1-10, E-1-10, E-1-17) and assigns some Chapter 2 labels/crops to the wrong printed question (QS-2-1..4, E-2-1..4). Audit source pages and preserve/migrate user-local saved answers before renumbering.
+2. **Audit older draft solutions.** 65 draft entries currently exist; 36 added in the latest continuation are source-reviewed, and 29 earlier drafts have not been consistently verified. No draft equals an official answer key or automatic grader.
+3. **Finish coverage in verified batches.** 338 currently indexed question IDs have no draft, plus additional printed questions missing from the catalog. Attach source PDF page(s) and use the `verification` marker only after reading the real question, numbers and figures.
+4. **QA and release gate.** Run exact-head tests and synthetic responsive browser checks, then inspect private PDF crop and saved progress on a disposable physical iPad. Do not merge PR #68 or publish the worked solutions until catalog/source correctness and current-head CI are established. Keep real progress, PDF, Notion, backend and sync safe.
+
 # Next steps
 
 ## Accounting textbook answer coverage (new request, 2026-11-13)
