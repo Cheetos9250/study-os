@@ -181,3 +181,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 ### Correct whitespace assertion semantics
 
 - Whitespace fix passed regression 43378205242 and browser 43378205248. The synthetic assertion accidentally used a double-escaped `\\s` regex, making the normalized uniqueness check weaker than intended. Corrected at SHA `97c93f0435fb2c8de27115351237f28cdb6bd648`; regression 43378451795 and browser 43378451810 pending. No production changes.
+
+### Invisible separator normalization
+
+- Whitespace assertion fix passed regression 43378451795 and browser 43378451810.
+- Strip invisible U+200B–U+200D/U+FEFF before whitespace normalization in English practice deduplication. Final implementation SHA `c0690cf48412017e867af79c89b17477fdbaab6f`, test SHA `8e155a9e54ec8ede3997bc0b5d2eac614f8ca565`. Regression 43379006639 and browser 43379006644 queued. No production access.
