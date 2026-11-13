@@ -28,7 +28,7 @@ test("Language experience is separate but existing links are preserved", () => {
 });
 test("Home uses local academic scripts and preserves progress read-only behavior", () => {
   assert.doesNotMatch(html, /\blocalStorage\b|\bsessionStorage\b|\bfetch\s*\(|\/progress\/|SYNC_KEY|NOTION_TOKEN/i);
-  assert.deepEqual([...html.matchAll(/<script src="([^"]+)" defer><\/script>/g)].map(m => m[1]), ["lib/study-os-legacy-progress-reader.js", "lib/study-os-dashboard.js", "lib/study-os-course-search.js", "lib/study-os-planner.js", "lib/study-os-plan-discovery.js", "lib/study-os-planner-ui.js"]);
+  assert.deepEqual([...html.matchAll(/<script src="([^"]+)" defer><\/script>/g)].map(m => m[1]), ["lib/study-os-legacy-progress-reader.js", "lib/study-os-dashboard.js", "lib/study-os-course-search.js", "lib/study-os-course-metadata.js", "lib/study-os-course-metadata-store.js", "lib/study-os-course-metadata-home.js", "lib/study-os-planner.js", "lib/study-os-plan-discovery.js", "lib/study-os-planner-ui.js"]);
   const discovery = fs.readFileSync(path.join(root, "lib/study-os-plan-discovery.js"), "utf8");
   assert.doesNotMatch(discovery, /localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|setItem|deleteDatabase/);
   const dashboard = fs.readFileSync(path.join(root, "lib/study-os-dashboard.js"), "utf8");
@@ -106,4 +106,18 @@ test("Study Planner warns on navigation only while a form draft is uncommitted",
   assert.match(source,/event\.preventDefault\(\)/);
   assert.match(source,/event\.returnValue=""/);
   assert.match(source,/dirty = false; title\.value = ""/);
+});
+
+test("Course metadata homepage customization is deliberate and read-only",()=>{
+  assert.match(html,/id="course-metadata-apply"[^>]*hidden/);
+  assert.match(html,/id="course-metadata-default"[^>]*hidden/);
+  assert.match(html,/id="course-metadata-status"[^>]*role="status"/);
+  const source=fs.readFileSync(path.join(root,"lib","study-os-course-metadata-home.js"),"utf8");
+  assert.match(source,/load\.addEventListener\("click",async/);
+  assert.match(source,/storage\.openCourseMetadata\(globalThis\.indexedDB\)/);
+  assert.match(source,/model\.normalizeMetadata\(metadata\)/);
+  assert.match(source,/\.textContent=validated\.courses\[id\]\.name/);
+  assert.match(source,/search\.dispatchEvent\(new Event\("input"/);
+  assert.match(source,/client\.close\(\)/);
+  assert.doesNotMatch(source,/\.innerHTML|\.href\s*=|\.dataset\.course\s*=|(?:localStorage|sessionStorage)|fetch\(|XMLHttpRequest|\.save\(|\.reset\(|\.importBackup\(|deleteDatabase\(/);
 });
