@@ -9,7 +9,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
   for(const [name,engine] of Object.entries({chromium,webkit})){
    const browser=await engine.launch();try{
     for(const width of [390,820,1280])for(const course of ['acc','eco','math','eng','zh']){
-     const context=await browser.newContext({viewport:{width,height:1000},acceptDownloads:true});const writes=[],errors=[];
+     const context=await browser.newContext({viewport:{width,height:1000},acceptDownloads:true,reducedMotion:'reduce'});const writes=[],errors=[];
      await context.route('**/*',route=>{const req=route.request();if(req.method()!=='GET')writes.push(req.method());return req.method()==='GET'&&new URL(req.url()).origin===base?route.continue():route.abort();});
      async function checkRecovery(file,payload){
       if(width!==390)return;
@@ -36,7 +36,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
      }
 
      assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),beforeDownload,'export wrote browser data');assert.equal(await page.evaluate(()=>progressWrites.hasPending()),true,'export must not claim local save succeeded');
-     for(const colorScheme of ['light','dark']){await page.emulateMedia({colorScheme});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'warning overflow');const bounds=await page.locator('.course-save-warning').boundingBox();assert.ok(bounds.y>=0&&bounds.y+bounds.height<1000,'warning exceeds viewport');await page.screenshot({path:path.join(output,`${name}-${width}-${course}-${colorScheme}.png`),fullPage:true});}
+     for(const colorScheme of ['light','dark']){await page.emulateMedia({colorScheme});await page.evaluate(()=>window.scrollTo(0,0));await page.waitForFunction(()=>scrollY===0);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'warning overflow');const bounds=await page.locator('.course-save-warning').boundingBox();assert.ok(bounds.y>=0&&bounds.y+bounds.height<1000,'warning exceeds viewport');await page.screenshot({path:path.join(output,`${name}-${width}-${course}-${colorScheme}.png`),fullPage:true});}
      await page.evaluate(()=>{window.blockProgress=false;});await page.locator('.course-save-retry').click();assert.equal(await page.locator('.course-save-warning').isHidden(),true);assert.equal(await page.evaluate(k=>localStorage.getItem(k),srsKey),json.entries[srsKey]);
      let quizValue=null,typingValue=null;
      if(await page.locator('[data-tab="prac"]').isVisible()){
