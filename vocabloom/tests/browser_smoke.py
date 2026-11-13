@@ -84,7 +84,7 @@ def run_case(browser, engine, tablet):
     first_word = page.locator('.word-row').first
     library_word = page.evaluate("allWords()[0].en")
     assert first_word.locator('[data-private-image-pick]').count() == 1
-    first_word.locator('[data-private-image-pick]').click()
+    first_word.locator('.word-thumb[data-private-image-pick]').click()
     page.locator('#voca-private-image-picker').set_input_files(image)
     page.wait_for_function("document.querySelector('.word-row .word-thumb img')?.complete === true")
     assert page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", library_word)
