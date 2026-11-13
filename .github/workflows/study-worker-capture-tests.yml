@@ -1,0 +1,50 @@
+name: Study Worker source recovery safety tests (no Cloudflare access)
+
+on:
+  push:
+    paths:
+      - "scripts/capture-study-worker-source.mjs"
+      - "tests/study-worker-source-capture.test.mjs"
+      - ".github/workflows/study-worker-source-capture.yml"
+      - ".github/workflows/study-worker-capture-tests.yml"
+  pull_request:
+    paths:
+      - "scripts/capture-study-worker-source.mjs"
+      - "tests/study-worker-source-capture.test.mjs"
+      - ".github/workflows/study-worker-source-capture.yml"
+      - ".github/workflows/study-worker-capture-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-source-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test synthetic read-only Cloudflare responses and failure guards
+        run: node --test tests/study-worker-source-capture.test.mjs
+      - name: Verify source capture is manual, default-branch-only and encrypted
+        run: |
+          node --input-type=module -e "
+            import { readFileSync } from 'node:fs';
+            import assert from 'node:assert/strict';
+            const y=readFileSync('.github/workflows/study-worker-source-capture.yml','utf8');
+            const c=readFileSync('scripts/capture-study-worker-source.mjs','utf8');
+            assert.match(y,/workflow_dispatch:/);
+            assert.match(y,/github.ref == 'refs\/heads\/main'/);
+            assert.match(y,/inputs.confirm_readonly == true/);
+            assert.doesNotMatch(y,/^\s+(?:schedule|push|pull_request|pull_request_target):/m);
+            assert.match(y,/permissions:\s+contents: read/);
+            assert.doesNotMatch(y,/(?:wrangler deploy|git push|d1 execute|kv put|npm publish)/);
+            assert.match(y,/gpg --batch --yes --quiet --pinentry-mode loopback --symmetric --cipher-algo AES256 --passphrase-fd 3/);
+            assert.match(y,/cmp --silent/);
+            assert.match(y,/retention-days: 7/);
+            assert.match(c,/method: 'GET'/);
+            assert.doesNotMatch(c,/method: '(?:PUT|POST|PATCH|DELETE)'/);
+          "
