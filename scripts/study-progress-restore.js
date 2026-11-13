@@ -34,6 +34,15 @@
     } else if (key.endsWith("-srs")) {
       if (!object(value.s) || !object(value.m))
         throw new Error("Invalid spaced-repetition data: " + key);
+    } else if (key === "studyos.accounting.textbook.progress.v1") {
+      for (var id of Object.keys(value)) {
+        var record = value[id];
+        if (!id || ["__proto__", "constructor", "prototype"].includes(id) || !object(record) ||
+            (record.status !== undefined && !["new", "doing", "done"].includes(record.status)) ||
+            (record.notes !== undefined && typeof record.notes !== "string") ||
+            (record.updated !== undefined && typeof record.updated !== "string"))
+          throw new Error("Invalid accounting textbook answer data");
+      }
     } else if (key === "vocabloom_mvp_v1") {
       if (!object(value.progress) || !object(value.days) ||
           !Array.isArray(value.custom) || !object(value.settings))

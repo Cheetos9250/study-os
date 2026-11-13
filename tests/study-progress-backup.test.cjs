@@ -77,3 +77,12 @@ test("backup core never writes to browser storage", () => {
   };
   assert.doesNotThrow(() => backup.createSnapshot(store, origin, timestamp));
 });
+
+test("textbook answers join the main backup without PDF caches or credentials", () => {
+  const key='studyos.accounting.textbook.progress.v1';
+  const raw=JSON.stringify({'QS 1-1':{notes:'Dr Cash / Cr Capital\nคำตอบส่วนตัว',status:'doing',updated:'2026-11-13T14:00:00Z'}});
+  const text=backup.createSnapshot(storage({[key]:raw,'study-sync-key':'EXCLUDE_SECRET','studyos-accounting-pdf-v1':'EXCLUDE_PDF'}),origin,timestamp);
+  assert.equal(JSON.parse(text).entries[key],raw);
+  assert.deepEqual(backup.inspectSnapshot(text,origin).keys,[key]);
+  assert.doesNotMatch(text,/EXCLUDE_SECRET|EXCLUDE_PDF/);
+});

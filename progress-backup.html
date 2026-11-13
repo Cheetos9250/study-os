@@ -40,7 +40,7 @@
     <p class="muted">For single-iPad learners · Save a private copy to Files or iCloud Drive</p>
     <div class="panel">
       <h2>1. Download a backup</h2>
-      <p>Back up local quiz and flashcard progress for the five legacy courses and VocaBloom. <strong>Only data saved by this website in this browser context is included.</strong></p>
+      <p>Back up local quiz and flashcard progress for the five courses, VocaBloom learning history, and saved accounting textbook answers. <strong>Only data saved by this website in this browser context is included.</strong></p>
       <p class="notice">Sync keys, passwords, and unrelated browser data are excluded. Nothing is sent to a server.</p>
       <button id="download" type="button">Download backup (.json)</button>
       <p id="status" role="status" aria-live="polite"></p>
@@ -61,11 +61,11 @@
     <div class="panel">
       <h2>Important limitations</h2>
       <p>This is a <strong>read-only backup</strong>, not a restore tool. It does not overwrite your existing progress.</p>
-      <p>This backup excludes <strong>Study Planner</strong> records in IndexedDB and records stored only in Cloudflare or Notion. Export those separately when their tools are available.</p>
+      <p>This backup excludes <strong>Study Planner</strong> records in IndexedDB and records stored only in Cloudflare or Notion. Export those separately when their tools are available. The original textbook PDF is not included; keep your own copy and select it again in the reader when needed.</p>
       <p>Before clearing Safari, changing devices, or upgrading, save and check the file in Files/iCloud Drive. Do not delete your original progress. If you use an iPad Home Screen app, launch this page from that same app: its storage may be separate from Safari.</p>
     </div>
   </main>
-  <script src="scripts/study-progress-backup.js"></script>
+  <script src="scripts/study-progress-backup.js?v=20261113-textbook"></script>
   <script>
     (function(){
       "use strict";

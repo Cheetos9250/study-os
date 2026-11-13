@@ -24,7 +24,7 @@
     Object.keys(COURSES).flatMap(function (course) {
       var mark = COURSES[course];
       return ["study-" + course, mark + "-srs", mark + "-typ"];
-    }).concat(["vocabloom_mvp_v1"])
+    }).concat(["vocabloom_mvp_v1", "studyos.accounting.textbook.progress.v1"])
   );
   var ALLOWED = new Set(KEYS);
 
