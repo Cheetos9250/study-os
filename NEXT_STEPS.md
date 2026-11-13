@@ -193,3 +193,11 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - Remaining release gate: manually run iPad Safari/VoiceOver with a disposable local profile and backup rehearsal. PR #44 remains Draft; no merge, deploy, Notion/Worker/KV/scheduler changes or cloud progress sync without approval.
 
 - Mobile QA follow-up: `a1d98ef` protects draft homepage cards from max-length course names; synthetic browser test `89de60b` checks no implicit refresh, manual readback and 390px overflow. Verify exact-head CI. A successful Node syntax parse is not a substitute for Chromium/WebKit results.
+
+
+## Course metadata homepage CI / manual verification — 2026-11-13
+
+- PR #44 branch now contains working opt-in read-only homepage metadata display and the linked browser-local editor. `6bf155c` adds missing metadata files to the no-deployment CI workflow path filters. `48ffc31` adds Node VM test cases for deliberate load, text/order projection, display-only restore, invalid backup rejection and inaccessible storage.
+- The exact GitHub Actions result has **not been established**: the connector's commit-run listing currently returns empty for new commits. Do not treat the three passing V8 mock-shim checks as GitHub CI, Chromium/WebKit or real iPad evidence.
+- Next: independently verify exact-head static-contract and browser-qa GitHub Actions checks, inspect logs and fix any regression. In a **disposable** browser/iPad profile, test edit → Save → dashboard Apply → reload → Apply → display Reset, search and long Thai/English names, download/restore, VoiceOver, and storage-denial behavior. No real course data should be deleted.
+- Remain Draft until explicit approval and real-device readiness checks; do not merge or deploy production or touch Notion/Worker/KV/cron/CAS.
