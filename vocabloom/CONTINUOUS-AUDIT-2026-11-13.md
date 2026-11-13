@@ -217,3 +217,10 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - Added all-Verified-row comparison between read-only reviewer `thaiMeaning` and live `uPracticeMeaning`, test SHA `c096dec49caaa99b8ead9a8750c5d01be957e9df`. Regression [43381503376](https://github.com/Cheetos9250/study-os/actions/runs/43381503376) **success**; browser [43381503455](https://github.com/Cheetos9250/study-os/actions/runs/43381503455) **queued** at writing time.
 - Earlier audit tests SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00` passed regression and browser. Physical iPad Safari manual checklist was extended at `295fc229acb6ff295b87bef8b680235609c15905`, but remains **not executed**.
 - No merge, deployment or real source/progress mutation. Latest documentation-only workflow status should be checked independently.
+
+### Completed Practice feedback and repeated small-pool variety
+
+- Added local-only `Session complete` notice after answering all frozen Practice questions; perfect and imperfect scores use the existing in-memory answer map, with no SRS/quiz/cloud writes. Node tests and isolated DOM QA cover all answered plus New set reset, preserving localStorage.
+- Implementation/test SHA `dd1cd111e18710390c581ea3922a30a3ba5911fa`; [regression 43382182948](https://github.com/Cheetos9250/study-os/actions/runs/43382182948) **success**; [browser 43382182871](https://github.com/Cheetos9250/study-os/actions/runs/43382182871) **success**.
+- Fixed repeated five/ten-card decks presenting identical distractor arrangements by seeding candidate and option rotation with the session offset's integer ten-step round. Deterministic source-grounded Node tests at SHA `8e3affa83f699309cb06793844e9eb20ee355893` passed [regression 43382305310](https://github.com/Cheetos9250/study-os/actions/runs/43382305310); [browser 43382305336](https://github.com/Cheetos9250/study-os/actions/runs/43382305336) was **in progress** when recorded.
+- Hosted Chromium/WebKit routes block real services; neither code/test change alters Study OS decks, learner keys, backups, endpoints, Notion, Worker/KV or live progress. No merge/deploy.
