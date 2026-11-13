@@ -1,12 +1,12 @@
 # Study OS progress
 
-## Accounting textbook in-page practice reader (2026-11-13; PR pending)
-- Replaced the impractical directory-plus-Drive-link UI with a focused, responsive one-question-at-a-time practice workspace. Chapter/type filters, searchable question list, original question region, answer field, progress status, and previous/next buttons are on the same page.
-- The user supplies the 1,210-page *Fundamental Accounting Principles* PDF once. PDF.js renders the **original printed question directly inside the website**, preserving numbers, tables and diagrams instead of trusting the PDF's corrupted text character map. The PDF is saved into local IndexedDB when browser quota permits and is never copied into the public GitHub repo or uploaded to a backend.
-- 1,361 indexed question headings are mapped to source PDF pages; automated geometry precisely matched 1,316 headings (96.7%). The remaining 45 show their original page as a fallback; use the full-page/next-page controls for continuation. Completeness and precise crop boundaries still need manual textbook audit.
-- Reused `studyos.accounting.textbook.progress.v1` for answer and status continuity. Local progress remains isolated from core subject quizzes; import/export remains compatible with previous JSON progress backups. No cross-device sync was added.
-- Added dedicated static/geometry consistency tests (3 locally passing). Physical iPad Safari, its IndexedDB PDF retention and PDF.js cross-origin script loading require real-device QA. No new backend or credentials.
-
+## Accounting textbook in-page practice reader — chapters 1–9 (2026-11-13; PR #63)
+- Restricted the new in-page textbook reader to exactly **Chapters 1–9**, ending at **Accounting for Receivables**, matching the currently studied course scope. The catalog now contains **403 numbered question references** and **36 section-level metadata references**; none of chapters 10–26 or appendices appear in the interface or published catalog/geometry JSON.
+- Replaced the directory-plus-Drive-link interface with a responsive one-question-at-a-time workspace: chapter/type/search filters, original question image, answer/working field, progress status and previous/next controls on one page.
+- User selects the original, private 1,210-page PDF once on their own iPad; PDF.js renders original printed questions inside Study OS to preserve calculations, tables and diagrams. The source PDF stays browser-local via IndexedDB when storage quotas permit; it is not published or uploaded to GitHub/Cloudflare.
+- **401/403** question headings match automatically cropped geometry; **2/403** use a full source-page fallback. Next-page navigation never crosses beyond the selected chapter boundary; exact crop/question completeness remains unaudited.
+- Reuses `studyos.accounting.textbook.progress.v1`; browser-local answers/progress, backup import/export; no cross-device sync. Existing Accounting course progress and flashcards were not modified.
+- Static tests now assert exactly nine chapters, 403 numbered questions, 401 matched regions, two fallbacks, scope guards, source rendering and privacy. Real iPad Safari rendering and IndexedDB retention still need live-device QA.
 
 ## Accounting textbook exercise index (feature branch, not yet released)
 - Added a source-linked **reference index**, not an unauthorized public copy of the textbook exercises, for *Fundamental Accounting Principles* (24th edition) from the owner's Google Drive.
