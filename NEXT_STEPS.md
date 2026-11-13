@@ -101,3 +101,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Escape-to-clear CI 43374096872 **success**. Pure metadata validator `e169998`, unit tests `9b48fb4`, design update `63fd982`; check [CI 43377242274](https://github.com/Cheetos9250/study-os/actions/runs/43377242274) for the exact model/test checkpoint.
 - Next: design and implement versioned isolated browser-local metadata persistence with explicit Save/Reset and atomic export/import; add concurrency, denied-storage and browser QA before UI integration. Stable course IDs/routes and legacy progress must never be mutated. No production deployment or migration.
+
+## Isolated course metadata store prototype — 2026-11-13
+
+- Pure metadata model CI 43377242274 passed both jobs. Added CommonJS IndexedDB prototype `e4034b3` and isolation tests `46b8cd1`. Check [CI 43378166800](https://github.com/Cheetos9250/study-os/actions/runs/43378166800) before marking the prototype tests verified.
+- Next: browser-exercise the store in isolated Chromium/WebKit profiles (CAS conflict, atomic invalid-import rollback, reset, denied IndexedDB), then adapt to a browser module and add explicit Save/Reset UI with backup flow. Do not expose the feature or migrate data until these checks pass.
