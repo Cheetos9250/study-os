@@ -22,7 +22,9 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
      const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/'+course+'.html',{waitUntil:'domcontentloaded'});await page.locator('.front-t').waitFor();
      const srsKey=await page.evaluate(()=>D.markKey+'-srs'),old=await page.evaluate(k=>localStorage.getItem(k),srsKey);
      await page.evaluate(()=>{localStorage.setItem('study-sync-key','SYNTHETIC-SECRET');const native=Storage.prototype.setItem;window.blockProgress=true;const keys=StudyCourseStorage.courseKeys(D.key,D.markKey);Storage.prototype.setItem=function(key,value){if(window.blockProgress&&keys.includes(key))throw new DOMException('Synthetic quota failure','QuotaExceededError');return native.call(this,key,value);};});
-     await page.locator('.card').click();await page.locator('.rate4 .r3').click();await page.locator('.course-save-warning').waitFor();
+     assert.equal(await page.locator('.card .face.back').isVisible(),false,'unflipped answer must stay hidden');
+     await page.locator('.card').click();assert.equal(await page.locator('.card .face:not(.back)').isVisible(),false,'flipped question must stay hidden');assert.equal(await page.locator('.card .face.back').isVisible(),true);
+     await page.locator('.rate4 .r3').click();await page.locator('.course-save-warning').waitFor();assert.equal(await page.locator('.card .face.back').isVisible(),false,'new card must not show a reversed back face');assert.equal(await page.locator('.card .face:not(.back)').isVisible(),true);
      assert.equal(await page.evaluate(k=>localStorage.getItem(k),srsKey),old,'failed rating changed stored bytes');assert.equal(await page.evaluate(()=>progressWrites.hasPending()),true);
      const beforeDownload=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
      const pending=page.waitForEvent('download');await page.locator('.course-save-download').click();const download=await pending;
