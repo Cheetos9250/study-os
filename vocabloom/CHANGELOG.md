@@ -48,3 +48,7 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — Legacy backup compatibility regression coverage
 
 - Added synthetic Full Restore tests for missing optional day maps, historical sparse daily rows and isolation from malformed cross-device daily counters. No production behavior changed.
+
+## 2026-11-13 — Full Backup malformed-file regression coverage
+
+- Added isolated execution tests confirming oversized files and malformed JSON cannot trigger restore confirmation, local writes or network calls. No application behavior changed.
