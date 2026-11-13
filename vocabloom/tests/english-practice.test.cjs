@@ -227,3 +227,26 @@ test('Ambiguous four-word pool fails closed with an accurate empty-state message
  assert.match(out.html,/non-overlapping Thai meanings/);
  assert.doesNotMatch(out.html,/data-action="u-practice-answer"/);
 });
+
+
+test('Practice session completion appears only after every answer and reports retry count',()=>{
+ const evaluate=new Function('deck',"const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4],ref:x[3]}));const h=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');"+pure+
+ "const questions=uPracticeQuestions(deck),before=uPracticeHTML(deck);for(let i=0;i<questions.length-1;i++)USTATE.practiceAnswers[questions[i].id]=questions[i].right;const partial=uPracticeHTML(deck);const last=questions[questions.length-1];USTATE.practiceAnswers[last.id]=(last.right+1)%4;const finished=uPracticeHTML(deck);USTATE.practiceQuestions=[last];USTATE.practiceAnswers={};const retry=uPracticeHTML(deck);return {total:questions.length,before,partial,finished,retry};");
+ const out=evaluate(deck);
+ assert.equal(out.total,10);
+ assert.doesNotMatch(out.before,/Session complete/);
+ assert.doesNotMatch(out.partial,/Session complete/);
+ assert.match(out.finished,/Session complete/);
+ assert.match(out.finished,/9\/10 correct/);
+ assert.match(out.finished,/1 to review/);
+ assert.match(out.finished,/Use Retry mistakes/);
+ assert.doesNotMatch(out.retry,/Session complete/);
+});
+test('Perfect practice round shows a summary without suggesting mistake review',()=>{
+ const out=new Function('deck',"const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4],ref:x[3]}));const h=x=>String(x);"+pure+
+ "const questions=uPracticeQuestions(deck);for(const q of questions)USTATE.practiceAnswers[q.id]=q.right;return uPracticeHTML(deck);")(deck);
+ assert.match(out,/Session complete/);
+ assert.match(out,/10\/10 correct/);
+ assert.match(out,/0 to review/);
+ assert.match(out,/Use New set/);
+});
