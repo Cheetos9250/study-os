@@ -30,4 +30,4 @@ The owner authorized completed, tested Study OS website changes to be merged and
 The backup file checker supports read-only comparison against this browser's allowlisted saved progress. It distinguishes identical/differing/browser-only/file-only data; it cannot determine which copy is newer or establish that recovery will succeed. Use the same browser context that holds the answers and do not clear originals based only on file-format validation.
 
 ## Course save failures
-The five course pages are being extended with explicit failed-save feedback, user-triggered retry and export of pending in-memory progress through the existing backup format. Progress stays browser-local; downloads and exit prompts are not automatic cloud protection.
+The five course pages now provide explicit failed-save feedback, user-triggered retry and export of pending in-memory progress through the existing backup format (PR #73). Progress stays browser-local; downloads and exit prompts are not automatic cloud protection.

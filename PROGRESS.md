@@ -158,3 +158,12 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Branch: fix/course-progress-save-feedback-20261113. Exact-head CI/PR/release evidence tracked in the corresponding PR.
 
 - If stored data cannot be read/included, draft export falls back to a clearly labelled partial backup containing pending in-memory datasets only. It does not imply that other stored data was backed up.
+
+
+## Published course save-reliability checkpoint — PR #73
+- Released as `f1b4b9622545e7d2f2e5133b0c23414ae071fe0e`, tested PR head `efcb4559a6de2631dfdba4a60b3b8e2b8392ce62`. All exact-main CI succeeded: Pages 43470097860, Node/icon 43470098754, VocaBloom regression 43470098727, basic/backup 43470098900 and course reliability 43470098896.
+- Evidence: 239 Node tests, 3 Python tests; 30 course-save journeys plus 48 existing basic/backup journeys in synthetic Chromium/WebKit. Save journeys cover five courses × 390/820/1280px, light/dark screenshots, quota failure, partial export on blocked reads, explicit retry, reload, and clean-profile recovery of exported files at 390px. No real user progress was used.
+- Screenshot inspection caught reversed inactive card text in WebKit. Explicit CSS visibility now hides the inactive face; tests verify both flip states and the new card after rating. Final WebKit 390px dark screenshot shows the proper question. Screenshots were settled at scroll-top with reduced motion for inspection.
+- Live read-only verification after deployment: all five course HTML pages, versioned guard JS, save CSS and backup JS returned HTTP 200 and exactly matched tested files. Embedded learning content and sync callbacks were preserved.
+- Screenshots/results: https://github.com/Cheetos9250/study-os/actions/runs/43469468689/artifacts/14059384694 . Physical iPad/Files and exit prompts remain outside controlled QA; no guarantee of protection on app termination or automatic cloud sync.
+- No backend deployment, production-data mutation, Notion dispatch or changes to PR #44/#68 branches. Further source/solution work must preserve the new guards and inactive-face rules.
