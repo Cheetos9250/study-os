@@ -121,3 +121,11 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Added `9cf2ed6` browser regression for reset confirmation/cancel, cross-tab stale editor rejection and explicit reload. Verify [CI 43379151530](https://github.com/Cheetos9250/study-os/actions/runs/43379151530); prior draft CI 43378984252 browser job was still in progress at inspection.
 - Next: inspect failed CI logs if any, then test corrupt JSON import rollback and downloadable backup round-trip. Keep draft unlinked and production unchanged.
+
+
+## Corrupt metadata recovery and backup QA — 2026-11-13
+
+- Guard fix f3111b5 plus synthetic corrupt-record test 485c11a passed CI 43379924786 in both jobs. Malformed values must be preserved, not treated as absent.
+- Immediately inspect exact-head static and Chromium/WebKit browser jobs for e41cd69 and later documentation commits. UI download/restore, invalid-import and denied-IndexedDB browser paths have not yet been verified green at the final head.
+- Once green, consider clearer recovery UI for corrupt local metadata, accessible field-error messages and no-JavaScript fallback checks. Keep editor unlinked until explicitly authorized to expose or release.
+- No merge, deploy, Notion/Cloudflare writes, production CAS cutover or real-data restore. Physical iPad Safari and cross-device sync remain release blockers.
