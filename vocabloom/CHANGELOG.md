@@ -97,3 +97,9 @@ All entries below describe an unmerged proposal, not a production release.
 
 - Added an executable full-Verified-export parity check between the semantic-review script and the actual Practice Thai-meaning parser.
 - Updated the unexecuted iPad Safari QA checklist to review explicitly overlapping Thai senses without treating antonyms as translation errors. This does not change release or production state.
+
+## 2026-11-13 — Practice completion and repeat-set variety (unmerged)
+
+- Added a completion notice showing correct/total and missed questions after all current Practice questions are answered, with a reminder to use Retry mistakes or New set.
+- Updated deterministic option rotation by round number so repeated five- and ten-card sets vary answer placement/distractors while preserving learning identities and frozen Retry mistakes.
+- Added Node regressions for partial, imperfect and perfect rounds; five/ten-card replay; and hosted Chromium/WebKit full-session completion without persistent practice writes.
