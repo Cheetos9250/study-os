@@ -173,7 +173,7 @@ test('Practice collapses whitespace-equivalent Thai meanings and headwords befor
 
 test('Invisible Unicode separators cannot create duplicate Thai distractors',()=>{
  const cards=[
-  {cat:'e1',f:'alpha',b:'n | การ พัฒนา',mid:'a'},
+  {cat:'e1',f:'alpha',b:'n | การพัฒนา',mid:'a'},
   {cat:'e1',f:'beta',b:'n | การ\u200Bพัฒนา',mid:'b'},
   {cat:'e1',f:'gamma',b:'n | ความรู้',mid:'c'},
   {cat:'e1',f:'delta',b:'n | ความเข้าใจ',mid:'d'},
