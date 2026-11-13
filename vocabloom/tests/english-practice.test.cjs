@@ -19,6 +19,8 @@ test('Practice meaning extracts both legacy and news vocabulary formats',()=>{
  assert.equal(meaning('แสร้งทำ | v | Example: Children pretend to be artists.'),'แสร้งทำ');
  assert.equal(meaning('ความหลงใหล | n | Example: Art is his passion.'),'ความหลงใหล');
  assert.equal(meaning('n | v | Example: malformed'),'');
+ assert.equal(meaning('n — preservation\nExample: Preservation protects buildings.'),'','English-only multiline text is not a Thai answer');
+ assert.equal(meaning('Example: The company filed a report.\nแปล: บริษัทส่งรายงาน'),'','Example lines are not answer meanings');
  assert.equal(meaning('n — การอนุรักษ์'+String.fromCharCode(10)+'Example: Preservation protects buildings.'),'การอนุรักษ์');
  assert.equal(meaning('**ความผิดพลาด**'+String.fromCharCode(10)+'ชนิดคำ: n.'+String.fromCharCode(10)+'ตัวอย่าง: A mistake.'),'ความผิดพลาด');
 });
