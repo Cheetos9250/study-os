@@ -68,7 +68,7 @@ function uPracticeContext(back){
 }
 // Avoid distractors that repeat any explicit Thai sense in a semicolon/slash/comma list.
 function uPracticeSenses(meaning){
- return String(meaning||'').normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').split(/[,，、;；/]/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+ return String(meaning||'').normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').split(/[,，、;；\/]/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
 }
 function uPracticeSharesSense(a,b){return a.some(x=>b.includes(x));}
 function uPracticeQuestions(d){
