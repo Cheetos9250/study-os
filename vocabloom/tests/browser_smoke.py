@@ -99,6 +99,8 @@ def run_case(browser, engine, tablet):
     page.locator('[data-page="studymerge"]:visible').first.click()
     page.locator('[data-action="u-tab"][data-tab="cards"]').click()
     image_word = page.evaluate("uCurrent(uDeck('eng')).f")
+    # Reload can refresh legitimate cached exports; compare only within this image-only flow.
+    before_card_image_storage = page.evaluate("JSON.stringify({...localStorage})")
     assert page.locator('.voca-integrated-photo').count() == 1
     page.locator('[data-private-image-pick]').first.click()
     page.locator('#voca-private-image-picker').set_input_files(image)
@@ -112,7 +114,7 @@ def run_case(browser, engine, tablet):
     page.locator('[data-private-image-remove]').first.click()
     page.wait_for_function("document.querySelector('.voca-integrated-photo img') === null")
     assert not page.evaluate("(word)=>VocaPersonalImages.read(word).then(x=>Boolean(x))", image_word)
-    assert page.evaluate("JSON.stringify({...localStorage})") == pre_image_storage, "Private image controls modified progress/SRS"
+    assert page.evaluate("JSON.stringify({...localStorage})") == before_card_image_storage, "Private image controls modified progress/SRS"
     page.locator('[data-action="u-tab"][data-tab="practice"]').click()
     page.wait_for_selector('[data-action="u-practice-answer"]')
     options = page.locator('[data-action="u-practice-answer"]')
