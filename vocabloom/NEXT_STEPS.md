@@ -19,3 +19,9 @@ Updated: 2026-11-13
 ## Non-negotiable
 
 Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate old progress or expose secrets without explicit authorization. Keep existing `data/config.json` `api` pointing to the original Notion content Worker.
+
+## Follow-up after explicit-sense guard
+
+- Code/test SHA `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7` rejects exact Thai sense collisions in distractors; regression [43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) passed. Verify the final conclusion of browser run [43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) before treating it as a completed browser gate.
+- Evaluate remaining semantic overlap not indicated by comma/semicolon/slash delimiters; do not auto-rewrite Verified source meanings. Check small chapter pools with fewer than four mutually disjoint Thai senses, ensuring a clear empty-state explanation.
+- Physical iPad Safari/VoiceOver, authorized historical backups and staging CAS remain separate unverified release gates. Do not merge/deploy or access production records.
