@@ -302,6 +302,12 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       assert.equal(await mobilePage.evaluate(()=>document.activeElement.id),"name-acc");
       assert.equal(await mobilePage.locator("label").count()>=7,true);
     }finally{await mobile.close();}
+    assert.equal(await draft.locator("#metadata-preview a").count(),3);
+    assert.equal(await draft.locator("#metadata-preview a").first().getAttribute("href"),"acc.html");
+    const homepage=await context.newPage();
+    await homepage.goto(base);
+    assert.equal(await homepage.locator('a[href="course-metadata-draft.html"]').count(),1);
+    assert.equal(await homepage.locator('[data-course="eco"] h3').textContent(),"Economics");
     return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export, denied factory and opt-in editor reload"};
   }finally{await context.close();}
 };
