@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Personal study index for Fundamental Accounting Principles exercises">
+<title>Textbook Exercises · Study OS</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#f7f8fc;--card:#fff;--text:#202445;--muted:#636c84;--line:#e4e7f0;--accent:#5b53d7;--soft:#f0eeff;--good:#23775b;--warn:#a56d16;--shadow:0 4px 24px #20244508}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#16192a;--card:#23283a;--text:#f4f3ff;--muted:#bbc0d6;--line:#45495e;--accent:#c4bfff;--soft:#353453;--good:#82d8b4;--warn:#f4bf75;--shadow:none}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 'DM Sans',system-ui,sans-serif}button,input,select,textarea{font:inherit}
+a{color:var(--accent)}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{max-width:1100px;margin:0 auto;padding:clamp(18px,4vw,42px) max(16px,env(safe-area-inset-right)) 80px max(16px,env(safe-area-inset-left))}
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:20px}
+.brand{font:800 22px 'Outfit',system-ui}.brand span{color:var(--accent)}.back{border:1px solid var(--line);padding:7px 13px;border-radius:10px;background:var(--card);text-decoration:none;font-weight:700}
+h1,h2,h3{font-family:'Outfit',system-ui;line-height:1.25}h1{font-size:clamp(30px,5vw,44px);margin:7px 0 10px}h2{font-size:21px;margin:0 0 12px}h3{font-size:17px;margin:0 0 9px}.eyebrow{color:var(--accent);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}.intro{margin:32px 0 24px}.intro p{color:var(--muted);max-width:850px;margin:8px 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0}.stat{padding:17px;border:1px solid var(--line);background:var(--card);border-radius:14px;box-shadow:var(--shadow)}.stat b{font:700 27px 'Outfit',sans-serif;display:block}.stat small{color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:18px 0;box-shadow:var(--shadow)}
+.controls{display:grid;grid-template-columns:2fr 1.25fr 1.2fr 1fr;gap:11px;align-items:end}.field label{display:block;color:var(--muted);font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:10px 12px;border-radius:9px;min-height:46px}
+.note{font-size:13px;color:var(--muted);margin:12px 0}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:9px;padding:8px 13px;font-weight:700}.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg)}.btn:hover{border-color:var(--accent)}
+.resultbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin:22px 0 14px}.resultbar strong{font-size:16px}.resultbar span{color:var(--muted);font-size:14px}
+.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.item{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:19px;min-width:0;box-shadow:var(--shadow)}.meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;color:var(--muted)}.tag{background:var(--soft);color:var(--accent);padding:3px 9px;border-radius:7px;font-weight:800}.code{font-size:13px;color:var(--muted);font-weight:700}.item p{margin:8px 0 14px;min-height:34px;color:var(--muted);font-size:14px}.foot{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.foot a{font-weight:700;font-size:14px}.foot select{margin-left:auto;min-height:39px;border:1px solid var(--line);border-radius:8px;padding:6px;background:var(--bg);color:var(--text)}
+.details{margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}summary{font-size:13px;color:var(--accent);cursor:pointer;font-weight:700}.details textarea{resize:vertical;display:block;margin-top:10px;width:100%;min-height:80px;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:9px;padding:10px}.saved{color:var(--good);font-size:12px}
+.pagination{display:flex;justify-content:center;align-items:center;gap:13px;margin:23px 0}.subtle{color:var(--muted);font-size:14px}.warning{border-left:4px solid var(--warn);background:var(--card);border-radius:8px;padding:13px 17px;color:var(--muted);font-size:14px}.warning strong{color:var(--text)}
+#upload{display:none}#error{color:#c23628;font-weight:700}#empty{padding:32px;text-align:center;color:var(--muted);background:var(--card);border-radius:12px}
+@media(max-width:830px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.results{grid-template-columns:1fr}}
+@media(max-width:520px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.controls{grid-template-columns:1fr}.item{padding:16px}.foot select{margin-left:0;width:100%}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body><main>
+<header><div class="brand">Study <span>OS</span></div><nav><a class="back" href="acc.html">← Accounting</a> <a class="back" href="index.html">Home</a></nav></header>
+<section class="intro"><div class="eyebrow">Accounting · Source-linked practice</div><h1>Textbook Exercises</h1>
+<p>Browse question numbers from <em>Fundamental Accounting Principles, 24th Edition</em> (Wild &amp; Shaw). Find an exercise, open your own textbook at the listed PDF page, and track your progress.</p></section>
+<div class="stats" aria-live="polite"><div class="stat"><b id="total">—</b><small>Indexed question headings</small></div><div class="stat"><b id="completed">—</b><small>Completed</small></div><div class="stat"><b id="working">—</b><small>In progress</small></div><div class="stat"><b id="chapters">—</b><small>Chapters &amp; appendices</small></div></div>
+<div class="warning"><strong>Source and access:</strong> The full questions and any diagrams remain inside your original PDF in Google Drive. This page stores only a study index and your answers/notes locally in this browser; it does not republish the textbook or automatically sync across devices. PDF page numbers refer to the 1,210-page file, not the printed textbook pagination. Automated indexing may contain missing or misread headings; always verify against the source.</div>
+<section class="panel" aria-labelledby="filters-heading"><h2 id="filters-heading">Find a question</h2><div class="controls">
+<div class="field"><label for="search">Search code or topic</label><input id="search" type="search" placeholder="e.g. 6-2B, FIFO, journal"></div>
+<div class="field"><label for="chapter">Chapter</label><select id="chapter"><option value="">All chapters</option></select></div>
+<div class="field"><label for="kind">Question type</label><select id="kind"><option value="">All types</option></select></div>
+<div class="field"><label for="status">Your status</label><select id="status"><option value="">All statuses</option><option value="new">Not started</option><option value="doing">In progress</option><option value="done">Completed</option></select></div>
+</div><div class="actions"><button class="btn" id="export" type="button">Export progress (JSON)</button><button class="btn" id="import" type="button">Import progress (JSON)</button><input type="file" accept=".json,application/json" id="upload"><a class="btn" id="source" target="_blank" rel="noopener noreferrer" href="https://drive.google.com/file/d/16fpKAjVF_liByv5WjrN9luJDAlL_FYaN/view">Open original PDF ↗</a></div><p class="note">Export your progress regularly, especially before clearing Safari data or switching devices. Imported progress replaces only this textbook's saved statuses and notes.</p><p id="error" role="alert" hidden></p></section>
+<div class="resultbar"><strong id="results-heading">Loading exercise index…</strong><span id="pageinfo"></span></div>
+<section class="results" id="results" aria-labelledby="results-heading"></section><p id="empty" hidden>No matching questions. Try another chapter, topic, or status.</p>
+<div class="pagination"><button class="btn" id="prev" type="button">Previous</button><span class="subtle" id="pager"></span><button class="btn" id="next" type="button">Next</button></div>
+<footer class="subtle">Study OS · Private browser progress · Source: Wild &amp; Shaw, McGraw-Hill Education (2019)</footer>
+</main><script>
+'use strict';
+const DB_KEY='studyos.accounting.textbook.progress.v1',PAGE_SIZE=24;
+const $=id=>document.getElementById(id);
+let catalog=null, progress={},offset=0,filtered=[];
+const allowed=new Set(['new','doing','done']);
+try{const x=JSON.parse(localStorage.getItem(DB_KEY)||'{}');if(x&&typeof x==='object'&&!Array.isArray(x))progress=x;}catch{}
+function showError(message){$('error').hidden=!message;$('error').textContent=message||''}
+function persist(){try{localStorage.setItem(DB_KEY,JSON.stringify(progress));return true;}catch{showError('Could not save in this browser. Export your data and check storage availability.');return false}}
+function statusOf(id){return allowed.has(progress[id]?.status)?progress[id].status:'new'}
+function refreshStats(){const items=catalog?.items.filter(x=>!x.sectionOnly)||[];$('total').textContent=items.length.toLocaleString();$('chapters').textContent=catalog?.chapters.length||'—';$('completed').textContent=items.filter(x=>statusOf(x.id)==='done').length.toLocaleString();$('working').textContent=items.filter(x=>statusOf(x.id)==='doing').length.toLocaleString()}
+function buildFilters(){for(const ch of catalog.chapters){let opt=new Option(ch.chapter+' · '+ch.name+' ('+ch.count+')',ch.chapter);$('chapter').add(opt)}for(const type of [...new Set(catalog.items.map(x=>x.type))])$('kind').add(new Option(type,type))}
+function fill(){const q=$('search').value.trim().toLowerCase(),ch=$('chapter').value,kind=$('kind').value,status=$('status').value;
+filtered=catalog.items.filter(x=>(!ch||x.chapter===ch)&&(!kind||x.type===kind)&&(!status||statusOf(x.id)===status)&&(!q||[x.id,x.title,x.type,catalog.chapters.find(c=>c.chapter===x.chapter)?.name||''].some(z=>String(z).toLowerCase().includes(q))));offset=0;render()}
+function span(tag,className,text){const x=document.createElement(tag);if(className)x.className=className;x.textContent=text;return x}
+function render(){const box=$('results');box.replaceChildren();$('results-heading').textContent=filtered.length.toLocaleString()+' matching entries';const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE)),current=Math.floor(offset/PAGE_SIZE)+1;
+$('pageinfo').textContent='Showing '+(filtered.length?offset+1:0)+'–'+Math.min(filtered.length,offset+PAGE_SIZE)+' of '+filtered.length;$('pager').textContent='Page '+current+' of '+totalPages;$('prev').disabled=offset<=0;$('next').disabled=offset+PAGE_SIZE>=filtered.length;$('empty').hidden=filtered.length!==0;
+for(const item of filtered.slice(offset,offset+PAGE_SIZE)){
+const card=span('article','item','');const meta=span('div','meta','');meta.append(span('span','tag',item.type),span('span','code',item.id),span('span','',item.chapter==='F'?'Appendix F':'Ch. '+item.chapter));card.append(meta);
+card.append(span('h3','',item.title),span('p','',item.sectionOnly?'Section reference — open the PDF for all questions in this section.':'Question details, amounts and supporting figures are in the original PDF.'));
+const foot=span('div','foot','');const link=span('a','',`Open PDF · page ${item.pdfPage} ↗`);link.href=catalog.meta.sourceUrl+'#page='+item.pdfPage;link.target='_blank';link.rel='noopener noreferrer';link.title='The Google Drive viewer may ignore the page fragment. Use the PDF page number shown here.';foot.append(link);
+const select=document.createElement('select');select.setAttribute('aria-label','Progress status for '+item.id);for(const [value,label] of [['new','Not started'],['doing','In progress'],['done','Completed']])select.add(new Option(label,value));select.value=statusOf(item.id);
+select.addEventListener('change',()=>{const prior=progress[item.id]?{...progress[item.id]}:null;const next={...(prior||{}),status:select.value,updated:new Date().toISOString()};progress[item.id]=next;if(!persist()){if(prior)progress[item.id]=prior;else delete progress[item.id];select.value=statusOf(item.id);return}refreshStats();if($('status').value)fill()});foot.append(select);card.append(foot);
+const details=document.createElement('details');details.className='details';details.append(span('summary','','My working notes / answer'));const area=document.createElement('textarea');area.maxLength=5000;area.placeholder='Write your answer or working here…';area.setAttribute('aria-label','Answer notes for '+item.id);area.value=progress[item.id]?.notes||'';
+const saved=span('div','saved','');area.addEventListener('change',()=>{const prior=progress[item.id]?{...progress[item.id]}:null;progress[item.id]={...(prior||{}),notes:area.value,updated:new Date().toISOString()};if(persist()){saved.textContent='Saved on this device';}else{if(prior)progress[item.id]=prior;else delete progress[item.id];saved.textContent='Not saved';}});
+details.append(area,saved);card.append(details);box.append(card)} }
+$('search').addEventListener('input',fill);for(const key of ['chapter','kind','status'])$(key).addEventListener('change',fill);
+$('prev').addEventListener('click',()=>{offset=Math.max(0,offset-PAGE_SIZE);render();$('results-heading').scrollIntoView({block:'start',behavior:'instant'})});$('next').addEventListener('click',()=>{offset+=PAGE_SIZE;render();$('results-heading').scrollIntoView({block:'start',behavior:'instant'})});
+$('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({version:1,book:'Fundamental Accounting Principles 24e',exportedAt:new Date().toISOString(),progress},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='studyos-accounting-textbook-progress.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+$('import').addEventListener('click',()=>$('upload').click());$('upload').addEventListener('change',async()=>{const file=$('upload').files[0];$('upload').value='';if(!file||!catalog)return;try{if(file.size>8e6)throw new Error('Progress file is too large.');const data=JSON.parse(await file.text());if(data.version!==1||data.book!=='Fundamental Accounting Principles 24e'||!data.progress||typeof data.progress!=='object'||Array.isArray(data.progress))throw new Error('Not a matching Study OS textbook progress backup.');const ids=new Set(catalog.items.map(x=>x.id)),next={};for(const [k,v] of Object.entries(data.progress)){if(!ids.has(k)||!v||typeof v!=='object'||Array.isArray(v))continue;next[k]={status:allowed.has(v.status)?v.status:'new',notes:String(v.notes||'').slice(0,5000),updated:String(v.updated||'')};}if(!confirm('Replace existing textbook progress with '+Object.keys(next).length+' entries from this backup?'))return;const prior=progress;progress=next;if(!persist()){progress=prior;return}showError('');refreshStats();fill()}catch(e){showError(e.message||'Could not import this file.')}});
+(async()=>{try{const response=await fetch('data/accounting-textbook-index.json',{cache:'no-cache'});if(!response.ok)throw new Error('Exercise data is unavailable.');const data=await response.json();if(!Array.isArray(data.items)||!Array.isArray(data.chapters)||!data.meta?.sourceUrl)throw new Error('Exercise data has an invalid format.');catalog=data;buildFilters();refreshStats();fill()}catch(e){$('results-heading').textContent='Exercise index unavailable';showError(e.message||'Could not load exercise data.')}})();
+</script></body></html>
