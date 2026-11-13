@@ -165,6 +165,12 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     });
     await draft.locator("#metadata-status").filter({hasText:"นำเข้าไม่ได้"}).waitFor();
     assert.equal(await draft.locator("#name-eco").inputValue(),beforeImport);
+    await draft.locator("#metadata-file").setInputFiles({
+      name:"oversized-course-metadata.json",mimeType:"application/json",
+      buffer:Buffer.alloc(65537,32)
+    });
+    await draft.locator("#metadata-status").filter({hasText:"ไฟล์ใหญ่เกินไป"}).waitFor();
+    assert.equal(await draft.locator("#name-eco").inputValue(),beforeImport);
     await draft.locator("#name-acc").fill("บัญชีชั่วคราว");
     await draft.locator("#metadata-form button[type=submit]").click();
     await draft.locator("#metadata-status").filter({hasText:"บันทึกสำเร็จ"}).waitFor();
