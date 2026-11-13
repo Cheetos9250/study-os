@@ -132,3 +132,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Nested browser daily-row rejection passed [43370623091](https://github.com/Cheetos9250/study-os/actions/runs/43370623091) and regression [43370623145](https://github.com/Cheetos9250/study-os/actions/runs/43370623145). Documentation head `55f1d0e4a84f390b353e20113b2cdf68128ef5a5` also passed browser 43370709823 and regression 43370709811.
 - New synthetic tests at `7b7f66a1fc5b40cf4f5ad60fa56920b54ec87076` cover omitted optional daily maps, sparse rows and malformed cross-device data; **new CI unverified** at documentation time. No live user backup read or write.
+
+### Legacy compatibility and malformed file gates
+
+- Legacy backup tests SHA `7b7f66a1fc5b40cf4f5ad60fa56920b54ec87076`: [regression 43371209483](https://github.com/Cheetos9250/study-os/actions/runs/43371209483) and [browser 43371209508](https://github.com/Cheetos9250/study-os/actions/runs/43371209508) **success**.
+- New oversized/invalid-JSON restore execution tests SHA `743619988c916903d44fc2c74c15924771a3700a`; [regression 43371443779](https://github.com/Cheetos9250/study-os/actions/runs/43371443779) and [browser 43371443800](https://github.com/Cheetos9250/study-os/actions/runs/43371443800) **pending** at documentation time. Disposable mock storage only; no live restore.
