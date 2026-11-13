@@ -77,6 +77,12 @@ def run_case(browser, engine, tablet):
     page.wait_for_selector('[data-action="u-practice-answer"]')
     snapshot = page.evaluate("JSON.stringify({...localStorage})")
     first = page.evaluate("uPracticeQuestions(uDeck('eng'))[0]")
+    listen = page.get_by_role("button", name="Hear English word pronunciation")
+    assert listen.is_visible(), "English Practice pronunciation control is missing"
+    assert page.locator("#u-practice-question").get_attribute("lang") == "en"
+    listen.click()
+    assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Listen modified learning storage"
+    assert page.evaluate("Object.keys(USTATE.practiceAnswers).length") == 0, "Listen recorded an answer"
     page.locator(f'[data-action="u-practice-answer"][data-answer="{(first["right"] + 1) % 4}"]').click()
     assert page.evaluate("document.activeElement?.classList.contains('notice')"), "Answer feedback lost keyboard focus"
     assert page.get_by_role("button", name="Retry mistakes (1)").is_enabled()
