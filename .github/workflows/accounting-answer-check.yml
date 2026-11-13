@@ -7,11 +7,16 @@ on:
       - tests/accounting-answer-check*.cjs
       - .github/workflows/accounting-answer-check.yml
   push:
+    branches: [main]
     paths:
       - accounting-textbook.html
       - scripts/accounting-answer-check.js
       - tests/accounting-answer-check*.cjs
       - .github/workflows/accounting-answer-check.yml
+concurrency:
+  group: study-os-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 jobs:

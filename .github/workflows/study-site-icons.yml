@@ -8,12 +8,17 @@ on:
       - tests/study-site-icons.test.cjs
       - .github/workflows/study-site-icons.yml
   push:
+    branches: [main]
     paths:
       - '*.html'
       - assets/favicon.*
       - assets/apple-touch-icon.png
       - tests/study-site-icons.test.cjs
       - .github/workflows/study-site-icons.yml
+concurrency:
+  group: study-os-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 jobs:

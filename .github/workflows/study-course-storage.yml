@@ -1,6 +1,7 @@
 name: Study OS course save reliability
 on:
   push:
+    branches: [main]
     paths:
       - acc.html
       - eco.html
@@ -24,6 +25,10 @@ on:
       - assets/study-course-save.css
       - tests/study-course-storage*.cjs
       - .github/workflows/study-course-storage.yml
+concurrency:
+  group: study-os-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 jobs:
