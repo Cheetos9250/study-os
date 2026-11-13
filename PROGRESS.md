@@ -1,5 +1,15 @@
 # Study OS progress
 
+## Source-reviewed Accounting textbook worked solutions (2026-11-13; feature branch)
+- Source: the owner's private `Acc textbook.pdf` (Wild & Shaw, *Fundamental Accounting Principles*, 24th ed.) verified in Google Drive and visually checked against PDF pages 51–57 and 268. The original PDF and copyrighted question pages were **not** copied to GitHub.
+- Added `data/accounting-textbook-solutions.json` with **24 original worked answers and explanations** tied to existing question IDs: 23 from Chapter 1 and one for QS-6-1. These are source-reviewed worked solutions, **not publisher-verified keys**. The existing deterministic auto-check remains only QS-6-1.
+- Updated `accounting-textbook.html` with a deliberate **Show worked solution** action that is separate from **Check answer** and the user's own notes. Solution text is safely inserted using `textContent`, hidden initially and on navigation, and unavailable questions are explicitly identified. Failed solution fetch does not block the original textbook reader.
+- 403 questions remain indexed; **379 indexed questions still lack a reviewed answer**. The PDF-derived index itself has known possible omissions: e.g. printed QS-1-10 and Exercise 1-10 are missing from the index, so the scope is **not** independently proven complete.
+- Existing user progress keys, status flags, backup/restore contract, PDF import/cache, Notion data, API, VocaBloom, and Cloudflare were **not modified**. Feature branch only; **no merge, production deploy, or live user-data tests**.
+- Automated assertions added for catalog identifiers, PDF-page provenance, 24/403 coverage, and reveal UI. Status of remote CI and physical iPad Safari testing must be recorded separately after checking their actual results.
+- Next: independently verify all worked calculations, audit the printed question list vs the 403-entry index, then continue solving the remaining 379 in reviewed batches before declaring full coverage.
+
+
 ## Accounting textbook reader usability improvements (2026-11-13; PR #64)
 - The reader defaults to all four question types, and its search finds questions by identifier/title across all studied Chapters 1–9 even if another chapter/type is selected (e.g. P-6-2B).
 - Remembers the last question separately from the previous answer/status storage and reopens it after reload.
