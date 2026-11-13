@@ -213,6 +213,23 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.equal(await tab.locator("#plan-view-date").inputValue(),shift(2));
     assert.match(await tab.locator("#plan-list").innerText(),/Upcoming navigation QA/);
     assert.equal(await tab.locator("#plan-list input[type=checkbox]").isChecked(),false);
+    // Explicit completion updates discovery atomically; never count done items as upcoming.
+    await tab.locator("#plan-list input[type=checkbox]").check();
+    await tab.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    await tab.waitForFunction(() => document.querySelector("#plan-discovery")?.textContent?.includes("7 วันข้างหน้า 1 · เสร็จแล้ว 1"));
+    assert.equal(await tab.locator('#plan-discovery-list li[data-plan-group="upcoming"]').count(),1);
+    assert.doesNotMatch(await tab.locator("#plan-discovery-list").textContent(),/Upcoming navigation QA/);
+    await tab.locator("#plan-list input[type=checkbox]").uncheck();
+    await tab.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    await tab.waitForFunction(() => document.querySelector("#plan-discovery")?.textContent?.includes("7 วันข้างหน้า 2 · เสร็จแล้ว 0"));
+    assert.equal(await tab.locator('#plan-discovery-list li[data-plan-group="upcoming"]').count(),2);
+    // Editing the topic refreshes the displayed read-only row, preserving the session identity.
+    await tab.locator("#plan-list button").first().click();
+    await tab.locator("#plan-title").fill("Upcoming edited QA");
+    await tab.locator("#plan-save").click();
+    await tab.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+    await tab.waitForFunction(() => document.querySelector("#plan-discovery-list")?.textContent?.includes("Upcoming edited QA"));
+    assert.doesNotMatch(await tab.locator("#plan-discovery-list").textContent(),/Upcoming navigation QA/);
     await tab.reload();
     await tab.locator("#open-planner").click();
     await tab.locator("#planner-content").waitFor({state:"visible"});
