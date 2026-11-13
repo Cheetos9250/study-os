@@ -250,3 +250,22 @@ test('Perfect practice round shows a summary without suggesting mistake review',
  assert.match(out,/0 to review/);
  assert.match(out,/Use New set/);
 });
+
+
+test('New set varies distractors and option order even for exactly five or ten cards',()=>{
+ const evaluate=new Function('size',"const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{}};const uCards=()=>Array.from({length:size},(_,i)=>({cat:'e1',f:'word'+i,b:'n | ความหมาย'+i,mid:'id'+i}));"+pure+
+ "const first=uPracticeQuestions({key:'eng'});USTATE.practiceOffset+=10;USTATE.practiceQuestions=null;const second=uPracticeQuestions({key:'eng'});return {first,second};");
+ for(const size of [5,10]){
+  const {first,second}=evaluate(size);
+  assert.equal(first.length,size);assert.equal(second.length,size);
+  assert.deepEqual(first.map(q=>q.id),second.map(q=>q.id),'Small pool keeps all cards, not a fabricated new set');
+  assert.ok(first.some((q,i)=>JSON.stringify(q.opts)!==JSON.stringify(second[i].opts)),
+    'New set should change visible choices for '+size+' words');
+  for(const q of [...first,...second]){
+   assert.equal(q.opts.length,4);
+   assert.equal(new Set(q.opts).size,4);
+   assert.equal(q.opts[q.right],'ความหมาย'+q.q.slice(4));
+  }
+ }
+ assert.deepEqual(evaluate(5),evaluate(5),'Same round and source remain deterministic');
+});
