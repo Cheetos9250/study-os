@@ -152,3 +152,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Fix SHA `cc1bcaf9bbdf5c1f584d15b0096d03b652a30f2d` passed [regression 43372068149](https://github.com/Cheetos9250/study-os/actions/runs/43372068149) and [isolated browser 43372068107](https://github.com/Cheetos9250/study-os/actions/runs/43372068107).
 - Extended synthetic failure regression to start with a **populated** cloud merged-day cache and a `synced` status and verify both survive a post-write render failure. Test SHA `3b2ad6d636dafa72816594cc26b6d6841807c35a`; its own CI is pending. No production data accessed.
+
+### English practice meaning fail-closed check
+
+- Cloud cache rollback test `3b2ad6d636dafa72816594cc26b6d6841807c35a` passed regression 43373593892 and browser 43373594003.
+- Added Thai-script requirement for multiline generated practice meanings at `af933c54817bb691ad8df8c73a918e7d2a2ade9d`; tests `7d7355ee6f3de5ecab4a1c685cf74e86ca76feec`. CI pending at documentation time. No changes to production Notion, Worker or KV.
