@@ -170,3 +170,17 @@ test('Practice collapses whitespace-equivalent Thai meanings and headwords befor
  assert.ok(!questions.some(q=>q.q==='beta'||q.q.trim()==='ALPHA'));
  for(const q of questions)assert.equal(new Set(q.opts.map(x=>x.normalize('NFKC').replace(/\s+/g,' ').trim())).size,4);
 });
+
+test('Invisible Unicode separators cannot create duplicate Thai distractors',()=>{
+ const cards=[
+  {cat:'e1',f:'alpha',b:'n | การ พัฒนา',mid:'a'},
+  {cat:'e1',f:'beta',b:'n | การ\u200Bพัฒนา',mid:'b'},
+  {cat:'e1',f:'gamma',b:'n | ความรู้',mid:'c'},
+  {cat:'e1',f:'delta',b:'n | ความเข้าใจ',mid:'d'},
+  {cat:'e1',f:'epsilon',b:'n | ความสำเร็จ',mid:'e'},
+  {cat:'e1',f:'al\u200Bpha',b:'n | ความแตกต่าง',mid:'f'}
+ ];
+ const questions=new Function('cards',`const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null};const uCards=()=>cards;${pure}return uPracticeQuestions({key:'eng'});`)(cards);
+ assert.equal(questions.length,4);
+ assert.ok(!questions.some(q=>q.q==='beta'||q.q.includes('al\u200Bpha')));
+});
