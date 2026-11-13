@@ -148,7 +148,17 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
       await target.locator("#plan-status").filter({hasText:"มีข้อมูลแผนที่ยังไม่บันทึก"}).waitFor();
       assert.equal(await target.locator("#plan-title").inputValue(),"Unsaved import draft");
       await target.locator("#plan-cancel").click();
-      assert.equal(await target.locator("#plan-title").inputValue(),"");
+      await target.waitForFunction(()=>document.getElementById("plan-title").value==="",
+        null,{timeout:5000}).catch(async error=>{
+        const state=await target.evaluate(()=>({
+          title:document.getElementById("plan-title").value,
+          cancelHidden:document.getElementById("plan-cancel").hidden,
+          cancelDisabled:document.getElementById("plan-cancel").disabled,
+          status:document.getElementById("plan-status").textContent,
+          busy:document.getElementById("planner-content").getAttribute("aria-busy")
+        }));
+        throw new Error("Cancel draft did not clear form: "+JSON.stringify({state,error:error.message}));
+      });
       assert.equal(await target.locator("#plan-file").inputValue(),"");
       // Keep this diagnostic until a repeated same-file import has passed in both engines.
       let importDialogSeen=false;
