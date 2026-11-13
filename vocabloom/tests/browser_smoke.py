@@ -84,6 +84,7 @@ def run_case(browser, engine, tablet):
     content["refresh"] = True
     page.evaluate("async()=>{await uBoot()}")
     assert page.evaluate("uPracticeQuestions(uDeck('eng'))[0]") == first, "Refresh changed the active question or source explanation"
+    assert page.evaluate("document.activeElement?.classList.contains('notice')"), "Content refresh lost feedback keyboard focus"
     content["refresh"] = False
     page.evaluate("async()=>{await uBoot()}")
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Refresh changed learner storage after original content was restored"
