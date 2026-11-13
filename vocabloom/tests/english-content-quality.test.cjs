@@ -62,7 +62,7 @@ test('Rotated practice options are distinct after Unicode, invisible-separator a
  const funcs=source.slice(start,end);
  const cards=verified.map(r=>({cat:r.Chapter||'all',f:r.Front,b:r.Back,mid:r.page_id,ref:r.page_id}));
  const make=new Function('cards','offset',`const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:offset,practiceQuestions:null};const uCards=()=>cards;${funcs}return uPracticeQuestions({key:'eng'});`);
- const normalized=x=>x.normalize('NFKC').toLowerCase().replace(/[\\u200B-\\u200D\\uFEFF]/g,'').replace(/\\s+/g,' ').trim();
+ const normalized=x=>x.normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').replace(/\s+/g,' ').trim();
  let checked=0;
  for(let offset=0;offset<Math.min(cards.length,650);offset+=10){
   for(const q of make(cards,offset)){
