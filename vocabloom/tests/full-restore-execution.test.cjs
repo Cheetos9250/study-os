@@ -50,3 +50,22 @@ test('Cloud sync starting during asynchronous backup read prevents restore',asyn
  assert.equal(r.calls.confirm,0);assert.equal(r.calls.writes,0);assert.deepEqual(r.store,r.original);
  assert.ok(r.calls.notice.some(x=>x.error));
 });
+
+test('Same-device daily counters reject arrays, null and scalar values before confirmation',async()=>{
+ for(const key of ['deviceDays','studyDays']){
+  for(const value of [[],null,17,'invalid']){
+   const p=valid();p.deviceId='local-device';p[key]=value;
+   const r=await simulate(p);
+   assert.equal(r.calls.confirm,0,key+' must fail before confirmation');
+   assert.equal(r.calls.writes,0,key+' must not write');
+   assert.deepEqual(r.store,r.original);
+  }
+ }
+});
+test('Cross-device daily counters are ignored even when source contains malformed values',async()=>{
+ const p=valid();p.deviceDays=[];p.studyDays='invalid';
+ const r=await simulate(p);
+ assert.equal(r.calls.confirm,1);
+ assert.deepEqual(JSON.parse(r.store['local-days']),{});
+ assert.deepEqual(JSON.parse(r.store['study-days']),{});
+});
