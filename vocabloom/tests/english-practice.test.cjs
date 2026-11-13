@@ -90,7 +90,7 @@ const q=uPracticeQuestions(deck)[0];uAction({dataset:{action:'u-practice-answer'
 });
 
 test('Practice HTML escapes malicious vocabulary and option strings',()=>{
- const html=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all'};const uCards=()=>[{cat:'e1',f:'<img src=x onerror=alert(1)>',b:'<script>alert(1)</script>',mid:'bad'},...deck.cards.slice(0,8).map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}))];const h=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');${pure}return uPracticeHTML(deck);`)(deck);
+ const html=new Function('deck',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:0,practiceAnswers:{},practiceQuestions:null,quizIndex:0,cat:'all'};const uCards=()=>[{cat:'e1',f:'<img src=x onerror=alert(1)>',b:'ความหมาย<script>alert(1)</script>',mid:'bad'},...deck.cards.slice(0,8).map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}))];const h=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');${pure}return uPracticeHTML(deck);`)(deck);
  assert.ok(html.includes('&lt;img'));assert.ok(html.includes('&lt;script'));
  assert.ok(!html.includes('<img src=x'));assert.ok(!html.includes('<script>'));
 });
