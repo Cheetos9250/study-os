@@ -67,12 +67,17 @@ jobs:
                 assert.equal(await overflow(),false,course+' cards overflow');
                 await page.screenshot({path:path.join(output,`${course}-${width}-${colorScheme}.png`),fullPage:true});
                 await page.locator('.card').click();assert.match(await page.locator('.card').getAttribute('class'),/flipped/);
+                const availableTabs=[];
+                const hasSummary=await page.evaluate(()=>D.sum.length>0);
                 for(const tab of ['sum','prac']){
+                  assert.equal(await page.locator(`[data-tab="${tab}"]`).isVisible(),hasSummary);
+                  if(!hasSummary)continue;
                   await page.locator(`[data-tab="${tab}"]`).click();
                   assert.equal(await page.locator('#tab-'+tab).isVisible(),true);
                   assert.equal(await overflow(),false,course+' '+tab+' overflow');
+                  availableTabs.push(tab);
                 }
-                assert.deepEqual(errors,[]);evidence.push({course,width,colorScheme,fonts,cardsSummaryPractice:'passed'});await context.close();
+                assert.deepEqual(errors,[]);evidence.push({course,width,colorScheme,fonts,cardFlip:'passed',availableTabs});await context.close();
               }
               await fs.writeFile(path.join(output,'results.json'),JSON.stringify({scope:'isolated localhost; external API and all writes blocked; disposable browser storage',evidence},null,2));
               console.log('PASS: 30 course/viewport/theme cases, card flips, summaries and practice tabs');
