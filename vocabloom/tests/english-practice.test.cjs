@@ -489,3 +489,29 @@ test('Keyboard 1–4 answers only active unanswered Practice and ignores editabl
  assert.match(src,/document\.addEventListener\('keydown',uPracticeKeydown\)/);
  assert.match(src,/Keyboard: press 1–4 to choose an answer/);
 });
+
+
+test('Practice number shortcuts respect open modals and sidebar focus',()=>{
+ const fn=extract('function uPracticeKeydown(event){','function uInstall(){');
+ const ui={page:'studymerge'},state={tab:'practice',quizIndex:0,practiceAnswers:{}},calls=[];
+ const q={id:'practice-demo',opts:['A','B','C','D'],right:0};
+ const inside={closest:()=>null},outside={closest:()=>null};
+ const modal={hidden:false},body={closest:()=>null};
+ const doc={
+  body,documentElement:{},
+  getElementById(id){return id==='modalLayer'?modal:id==='mainContent'?{contains:x=>x===inside}:null;}
+ };
+ const keydown=new Function('document','ui','USTATE','uDeck','UACTIVE_LANGUAGE','uPracticeQuestions','uAction',
+  fn+'return uPracticeKeydown;')(doc,ui,state,()=>({key:'eng'}),'eng',()=>[q],el=>calls.push(el.dataset.answer));
+ const send=target=>{
+  let prevented=false;
+  keydown({key:'1',target,preventDefault(){prevented=true}});
+  return prevented;
+ };
+ assert.equal(send(inside),false,'Visible modal should block shortcuts');
+ modal.hidden=true;
+ assert.equal(send(outside),false,'Sidebar focus must not answer');
+ assert.equal(send(inside),true,'Focus inside Practice should answer');
+ assert.equal(send(body),true,'Unfocused page should allow shortcuts');
+ assert.deepEqual(calls,['0','0']);
+});
