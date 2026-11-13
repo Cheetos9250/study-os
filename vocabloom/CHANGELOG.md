@@ -92,3 +92,8 @@ All entries below describe an unmerged proposal, not a production release.
 
 - Added a read-only CLI to screen committed Verified English translations for possible semantic overlap, plus deterministic tests.
 - Captured a human-review queue of initial candidates in `THAI-DISTRACTOR-REVIEW-2026-11-13.md`. Fuzzy candidates are not automatically removed from practice or treated as translation errors.
+
+## 2026-11-13 — Audit parser parity test and Safari QA checklist
+
+- Added an executable full-Verified-export parity check between the semantic-review script and the actual Practice Thai-meaning parser.
+- Updated the unexecuted iPad Safari QA checklist to review explicitly overlapping Thai senses without treating antonyms as translation errors. This does not change release or production state.
