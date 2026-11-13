@@ -90,3 +90,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Preview names the dataset Accounting textbook answers. Backup/recovery pages explicitly exclude the original PDF; no IndexedDB/PDF, catalog, geometry, reader source or production data changes are included.
 - Synthetic Chromium/WebKit tests save an answer in the actual reader UI without selecting a PDF, reload it, export it through the main backup, recover into a clean browser context, and reopen the reader to verify exact notes/status.
 - Physical iPad/PDF rendering and storage retention are still unverified; this change only covers answer-progress backup.
+
+
+## Local textbook final-answer checking — in review
+- Adds a local Check answer control and deterministic quantity check for QS-6-1 only (1 of 403 indexed questions). The reviewed calculation is 1,300 − 20 + 350 + 80 = 1,710 units, based on the owner's original-question screenshot, not a publisher answer key.
+- Explains ownership, excludes unsaleable damaged units and accepts equivalent whole-number/unit formatting. Working, journal entries and reasoning are not automatically graded. Unsupported questions cannot receive guessed grades.
+- Feedback clears when editing, changing question, finding no results or reloading. Checking saves current notes through the existing path but never marks a question completed or persists a grade. No new storage key, PDF access or upload is added.
+- Local validation: 222 Node tests and 3 Python tests passed; diff and JavaScript syntax checks passed. Synthetic Chromium/WebKit CI covers light/dark at 390/820/1280px, state invalidation, persistence and checker-load failure. CI result pending at initial commit. Physical iPad and PDF rendering remain unverified.
+- Branch: feat/textbook-answer-check-20261113. Production release and PR status must be checked separately; no backend/data changes.
