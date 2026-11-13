@@ -175,3 +175,5 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Local: all five YAML files parsed with PyYAML; compared parsed jobs, permissions, PR paths and manual events to base main and confirmed unchanged. 239 Node tests, 3 Python tests and diff checks passed. No permanent mirror tests added for this configuration-only change.
 - Actual GitHub trigger/cancellation evidence and exact-head CI are tracked on the PR before release. App HTML, language features, learning data and progress storage are unchanged.
 - Branch: chore/study-os-ci-dedup-20261114. Product focus reaffirmed: academic study/shared infrastructure; legacy language regression remains compatibility only.
+
+- Real GitHub observation for PR #75: the branch push produced zero runs before PR creation. Opening the PR produced exactly one pull_request run for each of the five affected workflows (43472558146, 43472558183, 43472558270, 43472558275, 43472558173), without duplicate push runs. A documentation follow-up while those checks are running exercises the superseded-PR cancellation policy; final results and exact head are recorded on PR #75.
