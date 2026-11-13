@@ -45,3 +45,7 @@ Validate nested same-device daily rows before Full Restore writes. Preserve vali
 ## 2026-11-13 — Full Restore failure atomicity
 
 On a failure after local backup writes, restore the cloud UI merged-day cache and remote-status label together with localStorage and in-memory progress. A successful restore still clears the merged-day cache and marks progress as restored locally; this does not trigger cloud sync.
+
+## 2026-11-13 — Avoid explicit duplicate Thai senses in distractors
+
+A read-only audit of 582 Verified English rows identified a source collision: `hinge on` translates to `ขึ้นอยู่กับ`, while `contingent on` includes `ขึ้นอยู่กับ; มีเงื่อนไขว่า`. Whole-string normalization alone can place these ambiguous choices in one question. Reject distractors that repeat an exact punctuation-delimited Thai sense; also keep distractors pairwise disjoint. Preserve complete original source meanings in feedback and skip questions lacking three safe alternatives. This is a conservative ambiguity guard, not a judgment that different-looking translations are semantically distinct.
