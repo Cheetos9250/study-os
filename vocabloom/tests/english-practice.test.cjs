@@ -345,10 +345,11 @@ test('Practice Listen safely no-ops when speech synthesis is unavailable',()=>{
  const source=[
   "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};",
   "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));const uDeck=()=>deck;const window={};",
-  "const localStorage={setItem(){throw Error('Unexpected write')},getItem(){throw Error('Unexpected read')}};",
+  "const localStorage={setItem(){throw Error('Unexpected write')},getItem(){throw Error('Unexpected read')}};const h=x=>String(x);",
   pure,actions,
-  "uAction({dataset:{action:'u-practice-speak'}});return Object.keys(USTATE.practiceAnswers).length;"
+  "const html=uPracticeHTML(deck);uAction({dataset:{action:'u-practice-speak'}});return {answers:Object.keys(USTATE.practiceAnswers).length,html};"
  ].join('\n');
  const out=new Function('deck',source)(deck);
- assert.equal(out,0);
+ assert.equal(out.answers,0);
+ assert.match(out.html,/disabled title="Speech unavailable on this device"/);
 });
