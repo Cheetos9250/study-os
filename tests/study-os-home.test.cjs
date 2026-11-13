@@ -60,3 +60,18 @@ test("Academic course search remains client-only and preserves stable course lin
     assert.match(html,new RegExp('data-course="'+subject+'"[^>]*data-search="[^"]+"[^>]*href="'+subject+'\\.html"'));
   }
 });
+
+test("Planner discovery details navigate by date without mutating stored sessions", () => {
+  assert.match(html,/id="plan-discovery-details"[^>]*class="plan-discovery-details"/);
+  assert.match(html,/id="plan-discovery-list"[^>]*aria-label="รายการงานค้างและแผนถัดไป"/);
+  assert.match(html,/id="plan-list"[^>]*tabindex="-1"/);
+  const script = fs.readFileSync(path.join(root,"lib","study-os-planner-ui.js"),"utf8");
+  const section=script.split('const discoveryList = get("plan-discovery-list");')[1]?.split('if (!api.validDate(view.value))')[0];
+  assert.ok(section, "discovery list renderer must exist");
+  assert.match(section,/discoveryList\.replaceChildren/);
+  assert.match(section,/row\.dataset\.planGroup=group/);
+  assert.match(section,/button\.setAttribute\("aria-label"/);
+  assert.match(section,/get\("plan-list"\)\.focus\(\)/);
+  assert.doesNotMatch(section,/client\.(?:add|update|reset|importBackup)\(/);
+  assert.doesNotMatch(section,/innerHTML/);
+});
