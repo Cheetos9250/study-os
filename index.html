@@ -104,20 +104,22 @@
     <div class="section-head">
       <div><h2 id="courses-title">วิชาของฉัน</h2><p class="sub">Accounting · Economics · Mathematics</p></div>
     </div>
-    <div class="grid">
-      <a class="course acc" data-course="acc" href="acc.html">
+    <div class="plan-tools"><label for="course-search">ค้นหารายวิชา</label><input id="course-search" type="search" placeholder="เช่น Accounting หรือบัญชี" aria-controls="course-list" autocomplete="off"></div>
+    <p id="course-search-status" class="sub" role="status" aria-live="polite">แสดงทั้งหมด 3 วิชา</p>
+    <div class="grid" id="course-list">
+      <a class="course acc" data-course="acc" data-search="accounting บัญชี การบัญชี" href="acc.html">
         <span class="num">COURSE 01</span>
         <h3>Accounting</h3>
         <p>บันทึกรายการ ปรับปรุงบัญชี งบทดลอง งบการเงิน และสินค้าคงเหลือ</p>
         <span class="go">เปิดวิชาบัญชี →</span>
       </a>
-      <a class="course eco" data-course="eco" href="eco.html">
+      <a class="course eco" data-course="eco" data-search="economics เศรษฐศาสตร์" href="eco.html">
         <span class="num">COURSE 02</span>
         <h3>Economics</h3>
         <p>ทบทวนแนวคิดเศรษฐศาสตร์จุลภาคและมหภาค พร้อมแบบฝึกหัด</p>
         <span class="go">เปิดวิชาเศรษฐศาสตร์ →</span>
       </a>
-      <a class="course math" data-course="math" href="math.html">
+      <a class="course math" data-course="math" data-search="mathematics คณิตศาสตร์ math for life" href="math.html">
         <span class="num">COURSE 03</span>
         <h3>Mathematics</h3>
         <p>ทบทวน Math for Life สูตรสำคัญ และฝึกโจทย์คณิตศาสตร์</p>
@@ -150,6 +152,7 @@
 <footer><div class="wrap">Study OS · Academic Learning · ข้อมูลรายวิชาและความคืบหน้าเดิมยังอยู่</div></footer>
 <script src="lib/study-os-legacy-progress-reader.js" defer></script>
 <script src="lib/study-os-dashboard.js" defer></script>
+<script src="lib/study-os-course-search.js" defer></script>
 <script src="lib/study-os-planner.js" defer></script>
 <script src="lib/study-os-plan-discovery.js" defer></script>
 <script src="lib/study-os-planner-ui.js" defer></script>
