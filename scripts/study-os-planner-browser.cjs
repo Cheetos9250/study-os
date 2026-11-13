@@ -147,14 +147,6 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
       await target.locator("#plan-file").setInputFiles(upload(backup));
       await target.locator("#plan-status").filter({hasText:"มีข้อมูลแผนที่ยังไม่บันทึก"}).waitFor();
       assert.equal(await target.locator("#plan-title").inputValue(),"Unsaved import draft");
-      await target.evaluate(()=>{
-        window.__cancelTrace=[];
-        const button=document.getElementById("plan-cancel");
-        for (const type of ["pointerdown","mousedown","mouseup","click"]) {
-          button.addEventListener(type,event=>window.__cancelTrace.push(type+":"+event.target.id),true);
-        }
-        document.addEventListener("click",event=>window.__cancelTrace.push("document:"+event.target.id),true);
-      });
       await target.locator("#plan-cancel").click();
       await target.waitForFunction(()=>document.getElementById("plan-title").value==="",
         null,{timeout:5000}).catch(async error=>{
@@ -164,8 +156,6 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
           cancelDisabled:document.getElementById("plan-cancel").disabled,
           status:document.getElementById("plan-status").textContent,
           busy:document.getElementById("planner-content").getAttribute("aria-busy"),
-          trace:window.__cancelTrace,
-          formCount:document.querySelectorAll("#plan-form").length,
           activeId:document.activeElement.id
         }));
         throw new Error("Cancel draft did not clear form: "+JSON.stringify({state,error:error.message}));
