@@ -179,3 +179,8 @@ Next action: editable academic course metadata while preserving stable subject I
 ## Metadata store browser verification — 2026-11-13
 
 - Added browser-loadable isolated store wrapper (`bf3f525`, `7f549bc`) and dedicated synthetic Chromium/WebKit test (`b9a0bc3`) covering two-tab stale revision rejection, invalid import rollback, export, reset and valid restore. Integrated test in CI browser harness (`46ea370`). CI pending; these are isolated browser profiles, **not** physical iPad Safari or production data. No homepage feature activation.
+
+## Opt-in course metadata editor draft — 2026-11-13
+
+- Verified [CI 43378426163](https://github.com/Cheetos9250/study-os/actions/runs/43378426163) **success** for synthetic Chromium/WebKit metadata CAS/rollback tests.
+- Added **unlinked** `course-metadata-draft.html` (`8a549c6`) and explicit Save/Reset/Import/Export editor (`fec0760`), canonical browser-compatible store `lib/study-os-course-metadata-store.js` (`eee561a`), and browser reload/persistence QA (`ae14471`). Draft opens a separate local IndexedDB database only after user clicks Open. Does not alter homepage, legacy course IDs, planner data, Notion or production. New CI pending; physical iPad Safari unverified.
