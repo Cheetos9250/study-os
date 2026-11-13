@@ -91,3 +91,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - CI 43371919159 passed static-contract/browser-qa after `08f8717`. New browser regression commit `0bd4922` checks Thai/English search, empty state and reset across Chromium/WebKit and four viewports. Verify [CI 43373533213](https://github.com/Cheetos9250/study-os/actions/runs/43373533213) before claiming the new test passes.
 - Editable course metadata remains a design task: preserve `acc/eco/math` IDs and legacy progress keys, use separate local namespace and atomic backup/import, do not migrate or mutate production data without approval.
+
+## Keyboard search and metadata design — 2026-11-13
+
+- Course-search browser regression CI 43373533213 **success**. Escape-to-clear and browser regression commits `d582ecf`, `a75d89b`; verify [CI 43374096872](https://github.com/Cheetos9250/study-os/actions/runs/43374096872).
+- Review `COURSE_METADATA_DESIGN.md` (`dc28c05`) before implementing editable display-only metadata. Preserve IDs/routes and isolate versioned local storage; no production migration or sync.
