@@ -135,3 +135,10 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - CI 43380434836 (44bb56c) and CI 43380640662 (9fdb772) both completed **success**: static Node and synthetic Chromium/WebKit browser checks passed for disabled-JavaScript fallback and safe invalid-metadata warning.
 - Next work: verify that all documentation-only PR head CI checks still pass; review PR #44 for scope creep and legacy progress isolation. Improve manual course editor accessibility and test physical iPad Safari/backup restore before seeking release authorization.
 - Metadata editor is an unlinked draft only; do not assume public deployment, no production CAS cutover, no Notion or KV writes, and no automatic merge.
+
+
+## Verified metadata import/mobile checkpoint — 2026-11-13
+
+- CI 43381126032 passed cross-tab stale-backup conflict protection; 43381245830 passed oversized JSON import rejection; 43381271777 passed mobile 390px dark-mode overflow/focus QA. All are synthetic Chromium/WebKit plus static-contract, not real iPad Safari.
+- Immediate next: inspect exact head after documentation-only changes; perform an independent review of PR #44 and verify physical iPad Safari with an isolated preview (not the production Pages site). Keep the draft metadata editor unlinked.
+- Before any authorized release: independently verify user-owned backup/restore, storage eviction/recovery and production KV/CAS safeguards. No merge/deploy/production write without explicit approval.
