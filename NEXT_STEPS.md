@@ -129,3 +129,9 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - Immediately inspect exact-head static and Chromium/WebKit browser jobs for e41cd69 and later documentation commits. UI download/restore, invalid-import and denied-IndexedDB browser paths have not yet been verified green at the final head.
 - Once green, consider clearer recovery UI for corrupt local metadata, accessible field-error messages and no-JavaScript fallback checks. Keep editor unlinked until explicitly authorized to expose or release.
 - No merge, deploy, Notion/Cloudflare writes, production CAS cutover or real-data restore. Physical iPad Safari and cross-device sync remain release blockers.
+
+## Verified metadata fallback and diagnostics — 2026-11-13
+
+- CI 43380434836 (44bb56c) and CI 43380640662 (9fdb772) both completed **success**: static Node and synthetic Chromium/WebKit browser checks passed for disabled-JavaScript fallback and safe invalid-metadata warning.
+- Next work: verify that all documentation-only PR head CI checks still pass; review PR #44 for scope creep and legacy progress isolation. Improve manual course editor accessibility and test physical iPad Safari/backup restore before seeking release authorization.
+- Metadata editor is an unlinked draft only; do not assume public deployment, no production CAS cutover, no Notion or KV writes, and no automatic merge.
