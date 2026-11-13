@@ -186,3 +186,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Whitespace assertion fix passed regression 43378451795 and browser 43378451810.
 - Strip invisible U+200B–U+200D/U+FEFF before whitespace normalization in English practice deduplication. Final implementation SHA `c0690cf48412017e867af79c89b17477fdbaab6f`, test SHA `8e155a9e54ec8ede3997bc0b5d2eac614f8ca565`. Regression 43379006639 and browser 43379006644 queued. No production access.
+
+### Rotated question normalized uniqueness
+
+- Invisible separator fix passed regression 43379006639 and browser 43379006644.
+- New test SHA `6775d45b667e12298409b3557f9ca6081d8916af` checks normalized uniqueness of generated Verified English practice options over rotated sets. CI regression 43379340424 and browser 43379338387 pending. No production access; human semantic review remains open.
