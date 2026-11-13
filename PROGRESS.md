@@ -197,3 +197,11 @@ Next action: editable academic course metadata while preserving stable subject I
 - Synthetic Chromium/WebKit corrupt-record assertions added at 485c11a; CI 43379924786 completed success (static-contract and browser-qa). Previous 43379887146 also passed.
 - Added browser JSON download/invalid import/explicit restore and unavailable-IndexedDB editor QA at 375b42b. Synced CommonJS/browser store at 7a3e629, Node parity guard at e41cd69. The final exact-head CI for those additions must be checked.
 - No production release, homepage activation, merge, external API calls, real data change or cloud migration. Physical iPad Safari and real storage eviction/restore remain unverified.
+
+## Verified metadata accessibility/recovery checkpoint — 2026-11-13
+
+- No-JavaScript fallback is implemented for the unlinked draft editor: warning is visible, inert Open button hidden and editor stays closed. Synthetic Chromium/WebKit browser regression passed CI 43380434836 at 44bb56c.
+- Corrupt saved metadata now shows a Thai warning without automatic overwrite/reset. Synthetic browser QA confirms invalid-record rejection, closed editor and explicit retry. CI 43380640662 at 9fdb772 completed **success** for static-contract and browser-qa.
+- Previous course metadata JSON download, invalid-import, explicit restore and IndexedDB-denied UI tests passed CI 43380131840 and 43380014201.
+- Root PROJECT.md, AGENTS.md, ARCHITECTURE.md and COURSE_METADATA_DESIGN.md were refreshed to distinguish this unlinked draft from released functionality.
+- Not validated: physical iPad Safari, browser/OS eviction, live Cloudflare Worker/KV sync or real user backup/restore. PR #44 stays Draft; main and production remain unchanged.
