@@ -61,3 +61,12 @@
 - Added `vocabloom/tests/progress-preservation-contract.test.cjs` (4 offline tests) for two-device SRS/answer merge, newest card revision selection, reset timestamp handling, day counters, five-deck restore completeness, confirmation-before-write, rollback scaffolding, and absence of cloud sync during local restore.
 - GitHub Actions push run https://github.com/Cheetos9250/study-os/actions/runs/43352012898 at code SHA `577e6e4a0ed4257c952fad234ad59d7304e62229`: **success**. This is offline CI only; no actual backup was imported and no Worker was contacted.
 - These tests are not a proof that legacy KV last-writer-wins is safe; Production CAS remains blocked and all iPad/live QA gates remain open.
+
+## P2 English Verified vocabulary parser fix — branch only
+
+- Repository export inspected at the branch baseline: 582 Verified English rows. The existing VocaBloom `parseNotionExport` accepted 412 using only the historical pipe-separated `Back` format; multiline news entries with `Example:` were skipped.
+- Updated `vocabloom/index.html` to support both the historical `part of speech | meaning | example` and the Verified multiline `part of speech — meaning\\nExample: sentence` format. Original `notion-...` word ID derivation, dedupe, subject/status filter, storage key, and SRS progress remain unchanged.
+- Recount with the same eligibility checks: **573 of 582** Verified rows are eligible after the patch (up from 412). The remaining nine are not silently rewritten or invented; their examples use different inflections, omit the exact headword, or use a different phrasing. A later content-quality review should decide whether to relax that validation without affecting identity.
+- Added regression assertions for current news entries including breakthrough, preservation, deluge, ambassador and pedestrian; original pipe-format regression still runs.
+- GitHub Actions CI: https://github.com/Cheetos9250/study-os/actions/runs/43352286978 at SHA `16a47bdd7c6db2e9759874be8b159dfdad2374e9` — **success**. This is GitHub CI, not deployed app behavior. No Notion writes or Worker/KV changes.
+- English Verified **quiz** records remain absent; this fix only increases imported vocabulary availability. Do not describe derived practice games as Notion Verified quizzes.
