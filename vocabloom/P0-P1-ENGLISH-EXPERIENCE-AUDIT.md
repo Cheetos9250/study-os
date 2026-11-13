@@ -109,3 +109,10 @@
 - Verified a simulated Draft English row is excluded without changing the original deck or existing quiz data. Legacy deck quiz counts remain `[42,60,34,0,0]`, and the committed Notion quiz export contains 222 rows, none English.
 - GitHub Actions CI passed at SHA `b89cf5543748fce29bf63ba85d51367f0c6b6270`: https://github.com/Cheetos9250/study-os/actions/runs/43353863921 .
 - Tests are repository-data and offline runtime tests only; not live Notion/Worker/KV, actual iPad Safari or production cross-device sync tests. No deployment or merge authorized.
+
+## P2 executable Full Restore sandbox regression
+
+- Added `vocabloom/tests/full-restore-execution.test.cjs`, invoking the real `cFullRestore` function in a disposable in-memory mock environment. The test never reads actual browser storage, files, user data or network services.
+- Five scenarios passed: incomplete five-subject backup rejected before prompt/writes; user cancellation preserves storage; successful mock restore writes all five subject pairs and excludes foreign-device daily counters; injected quota failure rolls back original records; busy cloud sync blocks restore.
+- CI passed at SHA `d26b82aa3e97a37bd8198a509414959ef7598568`: https://github.com/Cheetos9250/study-os/actions/runs/43354479003 .
+- The tests do not establish safety of actual Safari quota/eviction, file-picker behavior, browser profile persistence, Cloudflare KV concurrency or live restore. No production restore, sync, merge or deployment authorized.
