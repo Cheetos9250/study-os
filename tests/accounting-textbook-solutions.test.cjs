@@ -35,8 +35,8 @@ test('no answers are invented for incomplete catalog coverage',()=>{
  assert.equal(Object.hasOwn(bank.answers,'E-1-10'),false);
  assert.equal(Object.hasOwn(bank.answers,'QS-6-2'),false);
  assert.equal(Object.hasOwn(bank.answers,'QS-6-1'),true);
- assert.equal(bank.meta.reviewedCount,77);
- assert.equal(bank.meta.sourceReviewedNewCount,48);
+ assert.equal(bank.meta.reviewedCount,79);
+ assert.equal(bank.meta.sourceReviewedNewCount,50);
  for(const id of ['E-1-11','E-1-13','E-1-15','E-1-16','E-1-18','P-1-1A','P-1-2A','P-1-3A','P-1-4A','P-1-5A','P-1-6A','P-1-7A','P-1-8A','P-1-9A','P-1-11A','P-1-12A','P-1-1B','P-1-2B','P-1-3B','P-1-4B','P-1-5B','P-1-6B','P-1-7B','P-1-8B','P-1-9B','P-1-11B','P-1-12B','P-1-13B','P-1-14B','QS-2-5','QS-2-6','QS-2-7','QS-2-8','QS-2-9','E-2-5','E-2-6']){
   assert.equal(bank.answers[id]?.verification,'source-reviewed-2026-11-13',id+' must be source checked');
  }
@@ -67,7 +67,7 @@ test('solution reveal is independent from auto-checking and student progress',()
 });
 
 test('new source-reviewed chapter 2 worked solutions and repaired source geometry',()=>{
- const newlyReviewed=['QS-2-1','QS-2-2','QS-2-3','QS-2-4','E-2-1','E-2-2','E-2-3','E-2-4','E-2-7','E-2-8','E-2-9','P-2-1A'];
+ const newlyReviewed=['QS-2-1','QS-2-2','QS-2-3','QS-2-4','E-2-1','E-2-2','E-2-3','E-2-4','E-2-7','E-2-8','E-2-9','P-2-1A','P-2-7A','P-2-1B'];
  for(const id of newlyReviewed){
   assert.equal(bank.answers[id]?.verification,'source-reviewed-2026-11-14',id+' must be checked from original PDF');
  }
@@ -90,4 +90,6 @@ test('new source-reviewed chapter 2 worked solutions and repaired source geometr
  assert.equal(bank.answers['E-2-8'].answer.includes('$43,331'),true);
  assert.equal(bank.answers['E-2-9'].answer.includes('$94,850'),true);
  assert.equal(bank.answers['P-2-1A'].answer.includes('$119,490'),true);
+ assert.equal(bank.answers['P-2-7A'].answer.includes('$20,500'),true);
+ assert.equal(bank.answers['P-2-1B'].answer.includes('$74,330'),true);
 });
