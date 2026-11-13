@@ -99,3 +99,10 @@ The subsequent distractor audit exposed a nested duplicate search in every candi
 At `20f27cc8656296d55840bec2fff5208571b4145c`, [233-test Node / Python regression 43364282209](https://github.com/Cheetos9250/study-os/actions/runs/43364282209) and [extended browser run 43364281981](https://github.com/Cheetos9250/study-os/actions/runs/43364281981) completed **success**. Browser logs confirmed the four Chromium/WebKit desktop/tablet cases, each importing 581 words with no live service requests. This verifies the optimized distractor generator together with context, refresh and synthetic backup/restore flows.
 
 Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported data and the workflow itself. Documentation-only push commits can skip browser installation without bypassing relevant application changes. Job execution and read-only permissions are unchanged. The subsequent handoff/workflow-filter commit does not alter the tested application/test code. Physical iPad and live sync gates remain open.
+
+### Later browser malformed-backup regression — verified
+
+- Implementation SHA `f269d5f9514580f75785e71a430042a8db282c68` extends `vocabloom/tests/browser_smoke.py` with three malformed restore payloads: subjects array, VocaBloom progress array and missing English subject.
+- Each is passed to the real `cFullRestore` in a disposable, fully mocked Chromium/WebKit browser profile; assertions require no localStorage mutation and no successful restore state.
+- [Regression run 43367785010](https://github.com/Cheetos9250/study-os/actions/runs/43367785010) and [isolated browser run 43367784703](https://github.com/Cheetos9250/study-os/actions/runs/43367784703) both completed **success**. No real Worker/Notion/KV requests were permitted by the browser harness.
+- This closes the pending CI status from the earlier PROGRESS entry. Physical iPad Safari, VoiceOver and staging CAS persistence remain **unverified**. No merge, deploy or production data write occurred.
