@@ -34,3 +34,7 @@ The English importer checks complete normalized English token sequences. POS-gui
 ## Full Backup / Restore browser validation
 
 The browser harness now also submits three malformed Full Backup variants directly to the actual `cFullRestore` handler in a disposable localStorage profile. It checks that rejected input cannot alter persisted data and cannot set a successful restore status. This is in addition to accepted/cancelled synthetic restore paths and Node-level rollback/async sync-race tests. No actual cloud service or existing learner storage is used. Hosted WebKit emulation is not equivalent to a physical iPad Safari/VoiceOver run.
+
+## Restore daily-counter shape invariant
+
+`cFullRestore` requires same-device `deviceDays` and `studyDays` (when supplied) to be non-array objects before they can enter the local daily-counter state. A backup from a different `deviceId` discards both daily-counter maps, including malformed source values. This preserves device-specific counter isolation and fails closed on same-device invalid types. Regression coverage uses disposable in-memory storage.
