@@ -13,7 +13,7 @@ function thaiMeaning(back){
  return /[\u0E00-\u0E7F]/.test(candidate)?candidate:'';
 }
 function reviewKey(value){
- return String(value||'').normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF\s,;，；、/]/g,'').replace(/[()（）]/g,'');
+ return String(value||'').normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF\s,;，；、\/]/g,'').replace(/[()（）]/g,'');
 }
 function bigrams(text){
  const set=new Set();
