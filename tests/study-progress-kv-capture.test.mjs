@@ -64,7 +64,7 @@ test('rejects missing credentials before contacting Cloudflare', async () => {
   await fixture(async env => {
     const mock = synthetic();
     await assert.rejects(capture({ ...env, CLOUDFLARE_API_TOKEN: '' }, mock.fetch), /Missing dedicated/);
-    await assert.rejects(capture({ ...env, STUDY_PROGRESS_KV_NAMESPACE_ID: 'bad' }, mock.fetch), /namespace/);
+    await assert.rejects(capture({ ...env, STUDY_PROGRESS_KV_NAMESPACE_ID: 'bad' }, mock.fetch), /STUDY_PROGRESS_KV_NAMESPACE_ID/);
     assert.equal(mock.calls.length, 0);
   });
 });
