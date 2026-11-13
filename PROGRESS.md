@@ -275,3 +275,5 @@ Next action: editable academic course metadata while preserving stable subject I
 - Added draft editor return link (`c339015`), static source guards (`a77df5b`) and synthetic Chromium/WebKit browser regression for opt-in apply, search, order, no progress changes, reset display and failed storage (`9817c91`). CI not yet verified at time of this note. Nothing merged or deployed; no Notion/Worker/KV/scheduler changes.
 
 - Extended metadata dashboard fail-closed regression (`94b44fa`) to reject corrupt IndexedDB records without replacing default cards, and verify no-JavaScript mode hides the opt-in control. These tests remain pending GitHub Actions verification; browser/device completion must not be asserted before CI finishes.
+
+- Added responsive text wrapping for 80-character editable course names (`a1d98ef`) and a browser regression (`89de60b`) for deliberate refresh after a second revision plus 390px viewport overflow safety. CI evidence for these exact code commits still pending; JavaScript syntax was checked for the earlier home/static/browser files but that alone does not prove browser behavior.
