@@ -131,3 +131,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Extended synthetic basic journeys to Chromium/WebKit at 390/820/1280px with light/dark screenshots, comparison/race/cross-tab checks, and a clean-browser preview before isolated recovery. Existing course/PDF/answer data are unchanged.
 - Local: 229 Node tests, 3 Python tests, JavaScript syntax and diff checks passed. Exact-head CI/browser evidence tracked on the PR. Physical iPad/Files remains outside controlled QA.
 - Branch: feat/backup-file-comparison-20261113. PR #44/#68 branches remain untouched; no Notion dispatch, backend deploy or production-data mutation.
+
+
+## Textbook failed-save retry
+- Found a local-save retry gap: after a failed write, the answer stayed in memory; a later flush of unchanged text returned early without retrying storage. Status-only failures had the same retry gap.
+- Track unsaved progress until the existing localStorage write succeeds. Retrying unchanged notes/status now persists the in-memory data, clears only the specific storage error and displays the saved state. Failed writes explicitly display Not saved.
+- Add a best-effort browser exit warning while changes remain unsaved. iPad/app termination may not deliver this event; manual Export answers remains the recovery action and includes the in-memory draft. No new key or migration.
+- Local: 232 Node tests passed; targeted VM checks exercise the actual persist/flush/warning functions with failing storage. Synthetic Chromium/WebKit adds failure → draft export → retry without editing → failed-status retry → reload verification. CI tracked on PR. No real storage failure/user data is induced.
+- Backup-comparison PR #70 released as `489601d`: all release CI passed (Pages 43463559531, Node/icon 43463560763, backup/basic 43463560425, recovery 43463560588). Live backup HTML/versioned JS returned 200 and matched tested source.

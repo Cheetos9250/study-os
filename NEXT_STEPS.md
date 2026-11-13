@@ -36,3 +36,9 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 - Validate/release the read-only comparison branch after exact-head browser CI and screenshot inspection. Check differing answers, another browser with empty storage, latest-file selection, and cross-tab invalidation using disposable data only.
 - Continue physical iPad/Files export → choose-file → compare → isolated restore rehearsal; synthetic WebKit is not proof of native Files behavior. No real user backup has been inspected by the agent.
 - Preserve PR #68's separate worked-solutions work; do not duplicate its reader/solution changes.
+
+
+## Save reliability follow-up
+- Verify/release the narrowly scoped reader save-retry fix after exact-head tests. Existing reader/PDF/solution behavior and PR #68's branch remain separate.
+- Physical iPad: use disposable answers to test storage failure/retry and Export answers. Browser exit prompts are best-effort and must not be described as guaranteed protection.
+- Backup comparison is now released in PR #70 (`489601d`); preserve its read-only behavior and file-selection guards.
