@@ -40,6 +40,15 @@ footer{margin-top:34px;padding-top:24px;border-top:1px solid var(--line);display
 @media(max-width:760px){.grid{grid-template-columns:1fr}.subject{min-height:190px}.hero{padding:32px 0 16px}header{padding-bottom:20px}}
 @media(prefers-reduced-motion:reduce){.subject{transition:none}.subject:hover,.subject:active{transform:none}}
 .study-tools{display:flex;flex-wrap:wrap;gap:12px 20px;margin-top:24px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--white);font-size:14px}
+.textbook-feature{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px 22px;margin-top:16px;color:var(--text);text-decoration:none;transition:border-color .16s,transform .16s}
+.textbook-feature:hover{border-color:var(--purple);transform:translateY(-2px)}
+.textbook-feature:focus-visible{outline:3px solid var(--purple);outline-offset:4px}
+.textbook-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--lav);color:var(--purple)}
+.textbook-copy h3{font-size:18px;line-height:1.3;margin:0 0 3px}
+.textbook-copy p{font-size:14px;color:var(--readable-muted);margin:0}
+.textbook-open{font-size:14px;font-weight:750;color:var(--purple);white-space:nowrap}
+@media(max-width:760px){.textbook-feature{grid-template-columns:44px minmax(0,1fr);gap:10px 14px;padding:16px}.textbook-open{grid-column:2;white-space:normal}}
+
 </style>
 </head>
 <body>
@@ -77,11 +86,15 @@ footer{margin-top:34px;padding-top:24px;border-top:1px solid var(--line);display
 </a>
 </div>
 </section>
+<a class="textbook-feature" href="accounting-textbook.html" aria-label="Browse accounting textbook exercises by chapter and question number">
+<span class="textbook-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M9 7h7M9 11h5"/></svg></span>
+<div class="textbook-copy"><h3>Accounting Textbook Exercises</h3><p>1,361 indexed exercises · Chapters 1–26 · Quick Study, Exercises &amp; Problems</p></div>
+<span class="textbook-open">Browse exercises →</span>
+</a>
 <aside class="note" aria-label="About learning progress">
 <strong>About your progress:</strong> This page links to your existing courses. It does not move or delete your learning data. Saving and syncing are managed within each course. Check the sync status before switching devices.
 </aside>
 <nav class="study-tools" aria-label="Study tools">
-<a class="secondary" href="accounting-textbook.html">Accounting textbook exercises</a>
 <a class="secondary" href="progress-backup.html">Back up progress</a>
 <a class="secondary" href="progress-restore.html">Restore progress</a>
 <a class="secondary" href="eng.html">English EC1 vocabulary</a>
