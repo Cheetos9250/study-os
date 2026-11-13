@@ -181,6 +181,7 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
       await tab.locator("#plan-date").fill(dateValue);
       await tab.locator("#plan-save").click();
       await tab.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
+      await tab.waitForFunction(expected => document.querySelector("#plan-discovery")?.textContent?.includes(expected),label === "Overdue navigation QA" ? "งานค้าง 1" : "7 วันข้างหน้า 1");
     }
     assert.match(await tab.locator("#plan-discovery").innerText(),/งานค้าง 1 · วันนี้ 0 · 7 วันข้างหน้า 1 · เสร็จแล้ว 0/);
     await tab.locator("#plan-overdue").click();
