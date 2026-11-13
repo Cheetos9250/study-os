@@ -33,3 +33,7 @@ All entries below describe an unmerged proposal, not a production release.
 - Reject arrays, nulls and scalar `deviceDays` / `studyDays` maps when restoring a same-device Full Backup, before any local writes.
 - Continue discarding cross-device daily counters without validating or importing them, preserving the existing device-isolation rule.
 - Added executable regression tests. CI status is tracked in `PROGRESS.md` and the continuous audit; no production restore was attempted.
+
+## 2026-11-13 — Browser-level daily-map regression (unmerged)
+
+- Added disposable Chromium/WebKit QA for rejecting malformed same-device `deviceDays` and `studyDays` maps without modifying localStorage. No new production behavior beyond the prior daily-map validation fix.
