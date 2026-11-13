@@ -116,6 +116,11 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       await corruptPage.locator("#metadata-status").filter({hasText:"ระบบจะไม่เขียนทับหรือลบข้อมูลเดิม"}).waitFor();
       assert.equal(await corruptPage.locator("#editor").isVisible(),false);
       assert.equal(await corruptPage.locator("#metadata-open").isVisible(),true);
+      await corruptPage.goto(base);
+      await corruptPage.locator("#course-metadata-apply").click();
+      await corruptPage.locator("#course-metadata-status").filter({hasText:"อ่านชื่อรายวิชา"}).waitFor();
+      assert.equal(await corruptPage.locator('[data-course="acc"] h3').textContent(),"Accounting");
+      assert.equal(await corruptPage.locator("#course-metadata-default").isVisible(),false);
     }finally{await corruptContext.close();}
     const draft=await context.newPage();
     await draft.goto(base+"/course-metadata-draft.html");
@@ -287,6 +292,8 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       assert.equal(await disabledPage.locator("noscript p[role=alert]").isVisible(),true);
       assert.equal(await disabledPage.locator("#metadata-open").isVisible(),false);
       assert.equal(await disabledPage.locator("#editor").isVisible(),false);
+      await disabledPage.goto(base);
+      assert.equal(await disabledPage.locator("#course-metadata-apply").isVisible(),false);
     }finally{await withoutScripts.close();}
     // Small-screen keyboard/viewport contract, isolated from the tablet editor state.
     const mobile=await browser.newContext({viewport:{width:390,height:844},colorScheme:"dark",hasTouch:true});
