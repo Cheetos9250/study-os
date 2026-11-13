@@ -266,3 +266,10 @@ Next action: editable academic course metadata while preserving stable subject I
 ## Basic course editor usability — 2026-11-13
 
 - Added draft homepage navigation to opt-in course editor (`f66abba`), and safe saved metadata preview linking to unchanged `acc.html`, `eco.html`, `math.html` (`0973a45`, `7d325a6`). Custom labels/order only affect the editor preview; homepage course cards and legacy progress remain unchanged. Browser assertion added (`5192b45`), CI pending. No merge or production deployment.
+
+
+## Basic homepage course customization — 2026-11-13
+
+- Added deliberate read-only display controls to draft `index.html` (`eb179da`, `fa866b6`): learner can apply saved names/descriptions/order and return to initial presentation without deleting saved settings.
+- Added `lib/study-os-course-metadata-home.js` (`a6c1d75`) which validates metadata, updates text via `textContent`, keeps original `acc/eco/math` links/identifiers, refreshes course search, closes IndexedDB connections and fails without modifying cards if storage is denied.
+- Added draft editor return link (`c339015`), static source guards (`a77df5b`) and synthetic Chromium/WebKit browser regression for opt-in apply, search, order, no progress changes, reset display and failed storage (`9817c91`). CI not yet verified at time of this note. Nothing merged or deployed; no Notion/Worker/KV/scheduler changes.
