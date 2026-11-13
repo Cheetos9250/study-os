@@ -188,3 +188,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Improved the English Practice empty-state text for a four-word pool whose two meanings share the same Thai sense. A new synthetic execution test verifies zero misleading questions and no answer buttons. Code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678`.
 - Earlier exact-sense guard browser [43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) and regression [43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) both completed **success**.
 - For the new small-pool code/test SHA, [regression 43380708719](https://github.com/Cheetos9250/study-os/actions/runs/43380708719) completed **success**; [browser 43380708685](https://github.com/Cheetos9250/study-os/actions/runs/43380708685) was **in progress** at documentation time. No production service was accessed.
+
+### Offline Thai distractor review
+
+- Built `scripts/audit-thai-distractors.cjs` and `tests/english-distractor-review.test.cjs` at test SHA `4f43f9ec599fbfec69fff9b71b7c0643e95e7e00`. The tool only reads committed English source data and reports approximate Thai substring/bigram candidates; it does not affect the app, SRS, cloud or source data.
+- Initial read-only scan over 582 Verified English rows flagged 87 *review candidates*, including opposite meanings (`unsaturated` / `saturated`) that must not be automatically excluded. See `THAI-DISTRACTOR-REVIEW-2026-11-13.md`.
+- [Regression 43381193510](https://github.com/Cheetos9250/study-os/actions/runs/43381193510) completed **success**; isolated browser [43381193520](https://github.com/Cheetos9250/study-os/actions/runs/43381193520) was **in progress** when recorded. Previous empty-state code/test SHA `6c427d2b59c16f12a39dbadaf9ee76fbf8417678` passed regression 43380708719 and browser 43380708685.
