@@ -11,7 +11,11 @@ const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
 
 test('source-linked index has nonempty unique stable references',()=>{
   assert.ok(catalog.meta.sourceUrl.startsWith('https://drive.google.com/file/'));
-  assert.ok(catalog.items.length>1300);
+  assert.equal(catalog.items.filter(x=>!x.sectionOnly).length,403);
+  assert.equal(catalog.meta.questionCount,403);
+  assert.equal(catalog.meta.sectionReferenceCount,36);
+  assert.deepEqual(catalog.chapters.map(x=>x.chapter),['1','2','3','4','5','6','7','8','9']);
+  assert.equal(catalog.chapters.at(-1).name,'Accounting for Receivables');
   assert.equal(new Set(catalog.items.map(x=>x.id)).size,catalog.items.length);
   assert.equal(new Set(catalog.chapters.map(x=>x.chapter)).size,catalog.chapters.length);
 });
@@ -39,13 +43,15 @@ test('catalog record counts and source pages reconcile',()=>{
 test('study links use a separate local progress namespace',()=>{
   assert.match(html,/data\/accounting-textbook-index\.json/);
   assert.match(html,/studyos\.accounting\.textbook\.progress\.v1/);
-  assert.match(html,/Export progress/);
-  assert.match(html,/Import progress/);
-  assert.match(html,/The full questions and any diagrams remain inside your original PDF/);
+  assert.match(html,/Export answers/);
+  assert.match(html,/Import answers/);
+  assert.match(html,/The PDF is imported into this browser and is not uploaded to Study OS/);
   assert.match(accounting,/href="accounting-textbook\.html"/);
   assert.match(home,/href="accounting-textbook\.html"/);
   assert.match(home, /class="textbook-feature"/);
   assert.match(home, /Browse exercises/);
+  assert.match(home, /403 indexed exercises · Chapters 1–9 \(through Receivables\)/);
+  assert.match(html, /Textbook Exercises · Chapters 1–9/);
   assert.match(home, /aria-label="Browse accounting textbook exercises by chapter and question number"/);
   assert.equal((home.match(/href="accounting-textbook.html"/g)||[]).length,1);
   assert.doesNotMatch(html,/localStorage\.clear\(/);
