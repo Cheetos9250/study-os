@@ -76,7 +76,7 @@ function uPracticeQuestions(d){
   if(USTATE.cat!=='all'&&c.cat!==USTATE.cat)continue;
   const word=String(c.f||'').trim(),meaning=uPracticeMeaning(c.b);
   if(!word||!meaning||word.length>85||meaning.length>160)continue;
-  const wk=word.normalize('NFKC').toLowerCase(),mk=meaning.normalize('NFKC').toLowerCase();
+  const wk=word.normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim(),mk=meaning.normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim();
   if(seenWords.has(wk)||seenMeanings.has(mk))continue;
   seenWords.add(wk);seenMeanings.add(mk);
   pool.push({word,meaning,cat:c.cat,id:c.mid,context:uPracticeContext(c.b),ref:String(c.ref||'')});
