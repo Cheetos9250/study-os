@@ -27,3 +27,17 @@ test('Source reader excludes unverified content and normalizes nonbreaking invis
  assert.equal(thaiMeaning('v | ขึ้นอยู่กับ; มีเงื่อนไขว่า'),'ขึ้นอยู่กับ; มีเงื่อนไขว่า');
  assert.equal(reviewKey('การ\u200Bเรียน   รู้'),reviewKey('การเรียน รู้'));
 });
+
+
+test('Audit Thai-meaning parser matches actual English Practice parsing on every Verified source row',()=>{
+ const source=fs.readFileSync(path.resolve(__dirname,'../study-integration.js'),'utf8');
+ const start=source.indexOf('function uPracticeMeaning(back){');
+ const end=source.indexOf('function uPracticeContext(back){',start);
+ assert.ok(start>=0&&end>start);
+ const productionMeaning=new Function(source.slice(start,end)+'return uPracticeMeaning')();
+ const verified=rows.filter(r=>r.Subject==='English Vocab'&&r.Status==='Verified');
+ assert.ok(verified.length>500);
+ for(const row of verified){
+  assert.equal(thaiMeaning(row.Back),productionMeaning(row.Back),'Review parser drift for '+row.Front);
+ }
+});
