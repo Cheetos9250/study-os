@@ -368,6 +368,20 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
       await dashboard.locator("#course-metadata-apply").click();
       await dashboard.locator("#course-metadata-status").filter({hasText:"Revision 1"}).waitFor();
       assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"บัญชีขั้นสูง");
+      // A second save does not silently change an already-open homepage.
+      await dashboard.evaluate(async()=>{
+        const store=await globalThis.StudyOSCourseMetadataStore.openCourseMetadata(indexedDB);
+        const current=await store.read();
+        current.metadata.courses.acc.name="A".repeat(80);
+        await store.save(current.metadata,current.revision);
+        store.close();
+      });
+      assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"บัญชีขั้นสูง");
+      await dashboard.locator("#course-metadata-apply").click();
+      await dashboard.locator("#course-metadata-status").filter({hasText:"Revision 2"}).waitFor();
+      await dashboard.setViewportSize({width:390,height:844});
+      assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"A".repeat(80));
+      assert.equal(await dashboard.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     }finally{await dashboardProfile.close();}
     // Simulate unavailable IDB without modifying the original courses.
     const unavailableHome=await browser.newContext();
