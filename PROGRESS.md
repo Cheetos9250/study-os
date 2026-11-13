@@ -189,3 +189,11 @@ Next action: editable academic course metadata while preserving stable subject I
 
 - CI [43378984252](https://github.com/Cheetos9250/study-os/actions/runs/43378984252): static-contract **success**, browser-qa still in progress at inspection; do not claim complete success yet.
 - Expanded synthetic Chromium/WebKit editor QA (`9cf2ed6`) for reset cancel/confirm, stale editor rejection after another tab saves, unsaved field retention and explicit refresh recovery. New CI pending. No homepage exposure, merge, deploy or production writes.
+
+
+## Course metadata corruption and backup QA — 2026-11-13 (draft, unreleased)
+
+- Fixed malformed IndexedDB record handling on draft PR #44: a present null/invalid revision/invalid payload no longer resembles an empty settings record. Read and save fail closed; the original record is preserved for diagnosis. Browser store commit f3111b5.
+- Synthetic Chromium/WebKit corrupt-record assertions added at 485c11a; CI 43379924786 completed success (static-contract and browser-qa). Previous 43379887146 also passed.
+- Added browser JSON download/invalid import/explicit restore and unavailable-IndexedDB editor QA at 375b42b. Synced CommonJS/browser store at 7a3e629, Node parity guard at e41cd69. The final exact-head CI for those additions must be checked.
+- No production release, homepage activation, merge, external API calls, real data change or cloud migration. Physical iPad Safari and real storage eviction/restore remain unverified.
