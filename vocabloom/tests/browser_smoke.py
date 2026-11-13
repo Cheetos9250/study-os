@@ -145,6 +145,17 @@ def run_case(browser, engine, tablet):
           await cFullRestore({size:1024,text:async()=>JSON.stringify(payload)});
         }""", malformed)
         assert page.evaluate("JSON.stringify({...localStorage})") == stable, "Malformed daily map modified browser storage"
+    # Reject malformed nested daily counters in the real browser restore handler.
+    for key, bad_row in (("deviceDays", {"answered": -1}),
+                         ("studyDays", {"correct": "invalid"}),
+                         ("deviceDays", {"ids": [42]})):
+        malformed = {**backup, "deviceId": page.evaluate("CLOCAL.device"),
+                     key: {"2026-11-12": bad_row}}
+        stable = page.evaluate("JSON.stringify({...localStorage})")
+        page.evaluate("""async payload => {
+          await cFullRestore({size:1024,text:async()=>JSON.stringify(payload)});
+        }""", malformed)
+        assert page.evaluate("JSON.stringify({...localStorage})") == stable, "Malformed nested daily row modified storage"
     # Mutate a synthetic record, then restore through the real file input and confirmation.
     page.evaluate("localStorage.setItem('study-acc',JSON.stringify({ans:{changed:2}}))")
     with page.expect_event("dialog") as dialog_event:
