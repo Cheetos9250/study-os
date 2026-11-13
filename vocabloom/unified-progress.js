@@ -355,6 +355,18 @@ async function cFullRestore(file){
   if(!otherDevice&&((payload.deviceDays!==undefined&&!record(payload.deviceDays))||
       (payload.studyDays!==undefined&&!record(payload.studyDays))))
     throw Error('โครงสร้างข้อมูลรายวันไม่ถูกต้อง');
+  // Validate nested day rows before replacing locally accumulated counters.
+  const validDayMap=map=>Object.values(map).every(day=>
+    record(day)&&
+    (day.answered===undefined||(Number.isFinite(day.answered)&&day.answered>=0))&&
+    (day.correct===undefined||(Number.isFinite(day.correct)&&day.correct>=0))&&
+    (day.ids===undefined||Array.isArray(day.ids))&&
+    (day.ids===undefined||day.ids.every(id=>typeof id==='string'))
+  );
+  if(!otherDevice&&
+    ((record(payload.deviceDays)&&!validDayMap(payload.deviceDays))||
+     (record(payload.studyDays)&&!validDayMap(payload.studyDays))))
+    throw Error('รายการสถิติรายวันไม่ถูกต้อง');
   const importedDays=!otherDevice&&record(payload.deviceDays)?payload.deviceDays:{};
   const importedStudyDays=!otherDevice&&record(payload.studyDays)?payload.studyDays:{};
   writes[CLOUD_LOCAL_DAYS]=JSON.stringify(importedDays);
