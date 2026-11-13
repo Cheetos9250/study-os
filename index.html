@@ -6,32 +6,36 @@
 <meta name="description" content="Study OS — พื้นที่เรียนบัญชี เศรษฐศาสตร์ และคณิตศาสตร์">
 <title>Study OS — Academic Dashboard</title>
 <style>
-:root{color-scheme:light;--bg:#f5f4f0;--surface:#fff;--ink:#182721;--muted:#5b6a63;--line:#dce2dc;--accent:#245e48;--soft:#e7f1eb}
-@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#141c19;--surface:#202a25;--ink:#eaf1eb;--muted:#b1c1b7;--line:#405248;--accent:#8ed0a8;--soft:#253e31}}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:light;--bg:#f8f9fc;--white:#fff;--text:#202445;--muted:#858aa5;--line:#eaebf2;--purple:#5b53d7;--deep:#4f47c8;--lav:#f0eeff;--green:#2caa76;--orange:#ef9657;--shadow:0 6px 30px rgba(47,54,106,.035);--surface:var(--white);--ink:var(--text);--accent:var(--purple);--soft:var(--lav);--readable-muted:#666c88}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--purple:#b9b3ff;--deep:#d7d2ff;--lav:#37365e;--shadow:none;--readable-muted:#b1b5cc}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.6}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.6}
 .container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,44px) max(18px,env(safe-area-inset-right)) 65px max(18px,env(safe-area-inset-left))}
 header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:26px;border-bottom:1px solid var(--line)}
-.brand{font-weight:800;font-size:21px;letter-spacing:-.6px}.brand span{color:var(--accent)}
-.top-link{color:var(--muted);font-size:14px;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:8px 14px}
-.top-link:hover,.top-link:focus-visible{border-color:var(--accent);color:var(--ink)}
-.hero{padding:46px 0 28px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:800;margin:0 0 10px}
+.brand,h1,h2,h3,.symbol{font-family:'Outfit',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
+.brand{font-weight:800;font-size:21px;letter-spacing:-.6px}.brand span{color:var(--purple)}
+.top-link{color:var(--purple);background:var(--lav);font-size:14px;font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+.top-link:hover,.top-link:focus-visible{border-color:var(--deep);color:var(--deep)}
+.hero{padding:46px 0 28px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);font-weight:800;margin:0 0 10px}
 h1{font-size:clamp(32px,6vw,52px);line-height:1.2;letter-spacing:-1px;margin:0 0 15px}
-.lead{color:var(--muted);font-size:clamp(15px,2.3vw,18px);max-width:670px;margin:0}
+.lead{color:var(--readable-muted);font-size:clamp(15px,2.3vw,18px);max-width:670px;margin:0}
 h2{font-size:22px;margin:26px 0 16px}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-.subject{display:flex;flex-direction:column;min-height:238px;border:1px solid var(--line);border-radius:20px;background:var(--surface);padding:23px;text-decoration:none;color:inherit;transition:transform .16s,border-color .16s}
-.subject:hover{transform:translateY(-3px);border-color:var(--accent)}
-.subject:focus-visible,.secondary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
-.subject .symbol{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;font-size:19px;font-weight:800;margin-bottom:22px}
-.accounting .symbol{background:#e4f3e9;color:#216744}.economics .symbol{background:#f8ebdd;color:#a35d22}.math .symbol{background:#e7eaff;color:#4755a5}
-.subject h3{font-size:20px;margin:0 0 5px;line-height:1.3}.subject p{color:var(--muted);font-size:14px;margin:0 0 16px}.subject .go{margin-top:auto;font-size:14px;font-weight:750;color:var(--accent)}
-.note{border:1px solid var(--line);border-radius:16px;padding:18px 21px;margin-top:26px;color:var(--muted);font-size:14px;background:var(--surface)}
-.note strong{color:var(--ink)}
-footer{margin-top:34px;padding-top:24px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;color:var(--muted);font-size:13px}
-.secondary{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.subject{display:flex;flex-direction:column;min-height:238px;border:1px solid var(--line);border-radius:12px;background:var(--white);box-shadow:var(--shadow);padding:23px;text-decoration:none;color:var(--text);transition:transform .16s,border-color .16s}
+.subject:hover{transform:translateY(-3px);border-color:var(--purple)}
+.subject:active{transform:translateY(-1px);border-color:var(--deep)}
+.subject:hover .go,.subject:active .go{color:var(--deep)}
+.subject:focus-visible,.secondary:focus-visible,.top-link:focus-visible{outline:3px solid var(--purple);outline-offset:4px}
+.subject .symbol{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;font-size:19px;font-weight:800;margin-bottom:22px}
+.accounting .symbol{background:var(--green);color:#102d22}.economics .symbol{background:var(--orange);color:#50270d}.math .symbol{background:var(--purple);color:var(--white)}
+.subject h3{font-size:20px;margin:0 0 5px;line-height:1.3}.subject p{color:var(--readable-muted);font-size:14px;margin:0 0 16px}.subject .go{margin-top:auto;font-size:14px;font-weight:750;color:var(--purple)}
+.note{border:1px solid var(--line);border-radius:12px;padding:18px 21px;margin-top:26px;color:var(--readable-muted);font-size:14px;background:var(--white);box-shadow:var(--shadow)}
+.note strong{color:var(--text)}
+footer{margin-top:34px;padding-top:24px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;color:var(--readable-muted);font-size:13px}
+.secondary{color:var(--purple);text-decoration:underline;text-underline-offset:3px}.secondary:hover,.secondary:active{color:var(--deep)}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.subject{min-height:190px}.hero{padding:32px 0 16px}header{padding-bottom:20px}}
-@media(prefers-reduced-motion:reduce){.subject{transition:none}.subject:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.subject{transition:none}.subject:hover,.subject:active{transform:none}}
 </style>
 </head>
 <body>
