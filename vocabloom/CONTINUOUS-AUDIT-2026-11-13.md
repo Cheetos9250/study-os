@@ -231,3 +231,9 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 - Code SHA `24ff169ecc82cbf8a7bb275ae8592d5f071806b0`; synthetic focus test SHA `fa2fc2f8fd06b65637b9cf20cb1a5c31037dae40`; hosted browser focus assertions SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533`.
 - [Regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) **success**; [hosted browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) **in progress** when this entry was written. The prior repeat-set variation SHA `8e3affa83f699309cb06793844e9eb20ee355893` passed both workflows.
 - Physical iPad Safari/VoiceOver, actual private backups and staging CAS remain unverified; no production, Notion, Worker, KV, migration or deployment activity.
+
+### Final accessibility focus browser verification
+
+- Final code/test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533` passed [regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489): job `131744353930` log shows 258 Node tests passed / 0 failed and 3 Python exporter tests passed.
+- [Browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) completed success; inspected job `131744354214` logs show Chromium desktop, Chromium tablet, WebKit desktop and WebKit tablet each passed with 581 imported words and **0 live service requests**.
+- This verifies the synthetic hosted focus and practice completion flows only. No physical Safari/VoiceOver verification, private backup recovery, staging CAS proof, production deployment or data migration is claimed.

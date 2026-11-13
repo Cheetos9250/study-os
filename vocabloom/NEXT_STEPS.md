@@ -53,3 +53,9 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - English Practice browser focus changes at SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533` passed regression [43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489); verify final [browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491). If failing, inspect the exact failing assertion/job log and correct source or test before documenting a pass.
 - On an authorized preview with a disposable physical iPad Safari profile, manually verify VoiceOver announcement of answer feedback, focus after navigating Practice, keyboard-only navigation, and 200% zoom. Do not assume hosted WebKit emulation is physical iPad evidence.
 - Keep remaining semantic distractor reviews, private backup readback and staging CAS verification separate; no production sync/deploy approvals are implied.
+
+### Verified hosted focus gate, remaining manual checks
+
+- The focus test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533` passed [regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) (**258/258 Node, 3/3 Python**) and [browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) (**4/4 hosted Chromium/WebKit desktop/tablet**, no live service requests). Earlier pending notes are superseded.
+- Next: inspect actual keyboard/VoiceOver announcement and focus on a **physical iPad Safari** with disposable data in an approved non-production preview; document browser/iPadOS versions and any failed steps. Do not merge/deploy on the strength of hosted QA alone.
+- Continue human review of Thai-meaning ambiguities, authoritative private backup/readback and synthetic staging CAS concurrency only in their separate authorized environments.

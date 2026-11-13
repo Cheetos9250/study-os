@@ -218,3 +218,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Extended hosted Chromium/WebKit to assert the active focus after answer, Next, Retry and New set. Final test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533`.
 - [Regression CI 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) completed **success**. [Browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) was **in progress** when documented. Verify its final result before declaring browser success. Physical Safari/VoiceOver has **not** been tested; no production migration/deploy or live data writes occurred.
 - The separate repeated-set code/test SHA `8e3affa83f699309cb06793844e9eb20ee355893` passed both [regression 43382305310](https://github.com/Cheetos9250/study-os/actions/runs/43382305310) and [browser 43382305336](https://github.com/Cheetos9250/study-os/actions/runs/43382305336).
+
+### Practice focus final hosted CI confirmation
+
+- Final focus code/browser test SHA `b991ac24cb307ab29ed9b8f8e0d9b3a5fbc60533`: [regression 43382827489](https://github.com/Cheetos9250/study-os/actions/runs/43382827489) completed **success**, with **258 Node tests passed, 0 failed, and 3 Python exporter tests passed** in the inspected job log.
+- [Isolated browser 43382827491](https://github.com/Cheetos9250/study-os/actions/runs/43382827491) completed **success**. Inspected job `131744354214`: Chromium desktop/tablet and WebKit desktop/tablet **all passed**, each importing 581 words and reporting zero live service requests. The focus assertions and full-session DOM QA were part of that hosted run.
+- The earlier `in progress` entry above is a historical snapshot and is superseded by this verified result. This does **not** validate physical iPad Safari/VoiceOver, production CAS, private backups or live progress writes. App and tests at SHA `b991ac24` remain unmerged and undeployed.
