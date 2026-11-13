@@ -100,7 +100,7 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Branch: feat/textbook-answer-check-20261113. Released with owner authorization as `833489203629500839e090a7b8963532d21bdc43`. Exact-main Pages 43452770281, full Node/icon 43452770477 and answer-check 43452770417 passed; live HTML and versioned script matched tested source. No backend/data changes.
 
 
-## Reviewed monetary answers and worked-answer input — in review
+## Reviewed monetary answers and worked-answer input — released in PR #67
 - Extends the local checker to QS-6-2 inventory cost: $14,000 + $250 + $300 + $900 = $15,450, reviewed against the owner's displayed question. Advertising, sales staff salaries and shrub trimming are excluded. Coverage is now 2/403, not a complete answer key.
 - Parses USD amounts to integer cents with strict grouping/decimal/currency checks; quantity answers remain unit-specific. No rounding, arithmetic evaluation or guessing from arbitrary numbers in working.
 - Supports saved working with one explicit last line (`Final answer: $15,450.00`, or Thai label); unlabelled partial working and competing final answers remain ungraded. Existing notes/status/backup formats remain unchanged.
@@ -116,3 +116,9 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Offline CAS simulations passed: production candidate 14/14 and prototype 48/48. These are simulated tests, not deployed-backend evidence. Production Worker source and cloud-data recovery remain pending in draft PRs #57/#58.
 
 - Reconciled the current patches from PR #39 (`db92f7d`) and PR #50 (`d138ad5`) in a disposable detached worktree based on main `8334892`: both applied without conflicts. Combined offline validation passed 5 workflow safety tests, 6 Python exporter fixture tests and diff checks. This validates patch compatibility/fixtures only, not GitHub Actions permission to open PRs or real Notion pagination/content. Existing drafts and production workflow remain untouched.
+
+
+## PR #67 authorized website release
+- Owner authorized publishing completed/tested website work. PR #67 merged as `61d64f9d9272bbd2bea3176066ebdc6c33c54b8e`; its tested PR head is `b7e7e4dc24ae4346a79d9c2199e26f8aed0aabd7`.
+- Exact PR-head CI: answer-check 43458654412 and full Node/icon 43458654422 passed (225 Node, 3 Python, 13 synthetic browser scenarios). Main Pages 43459873288, answer-check 43459874131 and full Node/icon 43459874149 are the release runs; final outcome/live verification is recorded on PR #67 after completion.
+- Release adds QS-6-2, explicit final-answer lines and reviewed-solution reveal. Coverage remains 2/403; no backend/source PDF/real-data changes.
