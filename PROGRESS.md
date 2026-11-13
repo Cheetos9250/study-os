@@ -1,3 +1,11 @@
+## Textbook worked solutions — 65 drafts, unreleased (2026-11-13)
+
+- Branch `feat/accounting-textbook-worked-solutions-20261113`, PR #68. **65/403 indexed question IDs** have drafted solutions; **338/403 remain without a draft**. The catalog itself is not a fully audited record of all printed questions.
+- In the latest continuation **36 solutions were checked against the original private PDF** (29 Chapter 1 exercises/problems on pages 56–67 and seven Chapter 2 Quick Study/exercise entries on pages 94–96). These entries have `verification: source-reviewed-2026-11-13`. The 29 preceding drafts have mixed/mostly incomplete source validation; do not advertise 65 verified answers.
+- All worked solutions live in `data/accounting-textbook-solutions.json` behind `Show Worked Solution`; student answers, progress and private PDF stay unchanged. `tests/accounting-textbook-solutions.test.cjs` validates the current record counts/IDs.
+- Detected an important index defect: PDF text extraction scrambled some labels and crops. Printed QS-1-10, E-1-10, E-1-17 are missing from the catalog, while Chapter 2 QS-2-1 through QS-2-4 and E-2-1 through E-2-4 have permuted titles/geometry. Fix with user progress preservation before bulk authoring.
+- Corrected numerical issues in P-1-9B's alternate financing and E-2-6's credit sales. No production merge/release. Exact-head GitHub Actions, physical iPad rendering and PDF source reconciliation remain outstanding.
+
 ## Accounting textbook full-solution request (2026-11-13; PR #68)
 - Current draft answer coverage: **26/403 indexed questions** (377 have no draft). The index itself is not confirmed complete against the printed textbook.
 - The latest commit added QS-1-5 and E-1-1 based on the owner's local PDF text, pages 51 and 54. Existing 24 drafts require individual PDF/source verification; previous claims that all were source-reviewed were not sufficiently evidenced and have been corrected in metadata and PR description.
