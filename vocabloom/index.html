@@ -234,9 +234,20 @@ function parseNotionExport(payload){
  const words=[],seen=new Set();
  for(const row of payload.rows){
   if(row?.Status!=='Verified'||row?.Subject!=='English Vocab')continue;
-  const en=String(row.Front||'').trim(),parts=String(row.Back||'').split('|').map(x=>x.trim());
-  const th=parts.length>1?parts[1]:parts[0];
-  const example=(parts.length>2?parts.slice(2).join('|'):'').split(' = ')[0].trim();
+  const en=String(row.Front||'').trim(),back=String(row.Back||'');
+  const parts=back.split('|').map(x=>x.trim());
+  let th='',example='';
+  if(parts.length>=3){
+   // Historical pipe format: part of speech | Thai meaning | example = translation.
+   th=parts[1];
+   example=parts.slice(2).join('|').split(' = ')[0].trim();
+  }else{
+   // Verified news vocabulary format: "n — Thai meaning" followed by "Example: ...".
+   const lines=back.split(/\r?\n/);
+   th=(lines[0]||'').replace(/^[^\n—–:]{1,35}\s*[—–:]\s*/,'').trim();
+   const line=lines.find(x=>/^\s*Example\s*:/i.test(x));
+   example=line?line.replace(/^\s*Example\s*:\s*/i,'').trim():'';
+  }
   if(!en||!th||!example||en.length>85||!example.toLowerCase().includes(en.toLowerCase())||seen.has(en.toLowerCase()))continue;
   seen.add(en.toLowerCase());
   // Preserve the exact historical word ID while exposing no explicit URL in new exports.
