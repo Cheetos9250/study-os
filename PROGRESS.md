@@ -155,3 +155,5 @@ Next action: editable academic course metadata while preserving stable subject I
 
 - CI [43371435910](https://github.com/Cheetos9250/study-os/actions/runs/43371435910) **success** for multi-date navigation and accessibility checkpoint (static-contract and browser-qa).
 - Added nonpersistent accessible academic course search over the existing stable `acc/eco/math` course cards; searches English and Thai aliases, never touches localStorage/IndexedDB or live Notion. Commits `0dbbb22`, `2f45c73`, static regression `20c55d2`. New CI pending; physical iPad Safari unverified. This is filtering, **not** editable course metadata yet.
+
+- CI 43371847878 static-contract **failed** because the strict homepage script inventory omitted new `lib/study-os-course-search.js`; corrected the expected list in commit `08f8717`. This was a test contract update, not a change to the legacy progress storage. Browser-qa was in progress at diagnosis; verify subsequent CI before claiming success.
