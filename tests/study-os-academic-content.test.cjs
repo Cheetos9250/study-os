@@ -55,3 +55,35 @@ test("existing academic course pages and language legacy pages remain present", 
     assert.match(html, /<script\b/i);
   }
 });
+
+
+test("academic quiz items have valid choices, answers and explanations", () => {
+  for (const key of ["acc", "eco", "math"]) {
+    const deck = source.decks.find(item => item.key === key);
+    const categories = new Set(deck.cats.map(cat => cat[0]));
+    for (const [index, item] of deck.quiz.entries()) {
+      assert.ok(Array.isArray(item) && item.length >= 5, key + " quiz " + index + " malformed");
+      const [cat, question, options, answer, explanation] = item;
+      assert.ok(categories.has(cat), key + " quiz " + index + " unknown category");
+      assert.ok(typeof question === "string" && question.trim(), key + " quiz " + index + " missing question");
+      assert.ok(Array.isArray(options) && options.length >= 2, key + " quiz " + index + " missing choices");
+      assert.ok(options.every(option => typeof option === "string" && option.trim()), key + " quiz " + index + " blank choice");
+      assert.ok(Number.isInteger(answer) && answer >= 0 && answer < options.length, key + " quiz " + index + " invalid answer index");
+      assert.ok(typeof explanation === "string" && explanation.trim(), key + " quiz " + index + " missing explanation");
+    }
+  }
+});
+
+test("academic summaries have valid headings, category references and table rows", () => {
+  for (const key of ["acc", "eco", "math"]) {
+    const deck = source.decks.find(item => item.key === key);
+    const categories = new Set(deck.cats.map(cat => cat[0]));
+    for (const [index, item] of deck.sum.entries()) {
+      assert.ok(categories.has(item.cat), key + " summary " + index + " unknown category");
+      assert.ok(typeof item.h === "string" && item.h.trim(), key + " summary " + index + " missing heading");
+      assert.ok(Array.isArray(item.head) && item.head.length >= 2, key + " summary " + index + " missing table headings");
+      assert.ok(Array.isArray(item.rows) && item.rows.length > 0, key + " summary " + index + " missing rows");
+      assert.ok(item.rows.every(row => Array.isArray(row) && row.length === item.head.length), key + " summary " + index + " inconsistent columns");
+    }
+  }
+});
