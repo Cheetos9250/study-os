@@ -6,7 +6,7 @@ Updated: 2026-11-13
 
 1. Review the remaining `securities filing` partial-headword example and evaluate explicit irregular forms only when source examples require them. Bounded regular matching now imports 581 entries with all 573 previous IDs preserved. Do not edit Notion records or invent examples.
 2. Continue semantic review of ambiguous senses/distractors before adding new question types; a structural audit of 650 rotated questions found no exact shared Thai-meaning atoms, which is not a full linguistic review. Source example/translation feedback, Retry mistakes and efficient unique distractor rotation are implemented; keep context frozen and SRS isolation intact.
-3. Add browser-level invalid-backup/quota-recovery scenarios where needed; these already have offline function-level coverage. The extended content-refresh and disposable Full Backup/Restore flows passed all four Chromium/WebKit viewport cases in round 2. Physical Safari and live cross-device behavior remain separate gates.
+3. Browser-level malformed-backup rejection is now implemented and passed isolated Chromium/WebKit CI for three invalid shapes. **Remaining**: add disposable browser quota-write failure/rollback coverage and confirm all local keys plus in-memory progress recover, without touching real storage. Physical Safari and live cross-device behavior remain separate gates.
 4. Keep project/architecture/decision/changelog documents and the current evidence in `CONTINUOUS-AUDIT-2026-11-13.md` aligned. Older P0/P1 audits are historical snapshots; do not replace their recorded results with assumptions.
 
 ## Requires a real test environment or user approval
