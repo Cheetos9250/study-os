@@ -1,5 +1,13 @@
 # Study OS progress
 
+## Accounting textbook in-page practice reader (2026-11-13; PR pending)
+- Replaced the impractical directory-plus-Drive-link UI with a focused, responsive one-question-at-a-time practice workspace. Chapter/type filters, searchable question list, original question region, answer field, progress status, and previous/next buttons are on the same page.
+- The user supplies the 1,210-page *Fundamental Accounting Principles* PDF once. PDF.js renders the **original printed question directly inside the website**, preserving numbers, tables and diagrams instead of trusting the PDF's corrupted text character map. The PDF is saved into local IndexedDB when browser quota permits and is never copied into the public GitHub repo or uploaded to a backend.
+- 1,361 indexed question headings are mapped to source PDF pages; automated geometry precisely matched 1,316 headings (96.7%). The remaining 45 show their original page as a fallback; use the full-page/next-page controls for continuation. Completeness and precise crop boundaries still need manual textbook audit.
+- Reused `studyos.accounting.textbook.progress.v1` for answer and status continuity. Local progress remains isolated from core subject quizzes; import/export remains compatible with previous JSON progress backups. No cross-device sync was added.
+- Added dedicated static/geometry consistency tests (3 locally passing). Physical iPad Safari, its IndexedDB PDF retention and PDF.js cross-origin script loading require real-device QA. No new backend or credentials.
+
+
 ## Accounting textbook exercise index (feature branch, not yet released)
 - Added a source-linked **reference index**, not an unauthorized public copy of the textbook exercises, for *Fundamental Accounting Principles* (24th edition) from the owner's Google Drive.
 - Automatic PDF extraction created 1,361 individual Quick Study / Exercise / Problem references and 104 broader section references spanning chapters 1–26 and selected appendices. These are **candidate references, not an audited guarantee of every question**; some PDF text has nonstandard glyph encodings, so manual reconciliation is required.
