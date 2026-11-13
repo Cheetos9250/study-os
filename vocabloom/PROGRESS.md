@@ -175,3 +175,10 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 
 - Invisible-separator guard SHA `8e155a9e54ec8ede3997bc0b5d2eac614f8ca565` passed [regression 43379006639](https://github.com/Cheetos9250/study-os/actions/runs/43379006639) and [isolated browser 43379006644](https://github.com/Cheetos9250/study-os/actions/runs/43379006644).
 - Added a regression checking every option in rotated Verified English practice questions for duplicates after Unicode NFKC, invisible-separator stripping and whitespace normalization. Test-only final SHA `6775d45b667e12298409b3557f9ca6081d8916af`; regression 43379340424 and browser 43379338387 pending at documentation time. This checks mechanical duplicates, not whether semantically similar Thai translations are acceptable distractors. No source/progress/production writes.
+
+### Thai-sense ambiguity guard — implementation and CI
+
+- Read-only review of the committed 582 Verified English rows found one exact shared Thai sense between different whole-meaning strings: `hinge on` (`ขึ้นอยู่กับ`) and `contingent on` (`ขึ้นอยู่กับ; มีเงื่อนไขว่า`).
+- Implemented a conservative source-preserving answer/distractor guard at `study-integration.js`; synthetic collision and rotated real-data regression assertions were added at code/test SHA `1a2b4e96a8583fcf50b75e78d336ef0b0cd32fa7`.
+- [Regression CI 43380366218](https://github.com/Cheetos9250/study-os/actions/runs/43380366218) completed **success**. [Isolated browser CI 43380366207](https://github.com/Cheetos9250/study-os/actions/runs/43380366207) was **in progress** when this entry was written; do not claim a pass without inspecting the final result.
+- Exact punctuation-separated senses only; broader linguistic ambiguity still needs human review. No merge, deploy, private backup inspection, Notion edits or Worker/KV calls.
