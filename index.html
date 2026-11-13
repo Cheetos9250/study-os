@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Study OS — Your workspace for accounting, economics and mathematics">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Study OS — Academic Dashboard</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
@@ -36,6 +39,7 @@ footer{margin-top:34px;padding-top:24px;border-top:1px solid var(--line);display
 .secondary{color:var(--purple);text-decoration:underline;text-underline-offset:3px}.secondary:hover,.secondary:active{color:var(--deep)}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.subject{min-height:190px}.hero{padding:32px 0 16px}header{padding-bottom:20px}}
 @media(prefers-reduced-motion:reduce){.subject{transition:none}.subject:hover,.subject:active{transform:none}}
+.study-tools{display:flex;flex-wrap:wrap;gap:12px 20px;margin-top:24px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--white);font-size:14px}
 </style>
 </head>
 <body>
@@ -76,6 +80,12 @@ footer{margin-top:34px;padding-top:24px;border-top:1px solid var(--line);display
 <aside class="note" aria-label="About learning progress">
 <strong>About your progress:</strong> This page links to your existing courses. It does not move or delete your learning data. Saving and syncing are managed within each course. Check the sync status before switching devices.
 </aside>
+<nav class="study-tools" aria-label="Study tools">
+<a class="secondary" href="progress-backup.html">Back up progress</a>
+<a class="secondary" href="progress-restore.html">Restore progress</a>
+<a class="secondary" href="eng.html">English EC1 vocabulary</a>
+<a class="secondary" href="zh.html">Chinese vocabulary</a>
+</nav>
 </main>
 <footer>
 <span>Study OS · Academic workspace</span>

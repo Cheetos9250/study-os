@@ -1,0 +1,24 @@
+/* Keep sync settings in document flow so they cannot cover study actions. */
+body .wrap{padding-block-end:24px}
+.cloud-sync-bar{
+  position:static!important;
+  width:calc(100% - max(16px, env(safe-area-inset-left, 0px)) - max(16px, env(safe-area-inset-right, 0px)));
+  max-width:768px;
+  margin:0 auto max(16px, env(safe-area-inset-bottom, 0px));
+  flex-wrap:wrap;
+  justify-content:space-between;
+  border-radius:12px!important;
+}
+.cloud-sync-bar>span,.cloud-sync-bar>button{overflow-wrap:anywhere;max-width:100%}
+@media(max-width:480px){
+  body .tabs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);overflow:visible}
+  .tabs button:not([hidden]){
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;min-width:0;white-space:normal;font-size:14px;padding:10px 4px;
+  }
+  .tabs button::before{margin:0;width:18px;height:18px}
+}
+
+.course-links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;margin-bottom:18px;font-size:14px}
+.course-links a{color:var(--accent);text-underline-offset:3px}
+.course-links a:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:3px}

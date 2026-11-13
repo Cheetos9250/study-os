@@ -28,7 +28,7 @@ async function serve() {
         return;
       }
       const body = await fs.readFile(file);
-      res.writeHead(200, { "Content-Type": file.endsWith(".js") ? "text/javascript" : "text/html; charset=utf-8" }).end(body);
+      res.writeHead(200, { "Content-Type": ({".js":"text/javascript",".css":"text/css",".svg":"image/svg+xml",".png":"image/png",".ico":"image/x-icon"})[path.extname(file)] || "text/html; charset=utf-8" }).end(body);
     } catch (_) {
       res.writeHead(404).end();
     }
@@ -46,7 +46,7 @@ async function runEngine(name, engine, origin) {
       });
       await ctx.route("**/*", route => {
         const u = new URL(route.request().url());
-        return u.origin === origin ? route.continue() : route.abort();
+        return route.request().method() === "GET" && (u.origin === origin || ["fonts.googleapis.com","fonts.gstatic.com"].includes(u.hostname)) ? route.continue() : route.abort();
       });
       return ctx;
     }
@@ -81,9 +81,31 @@ async function runEngine(name, engine, origin) {
     const clean = await context(), recovery = await clean.newPage(), recErrors = [];
     recovery.on("pageerror", error => recErrors.push(error.message));
     await recovery.goto(origin + "/progress-restore.html");
+    await recovery.evaluate(async json=>{
+      const input=document.getElementById('file');let finish;
+      const older=new Promise(resolve=>{finish=resolve;});
+      Object.defineProperty(input,'files',{configurable:true,value:[{name:'older.json',size:json.length,text:()=>older}]});
+      input.dispatchEvent(new Event('change'));
+      Object.defineProperty(input,'files',{configurable:true,value:[{name:'latest.json',size:1,text:async()=>'{'}]});
+      input.dispatchEvent(new Event('change'));
+      await new Promise(resolve=>setTimeout(resolve,0));finish(json);
+      await new Promise(resolve=>setTimeout(resolve,0));
+    },json);
+    await recovery.locator('#status').getByText(/Backup check failed/).waitFor();
+    assert.equal(await recovery.locator('#restore').isDisabled(),true);
+    assert.equal(await recovery.evaluate(()=>localStorage.length),0);
+    reports.push({engine:name,test:'latest-file-selection-wins',status:'pass'});
+    await recovery.reload();
     await recovery.locator("#file").setInputFiles({ name: "safe-backup.json", mimeType: "application/json", buffer: Buffer.from(json) });
     await recovery.locator("#status").getByText(/4 missing data sets can be restored/).waitFor();
     assert.equal(await recovery.locator("#restore").isEnabled(), true);
+    assert.equal(await recovery.locator('#preview li').count(),4);
+    assert.equal(await recovery.evaluate(()=>localStorage.length),0);
+    recovery.once('dialog',dialog=>dialog.dismiss());
+    await recovery.locator('#restore').click();
+    assert.equal(await recovery.evaluate(()=>localStorage.length),0);
+    assert.equal(await recovery.locator('#restore').isEnabled(),true);
+    reports.push({engine:name,test:'preview-and-cancel-do-not-write',status:'pass'});
     recovery.once("dialog", dialog => dialog.accept());
     await recovery.locator("#restore").click();
     await recovery.locator("#status").getByText(/Restored 4 missing data sets/).waitFor();
@@ -98,7 +120,11 @@ async function runEngine(name, engine, origin) {
     assert.equal(saved.vocab, VOC);
     assert.equal(saved.secret, null);
     assert.equal(await recovery.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    await recovery.evaluate(()=>document.fonts.ready);
     await recovery.screenshot({ path: path.join(output, name + "-restored-390.png"), fullPage: true });
+    await recovery.reload();
+    assert.equal(await recovery.evaluate(()=>localStorage.getItem('study-acc')),ACC);
+    assert.equal(await recovery.locator('#restore').isDisabled(),true);
     assert.deepEqual(recErrors, []);
     reports.push({ engine: name, test: "empty-profile/restore/no-secret", status: "pass" });
     await clean.close();

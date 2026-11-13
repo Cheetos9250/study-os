@@ -104,3 +104,24 @@ test("restoring a second time is idempotent and makes no additional writes", () 
   assert.deepEqual(recovery.restoreMissing(storage, snapshot(), ORIGIN), { restored: 0, alreadyPresent: 4 });
   assert.equal(storage.counts().writes, first);
 });
+
+test("a key arriving after preview is refused without overwrite", () => {
+  const storage=createStorage();const read=storage.getItem;let reads=0;
+  storage.getItem=key=>{if(key==='study-acc'&&++reads===2)storage.setItem(key,'OTHER-TAB');return read(key);};
+  assert.throws(()=>recovery.restoreMissing(storage,snapshot(),ORIGIN),/did not complete/);
+  assert.deepEqual(storage.snapshot(),{'study-acc':'OTHER-TAB'});
+});
+
+test("a provider that writes then throws rolls back its newly written keys", () => {
+  const storage=createStorage();const write=storage.setItem;
+  storage.setItem=(key,value)=>{write(key,value);if(key==='acc-flashcards-v1-srs')throw Error('write then throw');};
+  assert.throws(()=>recovery.restoreMissing(storage,snapshot(),ORIGIN),/attempted rollback/);
+  assert.deepEqual(storage.snapshot(),{});
+});
+
+test("rollback preserves an added key subsequently changed by another tab", () => {
+  const storage=createStorage();const write=storage.setItem;
+  storage.setItem=(key,value)=>{if(key==='acc-flashcards-v1-srs'){write('study-acc','OTHER-TAB');throw Error('failure');}write(key,value);};
+  assert.throws(()=>recovery.restoreMissing(storage,snapshot(),ORIGIN),/attempted rollback/);
+  assert.deepEqual(storage.snapshot(),{'study-acc':'OTHER-TAB'});
+});
