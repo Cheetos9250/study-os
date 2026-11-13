@@ -42,7 +42,23 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),http=r
     assert.equal(await page.locator('#answer').inputValue(),'1,710 units');assert.equal(await page.locator('#checkFeedback').isHidden(),true);
     assert.equal(await page.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),saved,'reload preserves progress');
     await page.locator('#search').fill('QS-6-2');await page.waitForFunction(()=>current?.id==='QS-6-2');
-    assert.equal(await page.locator('#checkAnswer').isDisabled(),true);assert.match(await page.locator('#checkScope').innerText(),/1 of 403 questions/);assert.equal(await page.locator('#checkFeedback').isHidden(),true);
+    assert.equal(await page.locator('#checkAnswer').isDisabled(),false);assert.match(await page.locator('#checkScope').innerText(),/15,450/);assert.equal(await page.locator('#checkFeedback').isHidden(),true);
+    await page.locator('#answer').fill('250 for transportation in\n300 for shipping insurance');await page.locator('#checkAnswer').click();
+    assert.equal(await page.locator('#checkFeedback').getAttribute('data-result'),'format','partial working must not receive a guessed grade');
+    await page.locator('#answer').fill('250 for transportation in\n300 for shipping insurance\nFinal answer: $15,450.00');await page.locator('#checkAnswer').click();
+    assert.equal(await page.locator('#checkFeedback').getAttribute('data-result'),'correct');assert.match(await page.locator('#checkFeedback').innerText(),/import duties/);
+    assert.equal(await page.locator('#questionStatus').inputValue(),'new');
+    await page.screenshot({path:path.join(output,`${name}-${width}-${colorScheme}-money-correct.png`),fullPage:true});
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'money feedback overflow');
+    await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>current?.id==='QS-6-2');
+    assert.match(await page.locator('#answer').inputValue(),/Final answer: \$15,450.00/);assert.equal(await page.locator('#checkFeedback').isHidden(),true);
+    await page.locator('#answer').fill('$15,450.01');await page.locator('#checkAnswer').click();assert.equal(await page.locator('#checkFeedback').getAttribute('data-result'),'incorrect','one cent difference must fail');
+    const beforeReveal=await page.evaluate(()=>localStorage.getItem(PROGRESS_KEY));
+    await page.locator('#showAnswer').click();assert.equal(await page.locator('#checkFeedback').getAttribute('data-result'),'solution');
+    assert.equal(await page.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),beforeReveal,'reveal must not change stored working/status');
+    await page.locator('#search').fill('QS-6-9');await page.waitForFunction(()=>current?.id==='QS-6-9');
+    assert.equal(await page.locator('#checkAnswer').isDisabled(),true);assert.equal(await page.locator('#showAnswer').isDisabled(),true);
+    assert.match(await page.locator('#checkScope').innerText(),/2 of 403 questions/);assert.equal(await page.locator('#checkFeedback').isHidden(),true);
     await page.locator('#search').fill('no-such-question');assert.equal(await page.locator('#checkAnswer').isDisabled(),true);assert.match(await page.locator('#checkScope').innerText(),/Select a question/);
     assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
     results.push({engine:name,width,colorScheme,passed:true});console.log('PASS',name,width,colorScheme);
@@ -53,7 +69,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),http=r
   const browser=await chromium.launch();try{
    const context=await browser.newContext();await context.route('**/*',r=>new URL(r.request().url()).origin!==base||r.request().url().includes('accounting-answer-check.js')?r.abort():r.continue());
    const page=await context.newPage();await page.goto(base+'/accounting-textbook.html',{waitUntil:'domcontentloaded'});await page.locator('.q-item').first().waitFor({state:'attached'});
-   assert.match(await page.locator('#checkScope').innerText(),/could not load/);assert.equal(await page.locator('#checkAnswer').isDisabled(),true);
+   assert.match(await page.locator('#checkScope').innerText(),/could not load/);assert.equal(await page.locator('#checkAnswer').isDisabled(),true);assert.equal(await page.locator('#showAnswer').isDisabled(),true);
    await page.locator('#answer').fill('Still editable');await page.locator('#answer').blur();assert.match(await page.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),/Still editable/);
    results.push({engine:'chromium',scenario:'checker script unavailable; saving preserved',passed:true});await context.close();
   }finally{await browser.close();}

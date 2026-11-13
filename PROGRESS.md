@@ -92,9 +92,27 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Physical iPad/PDF rendering and storage retention are still unverified; this change only covers answer-progress backup.
 
 
-## Local textbook final-answer checking — in review
+## Local textbook final-answer checking — released in PR #66
 - Adds a local Check answer control and deterministic quantity check for QS-6-1 only (1 of 403 indexed questions). The reviewed calculation is 1,300 − 20 + 350 + 80 = 1,710 units, based on the owner's original-question screenshot, not a publisher answer key.
 - Explains ownership, excludes unsaleable damaged units and accepts equivalent whole-number/unit formatting. Working, journal entries and reasoning are not automatically graded. Unsupported questions cannot receive guessed grades.
 - Feedback clears when editing, changing question, finding no results or reloading. Checking saves current notes through the existing path but never marks a question completed or persists a grade. No new storage key, PDF access or upload is added.
 - Local validation: 222 Node tests and 3 Python tests passed; diff and JavaScript syntax checks passed. Synthetic Chromium/WebKit CI covers light/dark at 390/820/1280px, state invalidation, persistence and checker-load failure. Exact code-head `ea8b9f21b28dbbdeb46bae72cfc27dc01f64a1b6`: CI 43451198276 passed, including 13 synthetic browser scenarios and screenshots; full Node/icon CI 43451198282 also passed. WebKit 390px dark screenshot inspected. Local browser launch could not run because the installed Playwright browser executable is absent; CI browser execution succeeded. Physical iPad and PDF rendering remain unverified.
-- Branch: feat/textbook-answer-check-20261113. Production release and PR status must be checked separately; no backend/data changes.
+- Branch: feat/textbook-answer-check-20261113. Released with owner authorization as `833489203629500839e090a7b8963532d21bdc43`. Exact-main Pages 43452770281, full Node/icon 43452770477 and answer-check 43452770417 passed; live HTML and versioned script matched tested source. No backend/data changes.
+
+
+## Reviewed monetary answers and worked-answer input — in review
+- Extends the local checker to QS-6-2 inventory cost: $14,000 + $250 + $300 + $900 = $15,450, reviewed against the owner's displayed question. Advertising, sales staff salaries and shrub trimming are excluded. Coverage is now 2/403, not a complete answer key.
+- Parses USD amounts to integer cents with strict grouping/decimal/currency checks; quantity answers remain unit-specific. No rounding, arithmetic evaluation or guessing from arbitrary numbers in working.
+- Supports saved working with one explicit last line (`Final answer: $15,450.00`, or Thai label); unlabelled partial working and competing final answers remain ungraded. Existing notes/status/backup formats remain unchanged.
+- Adds Show reviewed answer for supported questions without marking them completed or changing their answer. Guidance and unsupported coverage come from rule metadata instead of a hardcoded QS-6-1 string.
+- Local validation: 225 Node tests and 3 Python tests passed, diff/syntax checks passed. Code head `44364bf77847f4c74ffc6c25366dae4a6b107499`: answer-check CI 43457836485 and full Node/icon CI 43457836637 passed. The 13 synthetic browser scenarios now exercise both unit and monetary answers, final-line working, one-cent mismatch, reveal and persistence. Inspected WebKit 390px dark and Chromium 820px light screenshots. Controlled physical iPad verification remains pending; owner screenshots show original PDF questions and saved notes, but do not establish reload/backup retention.
+- Branch: feat/textbook-money-answer-check-20261113. PR/release evidence tracked separately.
+
+
+## Read-only infrastructure checkpoint (2026-11-13)
+- Main before this branch: `8334892`; Pages 43452770281 and answer-check 43452770417 passed. A later scheduled Notion sync run 43455344492 reports success. This is workflow evidence, not an end-to-end verification of Notion content freshness or the Cloudflare Cron scheduler.
+- Current `.github/workflows/sync.yml` still runs every 15 minutes, commits `data` and pushes directly to main, then requests a Pages rebuild if data changes. Safety PRs #39/#50 remain separate drafts; no workflow dispatch or changes were made in this round. Review those PRs together before changing production automation.
+- GET-only probes of the configured public Worker `/quiz` and `/cards` returned HTTP 403; a diagnostic `/quiz` response reported `error code: 1010` (server header `envoy`). This does not prove the user-facing service is down; this execution environment could not validate its live content. No authentication, bypass attempts, progress reads or writes were performed. No Cloudflare connector was available to inspect Cron/source/KV.
+- Offline CAS simulations passed: production candidate 14/14 and prototype 48/48. These are simulated tests, not deployed-backend evidence. Production Worker source and cloud-data recovery remain pending in draft PRs #57/#58.
+
+- Reconciled the current patches from PR #39 (`db92f7d`) and PR #50 (`d138ad5`) in a disposable detached worktree based on main `8334892`: both applied without conflicts. Combined offline validation passed 5 workflow safety tests, 6 Python exporter fixture tests and diff checks. This validates patch compatibility/fixtures only, not GitHub Actions permission to open PRs or real Notion pagination/content. Existing drafts and production workflow remain untouched.
