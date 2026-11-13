@@ -42,3 +42,7 @@ The browser harness now also submits three malformed Full Backup variants direct
 ## Nested daily-row invariant
 
 The same-device Full Restore importer validates each `deviceDays` and `studyDays` entry as a record. Optional `answered`/`correct` counters must be finite nonnegative numbers; optional `ids` must be an array of strings. This follows the `cLocalRecord` and `cStudyRecord` consumers. The cross-device isolation rule still discards source-device daily counters.
+
+## Explicit Thai-sense distractor guard (2026-11-13)
+
+Each eligible English Practice card now precomputes normalized Thai sense fragments split at explicit comma, semicolon or slash delimiters. Distractor rotation rejects any candidate sharing an **exact** fragment with the correct answer or an already selected wrong option. When three nonoverlapping distractors do not exist, the question is omitted instead of presenting ambiguous options. This is a bounded formatting-based check, not human semantic validation or a translation change. Existing practice IDs, frozen active session snapshots, source exports, SRS and cloud state remain unchanged.
