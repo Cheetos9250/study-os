@@ -81,3 +81,8 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 
 - Commits `d66fbd9`, `2b9f5a0`, `64c0c33` expand synthetic browser navigation to 2 overdue + 2 upcoming dates and add accessible group/relationship markup with static regression checks. Check [CI 43371435910](https://github.com/Cheetos9250/study-os/actions/runs/43371435910) before marking this checkpoint verified.
 - Next: inspect course-management data boundaries and user-facing course navigation; do not create/migrate production course records or enable cloud sync without explicit approval.
+
+## Course search checkpoint — 2026-11-13
+
+- Multi-date navigation CI 43371435910 passed both static-contract and browser-qa. Course search commits `0dbbb22`, `2f45c73`, `20c55d2` add accessible local-only filtering with no persisted metadata or changes to course identity. Verify [CI 43371847878](https://github.com/Cheetos9250/study-os/actions/runs/43371847878) before marking course search verified.
+- Next: add isolated browser QA for Thai/English course search and no-match reset; design editable course metadata as a separate schema with stable IDs and backup guarantees, without touching production data.
