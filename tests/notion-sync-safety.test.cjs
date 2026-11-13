@@ -35,3 +35,12 @@ test("schedule remains manual/scheduled and does not run on a pull request", () 
   assert.doesNotMatch(yml, /^\s*pull_request:\s*$/m);
   assert.doesNotMatch(yml, /^\s*push:\s*$/m);
 });
+
+test("the exporter passes fixture validation before opening a content PR", () => {
+  const exportStep = yml.indexOf("python3 scripts/sync_notion.py");
+  const checkStep = yml.indexOf("python3 -m unittest discover -s vocabloom/tests");
+  const nodeStep = yml.indexOf("node --test vocabloom/tests/*.test.cjs");
+  const prStep = yml.indexOf("uses: peter-evans/create-pull-request@v7");
+  assert.ok(exportStep >= 0 && exportStep < checkStep);
+  assert.ok(checkStep < nodeStep && nodeStep < prStep);
+});
