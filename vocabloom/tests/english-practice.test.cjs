@@ -409,3 +409,52 @@ test('Practice stops ongoing speech on answer, navigation, restart and leaving t
  assert.equal(result.tab,'cards');
  assert.deepEqual(result.answers,{});
 });
+
+
+test('Broken speech cancellation cannot prevent answering, navigating or restarting Practice',()=>{
+ const actions=extract('function uAction(el){','async function uBoot(){');
+ const code=[
+  "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0,tab:'practice'};",
+  "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4],ref:x[3]}));const uDeck=()=>deck;",
+  "const ui={page:'studymerge'},render=()=>{},toast=()=>{};",
+  "const window={speechSynthesis:{cancel(){throw Error('Browser audio device failure')},speak(){}},SpeechSynthesisUtterance:function(text){this.text=text;}};",
+  pure,actions,
+  "const q=uPracticeQuestions(deck)[0];uAction({dataset:{action:'u-practice-answer',answer:String(q.right)}});",
+  "const answered=USTATE.practiceAnswers[q.id];uAction({dataset:{action:'u-q-next'}});const index=USTATE.quizIndex;",
+  "uAction({dataset:{action:'u-practice-restart'}});return {answered,right:q.right,index,cleared:Object.keys(USTATE.practiceAnswers).length};"
+ ].join('\n');
+ const out=new Function('deck',code)(deck);
+ assert.equal(out.answered,out.right);
+ assert.equal(out.index,1);
+ assert.equal(out.cleared,0);
+});
+
+test('Speech constructor, cancel and speak exceptions fail safely with helpful feedback',()=>{
+ const fns=extract('function uPracticeStopSpeech(){','function uPracticeQuestions(d){');
+ const errors=[];
+ const run=new Function('window','toast',fns+'return {stop:uPracticeStopSpeech,speak:uPracticeSpeak};');
+ for(const failure of ['constructor','cancel','speak']){
+  const synth={cancel(){if(failure==='cancel')throw Error('Synthetic cancel error')},speak(){if(failure==='speak')throw Error('Synthetic speak error')}};
+  const utterance=function(text){if(failure==='constructor')throw Error('Synthetic constructor error');this.text=text;};
+  const api=run({speechSynthesis:synth,SpeechSynthesisUtterance:utterance},text=>errors.push(text));
+  assert.doesNotThrow(()=>api.stop());
+  assert.equal(api.speak('Example sentence.'),false,failure+' must fail closed');
+ }
+ assert.equal(errors.length,3);
+ assert.ok(errors.every(x=>x.includes('continue practicing')));
+});
+
+test('Incomplete browser speech interface disables Listen and never throws',()=>{
+ const code=extract('function uPracticeMeaning(back){','function uHome(){');
+ const source=[
+  "const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:0,practiceQuestions:null,practiceAnswers:{},quizIndex:0};",
+  "const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));",
+  "const window={speechSynthesis:{cancel(){}},SpeechSynthesisUtterance:function(){}};",
+  "const h=x=>String(x);",
+  code,
+  "return {html:uPracticeHTML(deck),spoken:uPracticeSpeak('word')};"
+ ].join('\n');
+ const out=new Function('deck',source)(deck);
+ assert.equal(out.spoken,false);
+ assert.match(out.html,/disabled title="Speech unavailable on this device"/);
+});
