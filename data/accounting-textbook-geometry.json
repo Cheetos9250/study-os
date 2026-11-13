@@ -1,1 +1,2835 @@
-{"meta":{"version":1,"source":"User-supplied Fundamental Accounting Principles 24e PDF","pdfPages":1210,"matched":401,"fallback":2,"note":"Geometry is an aid; page image from locally imported textbook is the authoritative question.","scope":"Chapters 1–9: Accounting for Receivables"},"items":{"QS-1-1":{"page":51,"top":271.8,"bottom":351.7,"matchedTitle":"Understanding accounting","confidence":0.86},"QS-1-2":{"page":51,"top":338.7,"bottom":430.9,"matchedTitle":"Identifying accounting users","confidence":1},"QS-1-3":{"page":51,"top":417.9,"bottom":561.8,"matchedTitle":"Identifying ethical risks This icon highlights","confidence":0.63},"QS-1-4":{"page":51,"top":548.8,"bottom":626.1,"matchedTitle":"Identifying principles, assumptions, and constraints C%","confidence":0.78},"QS-1-5":{"page":51,"top":613.1,"bottom":742,"matchedTitle":"Identifying attributes of businesses","confidence":1},"QS-1-6":{"page":52,"top":45.1,"bottom":225.3,"matchedTitle":"Identifying accounting principles and assumptions","confidence":1},"QS-1-7":{"page":52,"top":212.3,"bottom":295.8,"matchedTitle":"Applying the accounting equation A!","confidence":1},"QS-1-8":{"page":52,"top":282.8,"bottom":478.5,"matchedTitle":"Applying the accounting equation","confidence":1},"QS-1-9":{"page":52,"top":465.5,"bottom":547.4,"matchedTitle":"Identifying and computing assets, liabilities, and equity","confidence":1},"QS-1-11":{"page":53,"top":45.2,"bottom":247,"matchedTitle":"Identifying effects of transactions using accounting equation— Assets and Liabilities","confidence":0.6},"QS-1-12":{"page":53,"top":234,"bottom":344.2,"matchedTitle":"Identifying items with financial statements","confidence":1},"QS-1-13":{"page":53,"top":331.2,"bottom":417.2,"matchedTitle":"Identifying income and equity accounts","confidence":1},"QS-1-14":{"page":53,"top":404.2,"bottom":477.5,"matchedTitle":"Identifying assets, liabilities, and equity P\"","confidence":0.71},"QS-1-15":{"page":53,"top":464.5,"bottom":575.5,"matchedTitle":"Preparing an income statement","confidence":1},"QS-1-16":{"page":53,"top":562.5,"bottom":655.5,"matchedTitle":"Computing and interpreting return on assets","confidence":1},"QS-1-17":{"page":53,"top":642.5,"bottom":742,"matchedTitle":"Identifying and computing assets, liabilities, and equity Samsung","confidence":0.91},"E-1-1":{"page":54,"top":85.4,"bottom":171.1,"matchedTitle":"Classifying activities reflected in the accounting system C!","confidence":0.74},"E-1-2":{"page":54,"top":158.1,"bottom":373.3,"matchedTitle":"Identifying accounting users and uses","confidence":1},"E-1-3":{"page":54,"top":360.3,"bottom":482.5,"matchedTitle":"Describing accounting responsibilities","confidence":1},"E-1-4":{"page":54,"top":469.5,"bottom":626.7,"matchedTitle":"Learning the language of business","confidence":1},"E-1-5":{"page":54,"top":613.7,"bottom":742,"matchedTitle":"Identifying ethical terminology","confidence":1},"E-1-6":{"page":55,"top":140.5,"bottom":339.3,"matchedTitle":"Distinguishing business organizations","confidence":1},"E-1-7":{"page":55,"top":326.3,"bottom":533.4,"matchedTitle":"Identifying accounting principles and assumptions","confidence":1},"E-1-8":{"page":55,"top":520.4,"bottom":630.5,"matchedTitle":"Using the accounting equation","confidence":1},"E-1-9":{"page":55,"top":617.5,"bottom":742,"matchedTitle":"Using the accounting equation","confidence":1},"E-1-11":{"page":56,"top":380.8,"bottom":742,"matchedTitle":"Identifying effects of transactions on the accounting equation","confidence":0.79},"E-1-12":{"page":57,"top":44.6,"bottom":197.7,"matchedTitle":"Identifying effects of transactions on the accounting equation","confidence":0.79},"E-1-13":{"page":57,"top":184.7,"bottom":484,"matchedTitle":"Identifying effects of transactions using the accounting equation","confidence":0.79},"E-1-14":{"page":57,"top":471,"bottom":541.8,"matchedTitle":"Analyzing return on assets","confidence":0.91},"E-1-15":{"page":57,"top":528.8,"bottom":691.4,"matchedTitle":"Preparing an income statement","confidence":1},"E-1-16":{"page":57,"top":678.4,"bottom":742,"matchedTitle":"Preparing a statement of owner’s equity P\"","confidence":1},"E-1-18":{"page":58,"top":95.2,"bottom":219,"matchedTitle":"Preparing a statement of cash flows","confidence":1},"E-1-19":{"page":58,"top":206,"bottom":320.9,"matchedTitle":"Identifying sections of the statement of cash flows","confidence":1},"E-1-31B":{"page":58,"top":395.7,"bottom":508.7,"matchedTitle":"Identifying business activities","confidence":1},"E-1-33":{"page":58,"top":307.9,"bottom":408.7,"matchedTitle":"Preparing an income statement for a company","confidence":1},"E-1-34":{"page":58,"top":585.6,"bottom":742,"matchedTitle":"Using the accounting equation","confidence":1},"P-1-1A":{"page":59,"top":86.3,"bottom":427.8,"matchedTitle":"Identifying effects of transactions on financial statements","confidence":0.88},"P-1-2A":{"page":59,"top":414.8,"bottom":742,"matchedTitle":"Computing missing information using accounting knowledge","confidence":0.73},"P-1-3A":{"page":60,"top":96.7,"bottom":278,"matchedTitle":"Preparing an income statement","confidence":1},"P-1-4A":{"page":60,"top":265,"bottom":330.9,"matchedTitle":"Preparing a statement of owner’s equity P2","confidence":1},"P-1-5A":{"page":60,"top":317.9,"bottom":389.1,"matchedTitle":"Preparing a balance sheet","confidence":0.91},"P-1-6A":{"page":60,"top":376.1,"bottom":509.6,"matchedTitle":"Preparing a statement of cash flows","confidence":1},"P-1-7A":{"page":60,"top":496.6,"bottom":742,"matchedTitle":"Analyzing transactions and preparing financial statements","confidence":0.87},"P-1-8A":{"page":61,"top":209.2,"bottom":531.4,"matchedTitle":"Analyzing effects of transactions","confidence":1},"P-1-9A":{"page":61,"top":518.4,"bottom":742,"matchedTitle":"Analyzing transactions and preparing financial statements","confidence":0.87},"P-1-11A":{"page":62,"top":370.7,"bottom":590.3,"matchedTitle":"Computing and interpreting return on assets","confidence":1},"P-1-12A":{"page":62,"top":577.3,"bottom":649.5,"matchedTitle":"Identifying risk and return","confidence":0.91},"P-1-13A":{"page":62,"top":636.5,"bottom":742,"matchedTitle":"Describing business activities","confidence":1},"P-1-14A":{"page":63,"top":44.5,"bottom":141,"matchedTitle":"Describing business activities C& PROBLEM SET B","confidence":0.73},"P-1-1B":{"page":63,"top":128,"bottom":473.8,"matchedTitle":"Identifying effects of transactions on financial statements","confidence":0.88},"P-1-2B":{"page":63,"top":460.8,"bottom":742,"matchedTitle":"Computing missing information using accounting knowledge","confidence":0.73},"P-1-3B":{"page":64,"top":141.9,"bottom":310.1,"matchedTitle":"Preparing an income statement","confidence":1},"P-1-4B":{"page":64,"top":297.1,"bottom":356.3,"matchedTitle":"Preparing a statement of owner’s equity P\"","confidence":1},"P-1-5B":{"page":64,"top":343.3,"bottom":402.4,"matchedTitle":"Preparing a balance sheet P\"","confidence":1},"P-1-6B":{"page":64,"top":389.4,"bottom":509.6,"matchedTitle":"Preparing a statement of cash flows","confidence":1},"P-1-7B":{"page":64,"top":496.6,"bottom":742,"matchedTitle":"Analyzing transactions and preparing financial statements","confidence":0.87},"P-1-8B":{"page":65,"top":208.2,"bottom":531,"matchedTitle":"Analyzing effects of transactions","confidence":1},"P-1-9B":{"page":65,"top":518,"bottom":742,"matchedTitle":"Analyzing transactions and preparing financial statements","confidence":0.87},"P-1-11B":{"page":66,"top":383.5,"bottom":591.2,"matchedTitle":"Computing and interpreting return on assets","confidence":1},"P-1-12B":{"page":66,"top":578.2,"bottom":649.4,"matchedTitle":"Identifying risk and return","confidence":0.91},"P-1-13B":{"page":66,"top":636.4,"bottom":742,"matchedTitle":"Describing business activities","confidence":1},"P-1-14B":{"page":67,"top":44.5,"bottom":742,"matchedTitle":"Describing business activities C&","confidence":1},"QS-2-1":{"page":94,"top":196.9,"bottom":270.5,"matchedTitle":"Identifying financial statement accounts","confidence":1},"QS-2-2":{"page":94,"top":350.9,"bottom":424.4,"matchedTitle":"Identifying normal balance","confidence":0.89},"QS-2-3":{"page":94,"top":153.3,"bottom":209.9,"matchedTitle":"Identifying source documents C#","confidence":1},"QS-2-4":{"page":94,"top":257.5,"bottom":363.9,"matchedTitle":"Reading a chart of accounts","confidence":0.92},"QS-2-5":{"page":94,"top":411.4,"bottom":497.9,"matchedTitle":"Linking debit or credit with normal balance","confidence":0.76},"QS-2-6":{"page":94,"top":484.9,"bottom":648.5,"matchedTitle":"Analyzing transactions and preparing journal entries","confidence":1},"QS-2-7":{"page":94,"top":635.5,"bottom":742,"matchedTitle":"Analyzing debit or credit by account","confidence":0.86},"QS-2-31":{"page":95,"top":581.1,"bottom":691.4,"matchedTitle":"Preparing an income statement","confidence":1},"QS-2-33":{"page":95,"top":473.3,"bottom":594.1,"matchedTitle":"Preparing journal entries","confidence":0.89},"QS-2-34":{"page":95,"top":678.4,"bottom":742,"matchedTitle":"Preparing a statement of owner’s equity P$","confidence":1},"QS-2-8":{"page":95,"top":45.1,"bottom":202.6,"matchedTitle":"Identifying a posting error","confidence":0.91},"QS-2-9":{"page":95,"top":189.6,"bottom":288.3,"matchedTitle":"Classifying accounts in financial statements","confidence":1},"QS-2-32":{"page":96,"top":45.2,"bottom":101.3,"matchedTitle":"Preparing a balance sheet P$","confidence":1},"QS-2-35":{"page":96,"top":88.3,"bottom":193.4,"matchedTitle":"Computing and using the debt ratio A!","confidence":1},"E-2-1":{"page":96,"top":228.6,"bottom":351.5,"matchedTitle":"Identifying and classifying accounts","confidence":1},"E-2-2":{"page":96,"top":448.5,"bottom":556.5,"matchedTitle":"Identifying type and normal balances of accounts","confidence":1},"E-2-3":{"page":96,"top":180.4,"bottom":241.6,"matchedTitle":"Steps in analyzing and recording transactions C#","confidence":1},"E-2-4":{"page":96,"top":338.5,"bottom":461.5,"matchedTitle":"Identifying a ledger and chart of accounts","confidence":1},"E-2-5":{"page":96,"top":543.5,"bottom":643.6,"matchedTitle":"Analyzing effects of a compound entry","confidence":1},"E-2-6":{"page":96,"top":630.6,"bottom":742,"matchedTitle":"Analyzing account entries and balances","confidence":1},"E-2-33":{"page":97,"top":543.6,"bottom":742,"matchedTitle":"Analyzing and journalizing transactions involving cash payments","confidence":0.9},"E-2-7":{"page":97,"top":91.8,"bottom":228.7,"matchedTitle":"Preparing general journal entries","confidence":1},"E-2-8":{"page":97,"top":215.7,"bottom":291.6,"matchedTitle":"Preparing T-accounts (ledger) and a trial balance P!","confidence":0.85},"E-2-9":{"page":97,"top":278.6,"bottom":504.5,"matchedTitle":"Recording effects of transactions in T-accounts","confidence":1},"E-2-31":{"page":98,"top":45.1,"bottom":243.9,"matchedTitle":"Analyzing and journalizing transactions involving receipt of cash","confidence":0.78},"E-2-32":{"page":98,"top":426.7,"bottom":480.7,"matchedTitle":"Preparing general journal entries P#","confidence":1},"E-2-34":{"page":98,"top":230.9,"bottom":439.7,"matchedTitle":"Entering transactions into T-accounts","confidence":1},"E-2-35":{"page":98,"top":466.5,"bottom":641.8,"matchedTitle":"Computing net income","confidence":0.88},"E-2-36":{"page":98,"top":628.8,"bottom":742,"matchedTitle":"Preparing an income statement","confidence":1},"E-2-13":{"page":99,"top":592.5,"bottom":742,"matchedTitle":"Analyzing a trial balance error","confidence":1},"E-2-37":{"page":99,"top":45.1,"bottom":115,"matchedTitle":"Preparing a statement of owner’s equity P$","confidence":1},"E-2-38":{"page":99,"top":102,"bottom":171.7,"matchedTitle":"Preparing a balance sheet P$","confidence":1},"E-2-39":{"page":99,"top":158.7,"bottom":292.2,"matchedTitle":"Analyzing changes in a company’s equity","confidence":1},"E-2-11":{"page":100,"top":45,"bottom":145.1,"matchedTitle":"Calculating and interpreting the debt ratio","confidence":0.69},"E-2-14":{"page":100,"top":132.1,"bottom":321.5,"matchedTitle":"Preparing journal entries","confidence":0.89},"P-2-1A":{"page":100,"top":308.5,"bottom":602.2,"matchedTitle":"Preparing and posting journal entries; preparing a trial balance","confidence":0.83},"P-2-3A":{"page":100,"top":589.2,"bottom":742,"matchedTitle":"Preparing and posting journal entries; preparing a trial balance","confidence":0.83},"P-2-4A":{"page":101,"top":627.5,"bottom":742,"matchedTitle":"Recording transactions; posting to ledger; preparing a trial balance","confidence":0.69},"P-2-5A":{"page":102,"top":335.8,"bottom":568.4,"matchedTitle":"Computing net income from equity analysis, preparing a balance sheet, and computing the de","confidence":0.66},"P-2-6A":{"page":102,"top":555.4,"bottom":742,"matchedTitle":"Analyzing account balances and reconstructing transactions","confidence":0.68},"P-2-1B":{"page":103,"top":353.3,"bottom":654.4,"matchedTitle":"Preparing and posting journal entries; preparing a trial balance","confidence":0.77},"P-2-2B":{"page":103,"top":641.4,"bottom":742,"matchedTitle":"Preparing and posting journal entries; preparing a trial balance","confidence":0.77},"P-2-7A":{"page":103,"top":127.7,"bottom":366.3,"matchedTitle":"Preparing an income statement, statement of owner’s equity, and balance sheet","confidence":0.63},"P-2-3B":{"page":104,"top":423.5,"bottom":742,"matchedTitle":"Preparing and posting journal entries; preparing a trial balance","confidence":0.77},"P-2-4B":{"page":105,"top":45.2,"bottom":417.4,"matchedTitle":"Recording transactions; posting to ledger; preparing a trial balance","confidence":0.69},"P-2-5B":{"page":105,"top":404.4,"bottom":648.7,"matchedTitle":"Computing net income from equity analysis, preparing a balance sheet, and computing the de","confidence":0.54},"P-2-6B":{"page":105,"top":635.7,"bottom":742,"matchedTitle":"Analyzing account balances and reconstructing transactions","confidence":0.68},"P-2-7B":{"page":106,"top":203.3,"bottom":742,"matchedTitle":"Preparing an income statement, statement of owner’s equity, and balance sheet","confidence":0.63},"QS-3-1":{"page":133,"top":464.1,"bottom":583.4,"matchedTitle":"Identifying accounting adjustments","confidence":1},"QS-3-2":{"page":133,"top":277.5,"bottom":386.9,"matchedTitle":"Periodic reporting","confidence":0.85},"QS-3-3":{"page":133,"top":373.9,"bottom":477.1,"matchedTitle":"Computing accrual and cash income","confidence":1},"QS-3-4":{"page":133,"top":570.4,"bottom":742,"matchedTitle":"Concepts of adjusting entries","confidence":1},"QS-3-5":{"page":134,"top":45.1,"bottom":199.3,"matchedTitle":"Prepaid (deferred) expenses adjustments","confidence":1},"QS-3-6":{"page":134,"top":186.3,"bottom":362.6,"matchedTitle":"Prepaid (deferred) expenses adjustments","confidence":1},"QS-3-7":{"page":134,"top":349.6,"bottom":479.9,"matchedTitle":"Adjusting prepaid (deferred) expenses","confidence":1},"QS-3-8":{"page":134,"top":466.9,"bottom":654.2,"matchedTitle":"Accumulated depreciation adjustments","confidence":1},"QS-3-9":{"page":134,"top":641.2,"bottom":742,"matchedTitle":"Adjusting for depreciation","confidence":0.89},"QS-3-21":{"page":135,"top":508.2,"bottom":607.9,"matchedTitle":"Accruing salaries","confidence":0.85},"QS-3-22":{"page":135,"top":215.1,"bottom":373.5,"matchedTitle":"Adjusting for unearned (deferred) revenues","confidence":1},"QS-3-23":{"page":135,"top":360.5,"bottom":521.2,"matchedTitle":"Accrued expenses adjustments","confidence":1},"QS-3-24":{"page":135,"top":594.9,"bottom":742,"matchedTitle":"Accrued revenues adjustments","confidence":1},"QS-3-25":{"page":136,"top":44.5,"bottom":190.4,"matchedTitle":"Recording and analyzing adjusting entries","confidence":1},"QS-3-26":{"page":136,"top":177.4,"bottom":294.3,"matchedTitle":"Determining effects of adjusting entries","confidence":1},"QS-3-27":{"page":136,"top":281.3,"bottom":437,"matchedTitle":"Preparing an adjusted trial balance","confidence":1},"QS-3-28":{"page":136,"top":424,"bottom":495.1,"matchedTitle":"Analyzing profit margin","confidence":0.89},"QS-3-29":{"page":136,"top":482.1,"bottom":742,"matchedTitle":"Preparing financial statements","confidence":1},"QS-3-22A":{"page":137,"top":200.8,"bottom":401.7,"matchedTitle":"Preparing adjusting entries","confidence":1},"QS-3-24A":{"page":137,"top":388.7,"bottom":601.7,"matchedTitle":"Preparing adjusting entries","confidence":1},"E-3-4":{"page":137,"top":588.7,"bottom":742,"matchedTitle":"Determining assets and expenses for accrual and cash accounting","confidence":0.82},"E-3-1":{"page":138,"top":215.8,"bottom":311.7,"matchedTitle":"Adjusting and paying accrued wages","confidence":1},"E-3-2":{"page":138,"top":403.8,"bottom":597.8,"matchedTitle":"Adjusting and paying accrued expenses","confidence":1},"E-3-3":{"page":138,"top":584.8,"bottom":742,"matchedTitle":"Preparing adjusting entries","confidence":1},"E-3-5":{"page":138,"top":298.7,"bottom":416.8,"matchedTitle":"Determining cost flows through accounts","confidence":1},"E-3-22":{"page":140,"top":373.9,"bottom":522.6,"matchedTitle":"Computing and interpreting profit margin","confidence":1},"E-3-23A":{"page":140,"top":509.6,"bottom":742,"matchedTitle":"Adjusting for prepaids recorded as expenses and unearned revenues recorded as revenues","confidence":0.73},"E-3-14":{"page":141,"top":255.2,"bottom":496.8,"matchedTitle":"Preparing adjusting entries","confidence":1},"E-3-21A":{"page":141,"top":45.1,"bottom":268.2,"matchedTitle":"Recording and reporting revenues received in advance","confidence":0.9},"P-3-2A":{"page":141,"top":483.8,"bottom":742,"matchedTitle":"Identifying adjusting entries with explanations","confidence":0.71},"P-3-1A":{"page":142,"top":496.8,"bottom":742,"matchedTitle":"Preparing adjusting entries, adjusted trial balance, and financial statements","confidence":0.46},"P-3-3A":{"page":142,"top":44.5,"bottom":509.8,"matchedTitle":"Preparing adjusting and subsequent journal entries","confidence":1},"P-3-4A":{"page":143,"top":524.9,"bottom":742,"matchedTitle":"Interpreting unadjusted and adjusted trial balances, and preparing financial statements P\"","confidence":0.68},"P-3-5A":{"page":144,"top":336,"bottom":742,"matchedTitle":"Preparing financial statements from the adjusted trial balance and computing profit margin","confidence":0.54},"P-3-2B":{"page":145,"top":374.8,"bottom":634.1,"matchedTitle":"Identifying adjusting entries with explanations","confidence":0.71},"P-3-3B":{"page":145,"top":621.1,"bottom":742,"matchedTitle":"Preparing adjusting and subsequent journal entries","confidence":1},"P-3-6A":{"page":145,"top":44.4,"bottom":387.8,"matchedTitle":"Recording prepaid expenses and unearned revenues","confidence":0.87},"P-3-1B":{"page":146,"top":349.8,"bottom":742,"matchedTitle":"Preparing adjusting entries, adjusted trial balance, and financial statements","confidence":0.46},"P-3-4B":{"page":147,"top":353.1,"bottom":742,"matchedTitle":"Interpreting unadjusted and adjusted trial balances, and preparing financial statements P\"","confidence":0.68},"P-3-5B":{"page":148,"top":191,"bottom":640.8,"matchedTitle":"Preparing financial statements from the adjusted trial balance and computing profit margin","confidence":0.54},"P-3-6B":{"page":148,"top":627.8,"bottom":742,"matchedTitle":"Recording prepaid expenses and unearned revenues","confidence":0.87},"QS-4-2":{"page":173,"top":365.5,"bottom":459.1,"matchedTitle":"Ordering work sheet steps","confidence":0.91},"QS-4-3":{"page":173,"top":537.6,"bottom":742,"matchedTitle":"Computing ending capital balance using work sheet information","confidence":0.89},"QS-4-4":{"page":173,"top":446.1,"bottom":550.6,"matchedTitle":"Preparing a work sheet","confidence":0.9},"QS-4-1":{"page":174,"top":44.5,"bottom":131.4,"matchedTitle":"Preparing a partial work sheet","confidence":1},"QS-4-5":{"page":174,"top":118.4,"bottom":250.4,"matchedTitle":"Explaining temporary and permanent accounts","confidence":1},"QS-4-6":{"page":174,"top":278.3,"bottom":336.3,"matchedTitle":"Identifying post-closing accounts P3","confidence":1},"QS-4-7":{"page":174,"top":237.4,"bottom":291.4,"matchedTitle":"Preparing closing entries from the ledger P2","confidence":1},"QS-4-8":{"page":174,"top":323.3,"bottom":422.3,"matchedTitle":"Identifying the accounting cycle","confidence":1},"QS-4-9":{"page":174,"top":409.3,"bottom":547.2,"matchedTitle":"Classifying balance sheet items","confidence":1},"QS-4-22":{"page":175,"top":44.5,"bottom":104.4,"matchedTitle":"Preparing a classified balance sheet C%","confidence":1},"QS-4-23A":{"page":175,"top":183.5,"bottom":317.5,"matchedTitle":"Reversing entries","confidence":0.85},"QS-4-24":{"page":175,"top":91.4,"bottom":196.5,"matchedTitle":"Identifying current accounts and computing the current ratio","confidence":0.56},"E-4-2":{"page":175,"top":304.5,"bottom":469.2,"matchedTitle":"Extending adjusted account balances on a work sheet P\"","confidence":0.79},"E-4-4":{"page":175,"top":456.2,"bottom":742,"matchedTitle":"Extending accounts in a work sheet P\"","confidence":1},"E-4-1":{"page":176,"top":266.6,"bottom":526.4,"matchedTitle":"Preparing unadjusted and adjusted trial balances, including the adjustments","confidence":0.74},"E-4-3":{"page":176,"top":44.5,"bottom":279.6,"matchedTitle":"Preparing adjusting entries from a work sheet P\"","confidence":1},"E-4-5":{"page":176,"top":513.4,"bottom":677.4,"matchedTitle":"Computing Income Summary and ending capital balance from closing entries","confidence":0.6},"E-4-6":{"page":176,"top":664.4,"bottom":742,"matchedTitle":"Completing the Income Statement columns and preparing closing entries","confidence":0.73},"E-4-22":{"page":178,"top":677.9,"bottom":742,"matchedTitle":"Preparing financial statements C%","confidence":1},"E-4-9":{"page":178,"top":44.5,"bottom":350.8,"matchedTitle":"Preparing closing entries and a post-closing trial balance","confidence":0.91},"E-4-21":{"page":179,"top":385.5,"bottom":476.8,"matchedTitle":"Preparing closing entries","confidence":0.89},"E-4-23":{"page":179,"top":329.3,"bottom":398.5,"matchedTitle":"Computing the current ratio","confidence":0.91},"E-4-24":{"page":179,"top":285.8,"bottom":342.3,"matchedTitle":"Preparing a classified balance sheet C%","confidence":1},"E-4-25":{"page":179,"top":463.8,"bottom":601.7,"matchedTitle":"Computing and analyzing the current ratio","confidence":1},"E-4-26A":{"page":179,"top":588.7,"bottom":742,"matchedTitle":"Preparing reversing entries","confidence":0.89},"E-4-27A":{"page":180,"top":44.4,"bottom":286.3,"matchedTitle":"Preparing reversing entries","confidence":0.89},"P-4-2A":{"page":180,"top":273.3,"bottom":742,"matchedTitle":"Applying the accounting cycle","confidence":1},"P-4-3A":{"page":181,"top":636.8,"bottom":742,"matchedTitle":"Determining balance sheet classifications","confidence":1},"P-4-4A":{"page":181,"top":44.5,"bottom":649.8,"matchedTitle":"Preparing a work sheet, adjusting and closing entries, and financial statements","confidence":0.8},"P-4-1A":{"page":182,"top":187.1,"bottom":742,"matchedTitle":"Preparing closing entries, financial statements, and ratios","confidence":0.91},"P-4-5A":{"page":183,"top":98,"bottom":504.2,"matchedTitle":"Preparing trial balances, closing entries, and financial statements","confidence":0.79},"P-4-6A":{"page":183,"top":491.2,"bottom":742,"matchedTitle":"Preparing adjusting, reversing, and next period entries","confidence":0.9},"P-4-2B":{"page":184,"top":287.3,"bottom":742,"matchedTitle":"Applying the accounting cycle","confidence":1},"P-4-3B":{"page":185,"top":636.8,"bottom":742,"matchedTitle":"Determining balance sheet classifications","confidence":1},"P-4-4B":{"page":185,"top":44.5,"bottom":649.8,"matchedTitle":"Preparing a work sheet, adjusting and closing entries, and financial statements","confidence":0.72},"P-4-1B":{"page":186,"top":190.1,"bottom":742,"matchedTitle":"Preparing closing entries, financial statements, and ratios","confidence":0.91},"P-4-5B":{"page":187,"top":99.1,"bottom":506,"matchedTitle":"Preparing trial balances, closing entries, and financial statements","confidence":0.79},"P-4-6B":{"page":187,"top":493,"bottom":742,"matchedTitle":"Preparing adjusting, reversing, and next period entries","confidence":0.79},"QS-5-1":{"page":223,"top":513.6,"bottom":611.5,"matchedTitle":"Recording purchases, returns, and discounts taken","confidence":0.9},"QS-5-2":{"page":223,"top":86.3,"bottom":240.7,"matchedTitle":"Applying merchandising terms","confidence":1},"QS-5-4":{"page":223,"top":227.7,"bottom":310.3,"matchedTitle":"Identifying inventory costs","confidence":0.89},"QS-5-5":{"page":223,"top":297.3,"bottom":444.6,"matchedTitle":"Merchandise accounts and computations","confidence":1},"QS-5-6":{"page":223,"top":431.6,"bottom":526.6,"matchedTitle":"Computing net invoice amounts","confidence":1},"QS-5-7":{"page":223,"top":598.5,"bottom":674.5,"matchedTitle":"Recording purchases and discounts taken","confidence":1},"QS-5-8":{"page":223,"top":661.5,"bottom":742,"matchedTitle":"Recording purchases and discounts missed","confidence":1},"QS-5-22":{"page":224,"top":355.7,"bottom":472.8,"matchedTitle":"Multiple-step income statement","confidence":1},"QS-5-23":{"page":224,"top":316.6,"bottom":370.6,"matchedTitle":"Closing entries P#","confidence":1},"QS-5-24":{"page":224,"top":459.8,"bottom":623.3,"matchedTitle":"Preparing a multiple-step income statement","confidence":1},"QS-5-25":{"page":224,"top":610.3,"bottom":742,"matchedTitle":"Preparing a classified balance sheet for a merchandiser","confidence":0.86},"QS-5-9":{"page":224,"top":45.2,"bottom":180.2,"matchedTitle":"Recording sales, returns, and discounts taken","confidence":1},"QS-5-21":{"page":225,"top":128.5,"bottom":254.5,"matchedTitle":"Computing and analyzing gross margin ratio","confidence":1},"QS-5-26":{"page":225,"top":45.2,"bottom":141.5,"matchedTitle":"Computing and interpreting acid-test ratio","confidence":1},"QS-5-27A":{"page":225,"top":241.5,"bottom":339.8,"matchedTitle":"Contrasting periodic and perpetual systems","confidence":1},"QS-5-28A":{"page":225,"top":326.8,"bottom":404,"matchedTitle":"Recording purchases, returns, and discounts— periodic & gross methods P\"","confidence":0.69},"QS-5-29A":{"page":225,"top":391,"bottom":457.3,"matchedTitle":"Recording sales, returns, and discounts—periodic & gross methods P\"","confidence":0.79},"QS-5-42C":{"page":225,"top":614,"bottom":680.3,"matchedTitle":"Recording purchases, returns, and discounts—net & perpetual methods P(","confidence":0.77},"QS-5-43B":{"page":225,"top":534.7,"bottom":627,"matchedTitle":"Recording estimates of future returns","confidence":1},"QS-5-44C":{"page":225,"top":667.3,"bottom":742,"matchedTitle":"Recording sales, returns, and discounts—net & perpetual methods P(","confidence":0.76},"QS-5-45":{"page":226,"top":45.2,"bottom":212.1,"matchedTitle":"Sales transactions","confidence":0.85},"E-5-2":{"page":226,"top":199.1,"bottom":349.9,"matchedTitle":"Computing revenues, expenses, and income","confidence":1},"E-5-4":{"page":226,"top":336.9,"bottom":420.9,"matchedTitle":"Operating cycle for merchandiser","confidence":1},"E-5-5":{"page":226,"top":407.9,"bottom":578.6,"matchedTitle":"Recording purchases, purchases returns, and purchases allowances","confidence":0.8},"E-5-6":{"page":226,"top":565.6,"bottom":742,"matchedTitle":"Recording sales, sales returns, and sales allowances","confidence":0.85},"E-5-1":{"page":227,"top":45.2,"bottom":110.1,"matchedTitle":"Recording purchases, purchases returns, and purchases allowances P&","confidence":0.74},"E-5-23":{"page":227,"top":576.3,"bottom":742,"matchedTitle":"Preparing adjusting and closing entries for a merchandiser","confidence":0.87},"E-5-7":{"page":227,"top":97.1,"bottom":196.8,"matchedTitle":"Recording sales, purchases, and cash discounts—buyer and seller","confidence":0.68},"E-5-8":{"page":227,"top":443.6,"bottom":589.3,"matchedTitle":"Recording purchases, sales, returns, and shipping","confidence":0.73},"E-5-9":{"page":227,"top":308.7,"bottom":456.6,"matchedTitle":"Inventory and cost of sales transactions in T-accounts","confidence":1},"E-5-21":{"page":228,"top":453.7,"bottom":624.7,"matchedTitle":"Preparing a multiple-step income statement","confidence":1},"E-5-22":{"page":228,"top":100.4,"bottom":190.1,"matchedTitle":"Net sales computation for multiple-step income statement","confidence":0.89},"E-5-24":{"page":228,"top":177.1,"bottom":271.1,"matchedTitle":"Impacts of inventory error on key accounts","confidence":1},"E-5-25":{"page":228,"top":258.1,"bottom":319.1,"matchedTitle":"Physical count error and profits A$","confidence":1},"E-5-26":{"page":228,"top":306.1,"bottom":466.7,"matchedTitle":"Computing and analyzing acid-test and current ratios","confidence":1},"E-5-27":{"page":228,"top":611.7,"bottom":742,"matchedTitle":"Preparing a classified balance sheet for a merchandiser","confidence":0.86},"E-5-28A":{"page":229,"top":45.1,"bottom":110.4,"matchedTitle":"Recording purchases, returns, and allowances— periodic P\"","confidence":0.82},"E-5-29A":{"page":229,"top":97.4,"bottom":162.5,"matchedTitle":"Recording sales, purchases, and discounts: buyer and seller—periodic P\"","confidence":0.78},"E-5-42B":{"page":229,"top":292.5,"bottom":435.4,"matchedTitle":"Recording estimates of future returns","confidence":1},"E-5-43B":{"page":229,"top":201.5,"bottom":305.5,"matchedTitle":"Recording estimates of future discounts","confidence":1},"E-5-44B":{"page":229,"top":422.4,"bottom":556.4,"matchedTitle":"Recording estimates of future returns","confidence":1},"E-5-45C":{"page":229,"top":149.5,"bottom":214.5,"matchedTitle":"Recording sales, purchases, shipping, and returns: buyer and seller—periodic P\"","confidence":0.78},"E-5-46C":{"page":229,"top":543.4,"bottom":619.4,"matchedTitle":"Recording sales, purchases, shipping, and returns: buyer and seller—perpetual and net meth","confidence":0.49},"E-5-41":{"page":230,"top":45.2,"bottom":246.6,"matchedTitle":"Purchasing transactions","confidence":0.86},"P-5-2A":{"page":230,"top":233.6,"bottom":488.1,"matchedTitle":"Preparing journal entries for merchandising activities—perpetual system","confidence":0.71},"P-5-4A":{"page":230,"top":475.1,"bottom":742,"matchedTitle":"Preparing journal entries for merchandising activities—perpetual system","confidence":0.71},"P-5-1A":{"page":231,"top":632.8,"bottom":742,"matchedTitle":"Preparing adjusting entries and income statements; computing gross margin, acid-test, and ","confidence":0.59},"P-5-5A":{"page":231,"top":138.2,"bottom":571.9,"matchedTitle":"Computing merchandising amounts and formatting income statements","confidence":0.79},"P-5-6A":{"page":231,"top":558.9,"bottom":645.8,"matchedTitle":"Preparing closing entries and interpreting information about discounts and returns C$","confidence":0.72},"P-5-2B":{"page":232,"top":553.2,"bottom":742,"matchedTitle":"Preparing journal entries for merchandising activities—perpetual system","confidence":0.71},"P-5-4B":{"page":233,"top":152.1,"bottom":492.3,"matchedTitle":"Preparing journal entries for merchandising activities—perpetual system","confidence":0.71},"P-5-5B":{"page":233,"top":479.3,"bottom":742,"matchedTitle":"Computing merchandising amounts and formatting income statements","confidence":0.79},"P-5-1B":{"page":234,"top":271.1,"bottom":742,"matchedTitle":"Preparing adjusting entries and income statements; computing gross margin, acid-test, and ","confidence":0.59},"P-5-6B":{"page":234,"top":197.7,"bottom":284.1,"matchedTitle":"Preparing closing entries and interpreting information about discounts and returns C$","confidence":0.72},"QS-6-1":{"page":268,"top":346.6,"bottom":444,"matchedTitle":"Inventory ownership","confidence":0.85},"QS-6-2":{"page":268,"top":431,"bottom":525.6,"matchedTitle":"Inventory costs","confidence":0.84},"QS-6-9":{"page":268,"top":512.6,"bottom":586.3,"matchedTitle":"Computing goods available for sale P\"","confidence":1},"QS-6-11":{"page":269,"top":45.1,"bottom":109.2,"matchedTitle":"Perpetual: Inventory costing with LIFO P\"","confidence":1},"QS-6-12":{"page":269,"top":96.2,"bottom":171.2,"matchedTitle":"Perpetual: Inventory costing with weighted average P\"","confidence":0.83},"QS-6-14A":{"page":269,"top":209.3,"bottom":273.5,"matchedTitle":"Periodic: Inventory costing with LIFO P%","confidence":1},"QS-6-18":{"page":269,"top":311.7,"bottom":464.9,"matchedTitle":"Perpetual: Assigning costs with FIFO","confidence":1},"QS-6-19":{"page":269,"top":565.2,"bottom":640.2,"matchedTitle":"Perpetual: Inventory costing with specific identification P\"","confidence":0.79},"QS-6-3":{"page":269,"top":503.1,"bottom":578.2,"matchedTitle":"Perpetual: Inventory costing with weighted average P\"","confidence":0.83},"QS-6-4":{"page":269,"top":451.9,"bottom":516.1,"matchedTitle":"Perpetual: Inventory costing with LIFO P\"","confidence":1},"QS-6-5A":{"page":269,"top":158.2,"bottom":222.3,"matchedTitle":"Periodic: Inventory costing with FIFO P%","confidence":1},"QS-6-6A":{"page":269,"top":678.3,"bottom":742,"matchedTitle":"Periodic: Inventory costing with LIFO P%","confidence":1},"QS-6-7A":{"page":269,"top":260.5,"bottom":324.7,"matchedTitle":"Periodic: Inventory costing with weighted average P%","confidence":1},"QS-6-13A":{"page":270,"top":45,"bottom":103.5,"matchedTitle":"Periodic: Inventory costing with weighted average P%","confidence":1},"QS-6-15A":{"page":270,"top":90.5,"bottom":160.1,"matchedTitle":"Periodic: Inventory costing with specific identification P%","confidence":0.79},"QS-6-16":{"page":270,"top":147.1,"bottom":259.5,"matchedTitle":"Contrasting inventory costing methods","confidence":1},"QS-6-17":{"page":270,"top":246.5,"bottom":365.3,"matchedTitle":"Applying LCM to inventories","confidence":1},"QS-6-21":{"page":270,"top":412.8,"bottom":471.2,"matchedTitle":"Analyzing inventory A%","confidence":1},"QS-6-22B":{"page":270,"top":458.2,"bottom":573.2,"matchedTitle":"Estimating inventories— gross profit method","confidence":1},"QS-6-28":{"page":270,"top":352.3,"bottom":425.8,"matchedTitle":"Inventory errors","confidence":0.85},"QS-6-29":{"page":270,"top":560.2,"bottom":692.2,"matchedTitle":"Inventory costs","confidence":0.84},"E-6-1":{"page":270,"top":679.2,"bottom":742,"matchedTitle":"Inventory ownership C\"","confidence":1},"E-6-2":{"page":271,"top":45.1,"bottom":114.6,"matchedTitle":"Inventory costs","confidence":0.84},"E-6-3A":{"page":271,"top":456.3,"bottom":577.5,"matchedTitle":"Periodic: Income effects of inventory methods","confidence":1},"E-6-4A":{"page":271,"top":388.8,"bottom":469.3,"matchedTitle":"Periodic: Inventory costing","confidence":0.89},"E-6-5":{"page":271,"top":564.5,"bottom":742,"matchedTitle":"Perpetual: Inventory costing methods—FIFO and LIFO","confidence":0.83},"E-6-9":{"page":271,"top":101.6,"bottom":317.3,"matchedTitle":"Perpetual: Inventory costing methods","confidence":1},"E-6-11":{"page":272,"top":314.4,"bottom":524.5,"matchedTitle":"Comparing LIFO numbers to FIFO numbers; ratio analysis","confidence":0.89},"E-6-12":{"page":272,"top":511.5,"bottom":631.1,"matchedTitle":"Analyzing inventory errors","confidence":1},"E-6-18":{"page":272,"top":197.2,"bottom":327.4,"matchedTitle":"Lower of cost or market","confidence":0.91},"E-6-19":{"page":272,"top":618.1,"bottom":742,"matchedTitle":"Inventory turnover and days’ sales in inventory","confidence":1},"E-6-6":{"page":272,"top":101.9,"bottom":162.5,"matchedTitle":"Specific identification P\"","confidence":1},"E-6-7A":{"page":272,"top":149.5,"bottom":210.2,"matchedTitle":"Periodic: Inventory costing P%","confidence":1},"E-6-13B":{"page":273,"top":353.1,"bottom":469,"matchedTitle":"Estimating ending inventory—retail method","confidence":1},"E-6-14A":{"page":273,"top":45,"bottom":218,"matchedTitle":"Periodic: Cost flow assumptions","confidence":1},"E-6-15B":{"page":273,"top":456,"bottom":537.5,"matchedTitle":"Estimating ending inventory—gross profit method P&","confidence":0.83},"E-6-16":{"page":273,"top":524.5,"bottom":742,"matchedTitle":"Perpetual inventory costing","confidence":0.89},"E-6-17A":{"page":274,"top":45.1,"bottom":167,"matchedTitle":"Periodic inventory costing","confidence":0.89},"P-6-1A":{"page":274,"top":154,"bottom":422.7,"matchedTitle":"Perpetual: Alternative cost flows","confidence":1},"P-6-2A":{"page":274,"top":409.7,"bottom":544.7,"matchedTitle":"Periodic: Alternative cost flows","confidence":1},"P-6-9A":{"page":274,"top":531.7,"bottom":742,"matchedTitle":"Perpetual: Alternative cost flows","confidence":1},"P-6-3A":{"page":275,"top":593.7,"bottom":742,"matchedTitle":"Analysis of inventory errors","confidence":1},"P-6-4A":{"page":275,"top":345.7,"bottom":606.7,"matchedTitle":"Lower of cost or market","confidence":0.91},"P-6-5A":{"page":276,"top":195.2,"bottom":347.1,"matchedTitle":"Periodic: Alternative cost flows P%","confidence":1},"P-6-6A":{"page":276,"top":334.1,"bottom":590.2,"matchedTitle":"Periodic: Income comparisons and cost flows","confidence":1},"P-6-7A":{"page":276,"top":577.2,"bottom":742,"matchedTitle":"Retail inventory method","confidence":0.89},"P-6-18A":{"page":277,"top":45,"bottom":231.9,"matchedTitle":"Gross profit method P&","confidence":0.59},"P-6-1B":{"page":277,"top":218.9,"bottom":463.8,"matchedTitle":"Perpetual: Alternative cost flows","confidence":1},"P-6-2B":{"page":277,"top":450.8,"bottom":574.3,"matchedTitle":"Periodic: Alternative cost flows","confidence":1},"P-6-9B":{"page":277,"top":561.3,"bottom":742,"matchedTitle":"Perpetual: Alternative cost flows","confidence":1},"P-6-3B":{"page":278,"top":596.6,"bottom":742,"matchedTitle":"Analysis of inventory errors","confidence":1},"P-6-4B":{"page":278,"top":339.6,"bottom":609.6,"matchedTitle":"Lower of cost or market","confidence":0.91},"P-6-5B":{"page":279,"top":194.4,"bottom":345.3,"matchedTitle":"Periodic: Alternative cost flows","confidence":1},"P-6-6B":{"page":279,"top":332.3,"bottom":577.8,"matchedTitle":"Periodic: Income comparisons and cost flows","confidence":1},"P-6-7B":{"page":279,"top":564.8,"bottom":742,"matchedTitle":"Retail inventory method","confidence":0.89},"P-6-18B":{"page":280,"top":45.5,"bottom":742,"matchedTitle":"Gross profit method","confidence":0.88},"QS-7-1":{"page":303,"top":471.7,"bottom":560.3,"matchedTitle":"Accounting information system components","confidence":1},"QS-7-2":{"page":303,"top":547.3,"bottom":698.5,"matchedTitle":"Accounting information system principles","confidence":1},"QS-7-3":{"page":303,"top":685.5,"bottom":742,"matchedTitle":"Identifying general and subsidiary ledgers C\"","confidence":1},"QS-7-4":{"page":304,"top":44.5,"bottom":189.8,"matchedTitle":"Controlling accounts and subsidiary ledgers","confidence":1},"QS-7-5":{"page":304,"top":176.8,"bottom":288.2,"matchedTitle":"Identifying the special journal of entry","confidence":1},"QS-7-6":{"page":304,"top":275.2,"bottom":406.6,"matchedTitle":"Sales journal","confidence":0.84},"QS-7-7":{"page":304,"top":393.6,"bottom":536,"matchedTitle":"Cash receipts journal","confidence":0.88},"QS-7-8":{"page":304,"top":523,"bottom":687.4,"matchedTitle":"Purchases journal","confidence":0.85},"QS-7-9":{"page":304,"top":674.4,"bottom":742,"matchedTitle":"Identifying journal of entry","confidence":1},"QS-7-11":{"page":305,"top":147.9,"bottom":266.4,"matchedTitle":"Entries in the general journal","confidence":1},"QS-7-12":{"page":305,"top":253.4,"bottom":480.4,"matchedTitle":"Accounts receivable ledger; posting to accounts","confidence":1},"QS-7-13":{"page":305,"top":467.4,"bottom":622.4,"matchedTitle":"Days’ payable outstanding","confidence":0.89},"E-7-1":{"page":305,"top":609.4,"bottom":742,"matchedTitle":"Sales journal","confidence":0.84},"E-7-2":{"page":306,"top":44.5,"bottom":110.4,"matchedTitle":"Identifying journal of entry","confidence":1},"E-7-3":{"page":306,"top":97.4,"bottom":264.9,"matchedTitle":"Cash receipts journal","confidence":0.88},"E-7-4":{"page":306,"top":251.9,"bottom":317.8,"matchedTitle":"Identifying journal of entry","confidence":1},"E-7-5":{"page":306,"top":304.8,"bottom":442.4,"matchedTitle":"Controlling accounts and subsidiary ledgers","confidence":1},"E-7-6":{"page":306,"top":429.4,"bottom":596.9,"matchedTitle":"Purchases journal","confidence":0.85},"E-7-7":{"page":306,"top":583.9,"bottom":742,"matchedTitle":"Cash payments journal","confidence":0.88},"E-7-11":{"page":307,"top":419.8,"bottom":550.8,"matchedTitle":"Special journal transactions and error discovery","confidence":0.65},"E-7-12":{"page":307,"top":537.8,"bottom":742,"matchedTitle":"Posting to subsidiary ledger accounts; preparing a schedule of accounts receivable","confidence":0.47},"E-7-8":{"page":307,"top":44.5,"bottom":107.9,"matchedTitle":"Identifying journal of entry","confidence":1},"E-7-9":{"page":307,"top":94.9,"bottom":259.8,"matchedTitle":"Entries in general journal","confidence":0.91},"E-7-13":{"page":308,"top":156.2,"bottom":321.8,"matchedTitle":"Days’ payable outstanding","confidence":0.89},"P-7-1A":{"page":308,"top":308.8,"bottom":742,"matchedTitle":"Special journals, subsidiary ledgers, trial balance","confidence":0.64},"P-7-2A":{"page":309,"top":146.8,"bottom":742,"matchedTitle":"Special journals, subsidiary ledgers, and schedule of accounts receivable","confidence":0.47},"P-7-1B":{"page":310,"top":279,"bottom":742,"matchedTitle":"Special journals, subsidiary ledgers, trial balance","confidence":0.64},"P-7-3A":{"page":310,"top":44.5,"bottom":292,"matchedTitle":"Special journals, subsidiary ledgers, and schedule of accounts payable","confidence":0.49},"P-7-2B":{"page":311,"top":123.7,"bottom":742,"matchedTitle":"Special journals, subsidiary ledgers, schedule of accounts receivable","confidence":0.5},"P-7-3B":{"page":312,"top":44.5,"bottom":742,"matchedTitle":"Special journals, subsidiary ledgers, and schedule of accounts payable","confidence":0.49},"QS-8-1":{"page":338,"top":651.4,"bottom":742,"matchedTitle":"Internal control objectives","confidence":0.89},"QS-8-2":{"page":339,"top":44.5,"bottom":130.2,"matchedTitle":"COSO internal control components","confidence":1},"QS-8-3":{"page":339,"top":117.2,"bottom":241.8,"matchedTitle":"Cash and equivalents","confidence":0.88},"QS-8-4":{"page":339,"top":228.8,"bottom":340.5,"matchedTitle":"Internal control for cash","confidence":0.91},"QS-8-5":{"page":339,"top":327.5,"bottom":391.2,"matchedTitle":"Cash Over and Short","confidence":0.9},"QS-8-6":{"page":339,"top":378.2,"bottom":498.9,"matchedTitle":"Petty cash accounting","confidence":0.88},"QS-8-7":{"page":339,"top":485.9,"bottom":652.8,"matchedTitle":"Bank reconciliation","confidence":0.85},"QS-8-8":{"page":339,"top":639.8,"bottom":742,"matchedTitle":"Bank reconciliation","confidence":0.85},"QS-8-33A":{"page":340,"top":414.1,"bottom":536,"matchedTitle":"Documents in a voucher system P4","confidence":1},"QS-8-35":{"page":340,"top":281.5,"bottom":427.1,"matchedTitle":"Days’ sales uncollected","confidence":1},"E-8-3":{"page":340,"top":523,"bottom":623.9,"matchedTitle":"Analyzing internal control","confidence":1},"E-8-4":{"page":340,"top":610.9,"bottom":742,"matchedTitle":"Applying internal control principles","confidence":1},"E-8-5":{"page":341,"top":262.6,"bottom":353.2,"matchedTitle":"Cash and cash equivalents","confidence":0.89},"E-8-6":{"page":341,"top":340.2,"bottom":469.7,"matchedTitle":"Control of cash receipts","confidence":0.9},"E-8-7":{"page":341,"top":456.7,"bottom":575.3,"matchedTitle":"Voucher system and control of cash payments","confidence":1},"E-8-8":{"page":341,"top":562.3,"bottom":657.9,"matchedTitle":"Petty cash fund with a shortage P$ Check (') Cr. Cash, $'(+ and (*) Cr. Cash, $\"#","confidence":0.71},"E-8-9":{"page":341,"top":644.9,"bottom":742,"matchedTitle":"Petty cash fund with an overage","confidence":1},"E-8-11":{"page":342,"top":119.6,"bottom":435.1,"matchedTitle":"Bank reconciliation and adjusting entries","confidence":1},"E-8-12":{"page":342,"top":422.1,"bottom":551.3,"matchedTitle":"Bank reconciliation","confidence":0.85},"E-8-13":{"page":342,"top":538.3,"bottom":592.9,"matchedTitle":"Adjusting entries from bank reconciliation P%","confidence":1},"E-8-14":{"page":342,"top":579.9,"bottom":742,"matchedTitle":"Bank reconciliation","confidence":0.85},"E-8-15":{"page":343,"top":44.5,"bottom":136.5,"matchedTitle":"Liquid assets and accounts receivable A#","confidence":1},"E-8-16A":{"page":343,"top":123.5,"bottom":381.6,"matchedTitle":"Documents in a voucher system","confidence":1},"P-8-1A":{"page":343,"top":368.6,"bottom":608.1,"matchedTitle":"Analyzing internal control","confidence":0.89},"P-8-2A":{"page":343,"top":595.1,"bottom":742,"matchedTitle":"Establishing, reimbursing, and adjusting petty cash","confidence":1},"P-8-3A":{"page":344,"top":184.1,"bottom":473,"matchedTitle":"Establishing, reimbursing, and increasing petty cash","confidence":1},"P-8-4A":{"page":344,"top":460,"bottom":742,"matchedTitle":"Preparing a bank reconciliation and recording adjustments","confidence":0.74},"P-8-1B":{"page":345,"top":664.6,"bottom":742,"matchedTitle":"Analyzing internal control","confidence":0.89},"P-8-5A":{"page":345,"top":44.5,"bottom":677.6,"matchedTitle":"Preparing a bank reconciliation and recording adjustments","confidence":0.74},"P-8-2B":{"page":347,"top":165,"bottom":468.9,"matchedTitle":"Establishing, reimbursing, and adjusting petty cash","confidence":1},"P-8-3B":{"page":347,"top":455.9,"bottom":742,"matchedTitle":"Establishing, reimbursing, and increasing petty cash","confidence":1},"P-8-4B":{"page":348,"top":44.5,"bottom":305.3,"matchedTitle":"Preparing a bank reconciliation and recording adjustments","confidence":0.74},"P-8-5B":{"page":348,"top":292.3,"bottom":742,"matchedTitle":"Preparing a bank reconciliation and recording adjustments","confidence":0.74},"QS-9-2":{"page":374,"top":190,"bottom":265.7,"matchedTitle":"Credit card sales","confidence":0.88},"QS-9-3":{"page":374,"top":252.7,"bottom":320.4,"matchedTitle":"Direct write-off method","confidence":0.9},"QS-9-4":{"page":374,"top":307.4,"bottom":382.4,"matchedTitle":"Recovering a bad debt","confidence":0.9},"QS-9-5":{"page":374,"top":369.4,"bottom":511.2,"matchedTitle":"Distinguishing between allowance method and direct write-off method","confidence":0.73},"QS-9-6":{"page":374,"top":498.2,"bottom":577,"matchedTitle":"Allowance method for bad debts","confidence":1},"QS-9-7":{"page":374,"top":564,"bottom":653.8,"matchedTitle":"Reporting allowance for doubtful accounts","confidence":1},"QS-9-8":{"page":374,"top":640.8,"bottom":742,"matchedTitle":"Percent of accounts receivable method","confidence":1},"QS-9-1":{"page":375,"top":95.2,"bottom":242.5,"matchedTitle":"Aging of receivables method","confidence":1},"QS-9-22":{"page":375,"top":325.8,"bottom":389,"matchedTitle":"Note receivable","confidence":0.84},"QS-9-23":{"page":375,"top":376,"bottom":439.2,"matchedTitle":"Note receivable honored","confidence":0.89},"QS-9-24":{"page":375,"top":426.2,"bottom":489.4,"matchedTitle":"Note receivable interest and maturity P&","confidence":1},"QS-9-25":{"page":375,"top":476.4,"bottom":530.4,"matchedTitle":"Factoring receivables C%","confidence":1},"QS-9-26":{"page":375,"top":512.2,"bottom":625.8,"matchedTitle":"Preparing an income statement","confidence":1},"QS-9-27":{"page":375,"top":612.8,"bottom":742,"matchedTitle":"Preparing a balance sheet","confidence":0.91},"QS-9-9":{"page":375,"top":44.5,"bottom":108.2,"matchedTitle":"Percent of sales method","confidence":0.9},"QS-9-28":{"page":376,"top":44.5,"bottom":193.1,"matchedTitle":"Accounts receivable turnover","confidence":1},"E-9-2":{"page":376,"top":180.1,"bottom":410,"matchedTitle":"Accounts receivable subsidiary ledger; schedule of accounts receivable","confidence":0.81},"E-9-3":{"page":376,"top":397,"bottom":498.3,"matchedTitle":"Accounting for credit card sales","confidence":1},"E-9-4":{"page":376,"top":485.3,"bottom":575.6,"matchedTitle":"Sales on store credit card","confidence":0.92},"E-9-5":{"page":376,"top":562.6,"bottom":644,"matchedTitle":"Direct write-off method","confidence":0.9},"E-9-6":{"page":376,"top":631,"bottom":742,"matchedTitle":"Writing off receivables","confidence":0.89},"E-9-1":{"page":377,"top":346.2,"bottom":455.9,"matchedTitle":"Percent of receivables method","confidence":1},"E-9-55":{"page":377,"top":672.5,"bottom":742,"matchedTitle":"Estimating bad debts","confidence":1},"E-9-56":{"page":377,"top":442.9,"bottom":685.5,"matchedTitle":"Aging of receivables schedule","confidence":1},"E-9-23":{"page":378,"top":166.6,"bottom":246.7,"matchedTitle":"Notes receivable transactions C$ Check Dec. '\", Cr. Interest Revenue, $')","confidence":0.59},"E-9-24":{"page":378,"top":233.7,"bottom":375.5,"matchedTitle":"Notes receivable transactions P& Check Jan. (*, Dr. Cash, $!,%!%","confidence":0.68},"E-9-25":{"page":378,"top":362.5,"bottom":451.2,"matchedTitle":"Honoring a note","confidence":0.87},"E-9-26":{"page":378,"top":438.2,"bottom":536,"matchedTitle":"Dishonoring a note","confidence":0.88},"E-9-27":{"page":378,"top":523,"bottom":642.8,"matchedTitle":"Selling and pledging accounts receivable","confidence":1},"E-9-28":{"page":378,"top":629.8,"bottom":742,"matchedTitle":"Accounts receivable turnover","confidence":1},"P-9-2A":{"page":379,"top":85.6,"bottom":257.6,"matchedTitle":"Sales on account and credit card sales","confidence":1},"P-9-3A":{"page":379,"top":244.6,"bottom":496.9,"matchedTitle":"Estimating and reporting bad debts","confidence":1},"P-9-4A":{"page":379,"top":483.9,"bottom":742,"matchedTitle":"Aging accounts receivable and accounting for bad debts","confidence":0.92},"P-9-5A":{"page":380,"top":44.5,"bottom":360.9,"matchedTitle":"Accounts receivable transactions and bad debts adjustments","confidence":0.88},"P-9-6A":{"page":380,"top":347.9,"bottom":742,"matchedTitle":"Analyzing and journalizing notes receivable transactions","confidence":0.86},"P-9-2B":{"page":381,"top":74.7,"bottom":246.8,"matchedTitle":"Sales on account and credit card sales C\" Check Aug. \"&, Dr. Cash,","confidence":0.75},"P-9-3B":{"page":381,"top":233.8,"bottom":466.9,"matchedTitle":"Estimating and reporting bad debts","confidence":1},"P-9-4B":{"page":381,"top":453.9,"bottom":742,"matchedTitle":"Aging accounts receivable and accounting for bad debts","confidence":0.92},"P-9-5B":{"page":382,"top":307.2,"bottom":742,"matchedTitle":"Analyzing and journalizing notes receivable transactions","confidence":0.86},"QS-5-34":{"page":242,"top":18,"bottom":765,"confidence":0,"fallback":true},"QS-8-16":{"page":368,"top":18,"bottom":765,"confidence":0,"fallback":true}}}
+{
+  "meta": {
+    "version": 1,
+    "source": "User-supplied Fundamental Accounting Principles 24e PDF",
+    "pdfPages": 1210,
+    "matched": 401,
+    "fallback": 2,
+    "note": "Geometry is an aid; page image from locally imported textbook is the authoritative question.",
+    "scope": "Chapters 1–9: Accounting for Receivables",
+    "sourceAuditNote": "Verified Chapter 2 QS-2-1 through QS-2-4 and E-2-1 through E-2-4 coordinates against original PDF pages 94 and 96; remaining crops unaudited."
+  },
+  "items": {
+    "QS-1-1": {
+      "page": 51,
+      "top": 271.8,
+      "bottom": 351.7,
+      "matchedTitle": "Understanding accounting",
+      "confidence": 0.86
+    },
+    "QS-1-2": {
+      "page": 51,
+      "top": 338.7,
+      "bottom": 430.9,
+      "matchedTitle": "Identifying accounting users",
+      "confidence": 1
+    },
+    "QS-1-3": {
+      "page": 51,
+      "top": 417.9,
+      "bottom": 561.8,
+      "matchedTitle": "Identifying ethical risks This icon highlights",
+      "confidence": 0.63
+    },
+    "QS-1-4": {
+      "page": 51,
+      "top": 548.8,
+      "bottom": 626.1,
+      "matchedTitle": "Identifying principles, assumptions, and constraints C%",
+      "confidence": 0.78
+    },
+    "QS-1-5": {
+      "page": 51,
+      "top": 613.1,
+      "bottom": 742,
+      "matchedTitle": "Identifying attributes of businesses",
+      "confidence": 1
+    },
+    "QS-1-6": {
+      "page": 52,
+      "top": 45.1,
+      "bottom": 225.3,
+      "matchedTitle": "Identifying accounting principles and assumptions",
+      "confidence": 1
+    },
+    "QS-1-7": {
+      "page": 52,
+      "top": 212.3,
+      "bottom": 295.8,
+      "matchedTitle": "Applying the accounting equation A!",
+      "confidence": 1
+    },
+    "QS-1-8": {
+      "page": 52,
+      "top": 282.8,
+      "bottom": 478.5,
+      "matchedTitle": "Applying the accounting equation",
+      "confidence": 1
+    },
+    "QS-1-9": {
+      "page": 52,
+      "top": 465.5,
+      "bottom": 547.4,
+      "matchedTitle": "Identifying and computing assets, liabilities, and equity",
+      "confidence": 1
+    },
+    "QS-1-11": {
+      "page": 53,
+      "top": 45.2,
+      "bottom": 247,
+      "matchedTitle": "Identifying effects of transactions using accounting equation— Assets and Liabilities",
+      "confidence": 0.6
+    },
+    "QS-1-12": {
+      "page": 53,
+      "top": 234,
+      "bottom": 344.2,
+      "matchedTitle": "Identifying items with financial statements",
+      "confidence": 1
+    },
+    "QS-1-13": {
+      "page": 53,
+      "top": 331.2,
+      "bottom": 417.2,
+      "matchedTitle": "Identifying income and equity accounts",
+      "confidence": 1
+    },
+    "QS-1-14": {
+      "page": 53,
+      "top": 404.2,
+      "bottom": 477.5,
+      "matchedTitle": "Identifying assets, liabilities, and equity P\"",
+      "confidence": 0.71
+    },
+    "QS-1-15": {
+      "page": 53,
+      "top": 464.5,
+      "bottom": 575.5,
+      "matchedTitle": "Preparing an income statement",
+      "confidence": 1
+    },
+    "QS-1-16": {
+      "page": 53,
+      "top": 562.5,
+      "bottom": 655.5,
+      "matchedTitle": "Computing and interpreting return on assets",
+      "confidence": 1
+    },
+    "QS-1-17": {
+      "page": 53,
+      "top": 642.5,
+      "bottom": 742,
+      "matchedTitle": "Identifying and computing assets, liabilities, and equity Samsung",
+      "confidence": 0.91
+    },
+    "E-1-1": {
+      "page": 54,
+      "top": 85.4,
+      "bottom": 171.1,
+      "matchedTitle": "Classifying activities reflected in the accounting system C!",
+      "confidence": 0.74
+    },
+    "E-1-2": {
+      "page": 54,
+      "top": 158.1,
+      "bottom": 373.3,
+      "matchedTitle": "Identifying accounting users and uses",
+      "confidence": 1
+    },
+    "E-1-3": {
+      "page": 54,
+      "top": 360.3,
+      "bottom": 482.5,
+      "matchedTitle": "Describing accounting responsibilities",
+      "confidence": 1
+    },
+    "E-1-4": {
+      "page": 54,
+      "top": 469.5,
+      "bottom": 626.7,
+      "matchedTitle": "Learning the language of business",
+      "confidence": 1
+    },
+    "E-1-5": {
+      "page": 54,
+      "top": 613.7,
+      "bottom": 742,
+      "matchedTitle": "Identifying ethical terminology",
+      "confidence": 1
+    },
+    "E-1-6": {
+      "page": 55,
+      "top": 140.5,
+      "bottom": 339.3,
+      "matchedTitle": "Distinguishing business organizations",
+      "confidence": 1
+    },
+    "E-1-7": {
+      "page": 55,
+      "top": 326.3,
+      "bottom": 533.4,
+      "matchedTitle": "Identifying accounting principles and assumptions",
+      "confidence": 1
+    },
+    "E-1-8": {
+      "page": 55,
+      "top": 520.4,
+      "bottom": 630.5,
+      "matchedTitle": "Using the accounting equation",
+      "confidence": 1
+    },
+    "E-1-9": {
+      "page": 55,
+      "top": 617.5,
+      "bottom": 742,
+      "matchedTitle": "Using the accounting equation",
+      "confidence": 1
+    },
+    "E-1-11": {
+      "page": 56,
+      "top": 380.8,
+      "bottom": 742,
+      "matchedTitle": "Identifying effects of transactions on the accounting equation",
+      "confidence": 0.79
+    },
+    "E-1-12": {
+      "page": 57,
+      "top": 44.6,
+      "bottom": 197.7,
+      "matchedTitle": "Identifying effects of transactions on the accounting equation",
+      "confidence": 0.79
+    },
+    "E-1-13": {
+      "page": 57,
+      "top": 184.7,
+      "bottom": 484,
+      "matchedTitle": "Identifying effects of transactions using the accounting equation",
+      "confidence": 0.79
+    },
+    "E-1-14": {
+      "page": 57,
+      "top": 471,
+      "bottom": 541.8,
+      "matchedTitle": "Analyzing return on assets",
+      "confidence": 0.91
+    },
+    "E-1-15": {
+      "page": 57,
+      "top": 528.8,
+      "bottom": 691.4,
+      "matchedTitle": "Preparing an income statement",
+      "confidence": 1
+    },
+    "E-1-16": {
+      "page": 57,
+      "top": 678.4,
+      "bottom": 742,
+      "matchedTitle": "Preparing a statement of owner’s equity P\"",
+      "confidence": 1
+    },
+    "E-1-18": {
+      "page": 58,
+      "top": 95.2,
+      "bottom": 219,
+      "matchedTitle": "Preparing a statement of cash flows",
+      "confidence": 1
+    },
+    "E-1-19": {
+      "page": 58,
+      "top": 206,
+      "bottom": 320.9,
+      "matchedTitle": "Identifying sections of the statement of cash flows",
+      "confidence": 1
+    },
+    "E-1-31B": {
+      "page": 58,
+      "top": 395.7,
+      "bottom": 508.7,
+      "matchedTitle": "Identifying business activities",
+      "confidence": 1
+    },
+    "E-1-33": {
+      "page": 58,
+      "top": 307.9,
+      "bottom": 408.7,
+      "matchedTitle": "Preparing an income statement for a company",
+      "confidence": 1
+    },
+    "E-1-34": {
+      "page": 58,
+      "top": 585.6,
+      "bottom": 742,
+      "matchedTitle": "Using the accounting equation",
+      "confidence": 1
+    },
+    "P-1-1A": {
+      "page": 59,
+      "top": 86.3,
+      "bottom": 427.8,
+      "matchedTitle": "Identifying effects of transactions on financial statements",
+      "confidence": 0.88
+    },
+    "P-1-2A": {
+      "page": 59,
+      "top": 414.8,
+      "bottom": 742,
+      "matchedTitle": "Computing missing information using accounting knowledge",
+      "confidence": 0.73
+    },
+    "P-1-3A": {
+      "page": 60,
+      "top": 96.7,
+      "bottom": 278,
+      "matchedTitle": "Preparing an income statement",
+      "confidence": 1
+    },
+    "P-1-4A": {
+      "page": 60,
+      "top": 265,
+      "bottom": 330.9,
+      "matchedTitle": "Preparing a statement of owner’s equity P2",
+      "confidence": 1
+    },
+    "P-1-5A": {
+      "page": 60,
+      "top": 317.9,
+      "bottom": 389.1,
+      "matchedTitle": "Preparing a balance sheet",
+      "confidence": 0.91
+    },
+    "P-1-6A": {
+      "page": 60,
+      "top": 376.1,
+      "bottom": 509.6,
+      "matchedTitle": "Preparing a statement of cash flows",
+      "confidence": 1
+    },
+    "P-1-7A": {
+      "page": 60,
+      "top": 496.6,
+      "bottom": 742,
+      "matchedTitle": "Analyzing transactions and preparing financial statements",
+      "confidence": 0.87
+    },
+    "P-1-8A": {
+      "page": 61,
+      "top": 209.2,
+      "bottom": 531.4,
+      "matchedTitle": "Analyzing effects of transactions",
+      "confidence": 1
+    },
+    "P-1-9A": {
+      "page": 61,
+      "top": 518.4,
+      "bottom": 742,
+      "matchedTitle": "Analyzing transactions and preparing financial statements",
+      "confidence": 0.87
+    },
+    "P-1-11A": {
+      "page": 62,
+      "top": 370.7,
+      "bottom": 590.3,
+      "matchedTitle": "Computing and interpreting return on assets",
+      "confidence": 1
+    },
+    "P-1-12A": {
+      "page": 62,
+      "top": 577.3,
+      "bottom": 649.5,
+      "matchedTitle": "Identifying risk and return",
+      "confidence": 0.91
+    },
+    "P-1-13A": {
+      "page": 62,
+      "top": 636.5,
+      "bottom": 742,
+      "matchedTitle": "Describing business activities",
+      "confidence": 1
+    },
+    "P-1-14A": {
+      "page": 63,
+      "top": 44.5,
+      "bottom": 141,
+      "matchedTitle": "Describing business activities C& PROBLEM SET B",
+      "confidence": 0.73
+    },
+    "P-1-1B": {
+      "page": 63,
+      "top": 128,
+      "bottom": 473.8,
+      "matchedTitle": "Identifying effects of transactions on financial statements",
+      "confidence": 0.88
+    },
+    "P-1-2B": {
+      "page": 63,
+      "top": 460.8,
+      "bottom": 742,
+      "matchedTitle": "Computing missing information using accounting knowledge",
+      "confidence": 0.73
+    },
+    "P-1-3B": {
+      "page": 64,
+      "top": 141.9,
+      "bottom": 310.1,
+      "matchedTitle": "Preparing an income statement",
+      "confidence": 1
+    },
+    "P-1-4B": {
+      "page": 64,
+      "top": 297.1,
+      "bottom": 356.3,
+      "matchedTitle": "Preparing a statement of owner’s equity P\"",
+      "confidence": 1
+    },
+    "P-1-5B": {
+      "page": 64,
+      "top": 343.3,
+      "bottom": 402.4,
+      "matchedTitle": "Preparing a balance sheet P\"",
+      "confidence": 1
+    },
+    "P-1-6B": {
+      "page": 64,
+      "top": 389.4,
+      "bottom": 509.6,
+      "matchedTitle": "Preparing a statement of cash flows",
+      "confidence": 1
+    },
+    "P-1-7B": {
+      "page": 64,
+      "top": 496.6,
+      "bottom": 742,
+      "matchedTitle": "Analyzing transactions and preparing financial statements",
+      "confidence": 0.87
+    },
+    "P-1-8B": {
+      "page": 65,
+      "top": 208.2,
+      "bottom": 531,
+      "matchedTitle": "Analyzing effects of transactions",
+      "confidence": 1
+    },
+    "P-1-9B": {
+      "page": 65,
+      "top": 518,
+      "bottom": 742,
+      "matchedTitle": "Analyzing transactions and preparing financial statements",
+      "confidence": 0.87
+    },
+    "P-1-11B": {
+      "page": 66,
+      "top": 383.5,
+      "bottom": 591.2,
+      "matchedTitle": "Computing and interpreting return on assets",
+      "confidence": 1
+    },
+    "P-1-12B": {
+      "page": 66,
+      "top": 578.2,
+      "bottom": 649.4,
+      "matchedTitle": "Identifying risk and return",
+      "confidence": 0.91
+    },
+    "P-1-13B": {
+      "page": 66,
+      "top": 636.4,
+      "bottom": 742,
+      "matchedTitle": "Describing business activities",
+      "confidence": 1
+    },
+    "P-1-14B": {
+      "page": 67,
+      "top": 44.5,
+      "bottom": 742,
+      "matchedTitle": "Describing business activities C&",
+      "confidence": 1
+    },
+    "QS-2-1": {
+      "page": 94,
+      "top": 153.3,
+      "bottom": 209.9,
+      "matchedTitle": "Identifying source documents",
+      "confidence": 1
+    },
+    "QS-2-2": {
+      "page": 94,
+      "top": 196.9,
+      "bottom": 270.5,
+      "matchedTitle": "Identifying financial statement accounts",
+      "confidence": 1
+    },
+    "QS-2-3": {
+      "page": 94,
+      "top": 257.5,
+      "bottom": 363.9,
+      "matchedTitle": "Reading a chart of accounts",
+      "confidence": 1
+    },
+    "QS-2-4": {
+      "page": 94,
+      "top": 350.9,
+      "bottom": 424.4,
+      "matchedTitle": "Identifying normal balance",
+      "confidence": 1
+    },
+    "QS-2-5": {
+      "page": 94,
+      "top": 411.4,
+      "bottom": 497.9,
+      "matchedTitle": "Linking debit or credit with normal balance",
+      "confidence": 0.76
+    },
+    "QS-2-6": {
+      "page": 94,
+      "top": 484.9,
+      "bottom": 648.5,
+      "matchedTitle": "Analyzing transactions and preparing journal entries",
+      "confidence": 1
+    },
+    "QS-2-7": {
+      "page": 94,
+      "top": 635.5,
+      "bottom": 742,
+      "matchedTitle": "Analyzing debit or credit by account",
+      "confidence": 0.86
+    },
+    "QS-2-31": {
+      "page": 95,
+      "top": 581.1,
+      "bottom": 691.4,
+      "matchedTitle": "Preparing an income statement",
+      "confidence": 1
+    },
+    "QS-2-33": {
+      "page": 95,
+      "top": 473.3,
+      "bottom": 594.1,
+      "matchedTitle": "Preparing journal entries",
+      "confidence": 0.89
+    },
+    "QS-2-34": {
+      "page": 95,
+      "top": 678.4,
+      "bottom": 742,
+      "matchedTitle": "Preparing a statement of owner’s equity P$",
+      "confidence": 1
+    },
+    "QS-2-8": {
+      "page": 95,
+      "top": 45.1,
+      "bottom": 202.6,
+      "matchedTitle": "Identifying a posting error",
+      "confidence": 0.91
+    },
+    "QS-2-9": {
+      "page": 95,
+      "top": 189.6,
+      "bottom": 288.3,
+      "matchedTitle": "Classifying accounts in financial statements",
+      "confidence": 1
+    },
+    "QS-2-32": {
+      "page": 96,
+      "top": 45.2,
+      "bottom": 101.3,
+      "matchedTitle": "Preparing a balance sheet P$",
+      "confidence": 1
+    },
+    "QS-2-35": {
+      "page": 96,
+      "top": 88.3,
+      "bottom": 193.4,
+      "matchedTitle": "Computing and using the debt ratio A!",
+      "confidence": 1
+    },
+    "E-2-1": {
+      "page": 96,
+      "top": 180.4,
+      "bottom": 241.6,
+      "matchedTitle": "Steps in analyzing and recording transactions",
+      "confidence": 1
+    },
+    "E-2-2": {
+      "page": 96,
+      "top": 228.6,
+      "bottom": 351.5,
+      "matchedTitle": "Identifying and classifying accounts",
+      "confidence": 1
+    },
+    "E-2-3": {
+      "page": 96,
+      "top": 338.5,
+      "bottom": 461.5,
+      "matchedTitle": "Identifying a ledger and chart of accounts",
+      "confidence": 1
+    },
+    "E-2-4": {
+      "page": 96,
+      "top": 448.5,
+      "bottom": 556.5,
+      "matchedTitle": "Identifying type and normal balances of accounts",
+      "confidence": 1
+    },
+    "E-2-5": {
+      "page": 96,
+      "top": 543.5,
+      "bottom": 643.6,
+      "matchedTitle": "Analyzing effects of a compound entry",
+      "confidence": 1
+    },
+    "E-2-6": {
+      "page": 96,
+      "top": 630.6,
+      "bottom": 742,
+      "matchedTitle": "Analyzing account entries and balances",
+      "confidence": 1
+    },
+    "E-2-33": {
+      "page": 97,
+      "top": 543.6,
+      "bottom": 742,
+      "matchedTitle": "Analyzing and journalizing transactions involving cash payments",
+      "confidence": 0.9
+    },
+    "E-2-7": {
+      "page": 97,
+      "top": 91.8,
+      "bottom": 228.7,
+      "matchedTitle": "Preparing general journal entries",
+      "confidence": 1
+    },
+    "E-2-8": {
+      "page": 97,
+      "top": 215.7,
+      "bottom": 291.6,
+      "matchedTitle": "Preparing T-accounts (ledger) and a trial balance P!",
+      "confidence": 0.85
+    },
+    "E-2-9": {
+      "page": 97,
+      "top": 278.6,
+      "bottom": 504.5,
+      "matchedTitle": "Recording effects of transactions in T-accounts",
+      "confidence": 1
+    },
+    "E-2-31": {
+      "page": 98,
+      "top": 45.1,
+      "bottom": 243.9,
+      "matchedTitle": "Analyzing and journalizing transactions involving receipt of cash",
+      "confidence": 0.78
+    },
+    "E-2-32": {
+      "page": 98,
+      "top": 426.7,
+      "bottom": 480.7,
+      "matchedTitle": "Preparing general journal entries P#",
+      "confidence": 1
+    },
+    "E-2-34": {
+      "page": 98,
+      "top": 230.9,
+      "bottom": 439.7,
+      "matchedTitle": "Entering transactions into T-accounts",
+      "confidence": 1
+    },
+    "E-2-35": {
+      "page": 98,
+      "top": 466.5,
+      "bottom": 641.8,
+      "matchedTitle": "Computing net income",
+      "confidence": 0.88
+    },
+    "E-2-36": {
+      "page": 98,
+      "top": 628.8,
+      "bottom": 742,
+      "matchedTitle": "Preparing an income statement",
+      "confidence": 1
+    },
+    "E-2-13": {
+      "page": 99,
+      "top": 592.5,
+      "bottom": 742,
+      "matchedTitle": "Analyzing a trial balance error",
+      "confidence": 1
+    },
+    "E-2-37": {
+      "page": 99,
+      "top": 45.1,
+      "bottom": 115,
+      "matchedTitle": "Preparing a statement of owner’s equity P$",
+      "confidence": 1
+    },
+    "E-2-38": {
+      "page": 99,
+      "top": 102,
+      "bottom": 171.7,
+      "matchedTitle": "Preparing a balance sheet P$",
+      "confidence": 1
+    },
+    "E-2-39": {
+      "page": 99,
+      "top": 158.7,
+      "bottom": 292.2,
+      "matchedTitle": "Analyzing changes in a company’s equity",
+      "confidence": 1
+    },
+    "E-2-11": {
+      "page": 100,
+      "top": 45,
+      "bottom": 145.1,
+      "matchedTitle": "Calculating and interpreting the debt ratio",
+      "confidence": 0.69
+    },
+    "E-2-14": {
+      "page": 100,
+      "top": 132.1,
+      "bottom": 321.5,
+      "matchedTitle": "Preparing journal entries",
+      "confidence": 0.89
+    },
+    "P-2-1A": {
+      "page": 100,
+      "top": 308.5,
+      "bottom": 602.2,
+      "matchedTitle": "Preparing and posting journal entries; preparing a trial balance",
+      "confidence": 0.83
+    },
+    "P-2-3A": {
+      "page": 100,
+      "top": 589.2,
+      "bottom": 742,
+      "matchedTitle": "Preparing and posting journal entries; preparing a trial balance",
+      "confidence": 0.83
+    },
+    "P-2-4A": {
+      "page": 101,
+      "top": 627.5,
+      "bottom": 742,
+      "matchedTitle": "Recording transactions; posting to ledger; preparing a trial balance",
+      "confidence": 0.69
+    },
+    "P-2-5A": {
+      "page": 102,
+      "top": 335.8,
+      "bottom": 568.4,
+      "matchedTitle": "Computing net income from equity analysis, preparing a balance sheet, and computing the de",
+      "confidence": 0.66
+    },
+    "P-2-6A": {
+      "page": 102,
+      "top": 555.4,
+      "bottom": 742,
+      "matchedTitle": "Analyzing account balances and reconstructing transactions",
+      "confidence": 0.68
+    },
+    "P-2-1B": {
+      "page": 103,
+      "top": 353.3,
+      "bottom": 654.4,
+      "matchedTitle": "Preparing and posting journal entries; preparing a trial balance",
+      "confidence": 0.77
+    },
+    "P-2-2B": {
+      "page": 103,
+      "top": 641.4,
+      "bottom": 742,
+      "matchedTitle": "Preparing and posting journal entries; preparing a trial balance",
+      "confidence": 0.77
+    },
+    "P-2-7A": {
+      "page": 103,
+      "top": 127.7,
+      "bottom": 366.3,
+      "matchedTitle": "Preparing an income statement, statement of owner’s equity, and balance sheet",
+      "confidence": 0.63
+    },
+    "P-2-3B": {
+      "page": 104,
+      "top": 423.5,
+      "bottom": 742,
+      "matchedTitle": "Preparing and posting journal entries; preparing a trial balance",
+      "confidence": 0.77
+    },
+    "P-2-4B": {
+      "page": 105,
+      "top": 45.2,
+      "bottom": 417.4,
+      "matchedTitle": "Recording transactions; posting to ledger; preparing a trial balance",
+      "confidence": 0.69
+    },
+    "P-2-5B": {
+      "page": 105,
+      "top": 404.4,
+      "bottom": 648.7,
+      "matchedTitle": "Computing net income from equity analysis, preparing a balance sheet, and computing the de",
+      "confidence": 0.54
+    },
+    "P-2-6B": {
+      "page": 105,
+      "top": 635.7,
+      "bottom": 742,
+      "matchedTitle": "Analyzing account balances and reconstructing transactions",
+      "confidence": 0.68
+    },
+    "P-2-7B": {
+      "page": 106,
+      "top": 203.3,
+      "bottom": 742,
+      "matchedTitle": "Preparing an income statement, statement of owner’s equity, and balance sheet",
+      "confidence": 0.63
+    },
+    "QS-3-1": {
+      "page": 133,
+      "top": 464.1,
+      "bottom": 583.4,
+      "matchedTitle": "Identifying accounting adjustments",
+      "confidence": 1
+    },
+    "QS-3-2": {
+      "page": 133,
+      "top": 277.5,
+      "bottom": 386.9,
+      "matchedTitle": "Periodic reporting",
+      "confidence": 0.85
+    },
+    "QS-3-3": {
+      "page": 133,
+      "top": 373.9,
+      "bottom": 477.1,
+      "matchedTitle": "Computing accrual and cash income",
+      "confidence": 1
+    },
+    "QS-3-4": {
+      "page": 133,
+      "top": 570.4,
+      "bottom": 742,
+      "matchedTitle": "Concepts of adjusting entries",
+      "confidence": 1
+    },
+    "QS-3-5": {
+      "page": 134,
+      "top": 45.1,
+      "bottom": 199.3,
+      "matchedTitle": "Prepaid (deferred) expenses adjustments",
+      "confidence": 1
+    },
+    "QS-3-6": {
+      "page": 134,
+      "top": 186.3,
+      "bottom": 362.6,
+      "matchedTitle": "Prepaid (deferred) expenses adjustments",
+      "confidence": 1
+    },
+    "QS-3-7": {
+      "page": 134,
+      "top": 349.6,
+      "bottom": 479.9,
+      "matchedTitle": "Adjusting prepaid (deferred) expenses",
+      "confidence": 1
+    },
+    "QS-3-8": {
+      "page": 134,
+      "top": 466.9,
+      "bottom": 654.2,
+      "matchedTitle": "Accumulated depreciation adjustments",
+      "confidence": 1
+    },
+    "QS-3-9": {
+      "page": 134,
+      "top": 641.2,
+      "bottom": 742,
+      "matchedTitle": "Adjusting for depreciation",
+      "confidence": 0.89
+    },
+    "QS-3-21": {
+      "page": 135,
+      "top": 508.2,
+      "bottom": 607.9,
+      "matchedTitle": "Accruing salaries",
+      "confidence": 0.85
+    },
+    "QS-3-22": {
+      "page": 135,
+      "top": 215.1,
+      "bottom": 373.5,
+      "matchedTitle": "Adjusting for unearned (deferred) revenues",
+      "confidence": 1
+    },
+    "QS-3-23": {
+      "page": 135,
+      "top": 360.5,
+      "bottom": 521.2,
+      "matchedTitle": "Accrued expenses adjustments",
+      "confidence": 1
+    },
+    "QS-3-24": {
+      "page": 135,
+      "top": 594.9,
+      "bottom": 742,
+      "matchedTitle": "Accrued revenues adjustments",
+      "confidence": 1
+    },
+    "QS-3-25": {
+      "page": 136,
+      "top": 44.5,
+      "bottom": 190.4,
+      "matchedTitle": "Recording and analyzing adjusting entries",
+      "confidence": 1
+    },
+    "QS-3-26": {
+      "page": 136,
+      "top": 177.4,
+      "bottom": 294.3,
+      "matchedTitle": "Determining effects of adjusting entries",
+      "confidence": 1
+    },
+    "QS-3-27": {
+      "page": 136,
+      "top": 281.3,
+      "bottom": 437,
+      "matchedTitle": "Preparing an adjusted trial balance",
+      "confidence": 1
+    },
+    "QS-3-28": {
+      "page": 136,
+      "top": 424,
+      "bottom": 495.1,
+      "matchedTitle": "Analyzing profit margin",
+      "confidence": 0.89
+    },
+    "QS-3-29": {
+      "page": 136,
+      "top": 482.1,
+      "bottom": 742,
+      "matchedTitle": "Preparing financial statements",
+      "confidence": 1
+    },
+    "QS-3-22A": {
+      "page": 137,
+      "top": 200.8,
+      "bottom": 401.7,
+      "matchedTitle": "Preparing adjusting entries",
+      "confidence": 1
+    },
+    "QS-3-24A": {
+      "page": 137,
+      "top": 388.7,
+      "bottom": 601.7,
+      "matchedTitle": "Preparing adjusting entries",
+      "confidence": 1
+    },
+    "E-3-4": {
+      "page": 137,
+      "top": 588.7,
+      "bottom": 742,
+      "matchedTitle": "Determining assets and expenses for accrual and cash accounting",
+      "confidence": 0.82
+    },
+    "E-3-1": {
+      "page": 138,
+      "top": 215.8,
+      "bottom": 311.7,
+      "matchedTitle": "Adjusting and paying accrued wages",
+      "confidence": 1
+    },
+    "E-3-2": {
+      "page": 138,
+      "top": 403.8,
+      "bottom": 597.8,
+      "matchedTitle": "Adjusting and paying accrued expenses",
+      "confidence": 1
+    },
+    "E-3-3": {
+      "page": 138,
+      "top": 584.8,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting entries",
+      "confidence": 1
+    },
+    "E-3-5": {
+      "page": 138,
+      "top": 298.7,
+      "bottom": 416.8,
+      "matchedTitle": "Determining cost flows through accounts",
+      "confidence": 1
+    },
+    "E-3-22": {
+      "page": 140,
+      "top": 373.9,
+      "bottom": 522.6,
+      "matchedTitle": "Computing and interpreting profit margin",
+      "confidence": 1
+    },
+    "E-3-23A": {
+      "page": 140,
+      "top": 509.6,
+      "bottom": 742,
+      "matchedTitle": "Adjusting for prepaids recorded as expenses and unearned revenues recorded as revenues",
+      "confidence": 0.73
+    },
+    "E-3-14": {
+      "page": 141,
+      "top": 255.2,
+      "bottom": 496.8,
+      "matchedTitle": "Preparing adjusting entries",
+      "confidence": 1
+    },
+    "E-3-21A": {
+      "page": 141,
+      "top": 45.1,
+      "bottom": 268.2,
+      "matchedTitle": "Recording and reporting revenues received in advance",
+      "confidence": 0.9
+    },
+    "P-3-2A": {
+      "page": 141,
+      "top": 483.8,
+      "bottom": 742,
+      "matchedTitle": "Identifying adjusting entries with explanations",
+      "confidence": 0.71
+    },
+    "P-3-1A": {
+      "page": 142,
+      "top": 496.8,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting entries, adjusted trial balance, and financial statements",
+      "confidence": 0.46
+    },
+    "P-3-3A": {
+      "page": 142,
+      "top": 44.5,
+      "bottom": 509.8,
+      "matchedTitle": "Preparing adjusting and subsequent journal entries",
+      "confidence": 1
+    },
+    "P-3-4A": {
+      "page": 143,
+      "top": 524.9,
+      "bottom": 742,
+      "matchedTitle": "Interpreting unadjusted and adjusted trial balances, and preparing financial statements P\"",
+      "confidence": 0.68
+    },
+    "P-3-5A": {
+      "page": 144,
+      "top": 336,
+      "bottom": 742,
+      "matchedTitle": "Preparing financial statements from the adjusted trial balance and computing profit margin",
+      "confidence": 0.54
+    },
+    "P-3-2B": {
+      "page": 145,
+      "top": 374.8,
+      "bottom": 634.1,
+      "matchedTitle": "Identifying adjusting entries with explanations",
+      "confidence": 0.71
+    },
+    "P-3-3B": {
+      "page": 145,
+      "top": 621.1,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting and subsequent journal entries",
+      "confidence": 1
+    },
+    "P-3-6A": {
+      "page": 145,
+      "top": 44.4,
+      "bottom": 387.8,
+      "matchedTitle": "Recording prepaid expenses and unearned revenues",
+      "confidence": 0.87
+    },
+    "P-3-1B": {
+      "page": 146,
+      "top": 349.8,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting entries, adjusted trial balance, and financial statements",
+      "confidence": 0.46
+    },
+    "P-3-4B": {
+      "page": 147,
+      "top": 353.1,
+      "bottom": 742,
+      "matchedTitle": "Interpreting unadjusted and adjusted trial balances, and preparing financial statements P\"",
+      "confidence": 0.68
+    },
+    "P-3-5B": {
+      "page": 148,
+      "top": 191,
+      "bottom": 640.8,
+      "matchedTitle": "Preparing financial statements from the adjusted trial balance and computing profit margin",
+      "confidence": 0.54
+    },
+    "P-3-6B": {
+      "page": 148,
+      "top": 627.8,
+      "bottom": 742,
+      "matchedTitle": "Recording prepaid expenses and unearned revenues",
+      "confidence": 0.87
+    },
+    "QS-4-2": {
+      "page": 173,
+      "top": 365.5,
+      "bottom": 459.1,
+      "matchedTitle": "Ordering work sheet steps",
+      "confidence": 0.91
+    },
+    "QS-4-3": {
+      "page": 173,
+      "top": 537.6,
+      "bottom": 742,
+      "matchedTitle": "Computing ending capital balance using work sheet information",
+      "confidence": 0.89
+    },
+    "QS-4-4": {
+      "page": 173,
+      "top": 446.1,
+      "bottom": 550.6,
+      "matchedTitle": "Preparing a work sheet",
+      "confidence": 0.9
+    },
+    "QS-4-1": {
+      "page": 174,
+      "top": 44.5,
+      "bottom": 131.4,
+      "matchedTitle": "Preparing a partial work sheet",
+      "confidence": 1
+    },
+    "QS-4-5": {
+      "page": 174,
+      "top": 118.4,
+      "bottom": 250.4,
+      "matchedTitle": "Explaining temporary and permanent accounts",
+      "confidence": 1
+    },
+    "QS-4-6": {
+      "page": 174,
+      "top": 278.3,
+      "bottom": 336.3,
+      "matchedTitle": "Identifying post-closing accounts P3",
+      "confidence": 1
+    },
+    "QS-4-7": {
+      "page": 174,
+      "top": 237.4,
+      "bottom": 291.4,
+      "matchedTitle": "Preparing closing entries from the ledger P2",
+      "confidence": 1
+    },
+    "QS-4-8": {
+      "page": 174,
+      "top": 323.3,
+      "bottom": 422.3,
+      "matchedTitle": "Identifying the accounting cycle",
+      "confidence": 1
+    },
+    "QS-4-9": {
+      "page": 174,
+      "top": 409.3,
+      "bottom": 547.2,
+      "matchedTitle": "Classifying balance sheet items",
+      "confidence": 1
+    },
+    "QS-4-22": {
+      "page": 175,
+      "top": 44.5,
+      "bottom": 104.4,
+      "matchedTitle": "Preparing a classified balance sheet C%",
+      "confidence": 1
+    },
+    "QS-4-23A": {
+      "page": 175,
+      "top": 183.5,
+      "bottom": 317.5,
+      "matchedTitle": "Reversing entries",
+      "confidence": 0.85
+    },
+    "QS-4-24": {
+      "page": 175,
+      "top": 91.4,
+      "bottom": 196.5,
+      "matchedTitle": "Identifying current accounts and computing the current ratio",
+      "confidence": 0.56
+    },
+    "E-4-2": {
+      "page": 175,
+      "top": 304.5,
+      "bottom": 469.2,
+      "matchedTitle": "Extending adjusted account balances on a work sheet P\"",
+      "confidence": 0.79
+    },
+    "E-4-4": {
+      "page": 175,
+      "top": 456.2,
+      "bottom": 742,
+      "matchedTitle": "Extending accounts in a work sheet P\"",
+      "confidence": 1
+    },
+    "E-4-1": {
+      "page": 176,
+      "top": 266.6,
+      "bottom": 526.4,
+      "matchedTitle": "Preparing unadjusted and adjusted trial balances, including the adjustments",
+      "confidence": 0.74
+    },
+    "E-4-3": {
+      "page": 176,
+      "top": 44.5,
+      "bottom": 279.6,
+      "matchedTitle": "Preparing adjusting entries from a work sheet P\"",
+      "confidence": 1
+    },
+    "E-4-5": {
+      "page": 176,
+      "top": 513.4,
+      "bottom": 677.4,
+      "matchedTitle": "Computing Income Summary and ending capital balance from closing entries",
+      "confidence": 0.6
+    },
+    "E-4-6": {
+      "page": 176,
+      "top": 664.4,
+      "bottom": 742,
+      "matchedTitle": "Completing the Income Statement columns and preparing closing entries",
+      "confidence": 0.73
+    },
+    "E-4-22": {
+      "page": 178,
+      "top": 677.9,
+      "bottom": 742,
+      "matchedTitle": "Preparing financial statements C%",
+      "confidence": 1
+    },
+    "E-4-9": {
+      "page": 178,
+      "top": 44.5,
+      "bottom": 350.8,
+      "matchedTitle": "Preparing closing entries and a post-closing trial balance",
+      "confidence": 0.91
+    },
+    "E-4-21": {
+      "page": 179,
+      "top": 385.5,
+      "bottom": 476.8,
+      "matchedTitle": "Preparing closing entries",
+      "confidence": 0.89
+    },
+    "E-4-23": {
+      "page": 179,
+      "top": 329.3,
+      "bottom": 398.5,
+      "matchedTitle": "Computing the current ratio",
+      "confidence": 0.91
+    },
+    "E-4-24": {
+      "page": 179,
+      "top": 285.8,
+      "bottom": 342.3,
+      "matchedTitle": "Preparing a classified balance sheet C%",
+      "confidence": 1
+    },
+    "E-4-25": {
+      "page": 179,
+      "top": 463.8,
+      "bottom": 601.7,
+      "matchedTitle": "Computing and analyzing the current ratio",
+      "confidence": 1
+    },
+    "E-4-26A": {
+      "page": 179,
+      "top": 588.7,
+      "bottom": 742,
+      "matchedTitle": "Preparing reversing entries",
+      "confidence": 0.89
+    },
+    "E-4-27A": {
+      "page": 180,
+      "top": 44.4,
+      "bottom": 286.3,
+      "matchedTitle": "Preparing reversing entries",
+      "confidence": 0.89
+    },
+    "P-4-2A": {
+      "page": 180,
+      "top": 273.3,
+      "bottom": 742,
+      "matchedTitle": "Applying the accounting cycle",
+      "confidence": 1
+    },
+    "P-4-3A": {
+      "page": 181,
+      "top": 636.8,
+      "bottom": 742,
+      "matchedTitle": "Determining balance sheet classifications",
+      "confidence": 1
+    },
+    "P-4-4A": {
+      "page": 181,
+      "top": 44.5,
+      "bottom": 649.8,
+      "matchedTitle": "Preparing a work sheet, adjusting and closing entries, and financial statements",
+      "confidence": 0.8
+    },
+    "P-4-1A": {
+      "page": 182,
+      "top": 187.1,
+      "bottom": 742,
+      "matchedTitle": "Preparing closing entries, financial statements, and ratios",
+      "confidence": 0.91
+    },
+    "P-4-5A": {
+      "page": 183,
+      "top": 98,
+      "bottom": 504.2,
+      "matchedTitle": "Preparing trial balances, closing entries, and financial statements",
+      "confidence": 0.79
+    },
+    "P-4-6A": {
+      "page": 183,
+      "top": 491.2,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting, reversing, and next period entries",
+      "confidence": 0.9
+    },
+    "P-4-2B": {
+      "page": 184,
+      "top": 287.3,
+      "bottom": 742,
+      "matchedTitle": "Applying the accounting cycle",
+      "confidence": 1
+    },
+    "P-4-3B": {
+      "page": 185,
+      "top": 636.8,
+      "bottom": 742,
+      "matchedTitle": "Determining balance sheet classifications",
+      "confidence": 1
+    },
+    "P-4-4B": {
+      "page": 185,
+      "top": 44.5,
+      "bottom": 649.8,
+      "matchedTitle": "Preparing a work sheet, adjusting and closing entries, and financial statements",
+      "confidence": 0.72
+    },
+    "P-4-1B": {
+      "page": 186,
+      "top": 190.1,
+      "bottom": 742,
+      "matchedTitle": "Preparing closing entries, financial statements, and ratios",
+      "confidence": 0.91
+    },
+    "P-4-5B": {
+      "page": 187,
+      "top": 99.1,
+      "bottom": 506,
+      "matchedTitle": "Preparing trial balances, closing entries, and financial statements",
+      "confidence": 0.79
+    },
+    "P-4-6B": {
+      "page": 187,
+      "top": 493,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting, reversing, and next period entries",
+      "confidence": 0.79
+    },
+    "QS-5-1": {
+      "page": 223,
+      "top": 513.6,
+      "bottom": 611.5,
+      "matchedTitle": "Recording purchases, returns, and discounts taken",
+      "confidence": 0.9
+    },
+    "QS-5-2": {
+      "page": 223,
+      "top": 86.3,
+      "bottom": 240.7,
+      "matchedTitle": "Applying merchandising terms",
+      "confidence": 1
+    },
+    "QS-5-4": {
+      "page": 223,
+      "top": 227.7,
+      "bottom": 310.3,
+      "matchedTitle": "Identifying inventory costs",
+      "confidence": 0.89
+    },
+    "QS-5-5": {
+      "page": 223,
+      "top": 297.3,
+      "bottom": 444.6,
+      "matchedTitle": "Merchandise accounts and computations",
+      "confidence": 1
+    },
+    "QS-5-6": {
+      "page": 223,
+      "top": 431.6,
+      "bottom": 526.6,
+      "matchedTitle": "Computing net invoice amounts",
+      "confidence": 1
+    },
+    "QS-5-7": {
+      "page": 223,
+      "top": 598.5,
+      "bottom": 674.5,
+      "matchedTitle": "Recording purchases and discounts taken",
+      "confidence": 1
+    },
+    "QS-5-8": {
+      "page": 223,
+      "top": 661.5,
+      "bottom": 742,
+      "matchedTitle": "Recording purchases and discounts missed",
+      "confidence": 1
+    },
+    "QS-5-22": {
+      "page": 224,
+      "top": 355.7,
+      "bottom": 472.8,
+      "matchedTitle": "Multiple-step income statement",
+      "confidence": 1
+    },
+    "QS-5-23": {
+      "page": 224,
+      "top": 316.6,
+      "bottom": 370.6,
+      "matchedTitle": "Closing entries P#",
+      "confidence": 1
+    },
+    "QS-5-24": {
+      "page": 224,
+      "top": 459.8,
+      "bottom": 623.3,
+      "matchedTitle": "Preparing a multiple-step income statement",
+      "confidence": 1
+    },
+    "QS-5-25": {
+      "page": 224,
+      "top": 610.3,
+      "bottom": 742,
+      "matchedTitle": "Preparing a classified balance sheet for a merchandiser",
+      "confidence": 0.86
+    },
+    "QS-5-9": {
+      "page": 224,
+      "top": 45.2,
+      "bottom": 180.2,
+      "matchedTitle": "Recording sales, returns, and discounts taken",
+      "confidence": 1
+    },
+    "QS-5-21": {
+      "page": 225,
+      "top": 128.5,
+      "bottom": 254.5,
+      "matchedTitle": "Computing and analyzing gross margin ratio",
+      "confidence": 1
+    },
+    "QS-5-26": {
+      "page": 225,
+      "top": 45.2,
+      "bottom": 141.5,
+      "matchedTitle": "Computing and interpreting acid-test ratio",
+      "confidence": 1
+    },
+    "QS-5-27A": {
+      "page": 225,
+      "top": 241.5,
+      "bottom": 339.8,
+      "matchedTitle": "Contrasting periodic and perpetual systems",
+      "confidence": 1
+    },
+    "QS-5-28A": {
+      "page": 225,
+      "top": 326.8,
+      "bottom": 404,
+      "matchedTitle": "Recording purchases, returns, and discounts— periodic & gross methods P\"",
+      "confidence": 0.69
+    },
+    "QS-5-29A": {
+      "page": 225,
+      "top": 391,
+      "bottom": 457.3,
+      "matchedTitle": "Recording sales, returns, and discounts—periodic & gross methods P\"",
+      "confidence": 0.79
+    },
+    "QS-5-42C": {
+      "page": 225,
+      "top": 614,
+      "bottom": 680.3,
+      "matchedTitle": "Recording purchases, returns, and discounts—net & perpetual methods P(",
+      "confidence": 0.77
+    },
+    "QS-5-43B": {
+      "page": 225,
+      "top": 534.7,
+      "bottom": 627,
+      "matchedTitle": "Recording estimates of future returns",
+      "confidence": 1
+    },
+    "QS-5-44C": {
+      "page": 225,
+      "top": 667.3,
+      "bottom": 742,
+      "matchedTitle": "Recording sales, returns, and discounts—net & perpetual methods P(",
+      "confidence": 0.76
+    },
+    "QS-5-45": {
+      "page": 226,
+      "top": 45.2,
+      "bottom": 212.1,
+      "matchedTitle": "Sales transactions",
+      "confidence": 0.85
+    },
+    "E-5-2": {
+      "page": 226,
+      "top": 199.1,
+      "bottom": 349.9,
+      "matchedTitle": "Computing revenues, expenses, and income",
+      "confidence": 1
+    },
+    "E-5-4": {
+      "page": 226,
+      "top": 336.9,
+      "bottom": 420.9,
+      "matchedTitle": "Operating cycle for merchandiser",
+      "confidence": 1
+    },
+    "E-5-5": {
+      "page": 226,
+      "top": 407.9,
+      "bottom": 578.6,
+      "matchedTitle": "Recording purchases, purchases returns, and purchases allowances",
+      "confidence": 0.8
+    },
+    "E-5-6": {
+      "page": 226,
+      "top": 565.6,
+      "bottom": 742,
+      "matchedTitle": "Recording sales, sales returns, and sales allowances",
+      "confidence": 0.85
+    },
+    "E-5-1": {
+      "page": 227,
+      "top": 45.2,
+      "bottom": 110.1,
+      "matchedTitle": "Recording purchases, purchases returns, and purchases allowances P&",
+      "confidence": 0.74
+    },
+    "E-5-23": {
+      "page": 227,
+      "top": 576.3,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting and closing entries for a merchandiser",
+      "confidence": 0.87
+    },
+    "E-5-7": {
+      "page": 227,
+      "top": 97.1,
+      "bottom": 196.8,
+      "matchedTitle": "Recording sales, purchases, and cash discounts—buyer and seller",
+      "confidence": 0.68
+    },
+    "E-5-8": {
+      "page": 227,
+      "top": 443.6,
+      "bottom": 589.3,
+      "matchedTitle": "Recording purchases, sales, returns, and shipping",
+      "confidence": 0.73
+    },
+    "E-5-9": {
+      "page": 227,
+      "top": 308.7,
+      "bottom": 456.6,
+      "matchedTitle": "Inventory and cost of sales transactions in T-accounts",
+      "confidence": 1
+    },
+    "E-5-21": {
+      "page": 228,
+      "top": 453.7,
+      "bottom": 624.7,
+      "matchedTitle": "Preparing a multiple-step income statement",
+      "confidence": 1
+    },
+    "E-5-22": {
+      "page": 228,
+      "top": 100.4,
+      "bottom": 190.1,
+      "matchedTitle": "Net sales computation for multiple-step income statement",
+      "confidence": 0.89
+    },
+    "E-5-24": {
+      "page": 228,
+      "top": 177.1,
+      "bottom": 271.1,
+      "matchedTitle": "Impacts of inventory error on key accounts",
+      "confidence": 1
+    },
+    "E-5-25": {
+      "page": 228,
+      "top": 258.1,
+      "bottom": 319.1,
+      "matchedTitle": "Physical count error and profits A$",
+      "confidence": 1
+    },
+    "E-5-26": {
+      "page": 228,
+      "top": 306.1,
+      "bottom": 466.7,
+      "matchedTitle": "Computing and analyzing acid-test and current ratios",
+      "confidence": 1
+    },
+    "E-5-27": {
+      "page": 228,
+      "top": 611.7,
+      "bottom": 742,
+      "matchedTitle": "Preparing a classified balance sheet for a merchandiser",
+      "confidence": 0.86
+    },
+    "E-5-28A": {
+      "page": 229,
+      "top": 45.1,
+      "bottom": 110.4,
+      "matchedTitle": "Recording purchases, returns, and allowances— periodic P\"",
+      "confidence": 0.82
+    },
+    "E-5-29A": {
+      "page": 229,
+      "top": 97.4,
+      "bottom": 162.5,
+      "matchedTitle": "Recording sales, purchases, and discounts: buyer and seller—periodic P\"",
+      "confidence": 0.78
+    },
+    "E-5-42B": {
+      "page": 229,
+      "top": 292.5,
+      "bottom": 435.4,
+      "matchedTitle": "Recording estimates of future returns",
+      "confidence": 1
+    },
+    "E-5-43B": {
+      "page": 229,
+      "top": 201.5,
+      "bottom": 305.5,
+      "matchedTitle": "Recording estimates of future discounts",
+      "confidence": 1
+    },
+    "E-5-44B": {
+      "page": 229,
+      "top": 422.4,
+      "bottom": 556.4,
+      "matchedTitle": "Recording estimates of future returns",
+      "confidence": 1
+    },
+    "E-5-45C": {
+      "page": 229,
+      "top": 149.5,
+      "bottom": 214.5,
+      "matchedTitle": "Recording sales, purchases, shipping, and returns: buyer and seller—periodic P\"",
+      "confidence": 0.78
+    },
+    "E-5-46C": {
+      "page": 229,
+      "top": 543.4,
+      "bottom": 619.4,
+      "matchedTitle": "Recording sales, purchases, shipping, and returns: buyer and seller—perpetual and net meth",
+      "confidence": 0.49
+    },
+    "E-5-41": {
+      "page": 230,
+      "top": 45.2,
+      "bottom": 246.6,
+      "matchedTitle": "Purchasing transactions",
+      "confidence": 0.86
+    },
+    "P-5-2A": {
+      "page": 230,
+      "top": 233.6,
+      "bottom": 488.1,
+      "matchedTitle": "Preparing journal entries for merchandising activities—perpetual system",
+      "confidence": 0.71
+    },
+    "P-5-4A": {
+      "page": 230,
+      "top": 475.1,
+      "bottom": 742,
+      "matchedTitle": "Preparing journal entries for merchandising activities—perpetual system",
+      "confidence": 0.71
+    },
+    "P-5-1A": {
+      "page": 231,
+      "top": 632.8,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting entries and income statements; computing gross margin, acid-test, and ",
+      "confidence": 0.59
+    },
+    "P-5-5A": {
+      "page": 231,
+      "top": 138.2,
+      "bottom": 571.9,
+      "matchedTitle": "Computing merchandising amounts and formatting income statements",
+      "confidence": 0.79
+    },
+    "P-5-6A": {
+      "page": 231,
+      "top": 558.9,
+      "bottom": 645.8,
+      "matchedTitle": "Preparing closing entries and interpreting information about discounts and returns C$",
+      "confidence": 0.72
+    },
+    "P-5-2B": {
+      "page": 232,
+      "top": 553.2,
+      "bottom": 742,
+      "matchedTitle": "Preparing journal entries for merchandising activities—perpetual system",
+      "confidence": 0.71
+    },
+    "P-5-4B": {
+      "page": 233,
+      "top": 152.1,
+      "bottom": 492.3,
+      "matchedTitle": "Preparing journal entries for merchandising activities—perpetual system",
+      "confidence": 0.71
+    },
+    "P-5-5B": {
+      "page": 233,
+      "top": 479.3,
+      "bottom": 742,
+      "matchedTitle": "Computing merchandising amounts and formatting income statements",
+      "confidence": 0.79
+    },
+    "P-5-1B": {
+      "page": 234,
+      "top": 271.1,
+      "bottom": 742,
+      "matchedTitle": "Preparing adjusting entries and income statements; computing gross margin, acid-test, and ",
+      "confidence": 0.59
+    },
+    "P-5-6B": {
+      "page": 234,
+      "top": 197.7,
+      "bottom": 284.1,
+      "matchedTitle": "Preparing closing entries and interpreting information about discounts and returns C$",
+      "confidence": 0.72
+    },
+    "QS-6-1": {
+      "page": 268,
+      "top": 346.6,
+      "bottom": 444,
+      "matchedTitle": "Inventory ownership",
+      "confidence": 0.85
+    },
+    "QS-6-2": {
+      "page": 268,
+      "top": 431,
+      "bottom": 525.6,
+      "matchedTitle": "Inventory costs",
+      "confidence": 0.84
+    },
+    "QS-6-9": {
+      "page": 268,
+      "top": 512.6,
+      "bottom": 586.3,
+      "matchedTitle": "Computing goods available for sale P\"",
+      "confidence": 1
+    },
+    "QS-6-11": {
+      "page": 269,
+      "top": 45.1,
+      "bottom": 109.2,
+      "matchedTitle": "Perpetual: Inventory costing with LIFO P\"",
+      "confidence": 1
+    },
+    "QS-6-12": {
+      "page": 269,
+      "top": 96.2,
+      "bottom": 171.2,
+      "matchedTitle": "Perpetual: Inventory costing with weighted average P\"",
+      "confidence": 0.83
+    },
+    "QS-6-14A": {
+      "page": 269,
+      "top": 209.3,
+      "bottom": 273.5,
+      "matchedTitle": "Periodic: Inventory costing with LIFO P%",
+      "confidence": 1
+    },
+    "QS-6-18": {
+      "page": 269,
+      "top": 311.7,
+      "bottom": 464.9,
+      "matchedTitle": "Perpetual: Assigning costs with FIFO",
+      "confidence": 1
+    },
+    "QS-6-19": {
+      "page": 269,
+      "top": 565.2,
+      "bottom": 640.2,
+      "matchedTitle": "Perpetual: Inventory costing with specific identification P\"",
+      "confidence": 0.79
+    },
+    "QS-6-3": {
+      "page": 269,
+      "top": 503.1,
+      "bottom": 578.2,
+      "matchedTitle": "Perpetual: Inventory costing with weighted average P\"",
+      "confidence": 0.83
+    },
+    "QS-6-4": {
+      "page": 269,
+      "top": 451.9,
+      "bottom": 516.1,
+      "matchedTitle": "Perpetual: Inventory costing with LIFO P\"",
+      "confidence": 1
+    },
+    "QS-6-5A": {
+      "page": 269,
+      "top": 158.2,
+      "bottom": 222.3,
+      "matchedTitle": "Periodic: Inventory costing with FIFO P%",
+      "confidence": 1
+    },
+    "QS-6-6A": {
+      "page": 269,
+      "top": 678.3,
+      "bottom": 742,
+      "matchedTitle": "Periodic: Inventory costing with LIFO P%",
+      "confidence": 1
+    },
+    "QS-6-7A": {
+      "page": 269,
+      "top": 260.5,
+      "bottom": 324.7,
+      "matchedTitle": "Periodic: Inventory costing with weighted average P%",
+      "confidence": 1
+    },
+    "QS-6-13A": {
+      "page": 270,
+      "top": 45,
+      "bottom": 103.5,
+      "matchedTitle": "Periodic: Inventory costing with weighted average P%",
+      "confidence": 1
+    },
+    "QS-6-15A": {
+      "page": 270,
+      "top": 90.5,
+      "bottom": 160.1,
+      "matchedTitle": "Periodic: Inventory costing with specific identification P%",
+      "confidence": 0.79
+    },
+    "QS-6-16": {
+      "page": 270,
+      "top": 147.1,
+      "bottom": 259.5,
+      "matchedTitle": "Contrasting inventory costing methods",
+      "confidence": 1
+    },
+    "QS-6-17": {
+      "page": 270,
+      "top": 246.5,
+      "bottom": 365.3,
+      "matchedTitle": "Applying LCM to inventories",
+      "confidence": 1
+    },
+    "QS-6-21": {
+      "page": 270,
+      "top": 412.8,
+      "bottom": 471.2,
+      "matchedTitle": "Analyzing inventory A%",
+      "confidence": 1
+    },
+    "QS-6-22B": {
+      "page": 270,
+      "top": 458.2,
+      "bottom": 573.2,
+      "matchedTitle": "Estimating inventories— gross profit method",
+      "confidence": 1
+    },
+    "QS-6-28": {
+      "page": 270,
+      "top": 352.3,
+      "bottom": 425.8,
+      "matchedTitle": "Inventory errors",
+      "confidence": 0.85
+    },
+    "QS-6-29": {
+      "page": 270,
+      "top": 560.2,
+      "bottom": 692.2,
+      "matchedTitle": "Inventory costs",
+      "confidence": 0.84
+    },
+    "E-6-1": {
+      "page": 270,
+      "top": 679.2,
+      "bottom": 742,
+      "matchedTitle": "Inventory ownership C\"",
+      "confidence": 1
+    },
+    "E-6-2": {
+      "page": 271,
+      "top": 45.1,
+      "bottom": 114.6,
+      "matchedTitle": "Inventory costs",
+      "confidence": 0.84
+    },
+    "E-6-3A": {
+      "page": 271,
+      "top": 456.3,
+      "bottom": 577.5,
+      "matchedTitle": "Periodic: Income effects of inventory methods",
+      "confidence": 1
+    },
+    "E-6-4A": {
+      "page": 271,
+      "top": 388.8,
+      "bottom": 469.3,
+      "matchedTitle": "Periodic: Inventory costing",
+      "confidence": 0.89
+    },
+    "E-6-5": {
+      "page": 271,
+      "top": 564.5,
+      "bottom": 742,
+      "matchedTitle": "Perpetual: Inventory costing methods—FIFO and LIFO",
+      "confidence": 0.83
+    },
+    "E-6-9": {
+      "page": 271,
+      "top": 101.6,
+      "bottom": 317.3,
+      "matchedTitle": "Perpetual: Inventory costing methods",
+      "confidence": 1
+    },
+    "E-6-11": {
+      "page": 272,
+      "top": 314.4,
+      "bottom": 524.5,
+      "matchedTitle": "Comparing LIFO numbers to FIFO numbers; ratio analysis",
+      "confidence": 0.89
+    },
+    "E-6-12": {
+      "page": 272,
+      "top": 511.5,
+      "bottom": 631.1,
+      "matchedTitle": "Analyzing inventory errors",
+      "confidence": 1
+    },
+    "E-6-18": {
+      "page": 272,
+      "top": 197.2,
+      "bottom": 327.4,
+      "matchedTitle": "Lower of cost or market",
+      "confidence": 0.91
+    },
+    "E-6-19": {
+      "page": 272,
+      "top": 618.1,
+      "bottom": 742,
+      "matchedTitle": "Inventory turnover and days’ sales in inventory",
+      "confidence": 1
+    },
+    "E-6-6": {
+      "page": 272,
+      "top": 101.9,
+      "bottom": 162.5,
+      "matchedTitle": "Specific identification P\"",
+      "confidence": 1
+    },
+    "E-6-7A": {
+      "page": 272,
+      "top": 149.5,
+      "bottom": 210.2,
+      "matchedTitle": "Periodic: Inventory costing P%",
+      "confidence": 1
+    },
+    "E-6-13B": {
+      "page": 273,
+      "top": 353.1,
+      "bottom": 469,
+      "matchedTitle": "Estimating ending inventory—retail method",
+      "confidence": 1
+    },
+    "E-6-14A": {
+      "page": 273,
+      "top": 45,
+      "bottom": 218,
+      "matchedTitle": "Periodic: Cost flow assumptions",
+      "confidence": 1
+    },
+    "E-6-15B": {
+      "page": 273,
+      "top": 456,
+      "bottom": 537.5,
+      "matchedTitle": "Estimating ending inventory—gross profit method P&",
+      "confidence": 0.83
+    },
+    "E-6-16": {
+      "page": 273,
+      "top": 524.5,
+      "bottom": 742,
+      "matchedTitle": "Perpetual inventory costing",
+      "confidence": 0.89
+    },
+    "E-6-17A": {
+      "page": 274,
+      "top": 45.1,
+      "bottom": 167,
+      "matchedTitle": "Periodic inventory costing",
+      "confidence": 0.89
+    },
+    "P-6-1A": {
+      "page": 274,
+      "top": 154,
+      "bottom": 422.7,
+      "matchedTitle": "Perpetual: Alternative cost flows",
+      "confidence": 1
+    },
+    "P-6-2A": {
+      "page": 274,
+      "top": 409.7,
+      "bottom": 544.7,
+      "matchedTitle": "Periodic: Alternative cost flows",
+      "confidence": 1
+    },
+    "P-6-9A": {
+      "page": 274,
+      "top": 531.7,
+      "bottom": 742,
+      "matchedTitle": "Perpetual: Alternative cost flows",
+      "confidence": 1
+    },
+    "P-6-3A": {
+      "page": 275,
+      "top": 593.7,
+      "bottom": 742,
+      "matchedTitle": "Analysis of inventory errors",
+      "confidence": 1
+    },
+    "P-6-4A": {
+      "page": 275,
+      "top": 345.7,
+      "bottom": 606.7,
+      "matchedTitle": "Lower of cost or market",
+      "confidence": 0.91
+    },
+    "P-6-5A": {
+      "page": 276,
+      "top": 195.2,
+      "bottom": 347.1,
+      "matchedTitle": "Periodic: Alternative cost flows P%",
+      "confidence": 1
+    },
+    "P-6-6A": {
+      "page": 276,
+      "top": 334.1,
+      "bottom": 590.2,
+      "matchedTitle": "Periodic: Income comparisons and cost flows",
+      "confidence": 1
+    },
+    "P-6-7A": {
+      "page": 276,
+      "top": 577.2,
+      "bottom": 742,
+      "matchedTitle": "Retail inventory method",
+      "confidence": 0.89
+    },
+    "P-6-18A": {
+      "page": 277,
+      "top": 45,
+      "bottom": 231.9,
+      "matchedTitle": "Gross profit method P&",
+      "confidence": 0.59
+    },
+    "P-6-1B": {
+      "page": 277,
+      "top": 218.9,
+      "bottom": 463.8,
+      "matchedTitle": "Perpetual: Alternative cost flows",
+      "confidence": 1
+    },
+    "P-6-2B": {
+      "page": 277,
+      "top": 450.8,
+      "bottom": 574.3,
+      "matchedTitle": "Periodic: Alternative cost flows",
+      "confidence": 1
+    },
+    "P-6-9B": {
+      "page": 277,
+      "top": 561.3,
+      "bottom": 742,
+      "matchedTitle": "Perpetual: Alternative cost flows",
+      "confidence": 1
+    },
+    "P-6-3B": {
+      "page": 278,
+      "top": 596.6,
+      "bottom": 742,
+      "matchedTitle": "Analysis of inventory errors",
+      "confidence": 1
+    },
+    "P-6-4B": {
+      "page": 278,
+      "top": 339.6,
+      "bottom": 609.6,
+      "matchedTitle": "Lower of cost or market",
+      "confidence": 0.91
+    },
+    "P-6-5B": {
+      "page": 279,
+      "top": 194.4,
+      "bottom": 345.3,
+      "matchedTitle": "Periodic: Alternative cost flows",
+      "confidence": 1
+    },
+    "P-6-6B": {
+      "page": 279,
+      "top": 332.3,
+      "bottom": 577.8,
+      "matchedTitle": "Periodic: Income comparisons and cost flows",
+      "confidence": 1
+    },
+    "P-6-7B": {
+      "page": 279,
+      "top": 564.8,
+      "bottom": 742,
+      "matchedTitle": "Retail inventory method",
+      "confidence": 0.89
+    },
+    "P-6-18B": {
+      "page": 280,
+      "top": 45.5,
+      "bottom": 742,
+      "matchedTitle": "Gross profit method",
+      "confidence": 0.88
+    },
+    "QS-7-1": {
+      "page": 303,
+      "top": 471.7,
+      "bottom": 560.3,
+      "matchedTitle": "Accounting information system components",
+      "confidence": 1
+    },
+    "QS-7-2": {
+      "page": 303,
+      "top": 547.3,
+      "bottom": 698.5,
+      "matchedTitle": "Accounting information system principles",
+      "confidence": 1
+    },
+    "QS-7-3": {
+      "page": 303,
+      "top": 685.5,
+      "bottom": 742,
+      "matchedTitle": "Identifying general and subsidiary ledgers C\"",
+      "confidence": 1
+    },
+    "QS-7-4": {
+      "page": 304,
+      "top": 44.5,
+      "bottom": 189.8,
+      "matchedTitle": "Controlling accounts and subsidiary ledgers",
+      "confidence": 1
+    },
+    "QS-7-5": {
+      "page": 304,
+      "top": 176.8,
+      "bottom": 288.2,
+      "matchedTitle": "Identifying the special journal of entry",
+      "confidence": 1
+    },
+    "QS-7-6": {
+      "page": 304,
+      "top": 275.2,
+      "bottom": 406.6,
+      "matchedTitle": "Sales journal",
+      "confidence": 0.84
+    },
+    "QS-7-7": {
+      "page": 304,
+      "top": 393.6,
+      "bottom": 536,
+      "matchedTitle": "Cash receipts journal",
+      "confidence": 0.88
+    },
+    "QS-7-8": {
+      "page": 304,
+      "top": 523,
+      "bottom": 687.4,
+      "matchedTitle": "Purchases journal",
+      "confidence": 0.85
+    },
+    "QS-7-9": {
+      "page": 304,
+      "top": 674.4,
+      "bottom": 742,
+      "matchedTitle": "Identifying journal of entry",
+      "confidence": 1
+    },
+    "QS-7-11": {
+      "page": 305,
+      "top": 147.9,
+      "bottom": 266.4,
+      "matchedTitle": "Entries in the general journal",
+      "confidence": 1
+    },
+    "QS-7-12": {
+      "page": 305,
+      "top": 253.4,
+      "bottom": 480.4,
+      "matchedTitle": "Accounts receivable ledger; posting to accounts",
+      "confidence": 1
+    },
+    "QS-7-13": {
+      "page": 305,
+      "top": 467.4,
+      "bottom": 622.4,
+      "matchedTitle": "Days’ payable outstanding",
+      "confidence": 0.89
+    },
+    "E-7-1": {
+      "page": 305,
+      "top": 609.4,
+      "bottom": 742,
+      "matchedTitle": "Sales journal",
+      "confidence": 0.84
+    },
+    "E-7-2": {
+      "page": 306,
+      "top": 44.5,
+      "bottom": 110.4,
+      "matchedTitle": "Identifying journal of entry",
+      "confidence": 1
+    },
+    "E-7-3": {
+      "page": 306,
+      "top": 97.4,
+      "bottom": 264.9,
+      "matchedTitle": "Cash receipts journal",
+      "confidence": 0.88
+    },
+    "E-7-4": {
+      "page": 306,
+      "top": 251.9,
+      "bottom": 317.8,
+      "matchedTitle": "Identifying journal of entry",
+      "confidence": 1
+    },
+    "E-7-5": {
+      "page": 306,
+      "top": 304.8,
+      "bottom": 442.4,
+      "matchedTitle": "Controlling accounts and subsidiary ledgers",
+      "confidence": 1
+    },
+    "E-7-6": {
+      "page": 306,
+      "top": 429.4,
+      "bottom": 596.9,
+      "matchedTitle": "Purchases journal",
+      "confidence": 0.85
+    },
+    "E-7-7": {
+      "page": 306,
+      "top": 583.9,
+      "bottom": 742,
+      "matchedTitle": "Cash payments journal",
+      "confidence": 0.88
+    },
+    "E-7-11": {
+      "page": 307,
+      "top": 419.8,
+      "bottom": 550.8,
+      "matchedTitle": "Special journal transactions and error discovery",
+      "confidence": 0.65
+    },
+    "E-7-12": {
+      "page": 307,
+      "top": 537.8,
+      "bottom": 742,
+      "matchedTitle": "Posting to subsidiary ledger accounts; preparing a schedule of accounts receivable",
+      "confidence": 0.47
+    },
+    "E-7-8": {
+      "page": 307,
+      "top": 44.5,
+      "bottom": 107.9,
+      "matchedTitle": "Identifying journal of entry",
+      "confidence": 1
+    },
+    "E-7-9": {
+      "page": 307,
+      "top": 94.9,
+      "bottom": 259.8,
+      "matchedTitle": "Entries in general journal",
+      "confidence": 0.91
+    },
+    "E-7-13": {
+      "page": 308,
+      "top": 156.2,
+      "bottom": 321.8,
+      "matchedTitle": "Days’ payable outstanding",
+      "confidence": 0.89
+    },
+    "P-7-1A": {
+      "page": 308,
+      "top": 308.8,
+      "bottom": 742,
+      "matchedTitle": "Special journals, subsidiary ledgers, trial balance",
+      "confidence": 0.64
+    },
+    "P-7-2A": {
+      "page": 309,
+      "top": 146.8,
+      "bottom": 742,
+      "matchedTitle": "Special journals, subsidiary ledgers, and schedule of accounts receivable",
+      "confidence": 0.47
+    },
+    "P-7-1B": {
+      "page": 310,
+      "top": 279,
+      "bottom": 742,
+      "matchedTitle": "Special journals, subsidiary ledgers, trial balance",
+      "confidence": 0.64
+    },
+    "P-7-3A": {
+      "page": 310,
+      "top": 44.5,
+      "bottom": 292,
+      "matchedTitle": "Special journals, subsidiary ledgers, and schedule of accounts payable",
+      "confidence": 0.49
+    },
+    "P-7-2B": {
+      "page": 311,
+      "top": 123.7,
+      "bottom": 742,
+      "matchedTitle": "Special journals, subsidiary ledgers, schedule of accounts receivable",
+      "confidence": 0.5
+    },
+    "P-7-3B": {
+      "page": 312,
+      "top": 44.5,
+      "bottom": 742,
+      "matchedTitle": "Special journals, subsidiary ledgers, and schedule of accounts payable",
+      "confidence": 0.49
+    },
+    "QS-8-1": {
+      "page": 338,
+      "top": 651.4,
+      "bottom": 742,
+      "matchedTitle": "Internal control objectives",
+      "confidence": 0.89
+    },
+    "QS-8-2": {
+      "page": 339,
+      "top": 44.5,
+      "bottom": 130.2,
+      "matchedTitle": "COSO internal control components",
+      "confidence": 1
+    },
+    "QS-8-3": {
+      "page": 339,
+      "top": 117.2,
+      "bottom": 241.8,
+      "matchedTitle": "Cash and equivalents",
+      "confidence": 0.88
+    },
+    "QS-8-4": {
+      "page": 339,
+      "top": 228.8,
+      "bottom": 340.5,
+      "matchedTitle": "Internal control for cash",
+      "confidence": 0.91
+    },
+    "QS-8-5": {
+      "page": 339,
+      "top": 327.5,
+      "bottom": 391.2,
+      "matchedTitle": "Cash Over and Short",
+      "confidence": 0.9
+    },
+    "QS-8-6": {
+      "page": 339,
+      "top": 378.2,
+      "bottom": 498.9,
+      "matchedTitle": "Petty cash accounting",
+      "confidence": 0.88
+    },
+    "QS-8-7": {
+      "page": 339,
+      "top": 485.9,
+      "bottom": 652.8,
+      "matchedTitle": "Bank reconciliation",
+      "confidence": 0.85
+    },
+    "QS-8-8": {
+      "page": 339,
+      "top": 639.8,
+      "bottom": 742,
+      "matchedTitle": "Bank reconciliation",
+      "confidence": 0.85
+    },
+    "QS-8-33A": {
+      "page": 340,
+      "top": 414.1,
+      "bottom": 536,
+      "matchedTitle": "Documents in a voucher system P4",
+      "confidence": 1
+    },
+    "QS-8-35": {
+      "page": 340,
+      "top": 281.5,
+      "bottom": 427.1,
+      "matchedTitle": "Days’ sales uncollected",
+      "confidence": 1
+    },
+    "E-8-3": {
+      "page": 340,
+      "top": 523,
+      "bottom": 623.9,
+      "matchedTitle": "Analyzing internal control",
+      "confidence": 1
+    },
+    "E-8-4": {
+      "page": 340,
+      "top": 610.9,
+      "bottom": 742,
+      "matchedTitle": "Applying internal control principles",
+      "confidence": 1
+    },
+    "E-8-5": {
+      "page": 341,
+      "top": 262.6,
+      "bottom": 353.2,
+      "matchedTitle": "Cash and cash equivalents",
+      "confidence": 0.89
+    },
+    "E-8-6": {
+      "page": 341,
+      "top": 340.2,
+      "bottom": 469.7,
+      "matchedTitle": "Control of cash receipts",
+      "confidence": 0.9
+    },
+    "E-8-7": {
+      "page": 341,
+      "top": 456.7,
+      "bottom": 575.3,
+      "matchedTitle": "Voucher system and control of cash payments",
+      "confidence": 1
+    },
+    "E-8-8": {
+      "page": 341,
+      "top": 562.3,
+      "bottom": 657.9,
+      "matchedTitle": "Petty cash fund with a shortage P$ Check (') Cr. Cash, $'(+ and (*) Cr. Cash, $\"#",
+      "confidence": 0.71
+    },
+    "E-8-9": {
+      "page": 341,
+      "top": 644.9,
+      "bottom": 742,
+      "matchedTitle": "Petty cash fund with an overage",
+      "confidence": 1
+    },
+    "E-8-11": {
+      "page": 342,
+      "top": 119.6,
+      "bottom": 435.1,
+      "matchedTitle": "Bank reconciliation and adjusting entries",
+      "confidence": 1
+    },
+    "E-8-12": {
+      "page": 342,
+      "top": 422.1,
+      "bottom": 551.3,
+      "matchedTitle": "Bank reconciliation",
+      "confidence": 0.85
+    },
+    "E-8-13": {
+      "page": 342,
+      "top": 538.3,
+      "bottom": 592.9,
+      "matchedTitle": "Adjusting entries from bank reconciliation P%",
+      "confidence": 1
+    },
+    "E-8-14": {
+      "page": 342,
+      "top": 579.9,
+      "bottom": 742,
+      "matchedTitle": "Bank reconciliation",
+      "confidence": 0.85
+    },
+    "E-8-15": {
+      "page": 343,
+      "top": 44.5,
+      "bottom": 136.5,
+      "matchedTitle": "Liquid assets and accounts receivable A#",
+      "confidence": 1
+    },
+    "E-8-16A": {
+      "page": 343,
+      "top": 123.5,
+      "bottom": 381.6,
+      "matchedTitle": "Documents in a voucher system",
+      "confidence": 1
+    },
+    "P-8-1A": {
+      "page": 343,
+      "top": 368.6,
+      "bottom": 608.1,
+      "matchedTitle": "Analyzing internal control",
+      "confidence": 0.89
+    },
+    "P-8-2A": {
+      "page": 343,
+      "top": 595.1,
+      "bottom": 742,
+      "matchedTitle": "Establishing, reimbursing, and adjusting petty cash",
+      "confidence": 1
+    },
+    "P-8-3A": {
+      "page": 344,
+      "top": 184.1,
+      "bottom": 473,
+      "matchedTitle": "Establishing, reimbursing, and increasing petty cash",
+      "confidence": 1
+    },
+    "P-8-4A": {
+      "page": 344,
+      "top": 460,
+      "bottom": 742,
+      "matchedTitle": "Preparing a bank reconciliation and recording adjustments",
+      "confidence": 0.74
+    },
+    "P-8-1B": {
+      "page": 345,
+      "top": 664.6,
+      "bottom": 742,
+      "matchedTitle": "Analyzing internal control",
+      "confidence": 0.89
+    },
+    "P-8-5A": {
+      "page": 345,
+      "top": 44.5,
+      "bottom": 677.6,
+      "matchedTitle": "Preparing a bank reconciliation and recording adjustments",
+      "confidence": 0.74
+    },
+    "P-8-2B": {
+      "page": 347,
+      "top": 165,
+      "bottom": 468.9,
+      "matchedTitle": "Establishing, reimbursing, and adjusting petty cash",
+      "confidence": 1
+    },
+    "P-8-3B": {
+      "page": 347,
+      "top": 455.9,
+      "bottom": 742,
+      "matchedTitle": "Establishing, reimbursing, and increasing petty cash",
+      "confidence": 1
+    },
+    "P-8-4B": {
+      "page": 348,
+      "top": 44.5,
+      "bottom": 305.3,
+      "matchedTitle": "Preparing a bank reconciliation and recording adjustments",
+      "confidence": 0.74
+    },
+    "P-8-5B": {
+      "page": 348,
+      "top": 292.3,
+      "bottom": 742,
+      "matchedTitle": "Preparing a bank reconciliation and recording adjustments",
+      "confidence": 0.74
+    },
+    "QS-9-2": {
+      "page": 374,
+      "top": 190,
+      "bottom": 265.7,
+      "matchedTitle": "Credit card sales",
+      "confidence": 0.88
+    },
+    "QS-9-3": {
+      "page": 374,
+      "top": 252.7,
+      "bottom": 320.4,
+      "matchedTitle": "Direct write-off method",
+      "confidence": 0.9
+    },
+    "QS-9-4": {
+      "page": 374,
+      "top": 307.4,
+      "bottom": 382.4,
+      "matchedTitle": "Recovering a bad debt",
+      "confidence": 0.9
+    },
+    "QS-9-5": {
+      "page": 374,
+      "top": 369.4,
+      "bottom": 511.2,
+      "matchedTitle": "Distinguishing between allowance method and direct write-off method",
+      "confidence": 0.73
+    },
+    "QS-9-6": {
+      "page": 374,
+      "top": 498.2,
+      "bottom": 577,
+      "matchedTitle": "Allowance method for bad debts",
+      "confidence": 1
+    },
+    "QS-9-7": {
+      "page": 374,
+      "top": 564,
+      "bottom": 653.8,
+      "matchedTitle": "Reporting allowance for doubtful accounts",
+      "confidence": 1
+    },
+    "QS-9-8": {
+      "page": 374,
+      "top": 640.8,
+      "bottom": 742,
+      "matchedTitle": "Percent of accounts receivable method",
+      "confidence": 1
+    },
+    "QS-9-1": {
+      "page": 375,
+      "top": 95.2,
+      "bottom": 242.5,
+      "matchedTitle": "Aging of receivables method",
+      "confidence": 1
+    },
+    "QS-9-22": {
+      "page": 375,
+      "top": 325.8,
+      "bottom": 389,
+      "matchedTitle": "Note receivable",
+      "confidence": 0.84
+    },
+    "QS-9-23": {
+      "page": 375,
+      "top": 376,
+      "bottom": 439.2,
+      "matchedTitle": "Note receivable honored",
+      "confidence": 0.89
+    },
+    "QS-9-24": {
+      "page": 375,
+      "top": 426.2,
+      "bottom": 489.4,
+      "matchedTitle": "Note receivable interest and maturity P&",
+      "confidence": 1
+    },
+    "QS-9-25": {
+      "page": 375,
+      "top": 476.4,
+      "bottom": 530.4,
+      "matchedTitle": "Factoring receivables C%",
+      "confidence": 1
+    },
+    "QS-9-26": {
+      "page": 375,
+      "top": 512.2,
+      "bottom": 625.8,
+      "matchedTitle": "Preparing an income statement",
+      "confidence": 1
+    },
+    "QS-9-27": {
+      "page": 375,
+      "top": 612.8,
+      "bottom": 742,
+      "matchedTitle": "Preparing a balance sheet",
+      "confidence": 0.91
+    },
+    "QS-9-9": {
+      "page": 375,
+      "top": 44.5,
+      "bottom": 108.2,
+      "matchedTitle": "Percent of sales method",
+      "confidence": 0.9
+    },
+    "QS-9-28": {
+      "page": 376,
+      "top": 44.5,
+      "bottom": 193.1,
+      "matchedTitle": "Accounts receivable turnover",
+      "confidence": 1
+    },
+    "E-9-2": {
+      "page": 376,
+      "top": 180.1,
+      "bottom": 410,
+      "matchedTitle": "Accounts receivable subsidiary ledger; schedule of accounts receivable",
+      "confidence": 0.81
+    },
+    "E-9-3": {
+      "page": 376,
+      "top": 397,
+      "bottom": 498.3,
+      "matchedTitle": "Accounting for credit card sales",
+      "confidence": 1
+    },
+    "E-9-4": {
+      "page": 376,
+      "top": 485.3,
+      "bottom": 575.6,
+      "matchedTitle": "Sales on store credit card",
+      "confidence": 0.92
+    },
+    "E-9-5": {
+      "page": 376,
+      "top": 562.6,
+      "bottom": 644,
+      "matchedTitle": "Direct write-off method",
+      "confidence": 0.9
+    },
+    "E-9-6": {
+      "page": 376,
+      "top": 631,
+      "bottom": 742,
+      "matchedTitle": "Writing off receivables",
+      "confidence": 0.89
+    },
+    "E-9-1": {
+      "page": 377,
+      "top": 346.2,
+      "bottom": 455.9,
+      "matchedTitle": "Percent of receivables method",
+      "confidence": 1
+    },
+    "E-9-55": {
+      "page": 377,
+      "top": 672.5,
+      "bottom": 742,
+      "matchedTitle": "Estimating bad debts",
+      "confidence": 1
+    },
+    "E-9-56": {
+      "page": 377,
+      "top": 442.9,
+      "bottom": 685.5,
+      "matchedTitle": "Aging of receivables schedule",
+      "confidence": 1
+    },
+    "E-9-23": {
+      "page": 378,
+      "top": 166.6,
+      "bottom": 246.7,
+      "matchedTitle": "Notes receivable transactions C$ Check Dec. '\", Cr. Interest Revenue, $')",
+      "confidence": 0.59
+    },
+    "E-9-24": {
+      "page": 378,
+      "top": 233.7,
+      "bottom": 375.5,
+      "matchedTitle": "Notes receivable transactions P& Check Jan. (*, Dr. Cash, $!,%!%",
+      "confidence": 0.68
+    },
+    "E-9-25": {
+      "page": 378,
+      "top": 362.5,
+      "bottom": 451.2,
+      "matchedTitle": "Honoring a note",
+      "confidence": 0.87
+    },
+    "E-9-26": {
+      "page": 378,
+      "top": 438.2,
+      "bottom": 536,
+      "matchedTitle": "Dishonoring a note",
+      "confidence": 0.88
+    },
+    "E-9-27": {
+      "page": 378,
+      "top": 523,
+      "bottom": 642.8,
+      "matchedTitle": "Selling and pledging accounts receivable",
+      "confidence": 1
+    },
+    "E-9-28": {
+      "page": 378,
+      "top": 629.8,
+      "bottom": 742,
+      "matchedTitle": "Accounts receivable turnover",
+      "confidence": 1
+    },
+    "P-9-2A": {
+      "page": 379,
+      "top": 85.6,
+      "bottom": 257.6,
+      "matchedTitle": "Sales on account and credit card sales",
+      "confidence": 1
+    },
+    "P-9-3A": {
+      "page": 379,
+      "top": 244.6,
+      "bottom": 496.9,
+      "matchedTitle": "Estimating and reporting bad debts",
+      "confidence": 1
+    },
+    "P-9-4A": {
+      "page": 379,
+      "top": 483.9,
+      "bottom": 742,
+      "matchedTitle": "Aging accounts receivable and accounting for bad debts",
+      "confidence": 0.92
+    },
+    "P-9-5A": {
+      "page": 380,
+      "top": 44.5,
+      "bottom": 360.9,
+      "matchedTitle": "Accounts receivable transactions and bad debts adjustments",
+      "confidence": 0.88
+    },
+    "P-9-6A": {
+      "page": 380,
+      "top": 347.9,
+      "bottom": 742,
+      "matchedTitle": "Analyzing and journalizing notes receivable transactions",
+      "confidence": 0.86
+    },
+    "P-9-2B": {
+      "page": 381,
+      "top": 74.7,
+      "bottom": 246.8,
+      "matchedTitle": "Sales on account and credit card sales C\" Check Aug. \"&, Dr. Cash,",
+      "confidence": 0.75
+    },
+    "P-9-3B": {
+      "page": 381,
+      "top": 233.8,
+      "bottom": 466.9,
+      "matchedTitle": "Estimating and reporting bad debts",
+      "confidence": 1
+    },
+    "P-9-4B": {
+      "page": 381,
+      "top": 453.9,
+      "bottom": 742,
+      "matchedTitle": "Aging accounts receivable and accounting for bad debts",
+      "confidence": 0.92
+    },
+    "P-9-5B": {
+      "page": 382,
+      "top": 307.2,
+      "bottom": 742,
+      "matchedTitle": "Analyzing and journalizing notes receivable transactions",
+      "confidence": 0.86
+    },
+    "QS-5-34": {
+      "page": 242,
+      "top": 18,
+      "bottom": 765,
+      "confidence": 0,
+      "fallback": true
+    },
+    "QS-8-16": {
+      "page": 368,
+      "top": 18,
+      "bottom": 765,
+      "confidence": 0,
+      "fallback": true
+    }
+  }
+}
