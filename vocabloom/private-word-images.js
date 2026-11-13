@@ -67,10 +67,12 @@ async function localUrl(word){
  const key=keyFor(word);
  if(urls.has(key))return urls.get(key);
  const request=read(word).then(blob=>{
+  // A newer upload/removal may have invalidated this async IndexedDB read.
+  if(urls.get(key)!==request)return null;
   const url=blob?root.URL.createObjectURL(blob):null;
   urls.set(key,url);
   return url;
- }).catch(()=>{urls.delete(key);return null;});
+ }).catch(()=>{if(urls.get(key)===request)urls.delete(key);return null;});
  urls.set(key,request);
  return request;
 }
