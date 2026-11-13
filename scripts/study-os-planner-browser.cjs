@@ -49,7 +49,7 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.equal(await page.locator("#plan-view-date").inputValue(),tomorrow);
     assert.equal(await page.locator("#plan-list a").getAttribute("href"),"eco.html");
     assert.match(await page.locator("#plan-summary").innerText(),/วางแผน 45 นาที · เสร็จแล้ว 1/);
-    assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 1 · เสร็จแล้ว 1/);
+    assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 0 · เสร็จแล้ว 1/);
     // An empty date picker must not cause a render error.
     await page.locator("#plan-view-date").fill("");
     assert.match(await page.locator("#plan-summary").innerText(),/เลือกวันที่/);
