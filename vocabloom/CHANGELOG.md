@@ -52,3 +52,8 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — Full Backup malformed-file regression coverage
 
 - Added isolated execution tests confirming oversized files and malformed JSON cannot trigger restore confirmation, local writes or network calls. No application behavior changed.
+
+## 2026-11-13 — Restore render-error state rollback
+
+- Restore now rolls back the in-memory cloud merged-day cache and remote-status label if an error occurs after the local backup write, alongside existing storage/progress rollback.
+- Added synthetic render-failure execution coverage. CI confirmation pending.
