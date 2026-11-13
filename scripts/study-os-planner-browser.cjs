@@ -99,6 +99,10 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     assert.equal(await page.locator("#plan-list img").count(),0);
     assert.equal(await page.locator("#plan-discovery-list img").count(),0);
     assert.equal(await page.evaluate(() => window.__injected),undefined);
+    // Show actual upcoming list on mobile: rows wrap safely, no horizontal scroll.
+    await page.locator("#plan-discovery-details summary").click();
+    assert.equal(await page.locator('#plan-discovery-list li[data-plan-group="upcoming"]').count()>0,true);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);
     const downloaded = page.waitForEvent("download");
     await page.locator("#plan-export").click();
     const file = await downloaded;
