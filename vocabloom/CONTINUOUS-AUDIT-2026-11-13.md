@@ -257,3 +257,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Browser-only `uPracticeStopSpeech` cancels active utterances on answer, chapter change, Previous/Next, Retry mistakes, New set or leaving Practice; no persistent state changed. Code SHA `93642e25c357ad884be7a8caae38e30d3cd82d87`, test SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32`.
 - [Regression 43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942) **success**; [browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) **in progress** at documentation time. No physical iPad audio or production traffic was tested.
+
+### Speech cancellation hosted CI completion
+
+- Tested source SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32` passed regression [43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942), job `131758604584`: 266 Node pass / 0 fail, 3 Python exporter pass.
+- Hosted isolated browser [43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139), job `131758604737`: Chromium desktop/tablet and WebKit desktop/tablet all passed, each importing 581 words with zero live service calls. This is not physical iPad audio output testing.

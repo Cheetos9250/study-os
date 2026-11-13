@@ -246,3 +246,9 @@ No merge, production deploy, Notion change, Cloudflare Worker/KV change, product
 - Added `uPracticeStopSpeech` to cancel existing browser speech when answering or changing the active Practice state. The helper no-ops safely without a browser speech engine. Implemented at SHA `93642e25c357ad884be7a8caae38e30d3cd82d87`; synthetic action tests at SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32`.
 - [Regression 43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942) completed **success**. [Isolated browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) was **in progress** when documented; do not assume browser success until its final conclusion is checked.
 - Code is unmerged on Draft PR #41, with no real data, deployment, Worker/KV/Notion, sync endpoint or SRS schema modification.
+
+### Pronunciation interruption — hosted CI verified
+
+- The speech-cancellation implementation/test SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32` passed [regression 43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942): inspected job `131758604584` logged **266 Node tests passed, 0 failed, plus 3 Python exporter tests passed**.
+- [Isolated browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) completed **success**: job `131758604737` logged Chromium/WebKit desktop/tablet **4/4 passes**, 581 imported English entries and **0 live service requests** per case.
+- This supersedes the earlier `in progress` browser line. Audible iPad Safari playback/VoiceOver and production CAS/private backups remain unverified. No merge or deployment.

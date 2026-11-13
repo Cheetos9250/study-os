@@ -78,3 +78,8 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - After the passing synthetic regression [43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942), verify final [hosted browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) for the code/test SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32`.
 - Test actual speaker output, speech cancellation when advancing/answering, browser-disabled audio, exact source examples, VoiceOver and focus on **physical iPad Safari in an approved non-production preview**. Headless Chromium/WebKit alone cannot certify audible sound.
 - Keep real five-subject backup, staging CAS/cross-device conflict testing and explicit production approvals outstanding.
+
+### Pronunciation interruption CI cleared (hosted only)
+
+- [Regression 43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942) passed **266/266 Node plus 3/3 Python**; [Browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) passed **4/4 Chromium/WebKit desktop/tablet** with zero live service requests for code/test SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32`. The previous pending note is superseded.
+- Remaining release blockers: **physical iPad Safari speaker playback/VoiceOver and interruption behaviour**, real authorized backup coverage, staging CAS/concurrency, and explicit owner approval for production sync/deployment.
