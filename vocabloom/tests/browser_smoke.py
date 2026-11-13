@@ -83,6 +83,9 @@ def run_case(browser, engine, tablet):
     page.locator('[data-page="library"]:visible').first.click()
     first_word = page.locator('.word-row').first
     library_word = page.evaluate("allWords()[0].en")
+    page.evaluate("""() => { const original = window.toast;
+      window.toast = msg => { window.__qaImageNotice = String(msg); return original(msg); };
+    }""")
     assert first_word.locator('[data-private-image-pick]').count() == 1
     first_word.locator('.word-thumb[data-private-image-pick]').click()
     page.locator('#voca-private-image-picker').set_input_files(image)
@@ -95,7 +98,8 @@ def run_case(browser, engine, tablet):
           try { const b = await VocaPersonalImages.read(word); record = b ? {type:b.type,size:b.size} : null; }
           catch(e){readError=String(e);}
           return {record,readError,marker:document.querySelector('.word-row .word-thumb')?.outerHTML,
-                  pickerType:document.querySelector('#voca-private-image-picker')?.files?.[0]?.type || null};
+                  pickerType:document.querySelector('#voca-private-image-picker')?.files?.[0]?.type || null,
+                  notice:window.__qaImageNotice || null};
         }""", library_word)
         print(json.dumps({"image_debug":debug,"engine":engine,"tablet":tablet}))
         raise
