@@ -308,6 +308,72 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await homepage.goto(base);
     assert.equal(await homepage.locator('a[href="course-metadata-draft.html"]').count(),1);
     assert.equal(await homepage.locator('[data-course="eco"] h3').textContent(),"Economics");
+    // Draft dashboard applies course presentation only after the user opts in.
+    // Isolated synthetic storage; no existing user or production data is read.
+    const dashboardProfile=await browser.newContext({viewport:{width:820,height:1180}});
+    try{
+      await dashboardProfile.route("**/*",route=>new URL(route.request().url()).origin===base?route.continue():route.abort());
+      const dashboard=await dashboardProfile.newPage();
+      await dashboard.goto(base);
+      assert.equal(await dashboard.locator("#course-metadata-apply").isVisible(),true);
+      const seeded=await dashboard.evaluate(async()=>{
+        const store=await globalThis.StudyOSCourseMetadataStore.openCourseMetadata(indexedDB);
+        const metadata=globalThis.StudyOSCourseMetadata.defaultMetadata();
+        metadata.courses.acc.name="บัญชีขั้นสูง";
+        metadata.courses.acc.description="เนื้อหาบัญชีเพิ่มเติม";
+        metadata.courses.eco.name="เศรษฐศาสตร์ใหม่";
+        metadata.order=["math","acc","eco"];
+        const result=await store.save(metadata,0);
+        store.close();
+        localStorage.setItem("study-acc","SYNTHETIC-UNTOUCHED");
+        return result.revision;
+      });
+      assert.equal(seeded,1);
+      assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"Accounting");
+      await dashboard.locator("#course-search").fill("เศรษฐศาสตร์ใหม่");
+      assert.match(await dashboard.locator("#course-search-status").textContent(),/ไม่พบ/);
+      await dashboard.locator("#course-metadata-apply").click();
+      await dashboard.locator("#course-metadata-status").filter({hasText:"Revision 1"}).waitFor();
+      assert.deepEqual(await dashboard.locator("#course-list a[data-course]").evaluateAll(cards=>cards.map(card=>card.dataset.course)),["math","acc","eco"]);
+      assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"บัญชีขั้นสูง");
+      assert.equal(await dashboard.locator('[data-course="acc"] p').textContent(),"เนื้อหาบัญชีเพิ่มเติม");
+      assert.equal(await dashboard.locator('[data-course="eco"] h3').textContent(),"เศรษฐศาสตร์ใหม่");
+      assert.match(await dashboard.locator("#course-search-status").textContent(),/แสดง 1 จาก 3 วิชา/);
+      for(const id of ["acc","eco","math"]) {
+        assert.equal(await dashboard.locator('[data-course="'+id+'"]').getAttribute("href"),id+".html");
+      }
+      assert.equal(await dashboard.locator("#course-list a[data-course]:visible").count(),1);
+      assert.deepEqual(await dashboard.evaluate(async()=>{
+        const store=await globalThis.StudyOSCourseMetadataStore.openCourseMetadata(indexedDB);
+        const current=await store.read();
+        store.close();
+        return {revision:current.revision,progress:localStorage.getItem("study-acc")};
+      }),{revision:1,progress:"SYNTHETIC-UNTOUCHED"});
+      await dashboard.locator("#course-metadata-default").click();
+      assert.deepEqual(await dashboard.locator("#course-list a[data-course]").evaluateAll(cards=>cards.map(card=>card.dataset.course)),["acc","eco","math"]);
+      assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"Accounting");
+      assert.equal(await dashboard.locator('[data-course="eco"] h3').textContent(),"Economics");
+      assert.equal(await dashboard.locator("#course-metadata-default").isVisible(),false);
+      await dashboard.locator("#course-search").fill("");
+      assert.equal(await dashboard.locator("#course-list a[data-course]:visible").count(),3);
+      await dashboard.reload();
+      assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"Accounting");
+      await dashboard.locator("#course-metadata-apply").click();
+      await dashboard.locator("#course-metadata-status").filter({hasText:"Revision 1"}).waitFor();
+      assert.equal(await dashboard.locator('[data-course="acc"] h3').textContent(),"บัญชีขั้นสูง");
+    }finally{await dashboardProfile.close();}
+    // Simulate unavailable IDB without modifying the original courses.
+    const unavailableHome=await browser.newContext();
+    try{
+      await unavailableHome.route("**/*",route=>new URL(route.request().url()).origin===base?route.continue():route.abort());
+      await unavailableHome.addInitScript(()=>Object.defineProperty(window,"indexedDB",{configurable:true,value:undefined}));
+      const page=await unavailableHome.newPage();
+      await page.goto(base);
+      await page.locator("#course-metadata-apply").click();
+      await page.locator("#course-metadata-status").filter({hasText:"อ่านชื่อรายวิชา"}).waitFor();
+      assert.equal(await page.locator('[data-course="acc"] h3').textContent(),"Accounting");
+      assert.equal(await page.locator("#course-metadata-default").isVisible(),false);
+    }finally{await unavailableHome.close();}
     return {engine,courseMetadata:"passed; synthetic IndexedDB CAS, import rollback, reset, export, denied factory and opt-in editor reload"};
   }finally{await context.close();}
 };
