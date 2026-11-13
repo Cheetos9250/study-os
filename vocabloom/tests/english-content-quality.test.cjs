@@ -57,16 +57,21 @@ test('Generated English practice answers and distractors retain Verified source 
  assert.ok(count>=100,'Expected broad rotated-question coverage');
 });
 
-test('Rotated practice options are distinct after Unicode, invisible-separator and whitespace normalization',()=>{
+test('Rotated practice options have no duplicate or shared explicit Thai senses',()=>{
  const start=source.indexOf('function uPracticeMeaning(back){'),end=source.indexOf('function uHome(){',start);
  const funcs=source.slice(start,end);
  const cards=verified.map(r=>({cat:r.Chapter||'all',f:r.Front,b:r.Back,mid:r.page_id,ref:r.page_id}));
  const make=new Function('cards','offset',`const UACTIVE_LANGUAGE='eng',USTATE={cat:'all',practiceOffset:offset,practiceQuestions:null};const uCards=()=>cards;${funcs}return uPracticeQuestions({key:'eng'});`);
  const normalized=x=>x.normalize('NFKC').toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g,'').replace(/\s+/g,' ').trim();
+ const senses=x=>normalized(x).split(/[,，、;；\/]/).map(s=>s.trim()).filter(Boolean);
  let checked=0;
  for(let offset=0;offset<Math.min(cards.length,650);offset+=10){
   for(const q of make(cards,offset)){
    assert.equal(new Set(q.opts.map(normalized)).size,q.opts.length,'Equivalent Thai options for '+q.q);
+   const groups=q.opts.map(senses);
+   for(let i=0;i<groups.length;i++)for(let j=i+1;j<groups.length;j++){
+    assert.ok(!groups[i].some(s=>groups[j].includes(s)),'Overlapping Thai sense in options for '+q.q);
+   }
    checked++;
   }
  }
