@@ -21,6 +21,7 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     await page.locator("#planner-content").waitFor({state:"visible"});
     const today = await page.locator("#plan-date").inputValue();
     assert.match(await page.locator("#plan-discovery").innerText(),/งานค้าง 0 · วันนี้ 0 · 7 วันข้างหน้า 0 · เสร็จแล้ว 0/);
+    assert.match(await page.locator("#plan-discovery-list").textContent(),/ยังไม่มีงานค้างหรือแผนใน 7 วันข้างหน้า/);
     await page.locator("#plan-overdue").click();
     assert.match(await page.locator("#plan-status").innerText(),/ไม่มีแผนค้าง/);
     await page.locator("#plan-upcoming").click();
@@ -96,6 +97,7 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
     await page.locator("#plan-save").click();
     await page.getByText("บันทึกแผนแล้ว",{exact:true}).waitFor();
     assert.equal(await page.locator("#plan-list img").count(),0);
+    assert.equal(await page.locator("#plan-discovery-list img").count(),0);
     assert.equal(await page.evaluate(() => window.__injected),undefined);
     const downloaded = page.waitForEvent("download");
     await page.locator("#plan-export").click();
@@ -184,6 +186,22 @@ module.exports = async function checkPlanner(browser,base,engine,output) {
       await tab.waitForFunction(expected => document.querySelector("#plan-discovery")?.textContent?.includes(expected),label === "Overdue recent QA" ? "งานค้าง 1" : label === "Upcoming later QA" ? "7 วันข้างหน้า 1" : label === "Overdue navigation QA" ? "งานค้าง 2" : "7 วันข้างหน้า 2");
     }
     assert.match(await tab.locator("#plan-discovery").textContent(),/งานค้าง 2 · วันนี้ 0 · 7 วันข้างหน้า 2 · เสร็จแล้ว 0/);
+    await tab.locator("#plan-discovery-details summary").click();
+    const overdueButtons=tab.locator('#plan-discovery-list li[data-plan-group="overdue"] button');
+    const upcomingButtons=tab.locator('#plan-discovery-list li[data-plan-group="upcoming"] button');
+    assert.equal(await overdueButtons.count(),2);
+    assert.equal(await upcomingButtons.count(),2);
+    assert.match(await overdueButtons.first().textContent(),/Overdue navigation QA/);
+    assert.match(await overdueButtons.last().textContent(),/Overdue recent QA/);
+    assert.match(await upcomingButtons.first().textContent(),/Upcoming navigation QA/);
+    assert.match(await upcomingButtons.last().textContent(),/Upcoming later QA/);
+    await overdueButtons.first().click();
+    assert.equal(await tab.locator("#plan-view-date").inputValue(),shift(-2));
+    assert.equal(await tab.evaluate(()=>document.activeElement.id),"plan-list");
+    assert.equal(await tab.locator("#plan-list input[type=checkbox]").isChecked(),false);
+    await upcomingButtons.first().click();
+    assert.equal(await tab.locator("#plan-view-date").inputValue(),shift(2));
+    assert.equal(await tab.locator("#plan-list input[type=checkbox]").isChecked(),false);
     await tab.locator("#plan-overdue").click();
     assert.equal(await tab.locator("#plan-view-date").inputValue(),shift(-2));
     assert.match(await tab.locator("#plan-list").innerText(),/Overdue navigation QA/);
