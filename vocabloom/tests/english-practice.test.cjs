@@ -4,8 +4,8 @@ const root=path.resolve(__dirname,'../..'),src=fs.readFileSync(path.join(root,'v
 const deck=JSON.parse(fs.readFileSync(path.join(root,'vocabloom/study-decks.json'),'utf8')).decks.find(d=>d.key==='eng');
 function extract(a,b){let i=src.indexOf(a),j=src.indexOf(b,i+a.length);assert.ok(i>=0&&j>i);return src.slice(i,j);}
 const pure=extract('function uPracticeMeaning(back){','function uHome(){');
-function run(offset=0){
- return new Function('deck','offset',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:offset,practiceAnswers:{},quizIndex:0};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));${pure};return {questions:uPracticeQuestions(deck),meaning:uPracticeMeaning};`)(deck,offset);
+function run(offset=0,cat='all'){
+ return new Function('deck','offset','cat',`const UACTIVE_LANGUAGE='eng',USTATE={practiceOffset:offset,practiceAnswers:{},quizIndex:0,cat};const uCards=d=>d.cards.map(x=>({cat:x[0],f:x[1],b:x[2],mid:x[4]}));${pure};return {questions:uPracticeQuestions(deck),meaning:uPracticeMeaning};`)(deck,offset,cat);
 }
 test('Generated practice produces ten answerable English-only questions with unique meanings',()=>{
  const {questions}=run();assert.equal(questions.length,10);
@@ -27,4 +27,14 @@ test('Practice is session-only and never uses legacy quiz or SRS write actions',
  assert.match(src,/Not a Verified Notion quiz/);
  assert.match(src,/Verified Quizzes/);
  assert.match(src,/case 'u-practice-restart'/);
+});
+
+test('Chapter filter limits generated practice to the chosen English category',()=>{
+ const all=run().questions;
+ const selected=run(0,'e1').questions;
+ assert.ok(selected.length>=4);
+ assert.ok(selected.every(q=>q.cat==='e1'));
+ assert.ok(all.some(q=>q.cat!=='e1')||all.length===10);
+ assert.deepEqual(run(0,'not-a-category').questions,[]);
+ assert.match(src,/USTATE\.practiceAnswers=\{\};USTATE\.practiceOffset=0;render\(\)/);
 });
