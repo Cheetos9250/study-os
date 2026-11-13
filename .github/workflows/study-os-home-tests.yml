@@ -5,11 +5,25 @@ on:
     paths:
       - 'index.html'
       - 'tests/study-os-home.test.cjs'
+      - 'tests/study-os-academic-content.test.cjs'
+      - 'vocabloom/study-decks.json'
+      - 'acc.html'
+      - 'eco.html'
+      - 'math.html'
+      - 'eng.html'
+      - 'zh.html'
       - '.github/workflows/study-os-home-tests.yml'
   pull_request:
     paths:
       - 'index.html'
       - 'tests/study-os-home.test.cjs'
+      - 'tests/study-os-academic-content.test.cjs'
+      - 'vocabloom/study-decks.json'
+      - 'acc.html'
+      - 'eco.html'
+      - 'math.html'
+      - 'eng.html'
+      - 'zh.html'
       - '.github/workflows/study-os-home-tests.yml'
   workflow_dispatch:
 
@@ -26,4 +40,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run static home checks
-        run: node --test tests/study-os-home.test.cjs
+        run: node --test tests/study-os-home.test.cjs tests/study-os-academic-content.test.cjs
