@@ -39,7 +39,8 @@ async function write(word,file){
  const database=await db(),key=keyFor(word);
  await new Promise((resolve,reject)=>{
   const tx=database.transaction(STORE,'readwrite');
-  tx.objectStore(STORE).put(file,key);
+  // Persist the image bytes as a Blob, not a File object with browser-specific metadata.
+  tx.objectStore(STORE).put(new Blob([file],{type:file.type}),key);
   tx.oncomplete=resolve;
   tx.onerror=()=>reject(tx.error||Error('บันทึกภาพไม่สำเร็จ'));
   tx.onabort=()=>reject(tx.error||Error('พื้นที่เก็บภาพไม่เพียงพอ'));
