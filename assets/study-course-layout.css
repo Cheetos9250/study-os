@@ -1,0 +1,12 @@
+/* Keep sync settings in document flow so they cannot cover study actions. */
+.wrap{padding-block-end:24px}
+.cloud-sync-bar{
+  position:static!important;
+  width:calc(100% - max(16px, env(safe-area-inset-left, 0px)) - max(16px, env(safe-area-inset-right, 0px)));
+  max-width:768px;
+  margin:0 auto max(16px, env(safe-area-inset-bottom, 0px));
+  flex-wrap:wrap;
+  justify-content:space-between;
+  border-radius:12px!important;
+}
+.cloud-sync-bar>span,.cloud-sync-bar>button{overflow-wrap:anywhere;max-width:100%}

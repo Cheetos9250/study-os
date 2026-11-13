@@ -4,12 +4,13 @@ on:
     paths:
       - '*.html'
       - assets/study-course-icons.css
+      - assets/study-course-layout.css
       - .github/workflows/study-course-fonts-qa.yml
 permissions:
   contents: read
 jobs:
   typography:
-    if: github.head_ref == 'feat/study-os-course-ui-icons-20261113'
+    if: github.head_ref == 'fix/study-os-mobile-sync-overlap-20261113'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -51,7 +52,7 @@ jobs:
             let browser;
             try{
               browser=await chromium.launch();const evidence=[];
-              for(const course of ['acc','eco','math','eng','zh'])for(const width of [390,820,1280])for(const colorScheme of ['light','dark']){
+              for(const course of ['acc','eco','math','eng','zh'])for(const width of [320,390,820,1280])for(const colorScheme of ['light','dark']){
                 const context=await browser.newContext({viewport:{width,height:1000},colorScheme});
                 await context.route('**/*',route=>{
                   const request=route.request(),url=new URL(request.url());
@@ -64,6 +65,14 @@ jobs:
                 assert.match(fonts.body,/^"?DM Sans/);assert.match(fonts.heading,/^"?Outfit/);assert.match(fonts.card,/^"?Outfit/);
                 assert.ok(fonts.loaded.includes('DM Sans'));assert.ok(fonts.loaded.includes('Outfit'));
                 assert.match(fonts.body,/IBM Plex Sans Thai/);assert.match(fonts.heading,/Noto Sans Thai/);
+                const bar=page.locator('.cloud-sync-bar');await bar.waitFor();
+                assert.equal(await bar.evaluate(n=>getComputedStyle(n).position),'static');
+                assert.equal(await bar.locator('button').count(),1);
+                const syncButton=page.locator('#syncBtn');
+                await syncButton.scrollIntoViewIfNeeded();
+                const overlaps=await page.evaluate(()=>{const a=document.querySelector('.cloud-sync-bar').getBoundingClientRect(),b=document.querySelector('#syncBtn').getBoundingClientRect();return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;});
+                assert.equal(overlaps,false,course+' sync toolbar covers save action');
+                await page.evaluate(()=>window.scrollTo(0,0));
                 const iconStyles=await page.locator('h1,.tabs button:not([hidden]),#dirBtn,#limBtn,#resetSrs,#syncBtn').evaluateAll(nodes=>nodes.map(n=>{const s=getComputedStyle(n,'::before');return {mask:s.maskImage||s.webkitMaskImage,width:parseFloat(s.width),content:s.content};}));
                 assert.ok(iconStyles.length>=6);assert.ok(iconStyles.every(s=>s.mask.includes('data:image/svg+xml')&&s.width>0&&s.content==='\"\"'),JSON.stringify(iconStyles));
                 const labelFonts=await page.locator('.chip .n,.count,.srs,.ref,.score .big,.cell').evaluateAll(nodes=>nodes.map(n=>getComputedStyle(n).fontFamily));
@@ -85,7 +94,7 @@ jobs:
                 assert.deepEqual(errors,[]);evidence.push({course,width,colorScheme,fonts,cardFlip:'passed',availableTabs});await context.close();
               }
               await fs.writeFile(path.join(output,'results.json'),JSON.stringify({scope:'isolated localhost; external API and all writes blocked; disposable browser storage',evidence},null,2));
-              console.log('PASS: 30 course/viewport/theme cases, card flips, summaries and practice tabs');
+              console.log('PASS: 40 course/viewport/theme cases, card flips, summaries and practice tabs');
             }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}
           })().catch(error=>{console.error(error);process.exitCode=1;});
           JS
