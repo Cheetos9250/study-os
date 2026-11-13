@@ -33,3 +33,10 @@
 Record each item as PASS/FAIL/BLOCKED and attach **redacted** screenshots or video, Safari console/network notes if available, browser storage readback, and the exact candidate commit SHA. Synthetic Chromium/WebKit CI is supplementary evidence and **cannot substitute** for this physical-device gate.
 
 **Release remains blocked without separate owner approval.** Do not merge PR #44, link the draft editor in production, deploy, migrate existing storage, change the Worker/KV/Notion/scheduler, or activate progress CAS as a consequence of this checklist.
+
+
+## Additional rapid-tap and draft-backup checks
+
+- [ ] With a typed but unsaved draft, tap Export: confirm an unsaved warning and no misleading saved backup. Confirm cancelling Import preserves the typed field.
+- [ ] Rapidly tap Save twice with test metadata: the UI should serialize the write, show a single successful revision and remain usable after reload.
+- [ ] Keep these tests strictly inside disposable synthetic profiles; ordinary user data and Production are not part of the test.

@@ -33,3 +33,11 @@
 - CI 43380131840 passed static-contract and synthetic Chromium/WebKit browser QA for download/restore and corrupt-record protection. CI 43380434836 passed no-JavaScript fallback QA. Last UI warning regression commit 9fdb772 passed CI 43380640662 (both jobs). Further synthetic backup/CAS, oversized-import and 390px dark-mode QA passed CI 43381126032, 43381245830 and 43381271777 at code head 5948042. Any subsequent docs-only head still needs independent CI confirmation.
 - All browser tests are synthetic; real iPad Safari, real storage eviction, Cloudflare administration/KV and production backup/restore are not verified.
 - Read PROGRESS.md and NEXT_STEPS.md for checkpoints and subsequent CI status; never infer approval to merge, deploy or change production data.
+
+
+## Latest QA handoff — 2026-11-13
+
+- Draft PR #44 course metadata backup portability, unsaved-export/import protection, rapid double-save serialization, and revision-overflow fail-closed tests passed synthetic Chromium/WebKit + Node CI runs 43381951146, 43382355274, 43382728589, 43383022547 respectively. Full evidence: PROGRESS.md.
+- Current candidate has a separate unlinked local course metadata editor. Do not silently expose it, migrate planner/progress stores, or merge/deploy.
+- Physical iPad Safari checklist: docs/study-os-course-metadata-ipad-qa-2026-11-13.md. This is an unexecuted manual checklist, not successful hardware QA.
+- Preserve exact-head CI verification and no Production writes for every subsequent change.

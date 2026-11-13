@@ -51,3 +51,11 @@ Status: **unlinked and unreleased opt-in draft**; local-only metadata editing an
 - Synthetic browser tests for JSON downloads/restore and invalid-import protection passed CI 43380014201 and 43380131840.
 - No-JavaScript warning and hidden inert Open button passed CI 43380434836; corrupted saved metadata produces a clear Thai warning and never automatically resets, confirmed in CI 43380640662.
 - This evidence is limited to isolated Chromium/WebKit profiles on CI. Physical iPad Safari, actual browser eviction/recovery and live cross-device sync remain untested. The editor stays unlinked and unreleased.
+
+
+## Backup UX and saturated revision follow-up — 2026-11-13
+
+- Export refuses to omit typed but unsaved field edits silently; the user must save or refresh before downloading. Import warns separately before discarding unsaved input, then asks for import approval. Synthetic browser QA: CI 43382355274 success.
+- Writes disable the editor controls during an outstanding transaction, preventing rapid double-submit from creating misleading self-conflicts. CI 43382728589 success.
+- A stored revision at Number.MAX_SAFE_INTEGER remains readable, but further save/import/reset fails with RangeError before persisting an unsafe integer. Both module entrypoints are kept byte-identical. CI 43383022547 success.
+- Cross-profile JSON restore is tested only in an isolated synthetic browser profile (CI 43381951146 success). Real iPad Safari Files workflows, browser storage eviction, VoiceOver and production operations still require separate review/approval.

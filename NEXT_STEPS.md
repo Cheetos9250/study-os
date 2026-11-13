@@ -142,3 +142,10 @@ Safety: PR #44 remains draft. Do not merge, deploy, modify Notion, Worker, KV, A
 - CI 43381126032 passed cross-tab stale-backup conflict protection; 43381245830 passed oversized JSON import rejection; 43381271777 passed mobile 390px dark-mode overflow/focus QA. All are synthetic Chromium/WebKit plus static-contract, not real iPad Safari.
 - Immediate next: inspect exact head after documentation-only changes; perform an independent review of PR #44 and verify physical iPad Safari with an isolated preview (not the production Pages site). Keep the draft metadata editor unlinked.
 - Before any authorized release: independently verify user-owned backup/restore, storage eviction/recovery and production KV/CAS safeguards. No merge/deploy/production write without explicit approval.
+
+
+## Verified metadata portability and transaction UX — 2026-11-13
+
+- Latest code tests: fresh-profile metadata backup restore [CI 43381951146](https://github.com/Cheetos9250/study-os/actions/runs/43381951146) **success**; unsaved-draft export/import confirmation [CI 43382355274](https://github.com/Cheetos9250/study-os/actions/runs/43382355274) **success**; rapid double-save guard [CI 43382728589](https://github.com/Cheetos9250/study-os/actions/runs/43382728589) **success**; revision overflow protection [CI 43383022547](https://github.com/Cheetos9250/study-os/actions/runs/43383022547) **success**. All Chromium/WebKit runs are isolated and synthetic, not physical iPad proof.
+- Immediately verify the **exact-head CI status** after this documentation-only commit. If green, next stage is an independent PR #44 review for accessibility, storage isolation and user-facing UX; then a manual physical iPad Safari test per docs/study-os-course-metadata-ipad-qa-2026-11-13.md, using only an isolated preview.
+- Do not link the draft metadata editor on the production homepage, merge, deploy, alter Notion/Cloudflare Worker/KV, reset user data or activate cross-device CAS without separate owner approval.
