@@ -2,12 +2,12 @@
   "meta": {
     "book": "Fundamental Accounting Principles, 24th Edition",
     "scope": "Chapter 1–9 questions indexed in Study OS",
-    "provenance": "Original worked answers independently prepared from the user's private textbook PDF; not a publisher answer key.",
+    "provenance": "Original study solutions, not a publisher answer key. Source-check status differs by question; do not treat all entries as verified.",
     "sourceFile": "Owner's Google Drive Acc textbook.pdf",
-    "reviewStatus": "source-reviewed (not publisher verified)",
+    "reviewStatus": "Draft worked solutions; only newly added E-1-1 and QS-1-5 checked against PDF text in this session; remaining entries require source-by-source verification.",
     "storage": "Public answers only; no textbook question wording, PDF pages, private notes or user progress",
     "lastUpdated": "2026-11-13",
-    "reviewedCount": 24,
+    "reviewedCount": 26,
     "catalogQuestionCount": 403
   },
   "answers": {
@@ -178,6 +178,20 @@
       "explanation": "1,300 − 20 + 350 + 80 = 1,710 units. Exclude 20 unsaleable damaged units; include 350 units under FOB destination and 80 consigned units that remain owned by Emma. This is the existing source-reviewed final quantity only, not a complete publisher solution.",
       "pages": [
         268
+      ]
+    },
+    "E-1-1": {
+      "answer": "1. C; 2. C; 3. R; 4. I; 5. C; 6. I; 7. I; 8. R.",
+      "explanation": "1. Analyzing and interpreting reports communicates information. 2. Presenting financial information communicates results. 3. Keeping a log of service costs records transactions. 4. Measuring product costs identifies/measures information. 5. Preparing financial statements communicates information. 6. Acquiring knowledge of revenue transactions identifies events. 7. Observing transactions and events identifies them. 8. Registering cash sales records transactions.",
+      "pages": [
+        54
+      ]
+    },
+    "QS-1-5": {
+      "answer": "Business taxed at entity level: Proprietorship No; Partnership No; Corporation Yes; LLC No (default pass-through treatment). Limited liability: Proprietorship No; Partnership No (general partnership); Corporation Yes; LLC Yes. Separate legal entity: Proprietorship No; Partnership No (textbook's simplified comparison); Corporation Yes; LLC Yes.",
+      "explanation": "The question uses the introductory textbook's simplified classification. Corporations are separately taxed, while sole proprietorships and general partnerships generally pass income through to owners; LLC taxation can vary by election and jurisdiction. General partners have unlimited liability, whereas corporate shareholders and LLC members generally have limited liability. The partnership legal-entity classification may differ under state law.",
+      "pages": [
+        51
       ]
     }
   }
