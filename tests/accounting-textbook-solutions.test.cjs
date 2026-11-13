@@ -7,6 +7,8 @@ const root = path.join(__dirname, '..');
 const read = p => fs.readFileSync(path.join(root,p),'utf8');
 const bank = JSON.parse(read('data/accounting-textbook-solutions.json'));
 const index = JSON.parse(read('data/accounting-textbook-index.json'));
+const geometry = JSON.parse(read('data/accounting-textbook-geometry.json'));
+
 const html = read('accounting-textbook.html');
 const items = index.items.filter(x=>!x.sectionOnly && /^[1-9]$/.test(String(x.chapter)));
 const idMap = new Map(items.map(x=>[x.id,x]));
@@ -24,7 +26,7 @@ test('worked solutions only reference indexed chapters 1–9 questions',()=>{
   assert.ok(record.explanation.trim(),'blank explanation: '+id);
   assert.ok(Array.isArray(record.pages)&&record.pages.length>0);
   assert.ok(record.pages.includes(q.pdfPage),'solution lacks question source page: '+id);
-  for(const p of record.pages)assert.ok(Number.isInteger(p)&&p>=51&&p<=410);
+  for(const p of record.pages)assert.ok(Number.isInteger(p) && ((p>=51&&p<=410) || (id==='QS-2-3'&&[1134,1135].includes(p))),'unexpected supporting PDF page for '+id+': '+p);
  }
 });
 
@@ -33,8 +35,8 @@ test('no answers are invented for incomplete catalog coverage',()=>{
  assert.equal(Object.hasOwn(bank.answers,'E-1-10'),false);
  assert.equal(Object.hasOwn(bank.answers,'QS-6-2'),false);
  assert.equal(Object.hasOwn(bank.answers,'QS-6-1'),true);
- assert.equal(bank.meta.reviewedCount,65);
- assert.equal(bank.meta.sourceReviewedNewCount,36);
+ assert.equal(bank.meta.reviewedCount,77);
+ assert.equal(bank.meta.sourceReviewedNewCount,48);
  for(const id of ['E-1-11','E-1-13','E-1-15','E-1-16','E-1-18','P-1-1A','P-1-2A','P-1-3A','P-1-4A','P-1-5A','P-1-6A','P-1-7A','P-1-8A','P-1-9A','P-1-11A','P-1-12A','P-1-1B','P-1-2B','P-1-3B','P-1-4B','P-1-5B','P-1-6B','P-1-7B','P-1-8B','P-1-9B','P-1-11B','P-1-12B','P-1-13B','P-1-14B','QS-2-5','QS-2-6','QS-2-7','QS-2-8','QS-2-9','E-2-5','E-2-6']){
   assert.equal(bank.answers[id]?.verification,'source-reviewed-2026-11-13',id+' must be source checked');
  }
@@ -43,6 +45,8 @@ test('no answers are invented for incomplete catalog coverage',()=>{
  assert.equal(bank.answers['P-1-9A']?.pages.includes(62),true);
  assert.ok(bank.answers['E-2-6'].answer.includes('$89,390'));
  assert.ok(bank.answers['P-1-9B'].answer.includes('$104,545'));
+ assert.ok(bank.answers['E-2-6'].answer.includes('$19,250'));
+ assert.deepEqual(bank.answers['QS-2-3'].pages,[94,1134,1135]);
 
 });
 
@@ -57,4 +61,30 @@ test('solution reveal is independent from auto-checking and student progress',()
  assert.match(html,/StudyAccountingCheck/);
  assert.match(html,/studyos\.accounting\.textbook\.progress\.v1/);
  assert.doesNotMatch(html,/localStorage\.clear\(/);
+});
+
+test('new source-reviewed chapter 2 worked solutions and repaired source geometry',()=>{
+ const newlyReviewed=['QS-2-1','QS-2-2','QS-2-3','QS-2-4','E-2-1','E-2-2','E-2-3','E-2-4','E-2-7','E-2-8','E-2-9','P-2-1A'];
+ for(const id of newlyReviewed){
+  assert.equal(bank.answers[id]?.verification,'source-reviewed-2026-11-14',id+' must be checked from original PDF');
+ }
+ const expected=[
+  ['QS-2-1','Identifying source documents',94,153.3],
+  ['QS-2-2','Identifying financial statement accounts',94,196.9],
+  ['QS-2-3','Reading a chart of accounts',94,257.5],
+  ['QS-2-4','Identifying normal balance',94,350.9],
+  ['E-2-1','Steps in analyzing and recording transactions',96,180.4],
+  ['E-2-2','Identifying and classifying accounts',96,228.6],
+  ['E-2-3','Identifying a ledger and chart of accounts',96,338.5],
+  ['E-2-4','Identifying type and normal balances of accounts',96,448.5]
+ ];
+ for(const [id,title,page,top] of expected){
+  assert.equal(idMap.get(id)?.title,title,id+' wrong display title');
+  assert.equal(geometry.items[id]?.page,page,id+' wrong PDF page');
+  assert.equal(geometry.items[id]?.top,top,id+' wrong source crop');
+  assert.equal(geometry.items[id]?.matchedTitle,title,id+' crop/title mismatch');
+ }
+ assert.equal(bank.answers['E-2-8'].answer.includes('$43,331'),true);
+ assert.equal(bank.answers['E-2-9'].answer.includes('$94,850'),true);
+ assert.equal(bank.answers['P-2-1A'].answer.includes('$119,490'),true);
 });
