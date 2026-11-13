@@ -72,3 +72,9 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - Review potential Thai meaning collisions using `node vocabloom/scripts/audit-practice-exposure.cjs --rounds=60 --all` (read-only). Initial scan of 3,000 generated questions / 12,000 options found 0 fuzzy-pair answer/distractor exposures, but **this does not certify translation quality or all future rotations**; expand bounded sampling and manually review source POS/context if needed.
 - Execute audio playback, speaker volume/unavailable-engine behavior, VoiceOver announcement, tab/feedback focus and full source-example answer gating on **physical iPad Safari with disposable data and an authorized preview**, not production.
 - Staging CAS persistence/concurrency, authoritative historical five-subject backup and explicit owner approval still gate any sync migration or release. No automatic merge/deploy.
+
+### Pronunciation interruption follow-up
+
+- After the passing synthetic regression [43387274942](https://github.com/Cheetos9250/study-os/actions/runs/43387274942), verify final [hosted browser 43387275139](https://github.com/Cheetos9250/study-os/actions/runs/43387275139) for the code/test SHA `f02ae1c5107a918e5a660bf101e25b7d96f5cd32`.
+- Test actual speaker output, speech cancellation when advancing/answering, browser-disabled audio, exact source examples, VoiceOver and focus on **physical iPad Safari in an approved non-production preview**. Headless Chromium/WebKit alone cannot certify audible sound.
+- Keep real five-subject backup, staging CAS/cross-device conflict testing and explicit production approvals outstanding.

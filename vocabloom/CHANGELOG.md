@@ -122,3 +122,8 @@ All entries below describe an unmerged proposal, not a production release.
 - Hide the example playback action before answering and reject forged pre-answer audio actions; disable audio controls if synthesis is unsupported. No practice persistence, SRS, quiz score, Cloudflare, Notion or backup changes.
 - Added Node and isolated browser QA for audio action guards, access labels, disabled fallback, source-only audio, no score/storage writes and real DOM visibility.
 - Added `scripts/audit-practice-exposure.cjs` and tests to scan generated Practice choices against review-only Thai similarity candidates.
+
+## 2026-11-13 — Stop stale pronunciation on navigation (unmerged)
+
+- Cancel in-progress Practice audio on answer, Previous/Next, Retry mistakes, New set, chapter switching and leaving Practice, while preserving session-only scores and existing SRS.
+- Added synthetic Node tests of cancellation counts and ignored navigation outside Practice. No Cloudflare/Notion, backup, source or production configuration changes.

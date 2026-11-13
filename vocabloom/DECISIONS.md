@@ -73,3 +73,7 @@ Preserve the active Practice question or feedback status through both renders in
 Use the browser's Speech Synthesis API for optional English Practice word pronunciation, without recording a pronunciation score or changing SRS. A source-example pronunciation control appears **only after the answer is recorded**, and the action handler verifies the answer gate even if a synthetic click is forged. Speak the exact frozen source-supplied English example; do not generate or translate audio content, send external requests or modify source records. Disable the control where browser speech synthesis is unavailable.
 
 Approximate Thai meaning matches are prioritized for human review only if they appear together in actual generated answer/distractor choices. They must never silently suppress words, alter Verified Notion data or be interpreted as proven wrong answers.
+
+## 2026-11-13 — Pronunciation must not leak across questions
+
+A spoken source sentence should stop when the learner answers, moves to another question, retries, starts a new set, changes chapter or leaves Practice. Cancel browser speech synchronously before the state transition, without changing scores or SRS. Continuing audio across a question transition would be misleading. Keep real iPad Safari audio cancellation as a separate manual verification gate.

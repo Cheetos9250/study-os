@@ -44,3 +44,7 @@ Current gate: **BLOCKED** until physical Safari tests and staging CAS atomicity 
 ## Pronunciation release checks (not executed on physical iPad)
 
 Using an approved, disposable iPad Safari preview, verify that **Listen** speaks the English headword, and that **Listen to example** appears only after a question has been answered and reads the exact source English sentence. Confirm a forged pre-answer action cannot speak the hidden example, and that disabled/unavailable audio states are understandable. Test portrait/landscape, VoiceOver reading order, hardware volume, repeat playback, and transitions between question/feedback focus. No physical-device audio or VoiceOver pass has been claimed; hosted Chromium/WebKit tests are not a substitute.
+
+### Additional physical iPad pronunciation transition checks (not executed)
+
+While a source example or English word is audibly playing, tap **Next**, **Previous**, **New set**, **Retry mistakes**, change chapters and leave Practice. Confirm the previous audio stops promptly and never continues under the next question. Re-enter Practice and confirm new playback works after a real user tap. Document Safari/iPadOS version and VoiceOver behaviour; automated headless tests cannot confirm audible output.
