@@ -136,8 +136,10 @@ function install(){
   remove(word).then(()=>{repaint();notice('ลบภาพส่วนตัวแล้ว');}).catch(e=>notice(e.message));
  },true);
  picker.addEventListener('change',async()=>{
-  const file=picker.files?.[0],word=pendingWord;pendingWord='';
+  const file=picker.files?.[0],word=pendingWord;
+  // Safari may fire an empty change event before the user-selected file arrives.
   if(!file||!word)return;
+  pendingWord='';
   try{await write(word,file);repaint();notice('บันทึกภาพส่วนตัวบนอุปกรณ์นี้แล้ว');}catch(e){notice(e.message);}
  });
  const main=document.getElementById('mainContent');
