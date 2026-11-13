@@ -89,3 +89,11 @@ Do not merge PR #41, deploy, change Cloudflare Worker/KV/Notion, delete/migrate 
 - Final application/test SHA `e26c326052f6803bf01e095317384f2d4e5840dd` passed [regression 43388801122](https://github.com/Cheetos9250/study-os/actions/runs/43388801122) (272 Node, 3 Python) and [isolated browser 43388801127](https://github.com/Cheetos9250/study-os/actions/runs/43388801127) (four Chromium/WebKit desktop/tablet passes, zero live requests).
 - In an approved non-production preview on a disposable physical iPad, verify hardware-keyboard number keys 1–4, screen-reader reading of numeric choices, correct answer focus, and that typing fields/sidebar/modal interactions are never hijacked. Also test Safari speaker playback failures and cancellation without losing answer state.
 - Continue source-grounded Thai semantic review, authorized private five-subject backups and staging CAS conflict/persistence verification as separate release gates. Do not merge/deploy or migrate production progress without explicit authorization.
+
+
+## New workstream — Private anime images for vocabulary (2026-11-13)
+
+1. Finalize and inspect hosted CI for personal image attachments: Node tests and Chromium/WebKit isolated browser smoke must pass on final code/test SHA `e37aeaa068fa38a3b2990485a161213babdf882e`. Check test logs, fix failures, and document exact run IDs and final SHA.
+2. Verify upload, reload persistence, library/lesson/game display, integrated card front/back, deletion, unsupported file rejection, and unchanged SRS/quiz/localStorage. Current browser smoke covers most navigation and media operations but does not establish physical iPad behavior.
+3. User action after authorized deployment: select own locally held anime images for individual words. No copyrighted image files are included or published from GitHub. Imported pictures are browser-local only: **not in Full Backup, not synced across devices**. Plan optional private image export/import separately before promising portability. Don't mistake private IndexedDB for cloud private storage.
+4. Preserve previous physical Safari/VoiceOver, actual staging CAS persistence, verified historical five-deck backup and explicit release authorization gates. No merge/deploy/production KV/Notion writes.
