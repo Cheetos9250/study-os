@@ -20,7 +20,7 @@ test('partial retry preserves remaining failed datasets',()=>{
 test('unsaved backup overlays pending raw data without changing storage or exporting secrets',()=>{
  const s=store();s.values.set('study-acc','old stored answer');s.values.set('study-eco','other course');s.values.set('study-sync-key','SECRET');s.blocked.add('study-acc');
  const g=core.createGuard(s,['study-acc']);g.write('study-acc','new unsaved answer');const before=[...s.values],writes=s.writes.length;
- const text=g.snapshot(backup,origin,new Date('2026-11-13T16:00:00Z')),json=JSON.parse(text);
+ const snapshot=g.snapshot(backup,origin,new Date('2026-11-13T16:00:00Z')),text=snapshot.text,json=JSON.parse(text);assert.equal(snapshot.partial,false);
  assert.equal(json.entries['study-acc'],'new unsaved answer');assert.equal(json.entries['study-eco'],'other course');assert.doesNotMatch(text,/SECRET/);assert.deepEqual([...s.values],before);assert.equal(s.writes.length,writes);assert.equal(g.hasPending(),true);assert.equal(backup.inspectSnapshot(text,origin).count,2);
 });
 test('invalid writes cannot touch credentials or create a pending secret',()=>{
@@ -34,4 +34,9 @@ test('all course writes use the guard while existing sync callbacks remain prese
   assert.match(html,/progressWrites\.write\(KEY,JSON\.stringify\(store\)\); window\.__xs&&window\.__xs\.dirty\(\)/);
   assert.match(html,/progressWrites\.write\(D\.markKey\+'-srs'/);assert.match(html,/progressWrites\.write\(D\.markKey\+'-typ'/);
  }
+});
+
+test('blocked reads still allow a clearly partial pending-only backup',()=>{
+ const s=store();s.blocked.add('study-acc');const g=core.createGuard(s,['study-acc']);g.write('study-acc','pending raw answer');s.getItem=()=>{throw Error('Storage denied');};
+ const result=g.snapshot(backup,origin,new Date('2026-11-13T16:00:00Z'));assert.equal(result.partial,true);assert.deepEqual(JSON.parse(result.text).entries,{'study-acc':'pending raw answer'});assert.equal(g.hasPending(),true);
 });

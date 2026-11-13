@@ -26,7 +26,10 @@
    },
    retry(){for(const [key,value] of [...pending])attempt(key,value);notify();return pending.size===0;},
    hasPending(){return pending.size>0;},
-   snapshot(backup,origin,at){return backup.createSnapshot({getItem(key){return pending.has(key)?pending.get(key):storage.getItem(key);}},origin,at);}
+   snapshot(backup,origin,at){
+    try{return {text:backup.createSnapshot({getItem(key){return pending.has(key)?pending.get(key):storage.getItem(key);}},origin,at),partial:false};}
+    catch(error){if(!pending.size)throw error;return {text:backup.createSnapshot({getItem:key=>pending.has(key)?pending.get(key):null},origin,at),partial:true};}
+   }
   };
  }
  function forCourse(course,mark){
@@ -45,10 +48,11 @@
    download.addEventListener('click',()=>{
     try{
      if(!root.StudyProgressBackup)throw Error('Backup tools did not load. Keep this page open and retry.');
-     const text=guard.snapshot(root.StudyProgressBackup,root.location.origin,new Date());
+     const snapshot=guard.snapshot(root.StudyProgressBackup,root.location.origin,new Date());
+     const text=snapshot.text;
      const url=root.URL.createObjectURL(new Blob([text],{type:'application/json'}));
      const a=root.document.createElement('a');a.href=url;a.download='study-os-unsaved-progress-'+new Date().toISOString().slice(0,10)+'.json';root.document.body.append(a);a.click();a.remove();root.setTimeout(()=>root.URL.revokeObjectURL(url),60000);
-     message.textContent='Backup created with your unsaved progress. Save the file privately. Progress is still not saved in this browser; keep this page open and retry.';
+     message.textContent=(snapshot.partial?'Partial backup created with unsaved data only; other stored data could not be included.':'Backup created with your unsaved progress.')+' Save the file privately. Progress is still not saved in this browser; keep this page open and retry.';
     }catch(error){message.textContent='Cannot create backup: '+error.message;}
    });
   }
