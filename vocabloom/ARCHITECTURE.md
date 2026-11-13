@@ -38,3 +38,7 @@ The browser harness now also submits three malformed Full Backup variants direct
 ## Restore daily-counter shape invariant
 
 `cFullRestore` requires same-device `deviceDays` and `studyDays` (when supplied) to be non-array objects before they can enter the local daily-counter state. A backup from a different `deviceId` discards both daily-counter maps, including malformed source values. This preserves device-specific counter isolation and fails closed on same-device invalid types. Regression coverage uses disposable in-memory storage.
+
+## Nested daily-row invariant
+
+The same-device Full Restore importer validates each `deviceDays` and `studyDays` entry as a record. Optional `answered`/`correct` counters must be finite nonnegative numbers; optional `ids` must be an array of strings. This follows the `cLocalRecord` and `cStudyRecord` consumers. The cross-device isolation rule still discards source-device daily counters.
