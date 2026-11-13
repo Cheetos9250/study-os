@@ -37,3 +37,7 @@ Keep Full Restore fail-closed for invalid backup object types or missing subject
 ## 2026-11-13 — Daily counter restore validation
 
 Require record-shaped daily counter maps for same-device Full Restore, rather than treating any JavaScript object (including arrays) as a valid map. Keep the existing cross-device rule: do not import source device counters. Reject malformed same-device input before confirmation and any local write; no production data migration is authorized.
+
+## 2026-11-13 — Nested daily counter safety
+
+Validate nested same-device daily rows before Full Restore writes. Preserve valid historical optional fields, require finite nonnegative counters and string-array IDs if supplied, and continue discarding cross-device counters. Do not silently normalize malformed backup statistics into learner progress.
