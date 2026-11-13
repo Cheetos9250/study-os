@@ -204,11 +204,14 @@ module.exports=async function checkCourseMetadata(browser,base,engine){
     await draft.locator("#metadata-status").filter({hasText:"มีการแก้ไขที่ยังไม่บันทึก"}).waitFor();
     assert.equal(await draft.locator("#name-acc").inputValue(),"ยังไม่บันทึก");
     // An import must require explicit confirmation before discarding typed text.
-    draft.once("dialog",dialog=>dialog.dismiss());
+    const dismissedImport= new Promise((resolve,reject)=>{
+      draft.once("dialog",dialog=>dialog.dismiss().then(resolve,reject));
+    });
     await draft.locator("#metadata-file").setInputFiles({
       name:"discard-warning-test.json",mimeType:"application/json",
       buffer:Buffer.from(JSON.stringify(backup))
     });
+    await dismissedImport; // Wait for asynchronous file-change confirmation before the next dialog.
     assert.equal(await draft.locator("#name-acc").inputValue(),"ยังไม่บันทึก");
     draft.once("dialog",dialog=>dialog.accept());
     await draft.locator("#metadata-refresh").click();
