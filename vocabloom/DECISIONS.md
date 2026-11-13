@@ -29,3 +29,7 @@ Show only source-supplied examples/translations after a practice answer, frozen 
 ## Round 2 — deterministic distractor performance
 
 Rely on the existing normalized unique-meaning pool when choosing distractors; exclude the current card and rotate candidates instead of re-scanning for duplicates inside every option. Preserve active snapshots and question/card IDs. Option ordering for newly generated sessions may change; it is not persistent learning progress. The 650-question Thai-atom audit is a screening check, not authority to mark all language content semantically Verified.
+
+## 2026-11-13 — Reject malformed restore payloads before local writes
+
+Keep Full Restore fail-closed for invalid backup object types or missing subject keys. Exercise rejection against the actual browser restore handler using disposable fixtures, not real user backups. Do not interpret mock browser success as production CAS or iPad Safari verification. Preserve all five legacy subjects and rollback protections.
