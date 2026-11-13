@@ -97,6 +97,9 @@ def run_case(browser, engine, tablet):
     if speech_supported:
         example_listen.click()
     assert page.evaluate("JSON.stringify({...localStorage})") == snapshot, "Listening to source example changed progress"
+    # A click on Listen moves focus onto the button; explicitly focus feedback before testing refresh preservation.
+    page.evaluate("""() => document.querySelector('#mainContent .panel .notice[role="status"]').focus({preventScroll:true})""")
+    assert page.evaluate("document.activeElement?.classList.contains('notice')"), "Feedback focus prerequisite failed"
     content["refresh"] = True
     page.evaluate("async()=>{await uBoot()}")
     assert page.evaluate("uPracticeQuestions(uDeck('eng'))[0]") == first, "Refresh changed the active question or source explanation"
