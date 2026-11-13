@@ -117,3 +117,8 @@ Narrowed browser workflow path triggers to app HTML/JS/JSON, tests, exported dat
 
 - Code/test SHA `ef260b87a69167a802fd61020ef84099db29a635` verified by [regression 43369307639](https://github.com/Cheetos9250/study-os/actions/runs/43369307639) and [browser 43369307661](https://github.com/Cheetos9250/study-os/actions/runs/43369307661), both **success**. Documentation head `4d288f6e3dc0963f963dc46353903a4598b0176e` also passed both workflows (43369380820 and 43369380885).
 - New browser-level same-device malformed day-map rejection check at `2c8569bd9693d2998b3f5dd80749764637bc973a`, pending [browser 43369918907](https://github.com/Cheetos9250/study-os/actions/runs/43369918907) and [regression 43369918882](https://github.com/Cheetos9250/study-os/actions/runs/43369918882). All browser fixtures block real services. No physical iPad or staging CAS claim.
+
+### Nested daily row validation follow-up
+
+- Previous same-device malformed-map browser scenario at SHA `2c8569bd9693d2998b3f5dd80749764637bc973a` passed [browser 43369918907](https://github.com/Cheetos9250/study-os/actions/runs/43369918907) and [regression 43369918882](https://github.com/Cheetos9250/study-os/actions/runs/43369918882).
+- Reviewed `cLocalRecord`/`cStudyRecord` and hardened nested per-day restore validation; tests added at `f5b6c75b2c6dc475e82dfcdaae909394a5c7c304`. This newer change has **not yet been verified by CI** at writing time. All tests use synthetic records and no production endpoint.
