@@ -10,8 +10,6 @@ async function simulate(payload,{confirm=true,failAt=null,busy=false}={}){
  const original=[...store.entries()],calls={confirm:0,writes:0,network:0,notice:[],render:0};
  const localStorage={getItem:k=>store.has(k)?store.get(k):null,setItem(k,v){calls.writes++;if(calls.writes===failAt)throw Error('Quota exceeded');store.set(k,v)},removeItem:k=>store.delete(k)};
  const context={CLOUD:{busy,studyMergedDays:null,remoteStatus:''},CLOCAL:{device:'local-device',days:{old:1},studyDays:{old:2}},USTATE:{decks},STORAGE_KEY:'vocabloom_mvp_v1',CLOUD_LOCAL_DAYS:'local-days',CLOUD_STUDY_DAYS:'study-days',data:{original:true},window:{confirm:()=>{calls.confirm++;return confirm}},localStorage,cSafeGet:k=>localStorage.getItem(k),cSafeSet(k,v){try{localStorage.setItem(k,v);return true}catch{return false}},cCloudNotice:(msg,error)=>calls.notice.push({msg,error}),render:()=>calls.render++,structuredClone,fetch:()=>{calls.network++;throw Error('Unexpected network')}};
- const run=new Function('ctx','file',`with(ctx){return (${restore};cFullRestore)(file)}`);
- // Function declarations cannot be wrapped as an expression with a trailing semicolon.
  const fn=new Function('ctx','file',`with(ctx){${restore};return cFullRestore(file)}`);
  await fn(context,{size:1000,text:async()=>JSON.stringify(payload)});
  return {calls,store:Object.fromEntries(store),original:Object.fromEntries(original),data:context.data,days:context.CLOCAL.days};
