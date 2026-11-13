@@ -110,3 +110,8 @@ Next action: editable academic course metadata while preserving stable subject I
 - Integration CI run [43368332244](https://github.com/Cheetos9250/study-os/actions/runs/43368332244) **failed**: static-contract 44/45 passed, browser-qa **success**. Static failure was the homepage script allowlist not yet including the new read-only `lib/study-os-plan-discovery.js`.
 - Updated `tests/study-os-home.test.cjs` to expect the new script in its actual load order and assert that the discovery module contains no browser storage/network writes. Fix commit `eeaba6c8d5f1ba332d03ffef4152510ed5938ee8`.
 - **Verification pending:** check exact-head CI for fix and do not infer success from prior browser job. No merge/deploy.
+
+## Second CI correction — 2026-11-13
+
+- Run [43368928342](https://github.com/Cheetos9250/study-os/actions/runs/43368928342): browser-qa **success**, static-contract **failure** because the newly added test itself contained an invalid regular expression (over-escaped `fetch\\s*\\(`). This was a test syntax error, not evidence of browser runtime failure.
+- Corrected regex escaping in `tests/study-os-home.test.cjs`, commit `e38f3db014d3d4090b5bce0193f8bb1fac29741b`. New CI verification pending; do not report it as passed until observed.
