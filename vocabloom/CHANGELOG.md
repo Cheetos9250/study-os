@@ -61,3 +61,7 @@ All entries below describe an unmerged proposal, not a production release.
 ## 2026-11-13 — English practice meaning validation
 
 - Multiline English practice answers now require actual Thai characters. English-only fallback text is skipped rather than presented as a Thai meaning; source records and learner progress are unchanged.
+
+## 2026-11-13 — English practice source provenance test
+
+- Added a regression checking rotated generated question answers and distractors against committed Verified Thai vocabulary meanings. No user-facing behavior or source data changed.
