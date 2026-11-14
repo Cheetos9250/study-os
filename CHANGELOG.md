@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-14 (Notion-style home dashboard)
+- index.html is now a dashboard modelled on the owner's Notion page: cover + avatar, Quick Launch cards, Daily Focus (start/end checklists reset daily + pomodoro), Tasks (own tasks + exam dates, priority badges, filter/sort), Review table (due cards by chapter), Subjects gallery, collapsible links. Old home kept as classic.html.
+- Cover image is chosen in the browser, resized and stored locally only (never uploaded). Own tasks/checklists use the new local key `studyos.home.v1` (not yet in backup allowlist or sync).
+- Tests: tests/dashboard-home.test.cjs; legacy home tests now target classic.html.
+
 ## 2026-11-14 (Monday quiz practice)
 - Added 14 embedded Accounting practice questions for the 16 Nov quiz: 7 on cost flow (ch6: FIFO, weighted average, specific ID, inventory error carry-over, lower of cost and NRV, consistency) and 7 on bank reconciliation (ch8: reconciling items, adjusted balances, NSF/service-charge entries, book error). Questions are appended at the end of the embedded set so existing answer history (indexed by position) is unchanged.
 - Added a 200-question English practice bank: 100 cost flow (Ch06: ownership, cost components, FIFO/weighted average/specific ID, periodic vs perpetual, error carry-over, lower of cost and NRV, turnover, gross profit method) and 100 bank reconciliation (Ch08: reconciling items by side, adjusted balances, journal entries, errors, controls). Numeric items are generated from formulas and every wrong option names a specific mistake. Appended at the end, so saved progress is unchanged.
