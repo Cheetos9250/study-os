@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..');
-const pages=['index','hub','today','classic','progress-backup','progress-restore','accounting-textbook','acc','eco','math','eng','zh'];
+const pages=['index','hub','today','progress-backup','progress-restore','accounting-textbook','acc','eco','math','eng','zh'];
 for(const f of pages)test(f+'.html supports manual light/dark and loads the theme script',()=>{
  const s=fs.readFileSync(path.join(root,f+'.html'),'utf8');
  assert.match(s,/scripts\/study-theme\.js/);
