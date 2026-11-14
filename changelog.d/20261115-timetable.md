@@ -1,3 +1,4 @@
 - Weekly timetable: Calendar page shows and edits classes (day, time, name, code, subject, not attending); Today shows today's classes with the current one highlighted; month view lists classes per day. Stored in `studyos.today.v1` (now included in backups, validated on restore); one-time import from a `calendar.html#timetable=…` link. Fix: ticking a plan item no longer drops extra settings.
 - Grades page (sidebar → Grades): courses with weighted items, current points and letter (course grading scale), what is needed on the remaining items for each grade, and an estimated GPA. Stored in `studyos.grades.v1` (backed up, validated on restore); one-time import from a `grades.html#grades=…` link.
 - Accounting final scope follows the 2026 syllabus (Ch5–9); an untouched old default (Ch6–9, unconfirmed) is upgraded automatically.
+- Today: subject card covers are taller (120–170 px) and card images are saved at higher resolution; "Exam tomorrow" wording.
