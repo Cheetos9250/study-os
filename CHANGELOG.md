@@ -18,3 +18,8 @@
 
 ## 2026-11-14 (stop Notion auto-sync)
 - Removed `.github/workflows/sync.yml` (15-minute Notion exporter that pushed to `main`). `data/cards.json` is kept because VocaBloom still fetches it; it is now a frozen snapshot, so new Notion rows no longer appear. `scripts/sync_notion.py`, `data/quiz.json` and their tests are kept until the English cards move into VocaBloom. Re-enable by restoring the workflow from git history.
+
+## 2026-11-14 (answer checker: ch6 perpetual inventory + ch8 bank reconciliation)
+- Added reviewed final-answer rules for 10 more textbook questions (2 → 12 of 403): perpetual inventory costing (LIFO, weighted average, FIFO, LIFO, weighted average, specific ID) and bank reconciliation (Exercise 8-12, 8-14, Problem 8-4A, 8-5A). Each shows a step-by-step explanation after checking.
+- Checked from the original pages (read as images, because the PDF text layer scrambles digits): answers recomputed independently; the four bank reconciliations also match the check figures printed in the textbook. Ch6 answers have no printed check figure.
+- Known catalog issue (not changed here): several question ids in `data/accounting-textbook-index.json` do not match the printed numbers (e.g. the printed QS 6-5 LIFO question is indexed as QS-6-4; printed QS 6-4 is missing). Rules are keyed by the catalog id of the question with the matching title and page. Renaming ids would orphan saved progress, so it needs a migration.

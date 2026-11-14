@@ -77,3 +77,5 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 - Owner approved moving English vocabulary to VocaBloom and increasing privacy (public repo exposes workers.dev account subdomain). Both touch data/backend and need a reviewed plan.
 
 - Notion auto-sync stopped (owner decision, 2026-11-14). Follow-up: move the English cards into VocaBloom, then delete `data/cards.json`, `data/quiz.json`, `scripts/sync_notion.py` and the Notion tests. Owner-side: revoke the Notion token in GitHub secrets if Notion is no longer used.
+
+- Answer checker now covers 12/403. Next: Exercise 8-13 and 8-11 (not single-number answers), printed QS 6-4 (FIFO, missing from the catalog: FIFO ending inventory $494), remaining ch6/ch8 exercises and problems. Fix catalog id mismatches with a progress migration before adding more.

@@ -58,7 +58,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),http=r
     assert.equal(await page.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),beforeReveal,'reveal must not change stored working/status');
     await page.locator('#search').fill('QS-6-9');await page.waitForFunction(()=>current?.id==='QS-6-9');
     assert.equal(await page.locator('#checkAnswer').isDisabled(),true);assert.equal(await page.locator('#showAnswer').isDisabled(),true);
-    assert.match(await page.locator('#checkScope').innerText(),/2 of 403 questions/);assert.equal(await page.locator('#checkFeedback').isHidden(),true);
+    assert.match(await page.locator('#checkScope').innerText(),/12 of 403 questions/);assert.equal(await page.locator('#checkFeedback').isHidden(),true);
     await page.locator('#search').fill('no-such-question');assert.equal(await page.locator('#checkAnswer').isDisabled(),true);assert.match(await page.locator('#checkScope').innerText(),/Select a question/);
     assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
     results.push({engine:name,width,colorScheme,passed:true});console.log('PASS',name,width,colorScheme);

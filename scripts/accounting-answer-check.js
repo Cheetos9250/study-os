@@ -13,6 +13,56 @@
       kind:'money',expected:(14000+250+300+900)*100,display:'$15,450.00',example:'$15,450.00',
       explanation:'$14,000 purchase price + $250 transportation-in + $300 shipping insurance + $900 import duties = $15,450 inventory cost. Include costs to acquire and bring the car to its saleable location and condition. Advertising ($150), sales staff salaries ($1,250) and shrub trimming ($180) are period expenses, not inventory cost.',
       source:'Reviewed calculation from the original QS-6-2 question; not an official publisher answer key.'
+    }),
+    'QS-6-4':Object.freeze({
+      kind:'money',expected:45000,display:'$450.00',example:'$450.00',
+      explanation:'Jan. data: 320 units @ $3.00, 80 @ $3.20 (Jan. 9), 100 @ $3.34 (Jan. 25); 350 units sold Jan. 26. Perpetual LIFO: the sale takes the latest costs first: 100 × $3.34 + 80 × $3.20 + 170 × $3.00 = $334 + $256 + $510 = $1,100 cost of goods sold. Ending inventory = 150 units × $3.00 = $450.',
+      source:'Reviewed calculation from the original question (data read from the printed page); not an official publisher answer key.'
+    }),
+    'QS-6-3':Object.freeze({
+      kind:'money',expected:46500,display:'$465.00',example:'$465.00',
+      explanation:'Jan. data: 320 units @ $3.00, 80 @ $3.20 (Jan. 9), 100 @ $3.34 (Jan. 25); 350 units sold Jan. 26. Perpetual weighted average (all purchases come before the sale): ($960 + $256 + $334) ÷ 500 units = $3.10 per unit. Cost of goods sold = 350 × $3.10 = $1,085; ending inventory = 150 × $3.10 = $465.',
+      source:'Reviewed calculation from the original question (data read from the printed page); not an official publisher answer key.'
+    }),
+    'QS-6-18':Object.freeze({
+      kind:'money',expected:39000,display:'$390.00',example:'$390.00',
+      explanation:'Dec. data: 10 units @ $6 (Dec. 7), 20 @ $12 (Dec. 14), 15 @ $14 (Dec. 21); 15 units sold Dec. 15. Perpetual FIFO: the Dec. 15 sale takes 10 × $6 + 5 × $12 = $120 cost of goods sold. Left: 15 × $12 = $180, plus the Dec. 21 purchase 15 × $14 = $210. Ending inventory = $180 + $210 = $390.',
+      source:'Reviewed calculation from the original question (data read from the printed page); not an official publisher answer key.'
+    }),
+    'QS-6-11':Object.freeze({
+      kind:'money',expected:33000,display:'$330.00',example:'$330.00',
+      explanation:'Dec. data: 10 units @ $6 (Dec. 7), 20 @ $12 (Dec. 14), 15 @ $14 (Dec. 21); 15 units sold Dec. 15. Perpetual LIFO: the Dec. 15 sale takes the latest costs available then: 15 × $12 = $180 cost of goods sold (the Dec. 21 units are not yet bought). Left: 10 × $6 + 5 × $12 = $120, plus 15 × $14 = $210. Ending inventory = $120 + $210 = $330.',
+      source:'Reviewed calculation from the original question (data read from the printed page); not an official publisher answer key.'
+    }),
+    'QS-6-12':Object.freeze({
+      kind:'money',expected:36000,display:'$360.00',example:'$360.00',
+      explanation:'Dec. data: 10 units @ $6 (Dec. 7), 20 @ $12 (Dec. 14), 15 @ $14 (Dec. 21); 15 units sold Dec. 15. Perpetual weighted average (recomputed after each purchase): on Dec. 15, ($60 + $240) ÷ 30 units = $10.00; cost of goods sold = 15 × $10 = $150, leaving 15 × $10 = $150. Add the Dec. 21 purchase $210. Ending inventory = $150 + $210 = $360.',
+      source:'Reviewed calculation from the original question (data read from the printed page); not an official publisher answer key.'
+    }),
+    'QS-6-19':Object.freeze({
+      kind:'money',expected:37800,display:'$378.00',example:'$378.00',
+      explanation:'Dec. data: 10 units @ $6 (Dec. 7), 20 @ $12 (Dec. 14), 15 @ $14 (Dec. 21); 15 units sold Dec. 15. Perpetual specific identification: 8 units sold from the Dec. 7 purchase and 7 from Dec. 14, so cost of goods sold = 8 × $6 + 7 × $12 = $48 + $84 = $132. Goods available = $60 + $240 + $210 = $510. Ending inventory = $510 − $132 = $378.',
+      source:'Reviewed calculation from the original question (data read from the printed page); not an official publisher answer key.'
+    }),
+    'E-8-12':Object.freeze({
+      kind:'money',expected:1158200,display:'$11,582.00',example:'$11,582.00',
+      explanation:'Bank side: $10,555 + $2,856 deposit in transit − $1,829 outstanding checks = $11,582. Book side: $11,589 − $16 service charge + $9 (check No. 919 was drawn for $467 but recorded as $476, so cash was understated by $9) = $11,582. The two adjusted balances agree.',
+      source:'Reviewed calculation from the original question; matches the check figure printed beside it in the textbook. Not an official publisher answer key.'
+    }),
+    'E-8-14':Object.freeze({
+      kind:'money',expected:2680000,display:'$26,800.00',example:'$26,800.00',
+      explanation:'Bank side: $25,800 + $6,200 deposit in transit − $5,600 outstanding checks + $400 (a check written by Smith Company was wrongly charged to this account) = $26,800. Book side: $27,500 − $100 service charge − $600 NSF check = $26,800. The two adjusted balances agree.',
+      source:'Reviewed calculation from the original question; matches the check figure printed beside it in the textbook. Not an official publisher answer key.'
+    }),
+    'P-8-4A':Object.freeze({
+      kind:'money',expected:3460200,display:'$34,602.00',example:'$34,602.00',
+      explanation:'Bank side: $27,233 + $11,514 deposit in transit − ($1,482 + $382 + $2,281 = $4,145 outstanding checks) = $34,602. Book side: $27,497 − $20 (check No. 3056 drawn for $1,270 but recorded as $1,250) + $7,955 note collected by the bank − $805 NSF check − $25 service charge = $34,602. The two adjusted balances agree.',
+      source:'Reviewed calculation from the original question; matches the check figure printed beside it in the textbook. Not an official publisher answer key.'
+    }),
+    'P-8-5A':Object.freeze({
+      kind:'money',expected:1827100,display:'$18,271.00',example:'$18,271.00',
+      explanation:'Bank side: $18,453 + $1,682 deposit in transit (Sep. 30) − ($494 + $982 + $388 = $1,864 outstanding checks: Nos. 5893, 5906, 5908) = $18,271. Book side: $17,404 − $30 (check No. 5904 cleared at $2,090 but was recorded as $2,060) − $600 NSF check + $1,485 note collected + $12 interest = $18,271. The two adjusted balances agree.',
+      source:'Reviewed calculation from the original question; matches the check figure printed beside it in the textbook. Not an official publisher answer key.'
     })
   });
   const ids=Object.freeze(Object.keys(rules));
