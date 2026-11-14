@@ -1,0 +1,2 @@
+- Course pages (Accounting, Economics, Math, English, Chinese) show one mode per page — Flashcards (`?tab=cards`), Lessons (`?tab=sum`) or Practice (`?tab=prac`); the tab bar is hidden.
+- Course pages now use the same look as the rest of Study OS (`assets/study-unify.css`: palette, fonts, buttons, cards) and English study controls. Sync/Notion error messages are unchanged.

@@ -43,8 +43,10 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
             await page.reload();await page.locator('.front-t').waitFor();
             assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'rating did not survive reload');
             assert.equal(await page.locator('#studyNav a[href="progress-backup.html"]').count(),1);
-            if(await page.locator('[data-tab="prac"]').isVisible()){
-              await page.locator('[data-tab="prac"]').click();
+            if(await page.locator('[data-tab="prac"]').count()&&!(await page.locator('[data-tab="prac"]').evaluate(b=>b.hidden))){
+              // Modes are separate pages now: open the Practice mode by URL; the tab bar stays hidden.
+              assert.equal(await page.locator('.tabs').isVisible(),false,'tab bar should be hidden');
+              await page.goto(base+'/'+course+'.html?tab=prac');await page.locator('#qBody .opt').first().waitFor();
               const option=page.locator('#qBody .opt').first(),choice=Number(await option.getAttribute('data-oi'));
               await option.click();await page.locator('.explain').waitFor();
               const quiz=await page.evaluate(()=>localStorage.getItem('study-'+D.key));
@@ -55,8 +57,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
               assert.deepEqual(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans,{});
               assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'quiz reset changed flashcard progress');
               await page.locator('#qBody .opt').first().click();await page.locator('.explain').waitFor();
-              await page.reload();await page.locator('.front-t').waitFor();
-              await page.locator('[data-tab="prac"]').click();await page.locator('.explain').waitFor();
+              await page.reload();await page.locator('.explain').waitFor();
               assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans[0],choice,'quiz answer did not survive reload');
             }
             await page.locator('#studyNav .sn-tab[data-sn="today"]').click();

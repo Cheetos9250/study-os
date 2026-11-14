@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Economics</title>
@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="assets/study-course-icons.css">
 <link rel="stylesheet" href="assets/study-course-layout.css">
 <link rel="stylesheet" href="assets/study-course-save.css?v=20261113">
+<link rel="stylesheet" href="assets/study-unify.css?v=1">
 <style>
 /* Layout: tabbed study sheet (cards / summary / practice) in one centred column. */
 :root{
@@ -123,36 +124,36 @@ td:first-child{font-weight:500;min-width:7.5em}
 <div class="wrap">
   <header><h1 class="course-title course-eco">Economics</h1><span>สรุป · แฟลชการ์ด · แบบฝึก — Micro (002–003) + Macro</span></header>
   <nav class="tabs" role="tablist">
-    <button role="tab" aria-selected="true" data-tab="cards">แฟลชการ์ด</button>
-    <button role="tab" aria-selected="false" data-tab="sum">สรุปบทเรียน</button>
-    <button role="tab" aria-selected="false" data-tab="prac">แบบฝึก</button>
+    <button role="tab" aria-selected="true" data-tab="cards">Flashcards</button>
+    <button role="tab" aria-selected="false" data-tab="sum">Lessons</button>
+    <button role="tab" aria-selected="false" data-tab="prac">Practice</button>
   </nav>
   <section id="tab-cards">
     <div class="row" id="cats"></div>
     <div class="row controls">
       <div class="row">
-        <button class="chip" id="dirBtn" aria-pressed="false" type="button">ด้านหน้า: หัวข้อ</button>
-        <button class="chip" id="typBtn" type="button" hidden>พิมพ์ตอบ: เปิด</button>
-        <button class="chip" id="limBtn" type="button">การ์ดใหม่/วัน: 20</button>
-        <button class="chip" id="resetSrs" type="button">ล้างความคืบหน้า</button>
+        <button class="chip" id="dirBtn" aria-pressed="false" type="button">Front: term</button>
+        <button class="chip" id="typBtn" type="button" hidden>Typing: on</button>
+        <button class="chip" id="limBtn" type="button">New/day: 20</button>
+        <button class="chip" id="resetSrs" type="button">Reset progress</button>
       </div>
       <span class="count" id="count"></span>
     </div>
     <div class="row srs" id="srsCounts"></div>
     <div class="stage" id="stage"></div>
     <div id="typeBox" class="typebox" hidden>
-      <div class="row"><input id="typeIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="พิมพ์คำตอบ แล้วกด Enter"><button class="btn primary" id="typeGo" type="button">ตรวจ</button></div>
+      <div class="row"><input id="typeIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the answer, then Enter"><button class="btn primary" id="typeGo" type="button">Check</button></div>
       <p id="typeRes" role="status"></p>
     </div>
-    <button class="btn primary show" id="showBtn" type="button" hidden>แสดงคำตอบ</button>
+    <button class="btn primary show" id="showBtn" type="button" hidden>Show answer</button>
     <div class="rate4" id="rate4" hidden>
-      <button class="btn r1" data-r="1" type="button">ลืม<small></small></button>
-      <button class="btn r2" data-r="2" type="button">ยาก<small></small></button>
-      <button class="btn r3" data-r="3" type="button">ปกติ<small></small></button>
-      <button class="btn r4" data-r="4" type="button">ง่าย<small></small></button>
+      <button class="btn r1" data-r="1" type="button">Again<small></small></button>
+      <button class="btn r2" data-r="2" type="button">Hard<small></small></button>
+      <button class="btn r3" data-r="3" type="button">Good<small></small></button>
+      <button class="btn r4" data-r="4" type="button">Easy<small></small></button>
     </div>
-    <p class="keys">แตะการ์ดหรือกด Space = พลิก · 1 ลืม · 2 ยาก · 3 ปกติ · 4 ง่าย</p>
-    <div class="sync" id="sync" hidden><p id="syncText"></p><button class="btn yes" id="syncBtn" type="button">บันทึกผลลง Notion</button><p id="syncMsg" role="status"></p></div>
+    <p class="keys">Tap or Space = flip · 1 Again · 2 Hard · 3 Good · 4 Easy</p>
+    <div class="sync" id="sync" hidden><p id="syncText"></p><button class="btn yes" id="syncBtn" type="button">Save result to Notion</button><p id="syncMsg" role="status"></p></div>
   </section>
   <section id="tab-sum" hidden>
     <div class="row" id="sumCats" style="margin-bottom:18px"></div>
@@ -180,7 +181,7 @@ const catLabel = id => (CATS.find(c=>c[0]===id)||[0,id])[1];
 
 function chipRow(box, sel, onPick, countFn){
   box.innerHTML='';
-  [['all','ทั้งหมด'],...CATS].forEach(([id,l])=>{
+  [['all','All'],...CATS].forEach(([id,l])=>{
     const b=document.createElement('button'); b.type='button'; b.className='chip';
     b.setAttribute('aria-pressed', id===sel);
     b.innerHTML = esc(l)+'<span class="n">'+countFn(id)+'</span>';
@@ -219,8 +220,8 @@ function sched(s,r){
   s.last=r; return s;
 }
 function lbl(s){
-  if(s.st==='learn'){ const m=Math.max(1,Math.round((s.due-Date.now())/MIN)); return m<60?m+' นาที':Math.round(m/60)+' ชม.'; }
-  return s.ivl<30?s.ivl+' วัน':s.ivl<365?(s.ivl/30).toFixed(1).replace('.0','')+' เดือน':(s.ivl/365).toFixed(1).replace('.0','')+' ปี';
+  if(s.st==='learn'){ const m=Math.max(1,Math.round((s.due-Date.now())/MIN)); return m<60?m+' min':Math.round(m/60)+' h'; }
+  return s.ivl<30?s.ivl+' d':s.ivl<365?(s.ivl/30).toFixed(1).replace('.0','')+' mo':(s.ivl/365).toFixed(1).replace('.0','')+' y';
 }
 const inScope=c=>fcat==='all'||c.cat===fcat;
 function queues(cat){
@@ -230,31 +231,31 @@ function queues(cat){
   L.sort((a,b)=>srs[a.mid].due-srs[b.mid].due); R.sort((a,b)=>srs[a.mid].due-srs[b.mid].due);
   return {L,R,N:N.slice(0,Math.max(0,NEWLIM-meta.newDone))};
 }
-function cardsRow(){ chipRow($('#cats'), fcat, id=>{ fcat=id; $('#syncBtn').textContent='บันทึกผลลง Notion'; $('#syncMsg').textContent=''; cardsRow(); renderCard(); }, id=>{ const q=queues(id); return q.L.length+q.R.length+q.N.length; }); }
+function cardsRow(){ chipRow($('#cats'), fcat, id=>{ fcat=id; $('#syncBtn').textContent='Save result to Notion'; $('#syncMsg').textContent=''; cardsRow(); renderCard(); }, id=>{ const q=queues(id); return q.L.length+q.R.length+q.N.length; }); }
 function renderCard(){
   const q=queues(fcat); cur=q.L[0]||q.R[0]||q.N[0]||null; shown=false;
-  $('#srsCounts').innerHTML='<span class="n"><b>'+q.N.length+'</b>ใหม่</span><span class="l"><b>'+q.L.length+'</b>เรียนซ้ำ</span><span class="d"><b>'+q.R.length+'</b>ครบกำหนด</span>';
+  $('#srsCounts').innerHTML='<span class="n"><b>'+q.N.length+'</b>new</span><span class="l"><b>'+q.L.length+'</b>learning</span><span class="d"><b>'+q.R.length+'</b>due</span>';
   const total=CARDS.filter(inScope).length, seen=CARDS.filter(c=>inScope(c)&&srs[c.mid]).length;
-  $('#count').textContent='เริ่มเรียนแล้ว '+seen+'/'+total+(extN?' · จาก Notion '+extN:'');
+  $('#count').textContent='Started '+seen+'/'+total+(extN?' · Notion '+extN:'');
   const st=$('#stage'), show=$('#showBtn'), rt=$('#rate4');
   if(!cur){
     const waits=CARDS.filter(c=>inScope(c)&&srs[c.mid]).map(c=>srs[c.mid].due).filter(d=>d>Date.now());
-    let nx=''; if(waits.length){ const d=Math.min(...waits)-Date.now(); nx=' · การ์ดถัดไปครบกำหนดอีก '+(d<3600000?Math.max(1,Math.round(d/MIN))+' นาที':d<DAY?Math.round(d/3600000)+' ชม.':Math.round(d/DAY)+' วัน'); }
-    st.innerHTML='<div class="empty"><b>วันนี้ทบทวนครบแล้ว</b><br>'+(q.N.length===0&&CARDS.some(c=>inScope(c)&&!srs[c.mid])?'ถึงโควตาการ์ดใหม่ของวันนี้แล้ว (เพิ่มได้ที่ปุ่ม “การ์ดใหม่/วัน”)':'ไม่มีการ์ดค้าง')+nx+'</div>';
+    let nx=''; if(waits.length){ const d=Math.min(...waits)-Date.now(); nx=' · next card in '+(d<3600000?Math.max(1,Math.round(d/MIN))+' min':d<DAY?Math.round(d/3600000)+' h':Math.round(d/DAY)+' d'); }
+    st.innerHTML='<div class="empty"><b>All done for today</b><br>'+(q.N.length===0&&CARDS.some(c=>inScope(c)&&!srs[c.mid])?'Daily new-card limit reached (change it with “New/day”)':'No cards left')+nx+'</div>';
     show.hidden=true; rt.hidden=true; $('#typeBox').hidden=true; renderSync(); return;
   }
-  show.hidden=false; show.textContent='แสดงคำตอบ'; rt.hidden=true;
+  show.hidden=false; show.textContent='Show answer'; rt.hidden=true;
   const typ=TYPING&&cur.ans&&cur.ans.length; const front=typ?cur.tp:(dirBack?cur.b:cur.f), back=typ?cur.tb:(dirBack?cur.f:cur.b);
   checked=false; suggest=0; $('#typeBox').hidden=!typ; $('#typeRes').textContent=''; $('#typeRes').className=''; $('#typeIn').value=''; $('#typeIn').disabled=false; $('#typeGo').disabled=false; document.querySelectorAll('#rate4 .btn').forEach(b=>b.classList.remove('sug'));
-  st.innerHTML='<div class="card" tabindex="0" role="button" aria-label="การ์ด แตะเพื่อพลิก">'+
-   '<div class="face"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="front-t'+(String(front).length<=6?' big':'')+'">'+rich(front)+'</div><span class="hint">แตะการ์ดเพื่อดูคำตอบ</span></div>'+
-   '<div class="face back"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="back-t">'+rich(back)+'</div>'+(cur.ref?'<span class="ref">'+esc(cur.ref)+'</span>':'')+'<span class="hint" style="bottom:28px">แตะการ์ดเพื่อดูคำถาม</span></div></div>';
+  st.innerHTML='<div class="card" tabindex="0" role="button" aria-label="Card, tap to flip">'+
+   '<div class="face"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="front-t'+(String(front).length<=6?' big':'')+'">'+rich(front)+'</div><span class="hint">Tap to see the answer</span></div>'+
+   '<div class="face back"><span class="cat-tag">'+esc(catLabel(cur.cat))+'</span><div class="back-t">'+rich(back)+'</div>'+(cur.ref?'<span class="ref">'+esc(cur.ref)+'</span>':'')+'<span class="hint" style="bottom:28px">Tap to see the question</span></div></div>';
   st.querySelector('.card').onclick=reveal;
   renderSync(); if(typ) setTimeout(()=>{ try{ $('#typeIn').focus({preventScroll:true}); }catch(e){} },0);
 }
 function reveal(){
   if(!cur) return; const c=$('.card'); const f=c.classList.toggle('flipped');
-  $('#showBtn').textContent=f?'ดูคำถาม':'แสดงคำตอบ';
+  $('#showBtn').textContent=f?'Show question':'Show answer';
   if(!shown){ shown=true; const rt=$('#rate4'); rt.hidden=false; const base=srs[cur.mid]||null;
     rt.querySelectorAll('.btn').forEach(b=>{ b.querySelector('small').textContent=lbl(sched(base,+b.dataset.r)); }); }
 }
@@ -265,16 +266,16 @@ function rate(r){
 }
 $('#showBtn').onclick=reveal;
 $('#rate4').querySelectorAll('.btn').forEach(b=>b.onclick=()=>rate(+b.dataset.r));
-$('#dirBtn').onclick=e=>{ dirBack=!dirBack; e.target.setAttribute('aria-pressed',dirBack); e.target.textContent=dirBack?'ด้านหน้า: คำตอบ':'ด้านหน้า: หัวข้อ'; renderCard(); };
-$('#limBtn').onclick=e=>{ NEWLIM=NEWLIM>=40?5:NEWLIM===5?10:NEWLIM===10?20:40; saveS(); e.target.textContent='การ์ดใหม่/วัน: '+NEWLIM; cardsRow(); renderCard(); };
-$('#limBtn').textContent='การ์ดใหม่/วัน: '+NEWLIM;
-let rs=0; $('#resetSrs').onclick=e=>{ if(!rs){ rs=1; e.target.textContent='กดอีกครั้งเพื่อยืนยันล้างทั้งหมด'; setTimeout(()=>{rs=0;e.target.textContent='ล้างความคืบหน้า'},4000); return; } srs={}; meta={day:0,newDone:0}; saveS(); rs=0; e.target.textContent='ล้างความคืบหน้า'; cardsRow(); renderCard(); };
+$('#dirBtn').onclick=e=>{ dirBack=!dirBack; e.target.setAttribute('aria-pressed',dirBack); e.target.textContent=dirBack?'Front: answer':'Front: term'; renderCard(); };
+$('#limBtn').onclick=e=>{ NEWLIM=NEWLIM>=40?5:NEWLIM===5?10:NEWLIM===10?20:40; saveS(); e.target.textContent='New/day: '+NEWLIM; cardsRow(); renderCard(); };
+$('#limBtn').textContent='New/day: '+NEWLIM;
+let rs=0; $('#resetSrs').onclick=e=>{ if(!rs){ rs=1; e.target.textContent='Tap again to confirm reset'; setTimeout(()=>{rs=0;e.target.textContent='Reset progress'},4000); return; } srs={}; meta={day:0,newDone:0}; saveS(); rs=0; e.target.textContent='Reset progress'; cardsRow(); renderCard(); };
 function check(){
   if(!cur||checked||!(TYPING&&cur.ans&&cur.ans.length)) return;
   const v=$('#typeIn').value; if(!v.trim()) return;
   checked=true; const ok=cur.ans.some(a=>norm(a)===norm(v)&&norm(a)!=='');
   suggest=ok?3:1; const r=$('#typeRes');
-  r.className=ok?'okk':'nok'; r.textContent=ok?'✓ ถูกต้อง · กด Enter อีกครั้งเพื่อไปต่อ ("ปกติ")':'✗ ยังไม่ตรง · คำตอบ: '+cur.ans[0]+' · คุณพิมพ์: '+v+' · กด Enter อีกครั้งเพื่อไปต่อ ("ลืม")';
+  r.className=ok?'okk':'nok'; r.textContent=ok?'✓ Correct · Enter again to continue ("Good")':'✗ Not quite · answer: '+cur.ans[0]+' · you typed: '+v+' · Enter again to continue ("Again")';
   $('#typeIn').disabled=true; $('#typeGo').disabled=true;
   if(!shown) reveal(); else $('.card').classList.add('flipped');
   document.querySelectorAll('#rate4 .btn').forEach(b=>b.classList.toggle('sug',+b.dataset.r===suggest));
@@ -282,7 +283,7 @@ function check(){
 }
 $('#typeGo').onclick=check;
 $('#typeIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); check(); } });
-const tb=$('#typBtn'); if(CAN_TYPE){ tb.hidden=false; const syncT=()=>{ tb.textContent='พิมพ์ตอบ: '+(TYPING?'เปิด':'ปิด'); tb.setAttribute('aria-pressed',TYPING); $('#dirBtn').hidden=TYPING; };
+const tb=$('#typBtn'); if(CAN_TYPE){ tb.hidden=false; const syncT=()=>{ tb.textContent='Typing: '+(TYPING?'on':'off'); tb.setAttribute('aria-pressed',TYPING); $('#dirBtn').hidden=TYPING; };
   syncT(); tb.onclick=()=>{ TYPING=!TYPING; progressWrites.write(D.markKey+'-typ',TYPING?'1':'0'); syncT(); renderCard(); }; }
 document.addEventListener('keydown',e=>{
   if($('#tab-cards').hidden) return;
@@ -312,7 +313,7 @@ let qcats=new Set(), missedOnly=false, unansOnly=false, deck=[], qpos=0, qStat='
 function buildDeck(){ const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q)))); qpos=0; }
 function renderQ(){
   (function(box){ box.innerHTML='';
-    [['all','ทั้งหมด'],...CATS].forEach(([id,l])=>{
+    [['all','All'],...CATS].forEach(([id,l])=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip';
       b.setAttribute('aria-pressed', id==='all'?!qcats.size:qcats.has(id));
       b.innerHTML=esc(l)+'<span class="n">'+(id==='all'?QS.length:QS.filter(q=>q.cat===id).length)+'</span>';
@@ -321,19 +322,19 @@ function renderQ(){
   })($('#qCats'));
   const box=$('#qBody');
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
-  let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">ตอบถูก / ตอบแล้ว (ทั้งหมด '+QS.length+' ข้อ)</span></div>';
-  if(qStat) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">ข้อที่ผิด</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">ข้อที่ยังไม่ทำ</button><button class="chip" id="resetBtn" type="button">ล้างคำตอบ</button></div>';
-  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+((missedOnly||unansOnly)?'ไม่มีข้อที่ตรงเงื่อนไขในหมวดที่เลือก (ลองปิดตัวกรองหรือเลือกบทเพิ่ม)':'ไม่มีข้อสอบในหมวดนี้')+'</div>'; wireQ(); return; }
+  let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
+  if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
+  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+((missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined;
-  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>ข้อ '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
+  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
   h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
   q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
     h+='<button type="button" class="'+cls+'" data-oi="'+oi+'" '+(done?'disabled':'')+'><span class="k">'+'ABCD'[k]+'</span><span>'+rich(q.opts[oi])+'</span></button>'; });
   h+='</div>';
-  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'ถูกต้อง':'ยังไม่ถูก ตอบข้อ '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+'</div>'; }
-  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>ก่อนหน้า</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>ถัดไป</button></div></div>';
-  h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="ข้อ '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
+  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+'</div>'; }
+  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
+  h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
   box.innerHTML=h;
   box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); save(); renderQ(); });
   box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
@@ -343,7 +344,7 @@ function renderQ(){
 function wireQ(){
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;buildDeck();renderQ()};
-  const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('ล้างคำตอบแบบฝึกทั้งหมดในวิชานี้? คะแนนและประวัติคำตอบจะถูกล้าง')) return; store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
+  const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
 
 /* ---------- tabs ---------- */
@@ -363,7 +364,7 @@ function renderSync(){
   if(fcat==='all'||!page||!((owner&&mcp)||(window.__xs&&window.__xs.reviewReady()))){ box.hidden=true; return; }
   const t=scopeT(); if(t.n===0||t.g+t.b<t.n){ box.hidden=true; return; }
   box.hidden=false; const pass=t.g/t.n>=PASS, pct=Math.round(t.g/t.n*100);
-  $('#syncText').textContent=pass?'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ผ่านเกณฑ์ 80% → Review Step จะเพิ่ม 1 ขั้น':'คะแนนล่าสุด “ปกติ/ง่าย” '+pct+'% ต่ำกว่า 80% → Review Step จะกลับเป็น 0 (ทบทวนอีกครั้งพรุ่งนี้)';
+  $('#syncText').textContent=pass?'Good/Easy '+pct+'% · passed 80% → Review Step +1':'Good/Easy '+pct+'% · below 80% → Review Step back to 0 (review again tomorrow)';
   if(!syncing) $('#syncBtn').disabled=false;
 }
 function errText(e,writing){
@@ -381,7 +382,7 @@ function errText(e,writing){
 async function syncViaApi(){
   const page=(D.pages||{})[fcat]; if(!page||syncing) return;
   const t=scopeT(), pass=t.g/t.n>=PASS, msg=$('#syncMsg'); const X=window.__xs;
-  syncing=true; $('#syncBtn').disabled=true; msg.className=''; msg.textContent='กำลังบันทึกลง Notion…';
+  syncing=true; $('#syncBtn').disabled=true; msg.className=''; msg.textContent='Saving to Notion…';
   let done=false;
   try{
     const reviewApi=await X.reviewApi();
@@ -390,8 +391,8 @@ async function syncViaApi(){
     const j=await r.json().catch(()=>({}));
     if(r.status===401){ msg.className='err'; msg.textContent='รหัสซิงก์ไม่ถูกต้อง กดปุ่ม ☁ มุมขวาล่างเพื่อตั้งรหัสใหม่'; }
     else if(!r.ok||!j.ok){ msg.className='err'; msg.textContent='บันทึกไม่สำเร็จ ('+(j.error||r.status)+')'; }
-    else if(j.already){ msg.className='ok'; msg.textContent='วันนี้บันทึกไปแล้ว · Review Step = '+j.step; done=true; $('#syncBtn').textContent='บันทึกแล้ว ✓'; }
-    else{ msg.className='ok'; msg.textContent='บันทึกแล้ว · '+catLabel(fcat)+': Last review '+j.today+' · Review Step '+j.step+' → '+j.next+' · ทบทวนรอบหน้าในอีก '+STEPS[Math.min(j.next,STEPS.length-1)]+' วัน'; done=true; $('#syncBtn').textContent='บันทึกแล้ว ✓'; }
+    else if(j.already){ msg.className='ok'; msg.textContent='วันนี้บันทึกไปแล้ว · Review Step = '+j.step; done=true; $('#syncBtn').textContent='Saved ✓'; }
+    else{ msg.className='ok'; msg.textContent='Saved · '+catLabel(fcat)+': Last review '+j.today+' · Review Step '+j.step+' → '+j.next+' · next review in '+STEPS[Math.min(j.next,STEPS.length-1)]+' days'; done=true; $('#syncBtn').textContent='Saved ✓'; }
   }catch(e){ msg.className='err'; msg.textContent='ติดต่อเซิร์ฟเวอร์ซิงก์ไม่ได้ ลองใหม่อีกครั้ง'; }
   syncing=false; if(!done) $('#syncBtn').disabled=false;
 }
@@ -408,11 +409,11 @@ async function syncNotion(){
     const m=text.match(/\\?"Review Step\\?"\s*:\s*(\d+(?:\.\d+)?)/); if(m) step=Math.max(0,Math.round(Number(m[1])));
   }catch(e){ msg.className='err'; msg.textContent=errText(e,false); syncing=false; $('#syncBtn').disabled=false; return; }
   const next=pass?step+1:0, today=todayBkk();
-  msg.textContent='กำลังบันทึกลง Notion…';
+  msg.textContent='Saving to Notion…';
   try{
     await mcp.callTool(NOTION,"notion-update-page",{page_id:page,command:"update_properties",properties:{"date:Last review:start":today,"date:Last review:is_datetime":0,"Review Step":next}});
-    msg.className='ok'; msg.textContent='บันทึกแล้ว · '+catLabel(fcat)+': Last review '+today+' · Review Step '+step+' → '+next+' · ทบทวนรอบหน้าในอีก '+STEPS[Math.min(next,STEPS.length-1)]+' วัน';
-    $('#syncBtn').textContent='บันทึกแล้ว ✓';
+    msg.className='ok'; msg.textContent='Saved · '+catLabel(fcat)+': Last review '+today+' · Review Step '+step+' → '+next+' · next review in '+STEPS[Math.min(next,STEPS.length-1)]+' days';
+    $('#syncBtn').textContent='Saved ✓';
   }catch(e){ msg.className='err'; msg.textContent=errText(e,true); $('#syncBtn').disabled=false; }
   syncing=false;
 }
@@ -492,7 +493,7 @@ async function loadExtQ(){
     }catch(e){ lastErr=e; await new Promise(r=>setTimeout(r,2500*(a+1))); }
   }
   const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
-  qStat='โหลดจาก Notion ไม่สำเร็จ ('+String((lastErr&&lastErr.message)||lastErr||'').slice(0,60)+') — ใช้ข้อมูลเก่าที่เก็บไว้ '+n+' ข้อ ลองปิดแล้วเปิดใหม่';
+  qStat='Could not load from Notion ('+String((lastErr&&lastErr.message)||lastErr||'').slice(0,60)+') — using '+n+' saved questions';
   qStatErr=true; renderQ();
 }
 async function loadStatic(){
@@ -664,6 +665,7 @@ window.__xs=(()=>{
     api:()=>api, hdr, sync };
 })();
 </script>
+<script src="scripts/study-course-mode.js?v=1"></script>
 <script src="scripts/study-course-nav.js?v=1"></script>
 <script src="scripts/study-nav.js?v=1"></script>
 </html>
