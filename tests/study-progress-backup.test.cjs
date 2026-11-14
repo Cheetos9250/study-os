@@ -119,5 +119,5 @@ test('home dashboard data (tasks, checklists, cover) is backed up and validated 
  const text=backup.createSnapshot({getItem:k=>k===key?good:null},origin,new Date('2026-11-14T00:00:00Z'));
  assert.deepEqual(backup.inspectSnapshot(text,origin).keys,[key]);
  const src=fs.readFileSync(path.join(__dirname,'../scripts/study-progress-restore.js'),'utf8');
- assert.match(src,/studyos\.home\.v1/);assert.match(src,/data:image\\\/jpeg;base64/);assert.match(src,/Invalid home dashboard task/);
+ assert.match(src,/studyos\.home\.v1/);assert.match(src,/data:image\\\/\(jpeg\|gif\|png\);base64/);assert.match(src,/Invalid home dashboard task/);
 });

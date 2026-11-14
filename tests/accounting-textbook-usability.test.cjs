@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'accounting-textbook.html'),'utf8'),today=fs.readFileSync(path.join(root,'today.html'),'utf8');
+const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'accounting-textbook.html'),'utf8'),today=fs.readFileSync(path.join(root,'index.html'),'utf8');
 test('reader has 1–9 chapter chips that clear search and keep the chapter select in sync',()=>{
  assert.match(html,/id="chapterChips"/);
  assert.match(html,/function buildChips\(\)/);

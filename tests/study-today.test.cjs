@@ -71,9 +71,9 @@ test('weak spots require two answers and sort by lowest accuracy',()=>{
  const w=T.weakSpots({acc:s});assert.equal(w.length,1);assert.equal(w[0].label,'06 Inventory');assert.equal(w[0].acc,0);
 });
 test('today page is read-only for course progress and linked from home',()=>{
- const html=fs.readFileSync(path.join(root,'today.html'),'utf8');
+ const html=fs.readFileSync(path.join(root,'calendar.html'),'utf8');
  assert.match(html,/scripts\/study-today\.js/);assert.doesNotMatch(html,/removeItem|localStorage\.clear/);
  const writes=[...html.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]);assert.deepEqual(writes,['T.SETTINGS_KEY']);
  assert.doesNotMatch(html,/workers\.dev|notion/i);
- assert.match(fs.readFileSync(path.join(root,'index.html'),'utf8'),/href="today\.html"/);
+ assert.match(fs.readFileSync(path.join(root,'index.html'),'utf8'),/href="calendar\.html"/);
 });
