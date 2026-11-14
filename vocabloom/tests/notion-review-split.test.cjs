@@ -59,7 +59,7 @@ test('All five Notion review flows send old content key ONLY to original content
   const body=JSON.parse(calls[0].opts.body);
   assert.equal(body.page,'notion-page-0001');
   assert.equal(body.pass,true);
-  assert.equal(panel.textContent,'บันทึกแล้ว ✓');
+  assert.equal(panel.textContent,'Saved ✓');
  }
 });
 test('Missing original Notion credential blocks all /review requests, regardless of progress token',async()=>{
@@ -135,6 +135,6 @@ test('Direct Notion connector retains priority when it is explicitly available',
   assert.equal(result.apiCalls,0,file);
   assert.deepEqual(result.connector.map(x=>x.operation),['notion-fetch','notion-update-page']);
   assert.equal(result.connector[1].body.properties['Review Step'],2);
-  assert.equal(result.outputs.syncBtn.textContent,'บันทึกแล้ว ✓');
+  assert.equal(result.outputs.syncBtn.textContent,'Saved ✓');
  }
 });

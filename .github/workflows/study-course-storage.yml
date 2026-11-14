@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - acc.html
+      - scripts/study-course-mode.js
+      - assets/study-unify.css
       - eco.html
       - math.html
       - eng.html
@@ -16,6 +18,8 @@ on:
   pull_request:
     paths:
       - acc.html
+      - scripts/study-course-mode.js
+      - assets/study-unify.css
       - eco.html
       - math.html
       - eng.html
