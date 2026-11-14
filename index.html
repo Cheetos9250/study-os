@@ -73,9 +73,9 @@ h2::before{content:"✦";font-size:.75em;color:var(--accent)}
 .moreBtn{border:0;background:none;color:var(--muted);font:14px var(--mono);min-height:46px;cursor:pointer}
 .subjects{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .subj{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg);position:relative}
-.subj .cv{height:70px;display:grid;place-items:center;font-size:32px;background-size:cover;background-position:center}.subj .cv.has{font-size:0}
+.subj .cv{height:clamp(120px,16vw,170px);display:grid;place-items:center;font-size:32px;background-size:cover;background-position:center}.subj .cv.has{font-size:0}
 .s-acc .cv{background-color:#bfe6cf}.s-eco .cv{background-color:#fbd9b5}.s-math .cv{background-color:#d3cffa}.s-voc .cv{background-color:#c9dcfb}.s-zh .cv{background-color:#fbc9c9}
-.subj .pic{position:absolute;top:6px;right:6px;min-width:44px;min-height:44px;border:0;border-radius:8px;background:rgba(255,255,255,.85);color:#333;font-size:15px;cursor:pointer;opacity:0}
+.subj .pic{position:absolute;top:8px;right:8px;min-width:44px;min-height:44px;border:0;border-radius:8px;background:rgba(255,255,255,.85);color:#333;font-size:15px;cursor:pointer;opacity:0}
 .subj:hover .pic,.subj:focus-within .pic{opacity:1}@media(hover:none){.subj .pic{opacity:.8}}
 .subj .b{padding:12px 14px 14px}.subj h3{font-size:16px;margin:0 0 2px}.subj .sub{font-size:12px;color:var(--muted);margin:0 0 10px}
 .subj .st{display:flex;gap:14px;font-size:13px;margin-bottom:8px}.subj .st b{font:700 18px var(--mono);display:block;line-height:1.1}
@@ -186,7 +186,7 @@ function paintImages(){
 /* one small menu for cover, icon and card images */
 const SLOTS={cover:{w:1400,q:.8,get:()=>st.cover,set:v=>{if(v)st.cover=v;else delete st.cover;}},
  avatar:{w:256,q:.85,alpha:true,get:()=>st.avatar,set:v=>{if(v)st.avatar=v;else delete st.avatar;}}};
-const slot=k=>SLOTS[k]||{w:640,q:.78,get:()=>st.covers[k],set:v=>{if(v)st.covers[k]=v;else delete st.covers[k];}};
+const slot=k=>SLOTS[k]||{w:960,q:.8,get:()=>st.covers[k],set:v=>{if(v)st.covers[k]=v;else delete st.covers[k];}};
 const fileIn=document.createElement('input');fileIn.type='file';fileIn.accept='image/*';fileIn.hidden=true;fileIn.id='imgFile';document.body.appendChild(fileIn);
 const menu=document.createElement('div');menu.id='imgMenu';menu.hidden=true;menu.setAttribute('role','dialog');menu.setAttribute('aria-label','Image');
 menu.innerHTML='<button type="button" data-act="upload">Upload image</button><button type="button" data-act="link">Paste image link (GIF)</button><button type="button" data-act="remove">Remove</button><button type="button" data-act="cancel">Cancel</button>';
@@ -269,7 +269,7 @@ function renderSubjects(){
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key],ne=upcoming().find(e=>e.course===c.key);
   const emoji={acc:'📒',eco:'📈',math:'🧮'}[c.key],pct=s&&s.total?Math.round(s.seen/s.total*100):0;
-  return '<article class="subj s-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">🖼</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam in '+(ne.d===0?'today':ne.d+' days'):'&nbsp;')+'</p>'
+  return '<article class="subj s-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">🖼</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam '+(ne.d===0?'today':ne.d===1?'tomorrow':'in '+ne.d+' days'):'&nbsp;')+'</p>'
    +(s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
    +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a><a href="hub.html#'+c.key+'">Lessons</a></div></div></article>';});
  const lang=(l,cv,emoji,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">🖼</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary</p>'
