@@ -87,6 +87,27 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),http=r
     results.push({engine:name,scenario:'quota failure, draft export, unchanged-note retry and failed-status retry',passed:true});console.log('PASS',name,'save retry');await context.close();
    }finally{await browser.close();}
   }
+  // Reader progress is a separate dataset; preserve both tabs using disposable storage.
+  for(const [name,engine] of Object.entries({chromium,webkit})){
+   const browser=await engine.launch();try{
+    for(const width of [390,820,1280]){
+     const context=await browser.newContext({viewport:{width,height:1000},acceptDownloads:true}),errors=[],writes=[];
+     await context.route('**/*',r=>{const req=r.request();if(req.method()!=='GET')writes.push(req.method());return req.method()==='GET'&&new URL(req.url()).origin===base?r.continue():r.abort();});
+     const a=await context.newPage(),b=await context.newPage(),stale=await context.newPage();
+     for(const page of [a,b,stale]){page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/accounting-textbook.html',{waitUntil:'domcontentloaded'});await page.locator('.q-item').first().waitFor({state:'attached'});}
+     const ownId=await a.evaluate(()=>current.id),otherId=await b.evaluate(()=>records.find(q=>q.id!==current.id).id);
+     await a.evaluate(()=>{const native=Storage.prototype.setItem;window.blockReader=true;Storage.prototype.setItem=function(key,value){if(window.blockReader&&key===PROGRESS_KEY)throw new DOMException('Synthetic quota','QuotaExceededError');return native.call(this,key,value);};});
+     await a.locator('#answer').fill('SYNTHETIC-READER-A');await a.locator('#answer').blur();await a.locator('#saveStatus').getByText(/Not saved/).waitFor();
+     await b.locator('#search').fill(otherId);await b.waitForFunction(id=>current?.id===id,otherId);await b.locator('#answer').fill('SYNTHETIC-READER-B');await b.locator('#answer').blur();const saved=await b.evaluate(()=>localStorage.getItem(PROGRESS_KEY));assert.equal(JSON.parse(saved)[otherId].notes,'SYNTHETIC-READER-B');
+     await a.evaluate(()=>{window.blockReader=false;});await a.locator('#answer').focus();await a.locator('#answer').blur();assert.match(await a.locator('#error').innerText(),/Saved answers changed/);assert.equal(await b.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),saved);
+     await stale.locator('#answer').fill('SYNTHETIC-READER-C');await stale.locator('#answer').blur();assert.match(await stale.locator('#error').innerText(),/Saved answers changed/);assert.equal(await b.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),saved);
+     await a.locator('details.settings summary').click();const pendingA=a.waitForEvent('download');await a.locator('#export').click();const own=JSON.parse(await fs.readFile(await (await pendingA).path(),'utf8'));assert.equal(own.progress[ownId].notes,'SYNTHETIC-READER-A');
+     const savedPage=await context.newPage();await savedPage.goto(base+'/progress-backup.html',{waitUntil:'domcontentloaded'});const pendingB=savedPage.waitForEvent('download');await savedPage.locator('#download').click();const backupB=JSON.parse(await fs.readFile(await (await pendingB).path(),'utf8'));assert.equal(backupB.entries['studyos.accounting.textbook.progress.v1'],saved);
+     for(const colorScheme of ['light','dark']){await a.emulateMedia({colorScheme});assert.equal(await a.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await a.screenshot({path:path.join(output,`${name}-${width}-${colorScheme}-reader-conflict.png`),fullPage:true});}
+     assert.equal(await a.evaluate(()=>progressDirty),true);assert.equal(await a.locator('#answer').inputValue(),'SYNTHETIC-READER-A');assert.equal(await b.evaluate(()=>localStorage.getItem(PROGRESS_KEY)),saved);assert.deepEqual(errors,[]);assert.deepEqual(writes,[]);results.push({engine:name,width,scenario:'reader multi-tab conflict preserves other question and both exports',passed:true});console.log('PASS',name,width,'reader multi-tab');await context.close();
+    }
+   }finally{await browser.close();}
+  }
   // Script delivery failure must preserve working and leave checking unavailable.
   const browser=await chromium.launch();try{
    const context=await browser.newContext();await context.route('**/*',r=>new URL(r.request().url()).origin!==base||r.request().url().includes('accounting-answer-check.js')?r.abort():r.continue());
