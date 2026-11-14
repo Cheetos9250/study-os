@@ -13,3 +13,5 @@
 - Added `today.html`: exam countdown, due cards for the three academic courses, weak chapters and a daily study plan; linked from the homepage. Course progress is read-only; settings use the new `studyos.today.v1` key.
 
 - Usability: 44px touch targets on course pages, rating buttons hidden until reveal, Today link in course navigation, and Today plan buttons that open the exact chapter tab (summary, cards, Practice).
+
+- Textbook reader: chapter chips, deep links, split question/answer view on wide screens, jump bar on narrow ones, loading message while a stored PDF reopens, and a Today link to the chapter. Checked with a synthetic 1,210-page PDF only; no real textbook or progress was used.

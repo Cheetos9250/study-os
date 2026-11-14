@@ -130,7 +130,7 @@ function acts(t,c){
  if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];
   return best&&best.n?'<div class="acts" style="grid-column:2"><a class="main" href="'+link(best.x,'cards')+'">เริ่มทวน'+esc(best.x.name)+' ('+best.n+') →</a></div>':'';}
  if(!c)return '';
- if(t.kind==='chapter')return '<div class="acts" style="grid-column:2"><a href="'+link(c,'sum',t.cat)+'">1 อ่านสรุป</a><a href="'+link(c,'cards',t.cat)+'">2 การ์ด</a><a class="main" href="'+link(c,'prac',t.cat)+'">3 ทำ Practice</a></div>';
+ if(t.kind==='chapter')return '<div class="acts" style="grid-column:2"><a href="'+link(c,'sum',t.cat)+'">1 อ่านสรุป</a><a href="'+link(c,'cards',t.cat)+'">2 การ์ด</a><a class="main" href="'+link(c,'prac',t.cat)+'">3 ทำ Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="accounting-textbook.html?ch='+t.cat.slice(1)+'">4 โจทย์ตำรา</a>':'')+'</div>';
  return '<div class="acts" style="grid-column:2"><a class="main" href="'+link(c,'prac')+'">เปิด Practice →</a></div>';
 }
 function compute(){
