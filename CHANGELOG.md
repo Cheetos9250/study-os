@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-14 (backup for home dashboard)
+- Backup/restore now include `studyos.home.v1` (own tasks, daily checklists, cover). Restore validates task fields, checklist object and that the cover is a JPEG data URL; unknown shapes are rejected.
+
 ## 2026-11-14 (Notion-style home dashboard)
 - index.html is now a dashboard modelled on the owner's Notion page: cover + avatar, Quick Launch cards, Daily Focus (start/end checklists reset daily + pomodoro), Tasks (own tasks + exam dates, priority badges, filter/sort), Review table (due cards by chapter), Subjects gallery, collapsible links. Old home kept as classic.html.
 - Cover image is chosen in the browser, resized and stored locally only (never uploaded). Own tasks/checklists use the new local key `studyos.home.v1` (not yet in backup allowlist or sync).

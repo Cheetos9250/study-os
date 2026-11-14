@@ -110,3 +110,14 @@ test('comparison fails closed on unreadable storage and validates files before r
  assert.throws(()=>backup.compareSnapshot(text,null,origin),/unavailable/);
  assert.throws(()=>backup.compareSnapshot(text,{getItem(){throw Error('must not read');}},'https://other.example'),/different site origin/);
 });
+
+test('home dashboard data (tasks, checklists, cover) is backed up and validated on restore',()=>{
+ const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+ const key='studyos.home.v1',origin='https://example.test';
+ assert.ok(backup.keys.includes(key));
+ const good=JSON.stringify({tasks:[{id:'t1',title:'Assignment',date:'2026-11-20',pri:'High',done:false}],focus:{day:'2026-11-14',done:{start0:1}},cover:'data:image/jpeg;base64,/9j/AAAA'});
+ const text=backup.createSnapshot({getItem:k=>k===key?good:null},origin,new Date('2026-11-14T00:00:00Z'));
+ assert.deepEqual(backup.inspectSnapshot(text,origin).keys,[key]);
+ const src=fs.readFileSync(path.join(__dirname,'../scripts/study-progress-restore.js'),'utf8');
+ assert.match(src,/studyos\.home\.v1/);assert.match(src,/data:image\\\/jpeg;base64/);assert.match(src,/Invalid home dashboard task/);
+});

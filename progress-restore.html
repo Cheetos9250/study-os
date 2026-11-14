@@ -73,6 +73,7 @@
   function datasetName(key) {
     if (key === "vocabloom_mvp_v1") return "VocaBloom learning history";
     if (key === "studyos.accounting.textbook.progress.v1") return "Accounting textbook answers";
+    if (key === "studyos.home.v1") return "Home dashboard tasks and checklists";
     var courses = {acc:"Accounting",eco:"Economics",math:"Mathematics",eng:"English",zh:"Chinese"};
     if (key.startsWith("study-")) return courses[key.slice(6)] + " quiz history";
     var prefix = key.replace(/-(srs|typ)$/, "");
