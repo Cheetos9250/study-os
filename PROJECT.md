@@ -40,3 +40,6 @@ Course pages and the textbook reader now refuse to overwrite saved progress chan
 
 ## Today page
 `today.html` (logic in `scripts/study-today.js`) shows the exam countdown, cards due across Accounting/Economics/Mathematics, weak chapters (embedded Practice accuracy below 70%, at least 2 answers) and a daily chapter plan. It reads course progress read-only and writes only `studyos.today.v1` (exam list, chapter completion). That key is not yet in the backup allowlist. Default exams: 16 Nov Accounting quiz (ch6 cost flow + ch8 bank reconciliation, confirmed by owner); 26 Nov Accounting, 27 Nov Economics, 1 Dec Mathematics (scopes are assumptions until the owner confirms them on the page). Weak-spot analysis counts embedded questions only; Notion-synced extra questions use dynamic IDs and are excluded.
+
+## iPad usability and deep links
+Course pages use 44px touch targets (chips, buttons, tabs, question-number cells, nav links; shared `assets/study-course-layout.css`). Card rating buttons stay hidden until the card is flipped. Academic course pages link to Today, and `scripts/study-course-nav.js` supports `course.html?tab=cards|sum|prac&cat=<chapter id>` by clicking the existing tab/chip controls; it reads and writes no progress. Today's plan tasks use these links (summary → cards → Practice for that chapter).

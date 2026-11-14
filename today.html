@@ -35,12 +35,15 @@ h2 small{font-family:'DM Sans',"IBM Plex Sans Thai",system-ui,sans-serif;font-si
 .pill b{color:var(--text)}
 .warn{display:inline-block;font-size:12px;font-weight:700;color:var(--orange);background:var(--orangebg);border-radius:6px;padding:1px 8px;margin-left:6px;vertical-align:middle}
 .tasks{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.task{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:start}
-.task input{width:22px;height:22px;margin:3px 0 0;accent-color:var(--purple)}
+.task{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start}
+.task input{width:28px;height:28px;margin:1px 0 0;accent-color:var(--purple)}
 .task h3{font-size:16px;margin:0;line-height:1.4}.task p{margin:2px 0 0;font-size:14px;color:var(--muted)}
 .task .tag{font-size:12px;font-weight:700;color:var(--purple);background:var(--lav);border-radius:6px;padding:1px 8px;margin-right:6px}
 .task.done h3,.task.done p{text-decoration:line-through;opacity:.6}
-.go{font-size:14px;font-weight:700;color:var(--purple);text-decoration:none;white-space:nowrap;padding:4px 0}
+.go{font-size:14px;font-weight:700;color:var(--purple);text-decoration:none;white-space:nowrap;padding:4px 0;display:inline-flex;align-items:center;min-height:44px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.acts a{font-size:14px;font-weight:700;color:var(--purple);background:var(--lav);border:1px solid var(--line);border-radius:10px;padding:0 14px;min-height:44px;display:inline-flex;align-items:center;text-decoration:none}
+.acts a.main{background:var(--purple);color:var(--white);border-color:var(--purple)}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .course h3{font-size:17px;margin:0 0 10px}
 .nums{display:flex;gap:18px;margin-bottom:12px}.nums div{font-size:13px;color:var(--muted)}.nums b{display:block;font-size:24px;font-family:'Outfit',system-ui,sans-serif;color:var(--text);line-height:1.2}
@@ -59,12 +62,12 @@ details.exam summary::-webkit-details-marker{display:none}
 .edit input[type=text],.edit input[type=date],.edit select{font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:42px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}.chips label{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:40px}
 .row{display:flex;flex-wrap:wrap;gap:10px}
-button{font:inherit;font-size:14px;font-weight:700;border-radius:10px;padding:9px 14px;min-height:42px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--purple)}
+button{font:inherit;font-size:14px;font-weight:700;border-radius:10px;padding:9px 14px;min-height:44px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--purple)}
 button.primary{background:var(--purple);color:var(--white);border-color:var(--purple)}
 button.danger{color:var(--red)}
 .note{margin-top:28px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
 .status{font-size:14px;color:var(--muted)}.status.err{color:var(--red)}
-@media(max-width:760px){.grid3{grid-template-columns:1fr}.task{grid-template-columns:28px 1fr}.task .go{grid-column:2}}
+@media(max-width:760px){.grid3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -122,6 +125,14 @@ function save(){
  catch{$('#saveStatus').textContent='บันทึกการตั้งค่าไม่สำเร็จ (พื้นที่เบราว์เซอร์อาจเต็ม) การเปลี่ยนแปลงจะหายเมื่อปิดหน้า';$('#saveStatus').className='status err';return false;}
 }
 function courseOf(key){return T.COURSES.find(c=>c.key===key);}
+function link(c,tab,cat){return c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');}
+function acts(t,c){
+ if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];
+  return best&&best.n?'<div class="acts" style="grid-column:2"><a class="main" href="'+link(best.x,'cards')+'">เริ่มทวน'+esc(best.x.name)+' ('+best.n+') →</a></div>':'';}
+ if(!c)return '';
+ if(t.kind==='chapter')return '<div class="acts" style="grid-column:2"><a href="'+link(c,'sum',t.cat)+'">1 อ่านสรุป</a><a href="'+link(c,'cards',t.cat)+'">2 การ์ด</a><a class="main" href="'+link(c,'prac',t.cat)+'">3 ทำ Practice</a></div>';
+ return '<div class="acts" style="grid-column:2"><a class="main" href="'+link(c,'prac')+'">เปิด Practice →</a></div>';
+}
 function compute(){
  const now=Date.now();summaries={};
  for(const c of T.COURSES){if(!data[c.key])continue;summaries[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);}
@@ -141,7 +152,7 @@ function render(){
  const doneToday=settings.tasks[plan.today]||{};
  $('#tasks').innerHTML=plan.tasks.length?plan.tasks.map((t,i)=>{
   const c=t.course?courseOf(t.course):null,done=t.kind==='chapter'?t.done:!!doneToday[t.id];
-  return '<li class="task'+(done?' done':'')+'"><input type="checkbox" data-i="'+i+'" id="t'+i+'"'+(done?' checked':'')+' aria-label="ทำเสร็จแล้ว: '+esc(t.title)+'"><label for="t'+i+'"><h3>'+(c?'<span class="tag">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3><p>'+esc(t.detail)+'</p>'+(t.reason?'<p>'+esc(t.reason)+(t.exam?' · สำหรับ '+esc(t.exam):'')+'</p>':'')+'</label>'+(c?'<a class="go" href="'+c.page+'">เปิดวิชา →</a>':'')+'</li>';
+  return '<li class="task'+(done?' done':'')+'"><input type="checkbox" data-i="'+i+'" id="t'+i+'"'+(done?' checked':'')+' aria-label="ทำเสร็จแล้ว: '+esc(t.title)+'"><label for="t'+i+'"><h3>'+(c?'<span class="tag">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3><p>'+esc(t.detail)+'</p>'+(t.reason?'<p>'+esc(t.reason)+(t.exam?' · สำหรับ '+esc(t.exam):'')+'</p>':'')+'</label>'+acts(t,c)+'</li>';
  }).join(''):'<li class="empty">ไม่มีงานสำหรับวันนี้ ลองเปิดการ์ดใหม่หรือเพิ่มวันสอบ</li>';
  $('#tasks').querySelectorAll('input[type=checkbox]').forEach(box=>box.onchange=()=>{
   settings=T.markChapter(settings,plan.tasks[+box.dataset.i],box.checked,Date.now());save();render();

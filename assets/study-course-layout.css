@@ -22,3 +22,14 @@ body .wrap{padding-block-end:24px}
 .course-links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;margin-bottom:18px;font-size:14px}
 .course-links a{color:var(--accent);text-underline-offset:3px}
 .course-links a:focus-visible{outline:3px solid var(--accent);outline-offset:4px;border-radius:3px}
+
+/* iPad touch comfort: 44px targets, reveal-before-rate, bounded question grid. */
+.rate4[hidden]{display:none}
+.chip{min-height:44px;padding-block:8px;display:inline-flex;align-items:center}
+.btn{min-height:44px}
+.tabs button{min-height:48px}
+.course-links a{display:inline-flex;align-items:center;min-height:44px}
+.cells{gap:6px;max-height:176px;overflow-y:auto;overscroll-behavior:contain;padding:2px}
+.cells .cell{width:40px;height:40px;font-size:13px}
+.opt{min-height:52px}
+.cloud-sync-bar>button{min-height:44px}
