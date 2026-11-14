@@ -11,7 +11,8 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
 :root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#7c7a76;--line:#e9e7e3;--panel:#f9f8f6;--blue:#e4f0fb;--green:#e8f0ea;--yellow:#f9f2d9;--purple:#f2eafa;--accent:#2383e2;--red:#e5534b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--mono:'IBM Plex Mono','IBM Plex Sans Thai',ui-monospace,Menlo,Consolas,monospace}
-@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a09d98;--line:#333;--panel:#202020;--blue:#1e3445;--green:#223228;--yellow:#3a3420;--purple:#33283f;--accent:#5aa9f0;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8}}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a09d98;--line:#333;--panel:#202020;--blue:#1e3445;--green:#223228;--yellow:#3a3420;--purple:#33283f;--accent:#5aa9f0;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a09d98;--line:#333;--panel:#202020;--blue:#1e3445;--green:#223228;--yellow:#3a3420;--purple:#33283f;--accent:#5aa9f0;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Thai',system-ui,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
@@ -94,6 +95,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 @media(max-width:520px){.row{grid-template-columns:28px minmax(0,1fr) 28px}.row .d,.row .tag{grid-column:2}.row .tag{justify-self:start}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<script src="scripts/study-theme.js?v=1"></script>
 </head>
 <body>
 <div class="topbar" role="navigation" aria-label="Page"><button type="button" id="goBack" aria-label="ย้อนกลับ">←</button><button type="button" id="goFwd" aria-label="ไปข้างหน้า">→</button><span class="pg"><span class="mini" id="miniAv">🎓</span><span>Study</span></span><span class="sp"></span><a href="today.html" aria-label="Today" title="Today">📅</a><a href="hub.html" aria-label="Study Hub" title="Study Hub">🗂</a></div>

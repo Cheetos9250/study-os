@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-14 (dark mode toggle)
+- All Study OS pages already followed the device dark mode; added a floating theme button (🌓 auto → 🌙 dark → ☀️ light) via scripts/study-theme.js. Choice is stored per device under `studyos.theme.v1` (not backed up or synced). VocaBloom has its own styling and is unchanged.
+- Tests: tests/theme.test.cjs; classic-home test allows the theme script.
+
 ## 2026-11-14 (Notion-style home dashboard)
 - index.html is now a dashboard modelled on the owner's Notion page: cover + avatar, Quick Launch cards, Daily Focus (start/end checklists reset daily + pomodoro), Tasks (own tasks + exam dates, priority badges, filter/sort), Review table (due cards by chapter), Subjects gallery, collapsible links. Old home kept as classic.html.
 - Cover image is chosen in the browser, resized and stored locally only (never uploaded). Own tasks/checklists use the new local key `studyos.home.v1` (not yet in backup allowlist or sync).

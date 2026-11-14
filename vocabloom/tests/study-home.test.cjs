@@ -46,7 +46,9 @@ test("homepage has responsive, focus, dark-mode, and reduced-motion rules", () =
 });
 
 test("homepage is navigation-only and cannot mutate progress", () => {
-  assert.doesNotMatch(html, /<script\b|localStorage|sessionStorage|fetch\s*\(|XMLHttpRequest|<form\b/i);
+  const page = html.replace(/<script src="scripts\/study-theme\.js\?v=1"><\/script>\n?/, "");
+  assert.match(html, /scripts\/study-theme\.js/);
+  assert.doesNotMatch(page, /<script\b|localStorage|sessionStorage|fetch\s*\(|XMLHttpRequest|<form\b/i);
 });
 
 test("academic cards have self-contained decorative SVG subject icons", () => {
