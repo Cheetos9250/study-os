@@ -41,3 +41,8 @@ test('inline scripts on the main pages parse',()=>{
   for(const m of read(f).matchAll(/<script>([\s\S]*?)<\/script>/g))assert.doesNotThrow(()=>new Function(m[1]),f);
  }
 });
+test('lesson notes are backed up and validated on restore',()=>{
+ assert.ok(require('../scripts/study-progress-backup.js').keys.includes('studyos.notes.v1'));
+ assert.match(read('scripts/study-progress-restore.js'),/key === "studyos\.notes\.v1"/);
+ assert.match(read('hub.html'),/data-note-text/);
+});
