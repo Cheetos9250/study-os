@@ -11,7 +11,8 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 :root{color-scheme:light;--bg:#f8f9fc;--white:#fff;--text:#202445;--muted:#666c88;--line:#eaebf2;--purple:#5b53d7;--deep:#4f47c8;--lav:#f0eeff;--green:#2caa76;--greenbg:#e3f5ed;--orange:#c96a24;--orangebg:#fdf0e5;--red:#c2413b;--redbg:#fbe9e8;--shadow:0 6px 30px rgba(47,54,106,.035)}
-@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--purple:#b9b3ff;--deep:#d7d2ff;--lav:#37365e;--green:#6fd3a5;--greenbg:#1f3a30;--orange:#f3b07a;--orangebg:#3d2a1c;--red:#f19a95;--redbg:#40211f;--shadow:none}}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--purple:#b9b3ff;--deep:#d7d2ff;--lav:#37365e;--green:#6fd3a5;--greenbg:#1f3a30;--orange:#f3b07a;--orangebg:#3d2a1c;--red:#f19a95;--redbg:#40211f;--shadow:none}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--purple:#b9b3ff;--deep:#d7d2ff;--lav:#37365e;--green:#6fd3a5;--greenbg:#1f3a30;--orange:#f3b07a;--orangebg:#3d2a1c;--red:#f19a95;--redbg:#40211f;--shadow:none}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.6}
 .container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,40px) max(18px,env(safe-area-inset-right)) 60px max(18px,env(safe-area-inset-left))}
@@ -69,6 +70,7 @@ button.danger{color:var(--red)}
 .status{font-size:14px;color:var(--muted)}.status.err{color:var(--red)}
 @media(max-width:760px){.grid3{grid-template-columns:1fr}}
 </style>
+<script src="scripts/study-theme.js?v=1"></script>
 </head>
 <body>
 <div class="container">
