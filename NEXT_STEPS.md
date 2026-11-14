@@ -62,11 +62,11 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 
 
 ## Next code review
-- Cross-tab course-save conflict reproduction is confirmed with synthetic data. Verify/release the baseline-check guard after exact-head CI, academic multi-tab recovery checks and screenshots. Preserve draft export/no-overwrite recovery and do not describe localStorage as atomic across tabs.
+- Cross-tab course-save guard is published in PR #77 (`4ae71f8`) with exact-head/main CI and live byte verification. Preserve draft export/no-overwrite recovery and do not describe localStorage as atomic across tabs.
 - Continue source/automation recovery reviews only within their existing authorization gates; keep independent active PR #68 and protected PR #44 branches untouched.
 
 
 ## Reader persistence follow-up
 - Course cross-tab guard is released in PR #77 (`4ae71f8`). Preserve its check-before-write behavior, pending drafts and versioned helper pins.
-- Validate/release the separate textbook-reader baseline guard after exact-head CI/screenshots. Preserve active PR #68's solutions and reconcile only the small persistence changes during future integration.
+- Textbook-reader baseline guard is published in PR #78 (`503f8dd`), with 248 Node / 3 Python tests, 21 synthetic reader browser journeys and live byte verification. Preserve active PR #68's solutions and reconcile only the small persistence changes during future integration.
 - Physical iPad: use disposable progress to rehearse two tabs, draft export and saved-copy backup. Checks are best-effort; no atomic localStorage or cross-browser sync guarantee.
