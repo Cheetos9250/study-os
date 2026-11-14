@@ -43,3 +43,6 @@ Course pages and the textbook reader now refuse to overwrite saved progress chan
 
 ## iPad usability and deep links
 Course pages use 44px touch targets (chips, buttons, tabs, question-number cells, nav links; shared `assets/study-course-layout.css`). Card rating buttons stay hidden until the card is flipped. Academic course pages link to Today, and `scripts/study-course-nav.js` supports `course.html?tab=cards|sum|prac&cat=<chapter id>` by clicking the existing tab/chip controls; it reads and writes no progress. Today's plan tasks use these links (summary → cards → Practice for that chapter).
+
+## Textbook reader usability
+`accounting-textbook.html` has chapter chips 1–9, deep links (`?ch=6`, `?ch=6&type=Problem%20A`, `?q=QS-6-2`; invalid values are ignored and resume still works otherwise), a split question/answer view at 980px and wider, a jump bar on narrower screens and 44px targets. While a stored PDF is reopening it shows a loading message instead of a Choose PDF prompt. The PDF lives in the storage of the browser context where it was chosen: Safari tab and Home Screen app do not share it. Today's accounting chapter tasks link to the matching textbook chapter. Answer checking coverage is unchanged (2/403).
