@@ -11,6 +11,7 @@
   {id:'calendar',href:'calendar.html',icon:'📅',label:'Calendar'}
  ];
  var MORE=[
+  {href:'grades.html',label:'Grades'},
   {href:'progress-backup.html',label:'Back up'},
   {href:'progress-restore.html',label:'Restore'}
  ];
@@ -18,7 +19,7 @@
  // Course pages show one mode (?tab=cards|sum|prac); highlight the matching section.
  var mode=(typeof URLSearchParams==='function'?new URLSearchParams(location.search).get('tab'):'')||'cards';
  var course=/^(acc|eco|math|eng|zh)\.html$/.test(file)?({cards:'cards',sum:'lessons',prac:'practice'}[mode]||'cards'):'';
- var active=course||{'':'today','index.html':'today','flashcards.html':'cards','practice.html':'practice','accounting-textbook.html':'practice','hub.html':'lessons','calendar.html':'calendar','today.html':'calendar'}[file]||'';
+ var active=course||{'':'today','index.html':'today','flashcards.html':'cards','practice.html':'practice','accounting-textbook.html':'practice','hub.html':'lessons','calendar.html':'calendar','today.html':'calendar','grades.html':''}[file]||'';
  var css=''
  +'#studyNav{--sn-bg:#f7f7f5;--sn-fg:#37352f;--sn-mute:#787774;--sn-line:#e9e9e7;--sn-hi:#ebebea;font-family:"DM Sans",system-ui,-apple-system,sans-serif;position:fixed;z-index:70;background:var(--sn-bg);color:var(--sn-fg);box-sizing:border-box}'
  +'@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #studyNav{--sn-bg:#202020;--sn-fg:#e6e6e4;--sn-mute:#9b9a97;--sn-line:#2f2f2f;--sn-hi:#2c2c2c}}'

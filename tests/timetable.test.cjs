@@ -19,3 +19,20 @@ test('calendar imports a timetable only from the link fragment and clears it',()
  assert.deepEqual([...cal.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]),['T.SETTINGS_KEY']);
  assert.match(read('index.html'),/id="classes"/);
 });
+test('grades: weighted score, letter, what is needed on the rest, GPA',()=>{
+ const G=require('../scripts/study-grades.js');
+ const c=G.load(JSON.stringify({courses:[{id:'acc',name:'Accounting',credits:3,items:[{name:'Lab',weight:10,got:9,max:10},{name:'HW',weight:10,got:8,max:10},{name:'Q1',weight:10,got:7,max:10},{name:'Q2',weight:10},{name:'Mid',weight:30,got:24,max:30},{name:'Final',weight:30}]}]})).courses[0];
+ const r=G.result(c);assert.equal(r.earned,48);assert.equal(r.remaining,40);assert.equal(r.letter,'A');
+ assert.equal(r.needs[0].letter,'A');assert.equal(r.needs[0].need,80);assert.equal(r.needs[1].need,67.5);
+ assert.deepEqual(G.gpa([c]),{gpa:4,credits:3});
+ assert.equal(G.letterFor(74.99),'B');assert.equal(G.letterFor(49.99),'F');
+ assert.equal(G.load('{"courses":[{"name":"x","credits":99,"items":[{"weight":500,"got":-1}]}]}').courses[0].credits,3);
+});
+test('grades are backed up, validated on restore, and reachable from the sidebar',()=>{
+ assert.ok(require('../scripts/study-progress-backup.js').keys.includes('studyos.grades.v1'));
+ assert.match(read('scripts/study-progress-restore.js'),/key === "studyos\.grades\.v1"/);
+ assert.match(read('scripts/study-nav.js'),/href:'grades\.html',label:'Grades'/);
+ const g=read('grades.html');assert.deepEqual([...g.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]),['KEY']);
+ assert.match(g,/location\.hash\.match\(\/\^#grades=/);assert.doesNotMatch(read('scripts/study-grades.js'),/localStorage|fetch\(/);
+ const T=require('../scripts/study-today.js');assert.deepEqual(T.DEFAULT_EXAMS.find(e=>e.id==='acc-final-20261126').cats,['c5','c6','c7','c8','c9']);
+});

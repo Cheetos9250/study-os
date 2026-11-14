@@ -77,6 +77,14 @@
             !/^\d{2}:\d{2}$/.test(String(cl.start)) || !/^\d{2}:\d{2}$/.test(String(cl.end)) ||
             (cl.name !== undefined && typeof cl.name !== "string"))
           throw new Error("Invalid timetable");
+    } else if (key === "studyos.grades.v1") {
+      if (!Array.isArray(value.courses)) throw new Error("Invalid grades data");
+      for (var gc of value.courses) {
+        if (!object(gc) || !Array.isArray(gc.items) || typeof gc.name !== "string") throw new Error("Invalid grades data");
+        for (var gi of gc.items)
+          if (!object(gi) || !Number.isFinite(Number(gi.weight)) || (gi.got !== null && gi.got !== undefined && !Number.isFinite(Number(gi.got))))
+            throw new Error("Invalid grades data");
+      }
     } else if (key === "vocabloom_mvp_v1") {
       if (!object(value.progress) || !object(value.days) ||
           !Array.isArray(value.custom) || !object(value.settings))

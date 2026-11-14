@@ -21,7 +21,7 @@
  // Scopes marked unconfirmed are assumptions until the learner edits them.
  const DEFAULT_EXAMS=Object.freeze([
   {id:'acc-quiz-20261116',course:'acc',title:'Accounting quiz',date:'2026-11-16',cats:['c6','c8'],confirmed:true},
-  {id:'acc-final-20261126',course:'acc',title:'Accounting final',date:'2026-11-26',cats:['c6','c7','c8','c9'],confirmed:false},
+  {id:'acc-final-20261126',course:'acc',title:'Accounting final',date:'2026-11-26',cats:['c5','c6','c7','c8','c9'],confirmed:true},
   {id:'eco-final-20261127',course:'eco',title:'Economics final',date:'2026-11-27',cats:['g','i','b','a','d'],confirmed:false},
   {id:'math-final-20261201',course:'math',title:'Math final',date:'2026-12-01',cats:['c5','c6','c7'],confirmed:false}
  ]);
@@ -65,10 +65,16 @@
  }
  // Default exam titles were Thai before the English UI; rename only exact old defaults.
  const OLD_TITLES={'Quiz \u0e1a\u0e31\u0e0d\u0e0a\u0e35: Cost flow + Bank reconciliation':'Accounting quiz','\u0e2a\u0e2d\u0e1a\u0e1b\u0e25\u0e32\u0e22\u0e20\u0e32\u0e04 \u0e1a\u0e31\u0e0d\u0e0a\u0e35':'Accounting final','\u0e2a\u0e2d\u0e1a\u0e1b\u0e25\u0e32\u0e22\u0e20\u0e32\u0e04 \u0e40\u0e28\u0e23\u0e29\u0e10\u0e28\u0e32\u0e2a\u0e15\u0e23\u0e4c':'Economics final','\u0e2a\u0e2d\u0e1a\u0e1b\u0e25\u0e32\u0e22\u0e20\u0e32\u0e04 \u0e04\u0e13\u0e34\u0e15\u0e28\u0e32\u0e2a\u0e15\u0e23\u0e4c':'Math final'};
+ // The 2026 syllabus puts Ch5–9 after the midterm: upgrade the old untouched default (Ch6–9, unconfirmed) only.
+ function upgradeDefault(e){
+  if(e.id==='acc-final-20261126'&&!e.confirmed&&e.cats.join()==='c6,c7,c8,c9')return {...e,cats:['c5','c6','c7','c8','c9'],confirmed:true};
+  return e;
+ }
  function normalizeExams(list){
   if(!Array.isArray(list))return DEFAULT_EXAMS.map(e=>({...e,cats:[...e.cats]}));
   return list.filter(e=>e&&typeof e==='object'&&typeof e.id==='string'&&COURSES.some(c=>c.key===e.course)&&Number.isFinite(dateStart(e.date)))
-   .map(e=>({id:e.id,course:e.course,title:String(OLD_TITLES[e.title]||e.title||'Exam').slice(0,80),date:e.date,cats:Array.isArray(e.cats)?e.cats.filter(x=>typeof x==='string'):[],confirmed:!!e.confirmed}));
+   .map(e=>({id:e.id,course:e.course,title:String(OLD_TITLES[e.title]||e.title||'Exam').slice(0,80),date:e.date,cats:Array.isArray(e.cats)?e.cats.filter(x=>typeof x==='string'):[],confirmed:!!e.confirmed}))
+   .map(upgradeDefault);
  }
  // Weekly timetable: [{id,day:0-6 (Sun=0),start:'HH:MM',end:'HH:MM',name,code,course,skip}]
  const HHMM=/^([01]\d|2[0-3]):[0-5]\d$/;
