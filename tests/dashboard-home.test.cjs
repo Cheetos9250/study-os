@@ -60,3 +60,13 @@ test('images: GIF detected by file bytes, iPad-converted GIF warning, safe https
 test('course pages highlight the section matching their mode',()=>{
  assert.match(nav,/\{cards:'cards',sum:'lessons',prac:'practice'\}/);
 });
+test('Google Drive share links become direct image addresses',()=>{
+ const LINK=eval(html.match(/LINK=(\/\^https:[^\n;]+\/);/)[1]);
+ const fns=html.match(/function driveId[\s\S]*?\n(?=function tryLoad)/)[0];const {driveId,imageCandidates}=new Function('LINK',fns+';return {driveId,imageCandidates};')(LINK);
+ const id='1AbCdEfGhIjKlMnOpQrStUvWxYz012345';
+ assert.equal(driveId('https://drive.google.com/file/d/'+id+'/view?usp=sharing'),id);
+ assert.equal(driveId('https://drive.google.com/open?id='+id),id);
+ assert.deepEqual(imageCandidates('https://drive.google.com/file/d/'+id+'/view'),['https://lh3.googleusercontent.com/d/'+id,'https://drive.google.com/uc?export=view&id='+id]);
+ assert.deepEqual(imageCandidates('https://evil.example/drive.google.com/file/d/'+id),['https://evil.example/drive.google.com/file/d/'+id]);
+ assert.deepEqual(imageCandidates('javascript:alert(1)'),[]);
+});

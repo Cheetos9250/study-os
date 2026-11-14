@@ -155,6 +155,10 @@ const course=k=>T.COURSES.find(c=>c.key===k);
 /* ---------- images (local only; GIFs keep their animation, icon keeps transparency; or an https image link) ---------- */
 const GIF_MAX=1.5*1024*1024,LINK=/^https:\/\/[^\s"'()\\<>]{4,1990}$/;
 const cssUrl=d=>'url("'+d+'")';
+/* Google Drive share links open a web page, not the image: turn them into direct image addresses. */
+function driveId(v){const m=String(v).match(/^https:\/\/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?(?:[^#]*&)?id=|uc\?(?:[^#]*&)?id=)([\w-]{20,})/);return m?m[1]:'';}
+function imageCandidates(v){const id=driveId(v);const list=id?['https://lh3.googleusercontent.com/d/'+id,'https://drive.google.com/uc?export=view&id='+id]:[v];return list.filter(u=>LINK.test(u));}
+function tryLoad(urls,ok,fail){if(!urls.length){fail();return;}const t=new Image();t.onload=()=>ok(urls[0]);t.onerror=()=>tryLoad(urls.slice(1),ok,fail);t.src=urls[0];}
 function pickImage(file,maxW,q,cb,alpha){
  file.slice(0,6).arrayBuffer().then(buf=>{
   const head=String.fromCharCode(...new Uint8Array(buf));
@@ -190,9 +194,10 @@ function closeMenu(){menu.hidden=true;}
 menu.addEventListener('click',e=>{const a=e.target.dataset&&e.target.dataset.act;if(!a)return;const k=target;closeMenu();
  if(a==='upload')fileIn.click();
  else if(a==='remove')put(k,null);
- else if(a==='link'){const v=(prompt('Paste an image link (https://… .gif, .png, .jpg). Giphy/Tenor: use "Copy image address" / the direct .gif link.')||'').trim();if(!v)return;
-  if(!LINK.test(v)){alert('That link cannot be used. It must start with https:// and contain no spaces or quotes.');return;}
-  const t=new Image();t.onload=()=>put(k,v);t.onerror=()=>alert('Could not load an image from that link. Use the direct image address.');t.src=v;}});
+ else if(a==='link'){const v=(prompt('Paste an image link: Google Drive (shared: Anyone with the link), Giphy/Tenor, or any direct .gif/.png/.jpg address.')||'').trim();if(!v)return;
+  const urls=imageCandidates(v);
+  if(!urls.length){alert('That link cannot be used. It must start with https:// and contain no spaces or quotes.');return;}
+  tryLoad(urls,u=>put(k,u),()=>alert(driveId(v)?'Could not load the image from Google Drive. In Drive, set sharing to "Anyone with the link", then copy the link again.':'Could not load an image from that link. Use the direct image address.'));}});
 document.addEventListener('click',e=>{if(!menu.hidden&&!menu.contains(e.target)&&!e.target.closest('[data-img]'))closeMenu();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
 fileIn.onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f||!target)return;const k=target,S=slot(k);pickImage(f,S.w,S.q,d=>put(k,d),S.alpha);};
