@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 test('dashboard keeps all main destinations',()=>{
- for(const h of ['today.html','hub.html','acc.html','eco.html','math.html','eng.html','zh.html','accounting-textbook.html','progress-backup.html','progress-restore.html','vocabloom/','classic.html'])assert.ok(html.includes('href="'+h),h);
+ for(const h of ['today.html','hub.html','acc.html','eco.html','math.html','eng.html','zh.html','accounting-textbook.html','progress-backup.html','progress-restore.html','vocabloom/'])assert.ok(html.includes('href="'+h),h);
  assert.match(html,/id="welcome-title"/);assert.match(html,/403 indexed exercises · Chapters 1–9/);
 });
 test('dashboard has Notion-style sections',()=>{
@@ -16,7 +16,7 @@ test('dashboard writes only its own key, never course progress or secrets',()=>{
  assert.doesNotMatch(html,/study-sync-key|\.removeItem|\.clear\(|method:\s*['"]PUT|method:\s*['"]POST/);
  assert.doesNotMatch(html,/<img[^>]+src="https?:/i);
 });
-test('dashboard keeps the classic home and iPad-friendly rules',()=>{
- assert.ok(fs.existsSync(path.join(root,'classic.html')));
+test('dashboard has iPad-friendly rules and no legacy home page',()=>{
+ assert.ok(!fs.existsSync(path.join(root,'classic.html')));
  assert.match(html,/min-height:4[4-8]px/);assert.match(html,/prefers-color-scheme:dark/);assert.match(html,/prefers-reduced-motion/);
 });
