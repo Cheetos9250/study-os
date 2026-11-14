@@ -24,7 +24,7 @@
     Object.keys(COURSES).flatMap(function (course) {
       var mark = COURSES[course];
       return ["study-" + course, mark + "-srs", mark + "-typ"];
-    }).concat(["vocabloom_mvp_v1", "studyos.accounting.textbook.progress.v1", "studyos.home.v1"])
+    }).concat(["vocabloom_mvp_v1", "studyos.accounting.textbook.progress.v1", "studyos.home.v1", "studyos.today.v1", "studyos.grades.v1"])
   );
   var ALLOWED = new Set(KEYS);
 
@@ -111,6 +111,8 @@
     if (key === "studyos.accounting.textbook.progress.v1") return "Accounting textbook answers";
     if (key === "vocabloom_mvp_v1") return "VocaBloom learning history";
     if (key === "studyos.home.v1") return "Home dashboard tasks and checklists";
+    if (key === "studyos.today.v1") return "Exam schedule, plan ticks and timetable";
+    if (key === "studyos.grades.v1") return "Grades and GPA";
     var names = { acc: "Accounting", eco: "Economics", math: "Mathematics", eng: "English", zh: "Chinese" };
     for (var course of Object.keys(COURSES)) {
       if (key === "study-" + course) return names[course] + " quiz answers";

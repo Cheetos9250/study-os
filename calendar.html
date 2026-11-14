@@ -110,6 +110,14 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 .btns button,.add{font:600 14px var(--mono);border-radius:8px;padding:0 16px;min-height:44px;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--text)}
 .btns .primary{background:var(--accent);border-color:var(--accent);color:#fff}.btns .danger{color:var(--red)}
 .status{font-size:13px;color:var(--muted);min-height:20px;margin:8px 0 0}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:14px}
+.wd{border:1px solid var(--line);border-radius:12px;padding:8px;min-height:90px;background:var(--bg)}
+.wd.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.wd h4{margin:0 0 6px;font:600 12px var(--mono);color:var(--muted)}
+.cl{border-radius:8px;padding:6px 7px;margin-bottom:6px;background:var(--blue-soft);font-size:12px;line-height:1.35}
+.cl b{display:block;font:600 13px var(--mono)}.cl.skip{opacity:.45;text-decoration:line-through}
+@media(max-width:700px){.week{grid-template-columns:1fr}.wd{min-height:0}.wd:not(.has){display:none}}
+
 
 </style>
 <script src="scripts/study-theme.js?v=2"></script>
@@ -122,6 +130,13 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
  <div class="cal-head"><button type="button" id="calPrev" aria-label="Previous month">‹</button><h3 id="calTitle" aria-live="polite"></h3><button type="button" id="calToday">Today</button><button type="button" id="calNext" aria-label="Next month">›</button></div>
  <div class="cal" id="cal"></div>
  <div class="dayList" id="dayList"></div>
+</section>
+<h2>Timetable</h2>
+<section class="box" aria-label="Weekly timetable">
+ <div class="week" id="week"></div>
+ <div id="ttList"></div>
+ <div class="btns" style="margin-top:12px"><button type="button" class="add" id="addClass">+ Add class</button></div>
+ <p class="status" id="ttStatus" role="status"></p>
 </section>
 <h2>Exam schedule</h2>
 <section class="box" aria-label="Exam schedule">
@@ -148,7 +163,8 @@ const isoUTC=d=>d.toISOString().slice(0,10),shortDay=iso=>{const p=parts(iso);re
 const course=k=>T.COURSES.find(c=>c.key===k);
 let now=Date.now(),today=T.dayKey(now);const tp=parts(today);let vy=tp.y,vm=tp.m,sel=today;
 function itemsOn(iso){
- return settings.exams.filter(e=>e.date===iso).map(e=>({k:'e',text:e.title}))
+ return T.classesOn(settings.timetable,iso).filter(x=>!x.skip).map(x=>({k:'c',text:x.start+'–'+x.end+' '+x.name}))
+  .concat(settings.exams.filter(e=>e.date===iso).map(e=>({k:'e',text:e.title})))
   .concat(homeTasks().filter(t=>t.date===iso).map(t=>({k:t.done?'d':'t',text:t.title+(t.done?' ✓':'')})));
 }
 function renderCal(){
@@ -156,11 +172,11 @@ function renderCal(){
  const startDow=new Date(Date.UTC(vy,vm,1)).getUTCDay(),dim=new Date(Date.UTC(vy,vm+1,0)).getUTCDate();
  let h=DOW.map(d=>'<div class="dow">'+d+'</div>').join('');
  for(let i=0;i<startDow;i++)h+='<div></div>';
- for(let d=1;d<=dim;d++){const iso=isoUTC(new Date(Date.UTC(vy,vm,d))),it=itemsOn(iso),ex=it.filter(x=>x.k==='e').length,tk=it.filter(x=>x.k!=='e').length;
+ for(let d=1;d<=dim;d++){const iso=isoUTC(new Date(Date.UTC(vy,vm,d))),it=itemsOn(iso),ex=it.filter(x=>x.k==='e').length,tk=it.filter(x=>x.k==='t'||x.k==='d').length;
   h+='<button type="button" class="day'+(iso===today?' today':'')+'" data-iso="'+iso+'" aria-pressed="'+(iso===sel)+'" aria-label="'+d+' '+MO[vm]+(ex?', '+ex+' exam':'')+(tk?', '+tk+' task':'')+'">'+d+'<span class="dots">'+(ex?'<i class="e"></i>':'')+(tk?'<i></i>':'')+'</span></button>';}
  $('#cal').innerHTML=h;
  const it=itemsOn(sel);
- $('#dayList').innerHTML='<h3>'+shortDay(sel)+(sel===today?' · Today':'')+'</h3>'+(it.length?'<ul>'+it.map(x=>'<li>'+(x.k==='e'?'📝 ':'📌 ')+esc(x.text)+'</li>').join('')+'</ul>':'<p class="empty" style="padding:4px 0">Nothing.</p>');
+ $('#dayList').innerHTML='<h3>'+shortDay(sel)+(sel===today?' · Today':'')+'</h3>'+(it.length?'<ul>'+it.map(x=>'<li>'+(x.k==='e'?'📝 ':x.k==='c'?'🏫 ':'📌 ')+esc(x.text)+'</li>').join('')+'</ul>':'<p class="empty" style="padding:4px 0">Nothing.</p>');
 }
 $('#cal').addEventListener('click',e=>{const b=e.target.closest('[data-iso]');if(!b)return;sel=b.dataset.iso;renderCal();});
 $('#calPrev').onclick=()=>{vm--;if(vm<0){vm=11;vy--;}renderCal();};
@@ -191,7 +207,36 @@ function renderExams(){
 function openExam(id){const d=[...document.querySelectorAll('details.ex')].find(x=>x.dataset.id===id);if(d)d.open=true;}
 $('#addExam').onclick=()=>{const id='exam-'+Date.now().toString(36);settings.exams.push({id,course:'acc',title:'New exam',date:T.dayKey(Date.now()+7*86400000),cats:[],confirmed:false});save();render();openExam(id);};
 $('#resetExams').onclick=()=>{if(!confirm('Reset the exam schedule to defaults? Your edits will be lost.'))return;settings.exams=T.normalizeExams(null);save();render();};
-function render(){const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id);renderCal();renderExams();open.forEach(openExam);}
+/* ---------- weekly timetable ---------- */
+const DAYNAME=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],ORDER=[1,2,3,4,5,6,0];
+const SUBJ=[{key:'',name:'—'}].concat(T.COURSES,T.LANGS);
+function renderWeek(){
+ const tt=settings.timetable,todayDow=new Date(T.dateStart(today)+7*3600000).getUTCDay();
+ $('#week').innerHTML=ORDER.map(d=>{const list=tt.filter(x=>x.day===d);
+  return '<div class="wd'+(d===todayDow?' today':'')+(list.length?' has':'')+'"><h4>'+DAYNAME[d]+'</h4>'+list.map(x=>'<div class="cl'+(x.skip?' skip':'')+'"><b>'+esc(x.name)+'</b>'+x.start+'–'+x.end+(x.code?' · '+esc(x.code):'')+'</div>').join('')+'</div>';}).join('');
+ $('#ttList').innerHTML=tt.length?tt.map(x=>'<details class="ex" data-cid="'+esc(x.id)+'"><summary><span>'+DAYNAME[x.day]+' · '+esc(x.name)+(x.skip?' <span class="warn">skip</span>':'')+'</span><span class="when">'+x.start+'–'+x.end+'</span></summary><form class="edit">'
+  +'<label>Name<input type="text" name="name" maxlength="40" value="'+esc(x.name)+'"></label>'
+  +'<label>Code<input type="text" name="code" maxlength="16" value="'+esc(x.code)+'"></label>'
+  +'<label>Day<select name="day">'+ORDER.map(d=>'<option value="'+d+'"'+(d===x.day?' selected':'')+'>'+DAYNAME[d]+'</option>').join('')+'</select></label>'
+  +'<label>Start<input type="time" name="start" value="'+x.start+'"></label><label>End<input type="time" name="end" value="'+x.end+'"></label>'
+  +'<label>Subject<select name="course">'+SUBJ.map(c=>'<option value="'+c.key+'"'+(c.key===x.course?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></label>'
+  +'<label style="flex-direction:row;display:flex;align-items:center;gap:8px"><input type="checkbox" name="skip"'+(x.skip?' checked':'')+'> Not attending</label>'
+  +'<div class="btns"><button type="submit" class="primary">Save</button><button type="button" class="danger" data-cdel>Delete</button></div></form></details>').join(''):'<p class="empty">No classes yet.</p>';
+ $('#ttList').querySelectorAll('details[data-cid]').forEach(det=>{const id=det.dataset.cid,f=det.querySelector('form');
+  f.onsubmit=ev=>{ev.preventDefault();const next=settings.timetable.map(x=>x.id!==id?x:{...x,name:f.name.value.trim()||'Class',code:f.code.value.trim(),day:+f.day.value,start:f.start.value,end:f.end.value,course:f.course.value,skip:f.skip.checked});
+   const norm=T.normalizeTimetable(next);if(norm.length!==next.length){$('#ttStatus').textContent='Check the times (start must be before end).';return;}
+   settings.timetable=norm;if(save())$('#ttStatus').textContent='Saved.';render();};
+  f.querySelector('[data-cdel]').onclick=()=>{if(!confirm('Delete this class?'))return;settings.timetable=settings.timetable.filter(x=>x.id!==id);save();render();};});
+}
+$('#addClass').onclick=()=>{const id='c'+Date.now().toString(36);settings.timetable=T.normalizeTimetable(settings.timetable.concat([{id,day:1,start:'08:00',end:'09:00',name:'New class',code:'',course:'',skip:false}]));save();render();const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;};
+/* One-time import from a link: calendar.html#timetable=<base64url JSON>. The data stays in the link fragment (never sent to the server) and is saved only in this browser. */
+(function(){const m=location.hash.match(/^#timetable=([A-Za-z0-9_-]{8,8000})$/);if(!m)return;
+ let list=null;try{const b=m[1].replace(/-/g,'+').replace(/_/g,'/');list=T.normalizeTimetable(JSON.parse(decodeURIComponent(escape(atob(b+'==='.slice((b.length+3)%4))))));}catch{}
+ history.replaceState(null,'',location.pathname+location.search);
+ if(!list||!list.length){$('#ttStatus').textContent='The timetable link could not be read.';return;}
+ if(settings.timetable.length&&!confirm('Replace your timetable with '+list.length+' classes from the link?'))return;
+ settings.timetable=list;if(save())$('#ttStatus').textContent='Imported '+list.length+' classes.';})();
+function render(){const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id||d.dataset.cid);renderCal();renderWeek();renderExams();open.forEach(id=>{openExam(id);const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;});}
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){settings=T.loadSettings(read(T.SETTINGS_KEY));render();}});
