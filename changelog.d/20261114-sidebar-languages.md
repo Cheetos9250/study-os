@@ -1,2 +1,4 @@
 - Sidebar no longer shows a gap at the top/bottom when Safari bounces on overscroll (colour extends past the viewport; uses `100lvh`).
 - English and Chinese are separate cards (home, Practice, Subjects) with their own due/new counts; Chinese card image key `zh` accepted on restore.
+- Images: one menu for cover, icon and card images (Upload / Paste image link / Remove). GIFs are detected from file bytes; warns when the iPad Photos picker sent a GIF as a still image. https image links (e.g. Giphy) keep animating; restore accepts them.
+- Fix: the title block overlapped the "Change cover" button, so taps could miss it.

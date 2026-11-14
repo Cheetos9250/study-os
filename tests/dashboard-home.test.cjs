@@ -24,7 +24,7 @@ test('main pages use English UI text',()=>{
  assert.deepEqual([...html.matchAll(/[\u0E00-\u0E7F]+/g)].map(m=>m[0]),['บัญชี','เศรษฐ','คณิต']); // only the task subject matcher
 });
 test('profile and cover images accept animated GIFs within a size cap',()=>{
- assert.match(html,/file\.type==='image\/gif'/);assert.match(html,/GIF_MAX=1\.5\*1024\*1024/);assert.match(html,/readAsDataURL/);
+ assert.match(html,/GIF_MAX=1\.5\*1024\*1024/);assert.match(html,/readAsDataURL/);
 });
 test('removed sections stay removed (no Quick Launch, no start/end checklists)',()=>{
  assert.doesNotMatch(html,/Quick Launch|START THE DAY|END THE DAY|Daily Focus/i);
@@ -46,4 +46,12 @@ test('English and Chinese are separate decks with their own card images',()=>{
 });
 test('sidebar colour extends past the viewport for Safari overscroll',()=>{
  assert.match(nav,/#studyNav::before,#studyNav::after/);assert.match(nav,/100lvh/);
+});
+test('images: GIF detected by file bytes, iPad-converted GIF warning, safe https image links',()=>{
+ assert.match(html,/head\.startsWith\('GIF8'\)/);assert.match(html,/sent this GIF as a still image/);
+ const m=html.match(/LINK=(\/\^https:[^\n;]+\/);/);assert.ok(m);const LINK=eval(m[1]);
+ assert.ok(LINK.test('https://media.giphy.com/media/abc/giphy.gif'));
+ for(const bad of ['javascript:alert(1)','http://x.com/a.gif','https://x.com/a.gif") ; color:red','https://x.com/a b.gif','https://x.com/(a).gif'])assert.ok(!LINK.test(bad),bad);
+ assert.match(html,/data-img="cover"/);assert.match(html,/data-img="avatar"/);
+ assert.match(read('scripts/study-progress-restore.js'),/\^https:/);
 });

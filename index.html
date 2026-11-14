@@ -19,10 +19,11 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans'
 h1,h2,h3,.mono{font-family:var(--mono)}
 a{color:inherit}
 .cover{position:relative;height:clamp(180px,30vw,320px);background:linear-gradient(120deg,#f6c1d6 0%,#d9b8f2 45%,#9ec5f5 100%) center/cover no-repeat}
-.cover-tools{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:10px;display:flex;gap:8px;opacity:.85}
+.cover-tools{position:absolute;z-index:2;right:max(14px,env(safe-area-inset-right));bottom:10px;display:flex;gap:8px;opacity:.9}
 .cover-tools button{font:600 12px var(--mono);min-height:36px;padding:0 12px;border-radius:8px;border:1px solid rgba(0,0,0,.12);background:rgba(255,255,255,.88);color:#333;cursor:pointer}
 .page{max-width:1040px;margin:0 auto;padding:0 max(18px,env(safe-area-inset-right)) 90px max(18px,env(safe-area-inset-left))}
 .head{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:-52px}
+.head{pointer-events:none}.head>*{pointer-events:auto}
 .avatar{width:104px;height:104px;border-radius:50%;background-color:var(--bg);display:grid;place-items:center;font-size:56px;box-shadow:0 0 0 4px var(--bg);border:0;padding:0;cursor:pointer;background-repeat:no-repeat;background-size:contain;background-position:center;flex:none}
 .avatar.img{font-size:0;border-radius:0;box-shadow:none;background-color:transparent}
 h1{font-size:clamp(30px,5vw,40px);margin:0;letter-spacing:-.5px;line-height:1.1}
@@ -83,6 +84,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 @media(max-width:820px){.top{grid-template-columns:1fr}}
 @media(max-width:520px){.row{grid-template-columns:24px minmax(0,1fr) 28px}.row .left,.row .pri{grid-column:2;justify-self:start}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+#imgMenu{position:fixed;z-index:90;width:228px;display:grid;gap:2px;padding:6px;border-radius:12px;background:var(--bg);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#imgMenu button{font:14px var(--mono);text-align:left;min-height:44px;padding:0 12px;border:0;border-radius:8px;background:none;color:var(--text);cursor:pointer}
+#imgMenu button:hover{background:var(--panel)}#imgMenu [data-act=remove]{color:var(--red)}
 .toolbar input.grow{flex:1;min-width:160px}
 .plan .acts{margin-top:6px}.plan .acts a{min-height:36px}
 .show-done{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;color:var(--muted);margin-left:auto}
@@ -92,11 +96,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 </head>
 <body>
 <div class="cover" id="cover" role="img" aria-label="Cover">
- <div class="cover-tools"><button type="button" id="coverPick">Change cover</button><button type="button" id="coverClear" hidden>Remove</button><input type="file" id="coverFile" accept="image/*" hidden></div>
+ <div class="cover-tools"><button type="button" id="coverPick" data-img="cover">Change cover</button></div>
 </div>
 <div class="page">
 <header class="head">
- <button type="button" class="avatar" id="avatar" aria-label="Change icon">🎓</button><input type="file" id="avFile" accept="image/*" hidden>
+ <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon">🎓</button>
  <div><h1 id="welcome-title">Study</h1><p class="date" id="today">Study OS</p></div>
 </header>
 <div class="chips" id="chips" aria-label="Summary"></div>
@@ -148,31 +152,51 @@ const parts=iso=>{const [y,m,d]=iso.split('-').map(Number);return {y,m:m-1,d};};
 function dowOf(iso){const p=parts(iso);return new Date(Date.UTC(p.y,p.m,p.d)).getUTCDay();}
 const shortDay=iso=>{const p=parts(iso);return p.d+' '+MO[p.m].slice(0,3);};
 const course=k=>T.COURSES.find(c=>c.key===k);
-/* ---------- images (local only; GIFs keep their animation, icon keeps transparency) ---------- */
-const GIF_MAX=1.5*1024*1024;
+/* ---------- images (local only; GIFs keep their animation, icon keeps transparency; or an https image link) ---------- */
+const GIF_MAX=1.5*1024*1024,LINK=/^https:\/\/[^\s"'()\\<>]{4,1990}$/;
+const cssUrl=d=>'url("'+d+'")';
 function pickImage(file,maxW,q,cb,alpha){
- if(file.type==='image/gif'){
-  if(file.size>GIF_MAX){alert('GIF is too large ('+(file.size/1048576).toFixed(1)+' MB). Max 1.5 MB.');return;}
-  const r=new FileReader();r.onload=()=>cb(String(r.result));r.onerror=()=>alert('Could not open image.');r.readAsDataURL(file);return;
- }
- const img=new Image(),u=URL.createObjectURL(file);
- img.onload=()=>{const w=Math.min(maxW,img.width),h=Math.round(img.height*w/img.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);cb(alpha&&file.type!=='image/jpeg'?c.toDataURL('image/png'):c.toDataURL('image/jpeg',q));};
- img.onerror=()=>{URL.revokeObjectURL(u);alert('Could not open image.');};img.src=u;}
+ file.slice(0,6).arrayBuffer().then(buf=>{
+  const head=String.fromCharCode(...new Uint8Array(buf));
+  if(head.startsWith('GIF8')){
+   if(file.size>GIF_MAX){alert('GIF is too large ('+(file.size/1048576).toFixed(1)+' MB). Max 1.5 MB, or use "Paste image link".');return;}
+   const r=new FileReader();r.onload=()=>cb('data:image/gif;base64,'+String(r.result).split(',')[1]);r.onerror=()=>alert('Could not open image.');r.readAsDataURL(file);return;
+  }
+  const converted=/\.gif$/i.test(file.name||'');
+  const img=new Image(),u=URL.createObjectURL(file);
+  img.onload=()=>{const w=Math.min(maxW,img.width),h=Math.round(img.height*w/img.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);cb(alpha&&file.type!=='image/jpeg'?c.toDataURL('image/png'):c.toDataURL('image/jpeg',q));
+   if(converted)alert('The iPad sent this GIF as a still image, so it will not move. Use "Paste image link" (for example a Giphy or Tenor link), or pick the file from the Files app instead of Photos.');};
+  img.onerror=()=>{URL.revokeObjectURL(u);alert('Could not open image.');};img.src=u;
+ }).catch(()=>alert('Could not open image.'));
+}
 const cover=$('#cover'),avatar=$('#avatar');
 function paintImages(){
- if(st.cover){cover.style.backgroundImage='url('+st.cover+')';$('#coverClear').hidden=false;}else{cover.style.backgroundImage='';$('#coverClear').hidden=true;}
- if(st.avatar){avatar.style.backgroundImage='url('+st.avatar+')';avatar.classList.add('img');}else{avatar.style.backgroundImage='';avatar.classList.remove('img');}
- document.querySelectorAll('[data-cv]').forEach(el=>{const d=st.covers[el.dataset.cv];if(d){el.style.backgroundImage='url('+d+')';el.classList.add('has');}else{el.style.backgroundImage='';el.classList.remove('has');}});
+ cover.style.backgroundImage=st.cover?cssUrl(st.cover):'';
+ if(st.avatar){avatar.style.backgroundImage=cssUrl(st.avatar);avatar.classList.add('img');}else{avatar.style.backgroundImage='';avatar.classList.remove('img');}
+ document.querySelectorAll('[data-cv]').forEach(el=>{const d=st.covers[el.dataset.cv];if(d){el.style.backgroundImage=cssUrl(d);el.classList.add('has');}else{el.style.backgroundImage='';el.classList.remove('has');}});
 }
-$('#coverPick').onclick=()=>$('#coverFile').click();
-$('#coverClear').onclick=()=>{delete st.cover;save();paintImages();};
-$('#coverFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;pickImage(f,1400,.8,d=>{const p=st.cover;st.cover=d;if(!save())st.cover=p;paintImages();});};
-avatar.onclick=()=>{if(st.avatar&&confirm('Remove icon? (Cancel to pick a new one)')){delete st.avatar;save();paintImages();return;}$('#avFile').click();};
-$('#avFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;pickImage(f,256,.85,d=>{const p=st.avatar;st.avatar=d;if(!save())st.avatar=p;paintImages();},true);};
-let picKey=null;
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-pic]');if(!b)return;picKey=b.dataset.pic;if(st.covers[picKey]&&confirm('Remove this image? (Cancel to pick a new one)')){delete st.covers[picKey];save();paintImages();return;}$('#picFile').click();});
-const pf=document.createElement('input');pf.type='file';pf.accept='image/*';pf.hidden=true;pf.id='picFile';document.body.appendChild(pf);
-pf.onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f||!picKey)return;const k=picKey;pickImage(f,640,.78,d=>{const p=st.covers[k];st.covers[k]=d;if(!save()){if(p)st.covers[k]=p;else delete st.covers[k];}paintImages();});};
+/* one small menu for cover, icon and card images */
+const SLOTS={cover:{w:1400,q:.8,get:()=>st.cover,set:v=>{if(v)st.cover=v;else delete st.cover;}},
+ avatar:{w:256,q:.85,alpha:true,get:()=>st.avatar,set:v=>{if(v)st.avatar=v;else delete st.avatar;}}};
+const slot=k=>SLOTS[k]||{w:640,q:.78,get:()=>st.covers[k],set:v=>{if(v)st.covers[k]=v;else delete st.covers[k];}};
+const fileIn=document.createElement('input');fileIn.type='file';fileIn.accept='image/*';fileIn.hidden=true;fileIn.id='imgFile';document.body.appendChild(fileIn);
+const menu=document.createElement('div');menu.id='imgMenu';menu.hidden=true;menu.setAttribute('role','dialog');menu.setAttribute('aria-label','Image');
+menu.innerHTML='<button type="button" data-act="upload">Upload image</button><button type="button" data-act="link">Paste image link (GIF)</button><button type="button" data-act="remove">Remove</button><button type="button" data-act="cancel">Cancel</button>';
+document.body.appendChild(menu);let target=null;
+function put(k,v){const S=slot(k),prev=S.get();S.set(v);if(!save())S.set(prev);paintImages();}
+function openMenu(k,anchor){target=k;menu.querySelector('[data-act="remove"]').hidden=!slot(k).get();menu.hidden=false;
+ const r=anchor.getBoundingClientRect();menu.style.left=Math.max(8,Math.min(innerWidth-236,r.left))+'px';menu.style.top=Math.min(innerHeight-200,r.bottom+6)+'px';menu.querySelector('button').focus();}
+function closeMenu(){menu.hidden=true;}
+menu.addEventListener('click',e=>{const a=e.target.dataset&&e.target.dataset.act;if(!a)return;const k=target;closeMenu();
+ if(a==='upload')fileIn.click();
+ else if(a==='remove')put(k,null);
+ else if(a==='link'){const v=(prompt('Paste an image link (https://… .gif, .png, .jpg). Giphy/Tenor: use "Copy image address" / the direct .gif link.')||'').trim();if(!v)return;
+  if(!LINK.test(v)){alert('That link cannot be used. It must start with https:// and contain no spaces or quotes.');return;}
+  const t=new Image();t.onload=()=>put(k,v);t.onerror=()=>alert('Could not load an image from that link. Use the direct image address.');t.src=v;}});
+document.addEventListener('click',e=>{if(!menu.hidden&&!menu.contains(e.target)&&!e.target.closest('[data-img]'))closeMenu();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
+fileIn.onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f||!target)return;const k=target,S=slot(k);pickImage(f,S.w,S.q,d=>put(k,d),S.alpha);};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-img]');if(!b)return;e.stopPropagation();openMenu(b.dataset.img,b);});
 /* ---------- pomodoro ---------- */
 let mins=25,left=25*60,endAt=0,tick=null;
 const clock=$('#clock'),fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
@@ -236,10 +260,10 @@ function renderSubjects(){
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key],ne=upcoming().find(e=>e.course===c.key);
   const emoji={acc:'📒',eco:'📈',math:'🧮'}[c.key],pct=s&&s.total?Math.round(s.seen/s.total*100):0;
-  return '<article class="subj s-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-pic="'+c.key+'" aria-label="Change '+esc(c.name)+' image">🖼</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam in '+(ne.d===0?'today':ne.d+' days'):'&nbsp;')+'</p>'
+  return '<article class="subj s-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">🖼</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam in '+(ne.d===0?'today':ne.d+' days'):'&nbsp;')+'</p>'
    +(s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
    +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a><a href="hub.html#'+c.key+'">Chapters</a></div></div></article>';});
- const lang=(l,cv,emoji,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-pic="'+cv+'" aria-label="Change '+l.name+' image">🖼</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary</p>'
+ const lang=(l,cv,emoji,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">🖼</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary</p>'
   +(ls?'<div class="st"><div><b>'+ls.reviewNow+'</b>due</div><div><b>'+ls.newToday+'</b>new</div></div>':'')+'<div class="acts">'+acts+'</div></div></article>';};
  cards.push(lang(T.LANGS[0],'voc','🇬🇧','<a class="main" href="eng.html">Cards</a><a href="vocabloom/">VocaBloom</a>'));
  cards.push(lang(T.LANGS[1],'zh','🇨🇳','<a class="main" href="zh.html">Cards</a>'));
