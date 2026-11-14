@@ -186,11 +186,11 @@ function renderExams(){
  const list=[...settings.exams].sort((a,b)=>a.date.localeCompare(b.date));
  $('#examList').innerHTML=list.length?list.map(e=>{
   const D=data[e.course],d=T.daysUntil(e.date,Date.now());
-  const cats=D?D.cats.map(([id,label])=>'<label><input type="checkbox" name="cat" value="'+esc(id)+'"'+(e.cats.includes(id)?' checked':'')+'> '+esc(label)+'</label>').join(''):'<span class="empty">Loading chapters…</span>';
+  const cats=D?D.cats.map(([id,label])=>'<label><input type="checkbox" name="cat" value="'+esc(id)+'"'+(e.cats.includes(id)?' checked':'')+'> '+esc(label)+'</label>').join(''):'<span class="empty">'+(T.COURSES.some(x=>x.key===e.course)?'Loading chapters…':'No chapters for this subject')+'</span>';
   return '<details class="ex" data-id="'+esc(e.id)+'"><summary><span>'+esc(e.title)+(e.confirmed?'':'<span class="warn">scope?</span>')+'</span><span class="when">'+shortDay(e.date)+(d>=0?' · '+d+'d':' · past')+'</span></summary><form class="edit">'
    +'<label>Name<input type="text" name="title" maxlength="80" value="'+esc(e.title)+'"></label>'
    +'<label>Date<input type="date" name="date" value="'+esc(e.date)+'"></label>'
-   +'<label>Subject<select name="course">'+T.COURSES.map(x=>'<option value="'+x.key+'"'+(x.key===e.course?' selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select></label>'
+   +'<label>Subject<select name="course">'+T.COURSES.concat(T.LANGS,[{key:'other',name:'Other (no cards)'}]).map(x=>'<option value="'+x.key+'"'+(x.key===e.course?' selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select></label>'
    +'<div><div class="empty" style="padding:0 0 4px">Chapters</div><div class="cchips">'+cats+'</div></div>'
    +'<div class="btns"><button type="submit" class="primary">Save</button><button type="button" class="danger" data-del>Delete</button></div></form></details>';
  }).join(''):'<p class="empty">No exams.</p>';

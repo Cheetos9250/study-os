@@ -41,3 +41,10 @@ test('inline scripts on the main pages parse',()=>{
   for(const m of read(f).matchAll(/<script>([\s\S]*?)<\/script>/g))assert.doesNotThrow(()=>new Function(m[1]),f);
  }
 });
+test('exams and deadlines may belong to languages or other subjects',()=>{
+ const T=require('../scripts/study-today.js');
+ const s=T.loadSettings(JSON.stringify({exams:[{id:'p',course:'eng',title:'EC1 presentation',date:'2026-11-18',cats:[]},{id:'x',course:'other',title:'Excel project',date:'2026-11-20',cats:[]},{id:'bad',course:'zz',date:'2026-11-20'}]}));
+ assert.deepEqual(s.exams.map(e=>e.id),['p','x']);
+ const plan=T.buildPlan(s.exams,{},s,Date.parse('2026-11-16T03:00:00Z'));assert.equal(plan.upcoming.length,2);
+ assert.match(read('calendar.html'),/name:'Other \(no cards\)'/);
+});
