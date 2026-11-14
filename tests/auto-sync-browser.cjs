@@ -35,11 +35,11 @@ srv.listen(0,async()=>{
  ok(hits.length===0,'auto off by default: no progress-worker calls ('+hits.length+')');
  ok(await A.page.locator('.cloud-sync-bar button').nth(1).isHidden(),'auto toggle hidden before a key is set');
  // set key (manual flow) then enable auto
- await A.page.locator('.cloud-sync-bar button').first().click();await A.page.waitForFunction(()=>/ซิงก์แล้ว/.test(document.querySelector('.cloud-sync-bar [role=status]').textContent));
+ await A.page.locator('.cloud-sync-bar button').first().click();await A.page.waitForFunction(()=>/Synced/.test(document.querySelector('.cloud-sync-bar [role=status]').textContent));
  ok(hits.length>=2,'manual sync still works (GET+PUT)');
  const autoBtn=A.page.locator('.cloud-sync-bar button').nth(1);
- ok(await autoBtn.isVisible()&&/ปิด/.test(await autoBtn.innerText()),'auto toggle visible, shows off');
- await autoBtn.click();ok(/เปิด/.test(await autoBtn.innerText()),'auto enabled');
+ ok(await autoBtn.isVisible()&&/: off/.test(await autoBtn.innerText()),'auto toggle visible, shows off');
+ await autoBtn.click();ok(/: on/.test(await autoBtn.innerText()),'auto enabled');
  // answer a question on device A, advance clock past the debounce
  await A.page.locator('.opt').first().click();
  const a1=await ans(A.page);const k1=Object.keys(a1)[0];ok(k1!==undefined,'device A answered '+k1);
@@ -48,7 +48,7 @@ srv.listen(0,async()=>{
  ok(hits.length>before&&store&&store.study&&store.study.ans&&store.study.ans[k1]!==undefined,'A auto-pushed the answer to the Worker');
  // device B: fresh browser, same key, auto on, loads page -> pulls
  let B=await device();await B.page.goto(base+'/acc.html?tab=prac&sync=1');
- await B.page.locator('.cloud-sync-bar button').first().click();await B.page.waitForFunction(()=>/ซิงก์แล้ว/.test(document.querySelector('.cloud-sync-bar [role=status]').textContent));
+ await B.page.locator('.cloud-sync-bar button').first().click();await B.page.waitForFunction(()=>/Synced/.test(document.querySelector('.cloud-sync-bar [role=status]').textContent));
  let b1=await ans(B.page);ok(b1[k1]!==undefined,'B received A\'s answer via sync');
  await B.page.locator('.cloud-sync-bar button').nth(1).click();
  // concurrent edits: A and B answer different questions
@@ -67,13 +67,13 @@ srv.listen(0,async()=>{
  const C=await device();await C.page.goto(base+'/acc.html?tab=prac&sync=1');
  C.page.removeAllListeners('dialog');C.page.on('dialog',d=>d.accept(d.type()==='prompt'?'wrong-key':undefined));
  const rv=rev;await C.page.locator('.cloud-sync-bar button').first().click();await C.page.waitForTimeout(600);
- ok(/ไม่ถูกต้อง/.test(await msg(C.page))&&rev===rv,'wrong key rejected, Worker data untouched');
+ ok(/Wrong sync key|Invalid/.test(await msg(C.page))&&rev===rv,'wrong key rejected, Worker data untouched');
  // worker without ETag: auto refuses, local data unchanged
  noEtag=true;const D=await device();await D.page.goto(base+'/acc.html?tab=prac&sync=1');
  await D.page.locator('.cloud-sync-bar button').first().click();await D.page.waitForTimeout(800);
  const autoD=D.page.locator('.cloud-sync-bar button').nth(1);
  if(await autoD.isVisible()){await autoD.click();await D.page.evaluate(()=>{const st=JSON.parse(localStorage.getItem('study-acc')||'{}').ans||{};const q=QS.find(x=>st[x.id]===undefined);qcats.clear();buildDeck();qpos=deck.findIndex(z=>z.id===q.id);renderQ();});await D.page.locator('.opt').first().click();const before2=rev;await D.page.clock.runFor(21000);await D.page.waitForTimeout(600);
-  ok(/ETag|ไม่ซิงก์อัตโนมัติ/.test(await msg(D.page)),'auto refuses Worker without ETag: '+await msg(D.page));
+  ok(/ETag|auto sync is off/.test(await msg(D.page)),'auto refuses Worker without ETag: '+await msg(D.page));
   ok(Object.keys(await ans(D.page)).length>=1,'local answers kept');ok(rev===before2,'no unsafe write');}
  else ok(true,'auto toggle hidden when manual sync could not complete');
  ok(errs.length===0,'no page errors '+errs.join('|'));

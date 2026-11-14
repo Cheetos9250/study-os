@@ -1,0 +1,1 @@
+- English UI: course-page sync/Notion messages and buttons, WordNest toasts and flashcard screens. Remaining Thai: WordNest Settings → cloud sync panel (unified-progress.js) and admin/staging tools.
