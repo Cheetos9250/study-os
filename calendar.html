@@ -135,7 +135,7 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 <section class="box" aria-label="Weekly timetable">
  <div class="week" id="week"></div>
  <div id="ttList"></div>
- <div class="btns" style="margin-top:12px"><button type="button" class="add" id="addClass">+ Add class</button></div>
+ <div class="btns" style="margin-top:12px"><button type="button" class="add" id="addClass">+ Add class</button><button type="button" class="add" id="pasteClass">Import from link</button></div>
  <p class="status" id="ttStatus" role="status"></p>
 </section>
 <h2>Exam schedule</h2>
@@ -229,13 +229,15 @@ function renderWeek(){
   f.querySelector('[data-cdel]').onclick=()=>{if(!confirm('Delete this class?'))return;settings.timetable=settings.timetable.filter(x=>x.id!==id);save();render();};});
 }
 $('#addClass').onclick=()=>{const id='c'+Date.now().toString(36);settings.timetable=T.normalizeTimetable(settings.timetable.concat([{id,day:1,start:'08:00',end:'09:00',name:'New class',code:'',course:'',skip:false}]));save();render();const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;};
-/* One-time import from a link: calendar.html#timetable=<base64url JSON>. The data stays in the link fragment (never sent to the server) and is saved only in this browser. */
-(function(){const m=location.hash.match(/^#timetable=([A-Za-z0-9_-]{8,8000})$/);if(!m)return;
+/* One-time import from a link: calendar.html#timetable=<base64url JSON>. The data stays in the link fragment (never sent to the server) and is saved only in this browser.
+   Home-screen apps on iPad keep separate storage from Safari, so the same link can also be pasted with "Import from link". */
+function importTimetable(text){const m=String(text||'').trim().match(/#timetable=([A-Za-z0-9_-]{8,8000})\s*$/);if(!m)return false;
  let list=null;try{const b=m[1].replace(/-/g,'+').replace(/_/g,'/');list=T.normalizeTimetable(JSON.parse(decodeURIComponent(escape(atob(b+'==='.slice((b.length+3)%4))))));}catch{}
- history.replaceState(null,'',location.pathname+location.search);
- if(!list||!list.length){$('#ttStatus').textContent='The timetable link could not be read.';return;}
- if(settings.timetable.length&&!confirm('Replace your timetable with '+list.length+' classes from the link?'))return;
- settings.timetable=list;if(save())$('#ttStatus').textContent='Imported '+list.length+' classes.';})();
+ if(!list||!list.length){$('#ttStatus').textContent='The timetable link could not be read.';return true;}
+ if(settings.timetable.length&&!confirm('Replace your timetable with '+list.length+' classes from the link?'))return true;
+ settings.timetable=list;if(save())$('#ttStatus').textContent='Imported '+list.length+' classes.';return true;}
+if(/^#timetable=/.test(location.hash)){importTimetable(location.hash);history.replaceState(null,'',location.pathname+location.search);}
+$('#pasteClass').onclick=()=>{const v=prompt('Paste the timetable link');if(v===null)return;if(!importTimetable(v))$('#ttStatus').textContent='That is not a timetable link.';render();};
 function render(){const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id||d.dataset.cid);renderCal();renderWeek();renderExams();open.forEach(id=>{openExam(id);const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;});}
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);

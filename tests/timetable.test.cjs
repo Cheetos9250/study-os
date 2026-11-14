@@ -15,7 +15,7 @@ test('timetable and exams are included in backups and validated on restore',()=>
  assert.match(read('progress-restore.html'),/Exam schedule, plan ticks and timetable/);
 });
 test('calendar imports a timetable only from the link fragment and clears it',()=>{
- const cal=read('calendar.html');assert.match(cal,/location\.hash\.match\(\/\^#timetable=/);assert.match(cal,/history\.replaceState/);
+ const cal=read('calendar.html');assert.match(cal,/\/\^#timetable=\/\.test\(location\.hash\)/);assert.match(cal,/history\.replaceState/);assert.match(cal,/id="pasteClass"/);
  assert.deepEqual([...cal.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]),['T.SETTINGS_KEY']);
  assert.match(read('index.html'),/id="classes"/);
 });
@@ -33,6 +33,11 @@ test('grades are backed up, validated on restore, and reachable from the sidebar
  assert.match(read('scripts/study-progress-restore.js'),/key === "studyos\.grades\.v1"/);
  assert.match(read('scripts/study-nav.js'),/href:'grades\.html',label:'Grades'/);
  const g=read('grades.html');assert.deepEqual([...g.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]),['KEY']);
- assert.match(g,/location\.hash\.match\(\/\^#grades=/);assert.doesNotMatch(read('scripts/study-grades.js'),/localStorage|fetch\(/);
+ assert.match(g,/\/\^#grades=\/\.test\(location\.hash\)/);assert.match(g,/id="pasteGrades"/);assert.doesNotMatch(read('scripts/study-grades.js'),/localStorage|fetch\(/);
  const T=require('../scripts/study-today.js');assert.deepEqual(T.DEFAULT_EXAMS.find(e=>e.id==='acc-final-20261126').cats,['c5','c6','c7','c8','c9']);
+});
+test('inline scripts on the main pages parse',()=>{
+ for(const f of ['index.html','calendar.html','grades.html','practice.html','flashcards.html','hub.html']){
+  for(const m of read(f).matchAll(/<script>([\s\S]*?)<\/script>/g))assert.doesNotThrow(()=>new Function(m[1]),f);
+ }
 });

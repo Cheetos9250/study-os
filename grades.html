@@ -147,7 +147,7 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 <div class="gpa" id="gpa"></div>
 <main>
 <div id="courses"></div>
-<div class="btns"><button type="button" class="add" id="addCourse">+ Add course</button></div>
+<div class="btns"><button type="button" class="add" id="addCourse">+ Add course</button><button type="button" class="add" id="pasteGrades">Import from link</button></div>
 <p class="status" id="gStatus" role="status"></p>
 </main>
 </div>
@@ -194,12 +194,14 @@ document.addEventListener('click',e=>{const t=e.target;
  else if(t.matches('[data-edit]')){const c=course(t);const n=prompt('Course name',c.name);if(n===null)return;const cr=G.num(prompt('Credits',c.credits));c.name=n.trim().slice(0,60)||c.name;if(cr!=null&&cr>0&&cr<=12)c.credits=cr;save();render();}});
 $('#addCourse').onclick=()=>{const n=prompt('Course name');if(!n)return;const cr=G.num(prompt('Credits','3'));st.courses.push({id:'g'+Date.now().toString(36),name:n.trim().slice(0,60),credits:cr>0&&cr<=12?cr:3,items:[],scale:G.DEFAULT_SCALE});save();render();};
 /* One-time import from a link: grades.html#grades=<base64url JSON>. The fragment never reaches the server. */
-(function(){const m=location.hash.match(/^#grades=([A-Za-z0-9_-]{8,12000})$/);if(!m)return;let inc=null;
+/* Same link can be pasted with "Import from link" (home-screen apps keep separate storage from Safari). */
+function importGrades(text){const m=String(text||'').trim().match(/#grades=([A-Za-z0-9_-]{8,12000})\s*$/);if(!m)return false;let inc=null;
  try{const b=m[1].replace(/-/g,'+').replace(/_/g,'/');inc=G.load(decodeURIComponent(escape(atob(b+'==='.slice((b.length+3)%4)))));}catch{}
- history.replaceState(null,'',location.pathname+location.search);
- if(!inc||!inc.courses.length){$('#gStatus').textContent='The grades link could not be read.';return;}
+ if(!inc||!inc.courses.length){$('#gStatus').textContent='The grades link could not be read.';return true;}
  for(const c of inc.courses){const old=st.courses.find(x=>x.id===c.id);if(old){if(!confirm('Replace '+old.name+' with the version from the link?'))continue;st.courses[st.courses.indexOf(old)]=c;}else st.courses.push(c);}
- if(save())$('#gStatus').textContent='Imported '+inc.courses.length+' course(s).';})();
+ if(save())$('#gStatus').textContent='Imported '+inc.courses.length+' course(s).';return true;}
+if(/^#grades=/.test(location.hash)){importGrades(location.hash);history.replaceState(null,'',location.pathname+location.search);}
+$('#pasteGrades').onclick=()=>{const v=prompt('Paste the grades link');if(v===null)return;if(!importGrades(v))$('#gStatus').textContent='That is not a grades link.';render();};
 render();
 })();
 </script>

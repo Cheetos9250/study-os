@@ -1,0 +1,1 @@
+- Calendar → Timetable and Grades get an "Import from link" button: paste the link inside the home-screen app, whose storage is separate from Safari.
