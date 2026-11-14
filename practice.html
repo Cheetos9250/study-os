@@ -9,13 +9,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Practice — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
-:root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--panel:#f9f8f6;--accent:#2383e2;--red:#d6453d;--orange:#d9730d;--green:#2f8f5b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--blue-soft:#e4f0fb;--mono:'IBM Plex Mono','IBM Plex Sans Thai',ui-monospace,Menlo,Consolas,monospace}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
+:root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--panel:#f9f8f6;--accent:#2383e2;--red:#d6453d;--orange:#d9730d;--green:#2f8f5b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--blue-soft:#e4f0fb;--mono:'Outfit','DM Sans','IBM Plex Sans Thai',system-ui,sans-serif}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans','IBM Plex Sans Thai',system-ui,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
 h1,h2,h3,.mono{font-family:var(--mono)}
 a{color:inherit}
 .cover{position:relative;height:clamp(96px,16vw,150px);background:linear-gradient(120deg,#f6c1d6 0%,#d9b8f2 45%,#9ec5f5 100%) center/cover no-repeat}
@@ -116,7 +116,6 @@ h1{margin:8px 0 0}
 <h2>More practice</h2>
 <section class="grid" aria-label="More practice">
  <div class="pc"><h3>📚 Accounting Textbook Exercises</h3><p class="small">403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</p><div class="acts"><a class="main" href="accounting-textbook.html">Open</a></div></div>
- <div class="pc"><h3>🌸 Languages</h3><div class="acts"><a class="main" href="vocabloom/">VocaBloom</a><a href="eng.html">English</a><a href="zh.html">Chinese</a></div></div>
 </section>
 </main>
 </div>
@@ -130,13 +129,16 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function read(k){try{return localStorage.getItem(k);}catch{return null;}}
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');
 const EMOJI={acc:'📒',eco:'📈',math:'🧮'};
-let data={},failed=[];
+let data={},langData={},failed=[];const FLAG={eng:'🇬🇧',zh:'🇨🇳'};
 function render(){
  const now=Date.now(),sum={};
  for(const c of T.COURSES)if(data[c.key])sum[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);
  $('#courses').innerHTML=T.COURSES.map(c=>{const s=sum[c.key];
   return '<div class="pc"><h3>'+EMOJI[c.key]+' '+esc(c.name)+'</h3>'+(s?'<div class="big'+(s.reviewNow?' due':'')+'">'+s.reviewNow+'<small>due</small> <span style="color:var(--text)">'+s.newToday+'</span><small>new</small></div>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
-   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Quiz</a></div></div>';}).join('');
+   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Quiz</a></div></div>';}).join('')
+  +T.LANGS.map(l=>{const s=langData[l.key]?T.summarize(langData[l.key],read(l.mark+'-srs'),null,now):null;
+   return '<div class="pc"><h3>'+FLAG[l.key]+' '+esc(l.name)+'</h3>'+(s?'<div class="big'+(s.reviewNow?' due':'')+'">'+s.reviewNow+'<small>due</small> <span style="color:var(--text)">'+s.newToday+'</span><small>new</small></div>':'<p class="empty" style="padding:0">Loading…</p>')
+    +'<div class="acts"><a class="main" href="'+l.page+'">Cards</a>'+(l.key==='eng'?'<a href="vocabloom/">VocaBloom</a>':'')+'</div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;
  $('#weak').innerHTML=weak.length?'<ul class="weak">'+weak.map(w=>{const c=T.COURSES.find(x=>x.key===w.course),D=data[w.course],cat=[w.cat];
@@ -145,6 +147,7 @@ function render(){
 }
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);
+Promise.all(T.LANGS.map(l=>fetch(l.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
 })();
 </script>

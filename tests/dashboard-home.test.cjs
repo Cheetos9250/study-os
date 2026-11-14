@@ -6,7 +6,9 @@ test('four-tab navigation reaches every main destination',()=>{
  for(const h of ['index.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html'])assert.match(nav,new RegExp("href:'"+h.replace('.','\\.')+"'"),h);
  for(const f of ['index.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html','accounting-textbook.html','acc.html','eco.html','math.html','eng.html','zh.html'])assert.match(read(f),/scripts\/study-nav\.js/,f);
  const practice=read('practice.html');
- for(const h of ['accounting-textbook.html','vocabloom/','eng.html','zh.html'])assert.ok(practice.includes('href="'+h),h);
+ for(const h of ['accounting-textbook.html','vocabloom/'])assert.ok(practice.includes('href="'+h),h);
+ assert.match(practice,/T\.LANGS\.map/);
+ for(const h of ['eng.html','zh.html'])assert.ok(html.includes('href="'+h),'home '+h);
  assert.match(html,/id="welcome-title"/);
  assert.match(read('today.html'),/url=calendar\.html/);
  assert.doesNotMatch(nav,/localStorage|sessionStorage|fetch\(/);
@@ -22,7 +24,7 @@ test('main pages use English UI text',()=>{
  assert.deepEqual([...html.matchAll(/[\u0E00-\u0E7F]+/g)].map(m=>m[0]),['บัญชี','เศรษฐ','คณิต']); // only the task subject matcher
 });
 test('profile and cover images accept animated GIFs within a size cap',()=>{
- assert.match(html,/file\.type==='image\/gif'/);assert.match(html,/GIF_MAX=1\.5\*1024\*1024/);assert.match(html,/readAsDataURL/);
+ assert.match(html,/GIF_MAX=1\.5\*1024\*1024/);assert.match(html,/readAsDataURL/);
 });
 test('removed sections stay removed (no Quick Launch, no start/end checklists)',()=>{
  assert.doesNotMatch(html,/Quick Launch|START THE DAY|END THE DAY|Daily Focus/i);
@@ -36,4 +38,20 @@ test('home writes only its own key and the shared Today settings key',()=>{
 });
 test('home has iPad-friendly rules',()=>{
  assert.match(html,/min-height:4[4-8]px/);assert.match(html,/prefers-color-scheme:dark/);assert.match(html,/prefers-reduced-motion/);
+});
+test('English and Chinese are separate decks with their own card images',()=>{
+ const T=require('../scripts/study-today.js');assert.deepEqual(T.LANGS.map(l=>l.page),['eng.html','zh.html']);
+ assert.match(html,/'voc','🇬🇧'/);assert.match(html,/'zh','🇨🇳'/);
+ assert.match(read('scripts/study-progress-restore.js'),/"voc", "zh"/);
+});
+test('sidebar colour extends past the viewport for Safari overscroll',()=>{
+ assert.match(nav,/#studyNav::before,#studyNav::after/);assert.match(nav,/100lvh/);
+});
+test('images: GIF detected by file bytes, iPad-converted GIF warning, safe https image links',()=>{
+ assert.match(html,/head\.startsWith\('GIF8'\)/);assert.match(html,/sent this GIF as a still image/);
+ const m=html.match(/LINK=(\/\^https:[^\n;]+\/);/);assert.ok(m);const LINK=eval(m[1]);
+ assert.ok(LINK.test('https://media.giphy.com/media/abc/giphy.gif'));
+ for(const bad of ['javascript:alert(1)','http://x.com/a.gif','https://x.com/a.gif") ; color:red','https://x.com/a b.gif','https://x.com/(a).gif'])assert.ok(!LINK.test(bad),bad);
+ assert.match(html,/data-img="cover"/);assert.match(html,/data-img="avatar"/);
+ assert.match(read('scripts/study-progress-restore.js'),/\^https:/);
 });

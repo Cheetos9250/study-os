@@ -52,13 +52,13 @@
           throw new Error("Invalid home dashboard task");
       }
       if (value.focus !== undefined && !object(value.focus)) throw new Error("Invalid home dashboard checklist");
-      var jpeg = /^data:image\/(jpeg|gif|png);base64,[A-Za-z0-9+\/=]+$/;
+      var jpeg = { test: function (v) { return /^data:image\/(jpeg|gif|png);base64,[A-Za-z0-9+\/=]+$/.test(v) || /^https:\/\/[^\s"'()\\<>]{4,1990}$/.test(v); } };
       if (value.avatar !== undefined && (typeof value.avatar !== "string" || !jpeg.test(value.avatar)))
         throw new Error("Invalid home dashboard avatar");
       if (value.covers !== undefined) {
         if (!object(value.covers)) throw new Error("Invalid home dashboard card images");
         for (var ck of Object.keys(value.covers))
-          if (!["acc", "eco", "math", "voc"].includes(ck) || typeof value.covers[ck] !== "string" || !jpeg.test(value.covers[ck]))
+          if (!["acc", "eco", "math", "voc", "zh"].includes(ck) || typeof value.covers[ck] !== "string" || !jpeg.test(value.covers[ck]))
             throw new Error("Invalid home dashboard card images");
       }
       if (value.cover !== undefined && (typeof value.cover !== "string" || !jpeg.test(value.cover)))

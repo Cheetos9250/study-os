@@ -8,6 +8,11 @@
  'use strict';
  const DAY=86400000,TZ=7*3600000;
  const SETTINGS_KEY='studyos.today.v1';
+ // Vocabulary decks (no exams or chapters plan); used for due counts only.
+ const LANGS=Object.freeze([
+  {key:'eng',page:'eng.html',mark:'eng-vocab-v1',name:'English'},
+  {key:'zh',page:'zh.html',mark:'zh-vocab-v1',name:'Chinese'}
+ ]);
  const COURSES=Object.freeze([
   {key:'acc',page:'acc.html',mark:'acc-flashcards-v1',name:'Accounting',full:'ACC'},
   {key:'eco',page:'eco.html',mark:'econ-flashcards-v1',name:'Economics',full:'ECO'},
@@ -102,5 +107,5 @@
   else{const t={...(next.tasks[dayKey(now)]||{})};if(doneFlag)t[task.id]=true;else delete t[task.id];next.tasks={[dayKey(now)]:t};}
   return next;
  }
- return {SETTINGS_KEY,COURSES,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,buildPlan,weakSpots,markChapter};
+ return {SETTINGS_KEY,COURSES,LANGS,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,buildPlan,weakSpots,markChapter};
 });
