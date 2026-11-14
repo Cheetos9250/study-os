@@ -31,9 +31,9 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
           await page.goto(base+'/');
           for(const course of ['acc','eco','math','eng','zh']){
-            const link=page.locator(`a[href="${course}.html"]`).first();
+            const link=page.locator(`a[href="${course}.html"], a[href^="${course}.html?tab=cards"]`).first();
             console.log('Course journey:',engine,width,course);
-            await Promise.all([page.waitForURL(base+'/'+course+'.html',{waitUntil:'domcontentloaded'}),link.click()]);
+            await Promise.all([page.waitForURL(u=>u.pathname.endsWith("/"+course+".html"),{waitUntil:'domcontentloaded'}),link.click()]);
             await page.waitForLoadState('domcontentloaded');
             try{await page.locator('.front-t').waitFor();}catch(error){console.error({engine,width,course,url:page.url(),errors,body:await page.locator('body').innerText()});await page.screenshot({path:path.join(output,'failure-'+engine+'-'+width+'-'+course+'.png'),fullPage:true});throw error;}
             await page.locator('.card').click();
