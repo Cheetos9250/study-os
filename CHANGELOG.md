@@ -18,3 +18,6 @@
 
 ## 2026-11-14 (stop Notion auto-sync)
 - Removed `.github/workflows/sync.yml` (15-minute Notion exporter that pushed to `main`). `data/cards.json` is kept because VocaBloom still fetches it; it is now a frozen snapshot, so new Notion rows no longer appear. `scripts/sync_notion.py`, `data/quiz.json` and their tests are kept until the English cards move into VocaBloom. Re-enable by restoring the workflow from git history.
+
+## 2026-11-14 (practice: multi-chapter)
+- Practice tab (acc/eco/math): tap several chapter chips to practice them together; "ทั้งหมด" clears the selection. New "ข้อที่ยังไม่ทำ" filter; with "ข้อที่ผิด" also on, it shows both (unanswered + wrong). Deep links still select one chapter. eng/zh unchanged.
