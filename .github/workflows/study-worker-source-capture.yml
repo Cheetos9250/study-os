@@ -1,0 +1,87 @@
+name: Study Worker source snapshot (encrypted, manual, no deploy)
+
+# Inert until separately reviewed, merged to main, and manually approved.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_readonly:
+        description: "I approve a read-only capture of study-api source to an encrypted temporary artifact"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: study-worker-source-capture
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.confirm_readonly == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate owner approval and recovery secrets before any Cloudflare request
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.STUDY_CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.STUDY_WORKER_READ_TOKEN }}
+          WORKER_BACKUP_PASSPHRASE: ${{ secrets.WORKER_BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main" || exit 1
+          test "$GITHUB_EVENT_NAME" = "workflow_dispatch" || exit 1
+          [[ "$CLOUDFLARE_ACCOUNT_ID" =~ ^[0-9a-fA-F]{32}$ ]] || { echo "::error::Missing Cloudflare account ID."; exit 1; }
+          test "${#CLOUDFLARE_API_TOKEN}" -ge 10 || { echo "::error::Missing read-only Cloudflare API token."; exit 1; }
+          test "${#WORKER_BACKUP_PASSPHRASE}" -ge 20 || { echo "::error::Missing 20+ character backup passphrase."; exit 1; }
+      - name: Download script and active deployment metadata (GET requests only)
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.STUDY_CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.STUDY_WORKER_READ_TOKEN }}
+          OUTPUT_DIR: ${{ runner.temp }}/study-worker-source-raw
+        run: |
+          set -euo pipefail
+          node scripts/capture-study-worker-source.mjs
+      - name: Encrypt, decrypt and verify source archive before release
+        env:
+          WORKER_BACKUP_PASSPHRASE: ${{ secrets.WORKER_BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          INPUT="$RUNNER_TEMP/study-worker-source.tar.gz"
+          OUT="$RUNNER_TEMP/study-worker-source-$GITHUB_RUN_ID.tar.gz.gpg"
+          tar -czf "$INPUT" -C "$RUNNER_TEMP/study-worker-source-raw" .
+          test -s "$INPUT"
+          gpg --batch --yes --quiet --pinentry-mode loopback --symmetric --cipher-algo AES256 --passphrase-fd 3 --output "$OUT" "$INPUT" 3<<<"$WORKER_BACKUP_PASSPHRASE"
+          gpg --batch --yes --quiet --pinentry-mode loopback --decrypt --passphrase-fd 3 --output "$RUNNER_TEMP/study-worker-roundtrip.tar.gz" "$OUT" 3<<<"$WORKER_BACKUP_PASSPHRASE"
+          cmp --silent "$INPUT" "$RUNNER_TEMP/study-worker-roundtrip.tar.gz" || { echo "::error::Encrypted file failed the round-trip check."; exit 1; }
+          echo "ENCRYPTED_CAPTURE=$OUT" >> "$GITHUB_ENV"
+          {
+            echo "## Study Worker source snapshot"
+            echo "- Mode: read-only source capture (no deployment)"
+            echo "- Script: study-api"
+            echo "- Commit: $GITHUB_SHA"
+            echo "- Encrypted artifact SHA-256: $(sha256sum "$OUT" | cut -d' ' -f1)"
+            echo "- Artifact retention: 7 days; download and store privately"
+            echo "- Not proof that every live deployment version was captured."
+            echo "- Worker bindings, secrets, KV and Notion data were not backed up."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove all plaintext source, manifest and temporary archives
+        if: always()
+        run: |
+          for file in "$RUNNER_TEMP/study-worker-source-raw/study-api-source.raw" "$RUNNER_TEMP/study-worker-source-raw/manifest.json" "$RUNNER_TEMP/study-worker-source.tar.gz" "$RUNNER_TEMP/study-worker-roundtrip.tar.gz"; do
+            if [ -f "$file" ]; then shred -u "$file" 2>/dev/null || rm -f "$file"; fi
+          done
+          rmdir "$RUNNER_TEMP/study-worker-source-raw" 2>/dev/null || true
+      - name: Upload encrypted source archive ONLY
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: study-worker-source-${{ github.run_id }}
+          path: ${{ env.ENCRYPTED_CAPTURE }}
+          if-no-files-found: error
+          retention-days: 7
