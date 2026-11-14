@@ -1,0 +1,24 @@
+name: Study OS Today checks
+on:
+  push:
+    branches: [main]
+    paths: [today.html, index.html, scripts/study-today.js, tests/study-today.test.cjs, acc.html, eco.html, math.html, .github/workflows/study-today.yml]
+  pull_request:
+    paths: [today.html, index.html, scripts/study-today.js, tests/study-today.test.cjs, acc.html, eco.html, math.html, .github/workflows/study-today.yml]
+  workflow_dispatch:
+concurrency:
+  group: study-os-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:
+  contents: read
+jobs:
+  today:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Today logic and full Node regression
+        run: node --test tests/*.test.cjs vocabloom/tests/*.test.cjs

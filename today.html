@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Study OS Today — การ์ดที่ต้องทวน นับถอยหลังวันสอบ และแผนอ่านวันนี้">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<title>Today — Study OS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:light;--bg:#f8f9fc;--white:#fff;--text:#202445;--muted:#666c88;--line:#eaebf2;--purple:#5b53d7;--deep:#4f47c8;--lav:#f0eeff;--green:#2caa76;--greenbg:#e3f5ed;--orange:#c96a24;--orangebg:#fdf0e5;--red:#c2413b;--redbg:#fbe9e8;--shadow:0 6px 30px rgba(47,54,106,.035)}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--purple:#b9b3ff;--deep:#d7d2ff;--lav:#37365e;--green:#6fd3a5;--greenbg:#1f3a30;--orange:#f3b07a;--orangebg:#3d2a1c;--red:#f19a95;--redbg:#40211f;--shadow:none}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.6}
+.container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,40px) max(18px,env(safe-area-inset-right)) 60px max(18px,env(safe-area-inset-left))}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.brand,h1,h2,h3,.big{font-family:'Outfit',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
+.brand{font-weight:800;font-size:21px;letter-spacing:-.6px;color:var(--text);text-decoration:none}.brand span{color:var(--purple)}
+.top-link{color:var(--purple);background:var(--lav);font-size:14px;font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--purple);outline-offset:3px}
+.hero{padding:30px 0 8px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);font-weight:800;margin:0 0 6px}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.2;margin:0 0 6px;letter-spacing:-.5px}
+.lead{color:var(--muted);margin:0}
+h2{font-size:20px;margin:30px 0 12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 small{font-family:'DM Sans',"IBM Plex Sans Thai",system-ui,sans-serif;font-size:13px;font-weight:500;color:var(--muted)}
+.card{background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px 20px}
+.countdown{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;align-items:center;margin-top:20px}
+.big{font-size:clamp(44px,9vw,64px);font-weight:800;line-height:1;color:var(--purple);grid-row:span 2;min-width:2ch;text-align:center}
+.big small{display:block;font-size:14px;font-weight:600;color:var(--muted);margin-top:6px}
+.cd-title{font-size:19px;font-weight:700;margin:0}.cd-sub{color:var(--muted);margin:0;font-size:14px}
+.others{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.pill{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--white);color:var(--muted)}
+.pill b{color:var(--text)}
+.warn{display:inline-block;font-size:12px;font-weight:700;color:var(--orange);background:var(--orangebg);border-radius:6px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.task{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:start}
+.task input{width:22px;height:22px;margin:3px 0 0;accent-color:var(--purple)}
+.task h3{font-size:16px;margin:0;line-height:1.4}.task p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.task .tag{font-size:12px;font-weight:700;color:var(--purple);background:var(--lav);border-radius:6px;padding:1px 8px;margin-right:6px}
+.task.done h3,.task.done p{text-decoration:line-through;opacity:.6}
+.go{font-size:14px;font-weight:700;color:var(--purple);text-decoration:none;white-space:nowrap;padding:4px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.course h3{font-size:17px;margin:0 0 10px}
+.nums{display:flex;gap:18px;margin-bottom:12px}.nums div{font-size:13px;color:var(--muted)}.nums b{display:block;font-size:24px;font-family:'Outfit',system-ui,sans-serif;color:var(--text);line-height:1.2}
+.nums .due b{color:var(--red)}.nums .new b{color:var(--purple)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}
+.small{font-size:13px;color:var(--muted);margin:6px 0 10px}
+.weak{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.weak li{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:15px}
+.badge{font-weight:700;font-size:13px;border-radius:6px;padding:2px 9px;background:var(--redbg);color:var(--red);white-space:nowrap}
+.empty{color:var(--muted);font-size:14px;margin:0}
+details.exam{border-top:1px solid var(--line);padding:10px 0}details.exam:first-of-type{border-top:0}
+details.exam summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;list-style:none;font-weight:600}
+details.exam summary::-webkit-details-marker{display:none}
+.edit{display:grid;gap:10px;padding:12px 0 4px}
+.edit label{font-size:13px;color:var(--muted);display:grid;gap:4px}
+.edit input[type=text],.edit input[type=date],.edit select{font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:42px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips label{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:40px}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+button{font:inherit;font-size:14px;font-weight:700;border-radius:10px;padding:9px 14px;min-height:42px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--purple)}
+button.primary{background:var(--purple);color:var(--white);border-color:var(--purple)}
+button.danger{color:var(--red)}
+.note{margin-top:28px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.status{font-size:14px;color:var(--muted)}.status.err{color:var(--red)}
+@media(max-width:760px){.grid3{grid-template-columns:1fr}.task{grid-template-columns:28px 1fr}.task .go{grid-column:2}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<a class="brand" href="index.html">Study <span>OS</span></a>
+<a class="top-link" href="index.html">← หน้าแรก</a>
+</header>
+<main>
+<section class="hero" aria-labelledby="today-title">
+<p class="eyebrow">Today</p>
+<h1 id="today-title">วันนี้เรียนอะไรดี</h1>
+<p class="lead" id="todayDate"></p>
+<div class="card countdown" id="countdown" aria-live="polite"><p class="status">กำลังโหลด…</p></div>
+<div class="others" id="otherExams"></div>
+</section>
+
+<section aria-labelledby="plan-title">
+<h2 id="plan-title">แผนวันนี้ <small>เรียงจากสิ่งที่สำคัญที่สุด</small></h2>
+<div class="card"><ul class="tasks" id="tasks"><li class="status">กำลังโหลด…</li></ul></div>
+</section>
+
+<section aria-labelledby="cards-title">
+<h2 id="cards-title">การ์ดที่ต้องทวน</h2>
+<div class="grid3" id="courses"></div>
+</section>
+
+<section aria-labelledby="weak-title">
+<h2 id="weak-title">จุดอ่อน <small>บทที่ทำ Practice ถูกต่ำกว่า 70%</small></h2>
+<div class="card" id="weak"><p class="status">กำลังโหลด…</p></div>
+</section>
+
+<section aria-labelledby="exams-title">
+<h2 id="exams-title">ตารางสอบ <small>แตะเพื่อแก้วันที่หรือบทที่ออกสอบ</small></h2>
+<div class="card"><div id="examList"></div>
+<div class="row" style="margin-top:12px"><button type="button" id="addExam">+ เพิ่มการสอบ</button><button type="button" id="resetExams" class="danger">คืนค่าตารางสอบเริ่มต้น</button></div>
+<p class="status" id="saveStatus" role="status"></p></div>
+</section>
+
+<p class="note">หน้านี้อ่านความคืบหน้าจากหน้าวิชาในเบราว์เซอร์นี้เท่านั้น ไม่แก้ ไม่ลบ และไม่ส่งข้อมูลการเรียนออกไปไหน ตารางสอบและเครื่องหมายเสร็จแล้วเก็บในเบราว์เซอร์นี้ (ยังไม่รวมในไฟล์ Backup) แผนอ่านเป็นข้อเสนอจากคะแนน Practice และการ์ดที่ยังไม่เปิด ไม่ใช่ขอบเขตสอบที่ยืนยันแล้ว</p>
+</main>
+</div>
+<script src="scripts/study-today.js?v=1"></script>
+<script>
+(function(){
+'use strict';
+const T=window.StudyToday,$=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TH_DAYS=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'],TH_MONTHS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thDate(iso){const t=T.dateStart(iso)+7*3600000,d=new Date(t);return TH_DAYS[d.getUTCDay()]+' '+d.getUTCDate()+' '+TH_MONTHS[d.getUTCMonth()];}
+function read(key){try{return localStorage.getItem(key);}catch{return null;}}
+let settings=T.loadSettings(read(T.SETTINGS_KEY)),data={},summaries={},loadErrors=[];
+function save(){
+ try{localStorage.setItem(T.SETTINGS_KEY,JSON.stringify(settings));$('#saveStatus').textContent='';$('#saveStatus').className='status';return true;}
+ catch{$('#saveStatus').textContent='บันทึกการตั้งค่าไม่สำเร็จ (พื้นที่เบราว์เซอร์อาจเต็ม) การเปลี่ยนแปลงจะหายเมื่อปิดหน้า';$('#saveStatus').className='status err';return false;}
+}
+function courseOf(key){return T.COURSES.find(c=>c.key===key);}
+function compute(){
+ const now=Date.now();summaries={};
+ for(const c of T.COURSES){if(!data[c.key])continue;summaries[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);}
+ return now;
+}
+function render(){
+ const now=compute(),plan=T.buildPlan(settings.exams,summaries,settings,now);
+ $('#todayDate').textContent=thDate(plan.today)+' '+(+plan.today.slice(0,4)+543);
+ // Countdown
+ const next=plan.upcoming[0];
+ if(next){
+  const c=courseOf(next.course);
+  $('#countdown').innerHTML='<div class="big">'+(next.days===0?'วันนี้':next.days)+(next.days===0?'':'<small>วัน</small>')+'</div><p class="cd-title">'+esc(next.title)+(next.confirmed?'':'<span class="warn">ขอบเขตยังไม่ยืนยัน</span>')+'</p><p class="cd-sub">'+thDate(next.date)+' · '+esc(c.name)+' · '+next.cats.length+' บท</p>';
+ }else $('#countdown').innerHTML='<p class="cd-title">ไม่มีการสอบที่กำลังจะถึง</p><p class="cd-sub">เพิ่มวันสอบได้ที่หัวข้อตารางสอบด้านล่าง</p>';
+ $('#otherExams').innerHTML=plan.upcoming.slice(1).map(e=>'<span class="pill"><b>'+e.days+' วัน</b> · '+esc(e.title)+' ('+thDate(e.date)+')</span>').join('');
+ // Tasks
+ const doneToday=settings.tasks[plan.today]||{};
+ $('#tasks').innerHTML=plan.tasks.length?plan.tasks.map((t,i)=>{
+  const c=t.course?courseOf(t.course):null,done=t.kind==='chapter'?t.done:!!doneToday[t.id];
+  return '<li class="task'+(done?' done':'')+'"><input type="checkbox" data-i="'+i+'" id="t'+i+'"'+(done?' checked':'')+' aria-label="ทำเสร็จแล้ว: '+esc(t.title)+'"><label for="t'+i+'"><h3>'+(c?'<span class="tag">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3><p>'+esc(t.detail)+'</p>'+(t.reason?'<p>'+esc(t.reason)+(t.exam?' · สำหรับ '+esc(t.exam):'')+'</p>':'')+'</label>'+(c?'<a class="go" href="'+c.page+'">เปิดวิชา →</a>':'')+'</li>';
+ }).join(''):'<li class="empty">ไม่มีงานสำหรับวันนี้ ลองเปิดการ์ดใหม่หรือเพิ่มวันสอบ</li>';
+ $('#tasks').querySelectorAll('input[type=checkbox]').forEach(box=>box.onchange=()=>{
+  settings=T.markChapter(settings,plan.tasks[+box.dataset.i],box.checked,Date.now());save();render();
+ });
+ // Courses
+ $('#courses').innerHTML=T.COURSES.map(c=>{
+  const s=summaries[c.key];
+  if(!s)return '<div class="card course"><h3>'+esc(c.name)+'</h3><p class="empty">'+(loadErrors.includes(c.key)?'โหลดข้อมูลวิชาไม่สำเร็จ ลองรีเฟรช':'กำลังโหลด…')+'</p></div>';
+  const pct=s.total?Math.round(s.seen/s.total*100):0;
+  return '<div class="card course"><h3>'+esc(c.name)+'</h3><div class="nums"><div class="due"><b>'+s.reviewNow+'</b>ครบกำหนด</div><div class="new"><b>'+s.newToday+'</b>ใหม่วันนี้</div></div><div class="bar" role="img" aria-label="เปิดแล้ว '+pct+'%"><i style="width:'+pct+'%"></i></div><p class="small">เปิดแล้ว '+s.seen+'/'+s.total+' ใบ</p><a class="go" href="'+c.page+'">ทวนการ์ด →</a></div>';
+ }).join('');
+ // Weak spots
+ const weak=T.weakSpots(summaries,6);
+ const anyAnswered=Object.values(summaries).some(s=>Object.values(s.per).some(p=>p.answered));
+ $('#weak').innerHTML=weak.length?'<ul class="weak">'+weak.map(w=>'<li><span><b>'+esc(w.courseName)+'</b> · '+esc(w.label)+'</span><span class="badge">'+Math.round(w.acc*100)+'% ('+w.correct+'/'+w.answered+')</span></li>').join('')+'</ul>'
+  :'<p class="empty">'+(anyAnswered?'ยังไม่มีบทที่ต่ำกว่า 70% (นับเฉพาะบทที่ทำอย่างน้อย 2 ข้อ)':'ยังไม่มีคะแนน Practice ในเบราว์เซอร์นี้ ทำ Practice ในหน้าวิชาแล้วกลับมาดูได้')+'</p>';
+ renderExams();
+}
+function renderExams(){
+ const list=[...settings.exams].sort((a,b)=>a.date.localeCompare(b.date));
+ $('#examList').innerHTML=list.length?list.map(e=>{
+  const c=courseOf(e.course),D=data[e.course],d=T.daysUntil(e.date,Date.now());
+  const cats=D?D.cats.map(([id,label])=>'<label><input type="checkbox" name="cat" value="'+esc(id)+'"'+(e.cats.includes(id)?' checked':'')+'> '+esc(label)+'</label>').join(''):'<span class="empty">กำลังโหลดรายชื่อบท…</span>';
+  return '<details class="exam" data-id="'+esc(e.id)+'"><summary><span>'+esc(e.title)+(e.confirmed?'':'<span class="warn">ขอบเขตยังไม่ยืนยัน</span>')+'</span><span class="status">'+thDate(e.date)+(d>=0?' · อีก '+d+' วัน':' · ผ่านไปแล้ว')+'</span></summary><form class="edit">'
+   +'<label>ชื่อการสอบ<input type="text" name="title" maxlength="80" value="'+esc(e.title)+'"></label>'
+   +'<label>วันสอบ<input type="date" name="date" value="'+esc(e.date)+'"></label>'
+   +'<label>วิชา<select name="course">'+T.COURSES.map(x=>'<option value="'+x.key+'"'+(x.key===e.course?' selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select></label>'
+   +'<div><div class="small">บทที่ออกสอบ</div><div class="chips">'+cats+'</div></div>'
+   +'<div class="row"><button type="submit" class="primary">บันทึก (ยืนยันขอบเขต)</button><button type="button" class="danger" data-del>ลบ</button></div></form></details>';
+ }).join(''):'<p class="empty">ยังไม่มีการสอบ</p>';
+ $('#examList').querySelectorAll('details.exam').forEach(det=>{
+  const id=det.dataset.id,form=det.querySelector('form');
+  form.course.onchange=()=>{const e=settings.exams.find(x=>x.id===id);if(!e)return;e.course=form.course.value;e.cats=[];save();render();openExam(id);};
+  form.onsubmit=ev=>{ev.preventDefault();const e=settings.exams.find(x=>x.id===id);if(!e)return;
+   if(!Number.isFinite(T.dateStart(form.date.value))){$('#saveStatus').textContent='กรุณาเลือกวันสอบ';return;}
+   e.title=form.title.value.trim()||'สอบ';e.date=form.date.value;e.cats=[...form.querySelectorAll('input[name=cat]:checked')].map(x=>x.value);e.confirmed=true;
+   if(save())$('#saveStatus').textContent='บันทึกแล้ว';render();};
+  form.querySelector('[data-del]').onclick=()=>{if(!confirm('ลบการสอบนี้?'))return;settings.exams=settings.exams.filter(x=>x.id!==id);save();render();};
+ });
+}
+function openExam(id){const d=[...document.querySelectorAll('details.exam')].find(x=>x.dataset.id===id);if(d)d.open=true;}
+$('#addExam').onclick=()=>{
+ const id='exam-'+Date.now().toString(36),date=T.dayKey(Date.now()+7*86400000);
+ settings.exams.push({id,course:'acc',title:'การสอบใหม่',date,cats:[],confirmed:false});save();render();openExam(id);
+};
+$('#resetExams').onclick=()=>{if(!confirm('คืนค่าตารางสอบเริ่มต้น? วันสอบที่แก้ไว้จะหาย'))return;settings.exams=T.normalizeExams(null);save();render();};
+render();
+Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();})
+ .then(html=>{data[c.key]=T.parseCourseData(html);}).catch(()=>{loadErrors.push(c.key);}))).then(render);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+})();
+</script>
+</body>
+</html>
