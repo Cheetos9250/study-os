@@ -89,10 +89,10 @@ button.danger{color:var(--red)}
 <div class="container">
 <main>
 <section class="hero">
-<h1 id="title">Subjects</h1>
+<h1 id="title">Lessons</h1>
 <p class="lead" id="lead" hidden></p>
 </section>
-<nav class="crumb" id="crumb" aria-label="Breadcrumb" hidden><a href="#">← Subjects</a></nav>
+<nav class="crumb" id="crumb" aria-label="Breadcrumb" hidden><a href="#">← Lessons</a></nav>
 <div id="view" class="list"><p class="status">Loading…</p></div>
 </main>
 </div>
@@ -112,16 +112,15 @@ function examFor(courseKey,catId,now){
  return settings.exams.filter(e=>e.course===courseKey&&e.cats.includes(catId)).map(e=>({...e,days:T.daysUntil(e.date,now)})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days)[0]||null;
 }
 function subjects(now){
- $('#title').textContent='Subjects';$('#crumb').hidden=true;
+ $('#title').textContent='Lessons';$('#crumb').hidden=true;
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key];
   if(!s)return '<div class="card subj"><h3>'+esc(c.name)+'</h3><p class="full">'+esc(c.full)+'</p><p class="empty">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p></div>';
   const pct=s.total?Math.round(s.seen/s.total*100):0,chapters=Object.keys(s.per).length;
-  return '<a class="card subj" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="due"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Chapters →</span></a>';
+  return '<a class="card subj" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="due"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Lessons →</span></a>';
  });
- cards.push('<a class="card subj" href="eng.html"><h3>English</h3><p class="full">Vocabulary</p><span class="go">Cards →</span></a>');
- cards.push('<a class="card subj" href="zh.html"><h3>Chinese</h3><p class="full">Vocabulary</p><span class="go">Cards →</span></a>');
- cards.push('<a class="card subj" href="vocabloom/index.html"><h3>VocaBloom</h3><p class="full">English app</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj" href="vocabloom/index.html?lang=en"><h3>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj" href="vocabloom/index.html?lang=zh"><h3>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
  $('#view').className='grid3';$('#view').innerHTML=cards.join('');
 }
 function chapters(c,now){
@@ -133,13 +132,13 @@ function chapters(c,now){
   const book=c.key==='acc'&&/^c\d+$/.test(id)?'<a href="accounting-textbook.html?ch='+id.slice(1)+'">Textbook</a>':'';
   return '<div class="card chap"><h3>'+esc(label)+(ex?' <span class="tagx">'+esc(ex.title)+' · '+(ex.days===0?'today':ex.days+'d')+'</span>':'')+'</h3>'
    +'<div class="meta"><span class="due">Due <b>'+p.due+'</b></span><span>Cards <b>'+p.seen+'/'+p.cards+'</b></span><span>Quiz <b>'+(p.quiz?(p.answered?Math.round(acc*100)+'%':'–'):'–')+'</b></span></div>'
-   +'<div class="acts"><a href="'+link(c,'sum',id)+'">Summary</a><a href="'+link(c,'cards',id)+'">Cards</a><a class="main" href="'+link(c,'prac',id)+'">Practice</a>'+book+'</div></div>';
+   +'<div class="acts"><a class="main" href="'+link(c,'sum',id)+'">Lesson</a><a href="'+link(c,'cards',id)+'">Cards</a><a href="'+link(c,'prac',id)+'">Practice</a>'+book+'</div></div>';
  });
  $('#view').className='list';$('#view').innerHTML=rows.join('');
 }
 function render(){
  const now=compute(),key=(location.hash||'').slice(1),c=T.COURSES.find(x=>x.key===key);
- document.title=(c?c.name+' — ':'Subjects — ')+'Study OS';
+ document.title=(c?c.name+' — ':'')+'Lessons — Study OS';
  c?chapters(c,now):subjects(now);
 }
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);});

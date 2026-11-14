@@ -2,13 +2,15 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8'),nav=read('scripts/study-nav.js');
-test('four-tab navigation reaches every main destination',()=>{
- for(const h of ['index.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html'])assert.match(nav,new RegExp("href:'"+h.replace('.','\\.')+"'"),h);
- for(const f of ['index.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html','accounting-textbook.html','acc.html','eco.html','math.html','eng.html','zh.html'])assert.match(read(f),/scripts\/study-nav\.js/,f);
+test('navigation (Today · Flashcards · Practice · Lessons · Calendar) reaches every main destination',()=>{
+ for(const h of ['index.html','flashcards.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html'])assert.match(nav,new RegExp("href:'"+h.replace('.','\\.')+"'"),h);
+ for(const f of ['index.html','flashcards.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html','accounting-textbook.html','acc.html','eco.html','math.html','eng.html','zh.html'])assert.match(read(f),/scripts\/study-nav\.js/,f);
  const practice=read('practice.html');
  for(const h of ['accounting-textbook.html','vocabloom/'])assert.ok(practice.includes('href="'+h),h);
- assert.match(practice,/T\.LANGS\.map/);
- for(const h of ['eng.html','zh.html'])assert.ok(html.includes('href="'+h),'home '+h);
+ assert.match(read('flashcards.html'),/T\.LANGS\.map/);assert.match(read('flashcards.html'),/l\.app/);
+ const T=require('../scripts/study-today.js');assert.deepEqual(T.LANGS.map(l=>l.app),['vocabloom/?lang=en','vocabloom/?lang=zh']);
+ assert.match(html,/T\.LANGS\[1\]\.app/);
+ for(const f of ['index.html','practice.html','hub.html','flashcards.html'])assert.doesNotMatch(read(f),/VocaBloom|href="zh\.html"/,f);
  assert.match(html,/id="welcome-title"/);
  assert.match(read('today.html'),/url=calendar\.html/);
  assert.doesNotMatch(nav,/localStorage|sessionStorage|fetch\(/);
@@ -20,7 +22,7 @@ test('home answers: today, exams, tasks, subjects (calendar has its own page)',(
  const cal=read('calendar.html');for(const id of ['cal','dayList','examList','addExam'])assert.match(cal,new RegExp('id="'+id+'"'),id);
 });
 test('main pages use English UI text',()=>{
- for(const f of ['practice.html','calendar.html','hub.html','scripts/study-nav.js'])assert.doesNotMatch(read(f),/[\u0E00-\u0E7F]/,f);
+ for(const f of ['practice.html','flashcards.html','calendar.html','hub.html','scripts/study-nav.js'])assert.doesNotMatch(read(f),/[\u0E00-\u0E7F]/,f);
  assert.deepEqual([...html.matchAll(/[\u0E00-\u0E7F]+/g)].map(m=>m[0]),['บัญชี','เศรษฐ','คณิต']); // only the task subject matcher
 });
 test('profile and cover images accept animated GIFs within a size cap',()=>{
@@ -54,4 +56,7 @@ test('images: GIF detected by file bytes, iPad-converted GIF warning, safe https
  for(const bad of ['javascript:alert(1)','http://x.com/a.gif','https://x.com/a.gif") ; color:red','https://x.com/a b.gif','https://x.com/(a).gif'])assert.ok(!LINK.test(bad),bad);
  assert.match(html,/data-img="cover"/);assert.match(html,/data-img="avatar"/);
  assert.match(read('scripts/study-progress-restore.js'),/\^https:/);
+});
+test('course pages highlight the section matching their mode',()=>{
+ assert.match(nav,/\{cards:'cards',sum:'lessons',prac:'practice'\}/);
 });

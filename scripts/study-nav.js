@@ -5,8 +5,9 @@
  if(typeof document==='undefined'||document.getElementById('studyNav'))return;
  var TABS=[
   {id:'today',href:'index.html',icon:'☀️',label:'Today'},
+  {id:'cards',href:'flashcards.html',icon:'🃏',label:'Flashcards'},
   {id:'practice',href:'practice.html',icon:'✏️',label:'Practice'},
-  {id:'subjects',href:'hub.html',icon:'📚',label:'Subjects'},
+  {id:'lessons',href:'hub.html',icon:'📚',label:'Lessons'},
   {id:'calendar',href:'calendar.html',icon:'📅',label:'Calendar'}
  ];
  var MORE=[
@@ -14,7 +15,10 @@
   {href:'progress-restore.html',label:'Restore'}
  ];
  var file=(location.pathname.split('/').pop()||'index.html').toLowerCase();
- var active={'':'today','index.html':'today','practice.html':'practice','acc.html':'practice','eco.html':'practice','math.html':'practice','eng.html':'practice','zh.html':'practice','accounting-textbook.html':'practice','hub.html':'subjects','calendar.html':'calendar','today.html':'calendar'}[file]||'';
+ // Course pages show one mode (?tab=cards|sum|prac); highlight the matching section.
+ var mode=(typeof URLSearchParams==='function'?new URLSearchParams(location.search).get('tab'):'')||'cards';
+ var course=/^(acc|eco|math|eng|zh)\.html$/.test(file)?({cards:'cards',sum:'lessons',prac:'practice'}[mode]||'cards'):'';
+ var active=course||{'':'today','index.html':'today','flashcards.html':'cards','practice.html':'practice','accounting-textbook.html':'practice','hub.html':'lessons','calendar.html':'calendar','today.html':'calendar'}[file]||'';
  var css=''
  +'#studyNav{--sn-bg:#f7f7f5;--sn-fg:#37352f;--sn-mute:#787774;--sn-line:#e9e9e7;--sn-hi:#ebebea;font-family:"DM Sans",system-ui,-apple-system,sans-serif;position:fixed;z-index:70;background:var(--sn-bg);color:var(--sn-fg);box-sizing:border-box}'
  +'@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #studyNav{--sn-bg:#202020;--sn-fg:#e6e6e4;--sn-mute:#9b9a97;--sn-line:#2f2f2f;--sn-hi:#2c2c2c}}'

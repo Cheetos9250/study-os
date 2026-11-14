@@ -217,7 +217,7 @@ function renderChips(){
  const dueTotal=Object.values(summaries).reduce((n,s)=>n+(s?s.reviewNow:0),0);
  const open=st.tasks.filter(t=>!t.done),late=open.filter(t=>t.date<today).length,ne=upcoming()[0];
  const top=T.COURSES.slice().sort((a,b)=>((summaries[b.key]||{}).reviewNow||0)-((summaries[a.key]||{}).reviewNow||0))[0];
- const chips=['<a class="chip" href="'+(dueTotal?link(top,'cards'):'practice.html')+'"><b>'+dueTotal+'</b><span>cards due</span></a>',
+ const chips=['<a class="chip" href="'+(dueTotal?link(top,'cards'):'flashcards.html')+'"><b>'+dueTotal+'</b><span>cards due</span></a>',
   '<div class="chip'+(late?' warn':'')+'"><b>'+open.length+'</b><span>tasks'+(late?' · '+late+' late':'')+'</span></div>'];
  if(ne)chips.push('<a class="chip'+(ne.d<=3?' warn':ne.d<=7?' soon':'')+'" href="#exams"><b>'+(ne.d===0?'Today':ne.d)+'</b><span>'+(ne.d===0?'':'days to ')+esc((course(ne.course)||{}).name||'')+' exam</span></a>');
  $('#chips').innerHTML=chips.join('');
@@ -262,11 +262,11 @@ function renderSubjects(){
   const emoji={acc:'📒',eco:'📈',math:'🧮'}[c.key],pct=s&&s.total?Math.round(s.seen/s.total*100):0;
   return '<article class="subj s-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">🖼</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam in '+(ne.d===0?'today':ne.d+' days'):'&nbsp;')+'</p>'
    +(s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
-   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a><a href="hub.html#'+c.key+'">Chapters</a></div></div></article>';});
+   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a><a href="hub.html#'+c.key+'">Lessons</a></div></div></article>';});
  const lang=(l,cv,emoji,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">🖼</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary</p>'
   +(ls?'<div class="st"><div><b>'+ls.reviewNow+'</b>due</div><div><b>'+ls.newToday+'</b>new</div></div>':'')+'<div class="acts">'+acts+'</div></div></article>';};
- cards.push(lang(T.LANGS[0],'voc','🇬🇧','<a class="main" href="eng.html">Cards</a><a href="vocabloom/">VocaBloom</a>'));
- cards.push(lang(T.LANGS[1],'zh','🇨🇳','<a class="main" href="zh.html">Cards</a>'));
+ cards.push(lang(T.LANGS[0],'voc','🇬🇧','<a class="main" href="'+T.LANGS[0].app+'">WordNest</a>'));
+ cards.push(lang(T.LANGS[1],'zh','🇨🇳','<a class="main" href="'+T.LANGS[1].app+'">WordNest</a>'));
  $('#subjects').innerHTML=cards.join('');paintImages();
 }
 function compute(){now=Date.now();today=T.dayKey(now);summaries={};langSum={};for(const c of T.COURSES)if(data[c.key])summaries[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);for(const l of T.LANGS)if(langData[l.key])langSum[l.key]=T.summarize(langData[l.key],read(l.mark+'-srs'),null,now);}

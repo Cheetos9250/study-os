@@ -10,8 +10,8 @@
  const SETTINGS_KEY='studyos.today.v1';
  // Vocabulary decks (no exams or chapters plan); used for due counts only.
  const LANGS=Object.freeze([
-  {key:'eng',page:'eng.html',mark:'eng-vocab-v1',name:'English'},
-  {key:'zh',page:'zh.html',mark:'zh-vocab-v1',name:'Chinese'}
+  {key:'eng',page:'eng.html',app:'vocabloom/?lang=en',mark:'eng-vocab-v1',name:'English'},
+  {key:'zh',page:'zh.html',app:'vocabloom/?lang=zh',mark:'zh-vocab-v1',name:'Chinese'}
  ]);
  const COURSES=Object.freeze([
   {key:'acc',page:'acc.html',mark:'acc-flashcards-v1',name:'Accounting',full:'ACC'},
