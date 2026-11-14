@@ -70,3 +70,8 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 - Course cross-tab guard is released in PR #77 (`4ae71f8`). Preserve its check-before-write behavior, pending drafts and versioned helper pins.
 - Textbook-reader baseline guard is published in PR #78 (`503f8dd`), with 248 Node / 3 Python tests, 21 synthetic reader browser journeys and live byte verification. Preserve active PR #68's solutions and reconcile only the small persistence changes during future integration.
 - Physical iPad: use disposable progress to rehearse two tabs, draft export and saved-copy backup. Checks are best-effort; no atomic localStorage or cross-browser sync guarantee.
+
+## Today page follow-ups (owner priorities 2026-11-14)
+- Owner priorities: Today page (released), exam countdown/plan (released), AI Tutor that answers questions and checks answers (not started; needs cost/backend decision).
+- Confirm 26 Nov / 27 Nov / 1 Dec exam scopes with the owner; add `studyos.today.v1` to backup allowlist; deep-link course tabs/chapters from plan tasks.
+- Owner approved moving English vocabulary to VocaBloom and increasing privacy (public repo exposes workers.dev account subdomain). Both touch data/backend and need a reviewed plan.
