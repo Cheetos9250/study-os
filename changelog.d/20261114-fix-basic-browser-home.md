@@ -1,0 +1,1 @@
+- Fix basic-browser CI test: course links now match the new home page (card links with `?tab=cards`, plain links for English/Chinese).
