@@ -308,16 +308,23 @@ const QS = D.quiz.map((q,i)=>{ const o={id:i,cat:q[0],q:q[1],opts:q[2],exp:q[4]|
   let s=(i+1)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
   const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   o.order=idx; o.right=q[3]; return o; });
-let qcat='all', missedOnly=false, deck=[], qpos=0, qStat='', qStatErr=false;
-function buildDeck(){ deck=QS.filter(q=>(qcat==='all'||q.cat===qcat)&&(!missedOnly||(store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right))); qpos=0; }
+let qcats=new Set(), missedOnly=false, unansOnly=false, deck=[], qpos=0, qStat='', qStatErr=false;
+function buildDeck(){ const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q)))); qpos=0; }
 function renderQ(){
-  chipRow($('#qCats'), qcat, id=>{qcat=id;buildDeck();renderQ()}, id=>id==='all'?QS.length:QS.filter(q=>q.cat===id).length);
+  (function(box){ box.innerHTML='';
+    [['all','ทั้งหมด'],...CATS].forEach(([id,l])=>{
+      const b=document.createElement('button'); b.type='button'; b.className='chip';
+      b.setAttribute('aria-pressed', id==='all'?!qcats.size:qcats.has(id));
+      b.innerHTML=esc(l)+'<span class="n">'+(id==='all'?QS.length:QS.filter(q=>q.cat===id).length)+'</span>';
+      b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); buildDeck();renderQ(); };
+      box.appendChild(b); });
+  })($('#qCats'));
   const box=$('#qBody');
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">ตอบถูก / ตอบแล้ว (ทั้งหมด '+QS.length+' ข้อ)</span></div>';
   if(qStat) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">เฉพาะข้อที่ผิด</button><button class="chip" id="resetBtn" type="button">ล้างคำตอบ</button></div>';
-  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(missedOnly?'ยังไม่มีข้อที่ตอบผิดในหมวดนี้':'ไม่มีข้อสอบในหมวดนี้')+'</div>'; wireQ(); return; }
+  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">ข้อที่ผิด</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">ข้อที่ยังไม่ทำ</button><button class="chip" id="resetBtn" type="button">ล้างคำตอบ</button></div>';
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+((missedOnly||unansOnly)?'ไม่มีข้อที่ตรงเงื่อนไขในหมวดที่เลือก (ลองปิดตัวกรองหรือเลือกบทเพิ่ม)':'ไม่มีข้อสอบในหมวดนี้')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined;
   h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>ข้อ '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
   h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
@@ -335,6 +342,7 @@ function renderQ(){
 }
 function wireQ(){
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
+  const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;buildDeck();renderQ()};
   const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('ล้างคำตอบแบบฝึกทั้งหมดในวิชานี้? คะแนนและประวัติคำตอบจะถูกล้าง')) return; store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
 
