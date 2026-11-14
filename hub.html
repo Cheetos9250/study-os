@@ -9,15 +9,15 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Hub — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
 :root{color-scheme:light;--bg:#fff;--white:#f9f8f6;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--purple:#2383e2;--deep:#1a6fc4;--lav:#e4f0fb;--green:#2f8f5b;--greenbg:#d9ead9;--orange:#d9730d;--orangebg:#f5e6b0;--red:#d6453d;--redbg:#fadddb;--shadow:none}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--white:#212121;--text:#ececec;--muted:#a8a5a0;--line:#333;--purple:#5aa9f0;--deep:#8cc4f5;--lav:#1e3445;--green:#6fcf9b;--greenbg:#26422a;--orange:#f0a050;--orangebg:#4d4115;--red:#ff8a80;--redbg:#5a2a27;--shadow:none}}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--white:#212121;--text:#ececec;--muted:#a8a5a0;--line:#333;--purple:#5aa9f0;--deep:#8cc4f5;--lav:#1e3445;--green:#6fcf9b;--greenbg:#26422a;--orange:#f0a050;--orangebg:#4d4115;--red:#ff8a80;--redbg:#5a2a27;--shadow:none}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans','IBM Plex Sans Thai',system-ui,sans-serif;line-height:1.55}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55}
 .container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,40px) max(18px,env(safe-area-inset-right)) 60px max(18px,env(safe-area-inset-left))}
 header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:22px;border-bottom:1px solid var(--line)}
-.brand,h1,h2,h3,.big,.nums b,.acts a,.go{font-family:'IBM Plex Mono','IBM Plex Sans Thai',ui-monospace,monospace}
+.brand,h1,h2,h3,.big,.nums b,.acts a,.go{font-family:'Outfit','DM Sans','IBM Plex Sans Thai',system-ui,sans-serif}
 .brand{font-weight:800;font-size:21px;letter-spacing:-.6px;color:var(--text);text-decoration:none}.brand span{color:var(--purple)}
 .top-link{color:var(--purple);background:var(--lav);font-size:14px;font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:8px 14px}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--purple);outline-offset:3px}
@@ -47,7 +47,7 @@ h2 small{font-family:'DM Sans',"IBM Plex Sans Thai",system-ui,sans-serif;font-si
 .acts a.main{background:var(--purple);color:#fff;border-color:var(--purple)}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .course h3{font-size:17px;margin:0 0 10px}
-.nums{display:flex;gap:18px;margin-bottom:12px}.nums div{font-size:13px;color:var(--muted)}.nums b{display:block;font-size:24px;font-family:'IBM Plex Mono',ui-monospace,monospace;color:var(--text);line-height:1.2}
+.nums{display:flex;gap:18px;margin-bottom:12px}.nums div{font-size:13px;color:var(--muted)}.nums b{display:block;font-size:24px;font-family:'Outfit',system-ui,sans-serif;color:var(--text);line-height:1.2}
 .nums .due b{color:var(--red)}.nums .new b{color:var(--purple)}
 .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}
 .small{font-size:13px;color:var(--muted);margin:6px 0 10px}
