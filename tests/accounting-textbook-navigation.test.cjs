@@ -34,7 +34,8 @@ test('reader remembers the most recent question and keeps continuation inside a 
  assert.match(html,/LAST_KEY='studyos\.accounting\.textbook\.last\.v1'/);
  assert.match(html,/localStorage\.setItem\(LAST_KEY,id\)/);
  assert.match(html,/resumeId=localStorage\.getItem\(LAST_KEY\)/);
- assert.match(html,/const saved=records\.find\(x=>x\.id===resumeId\)/);
+ assert.match(html,/const resumed=records\.find\(x=>x\.id===resumeId\)/);
+ assert.match(html,/const saved=linkQ\|\|\(linkCh\?null:resumed\)/);
  assert.match(html,/requestedPage>=chapterEnd/);
  assert.match(html,/\$\('sidebar'\)\.classList\.remove\('expanded'\)/);
  assert.match(html,/\$\('workspace'\)\.scrollIntoView/);
