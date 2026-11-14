@@ -1,0 +1,1 @@
+- Fix basic-browser CI after #99: English/Chinese course pages are opened directly (home links to WordNest now).
