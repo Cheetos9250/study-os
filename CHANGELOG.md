@@ -15,3 +15,6 @@
 - Usability: 44px touch targets on course pages, rating buttons hidden until reveal, Today link in course navigation, and Today plan buttons that open the exact chapter tab (summary, cards, Practice).
 
 - Textbook reader: chapter chips, deep links, split question/answer view on wide screens, jump bar on narrow ones, loading message while a stored PDF reopens, and a Today link to the chapter. Checked with a synthetic 1,210-page PDF only; no real textbook or progress was used.
+
+## 2026-11-14 (stop Notion auto-sync)
+- Removed `.github/workflows/sync.yml` (15-minute Notion exporter that pushed to `main`). `data/cards.json` is kept because VocaBloom still fetches it; it is now a frozen snapshot, so new Notion rows no longer appear. `scripts/sync_notion.py`, `data/quiz.json` and their tests are kept until the English cards move into VocaBloom. Re-enable by restoring the workflow from git history.
