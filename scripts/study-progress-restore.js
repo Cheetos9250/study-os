@@ -63,6 +63,20 @@
       }
       if (value.cover !== undefined && (typeof value.cover !== "string" || !jpeg.test(value.cover)))
         throw new Error("Invalid home dashboard cover");
+    } else if (key === "studyos.today.v1") {
+      if (value.exams !== undefined && !Array.isArray(value.exams)) throw new Error("Invalid exam schedule");
+      for (var ex of (value.exams || []))
+        if (!object(ex) || typeof ex.id !== "string" || typeof ex.course !== "string" ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(String(ex.date)) || (ex.cats !== undefined && !Array.isArray(ex.cats)))
+          throw new Error("Invalid exam schedule");
+      if (value.done !== undefined && !object(value.done)) throw new Error("Invalid plan progress");
+      if (value.tasks !== undefined && !object(value.tasks)) throw new Error("Invalid plan progress");
+      if (value.timetable !== undefined && !Array.isArray(value.timetable)) throw new Error("Invalid timetable");
+      for (var cl of (value.timetable || []))
+        if (!object(cl) || !Number.isInteger(cl.day) || cl.day < 0 || cl.day > 6 ||
+            !/^\d{2}:\d{2}$/.test(String(cl.start)) || !/^\d{2}:\d{2}$/.test(String(cl.end)) ||
+            (cl.name !== undefined && typeof cl.name !== "string"))
+          throw new Error("Invalid timetable");
     } else if (key === "vocabloom_mvp_v1") {
       if (!object(value.progress) || !object(value.days) ||
           !Array.isArray(value.custom) || !object(value.settings))

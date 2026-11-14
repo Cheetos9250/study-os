@@ -70,9 +70,20 @@
   return list.filter(e=>e&&typeof e==='object'&&typeof e.id==='string'&&COURSES.some(c=>c.key===e.course)&&Number.isFinite(dateStart(e.date)))
    .map(e=>({id:e.id,course:e.course,title:String(OLD_TITLES[e.title]||e.title||'Exam').slice(0,80),date:e.date,cats:Array.isArray(e.cats)?e.cats.filter(x=>typeof x==='string'):[],confirmed:!!e.confirmed}));
  }
+ // Weekly timetable: [{id,day:0-6 (Sun=0),start:'HH:MM',end:'HH:MM',name,code,course,skip}]
+ const HHMM=/^([01]\d|2[0-3]):[0-5]\d$/;
+ function normalizeTimetable(list){
+  if(!Array.isArray(list))return [];
+  return list.filter(x=>x&&typeof x==='object'&&Number.isInteger(x.day)&&x.day>=0&&x.day<=6&&HHMM.test(x.start)&&HHMM.test(x.end)&&x.start<x.end)
+   .slice(0,60).map((x,i)=>({id:typeof x.id==='string'&&x.id?x.id.slice(0,40):'c'+i,day:x.day,start:x.start,end:x.end,
+    name:String(x.name||'Class').slice(0,40),code:String(x.code||'').slice(0,16),
+    course:[...COURSES,...LANGS].some(c=>c.key===x.course)?x.course:'',skip:!!x.skip}))
+   .sort((a,b)=>a.day-b.day||a.start.localeCompare(b.start));
+ }
+ function classesOn(timetable,iso){const t=dateStart(iso);if(!Number.isFinite(t))return [];const dow=new Date(t+7*3600000).getUTCDay();return normalizeTimetable(timetable).filter(x=>x.day===dow);}
  function loadSettings(raw){
   const s=readJSON(raw,{});
-  return {exams:normalizeExams(s.exams),done:s.done&&typeof s.done==='object'?s.done:{},tasks:s.tasks&&typeof s.tasks==='object'?s.tasks:{}};
+  return {exams:normalizeExams(s.exams),done:s.done&&typeof s.done==='object'?s.done:{},tasks:s.tasks&&typeof s.tasks==='object'?s.tasks:{},timetable:normalizeTimetable(s.timetable)};
  }
  function buildPlan(exams,summaries,settings,now){
   const today=dayKey(now),tasks=[];
@@ -102,10 +113,10 @@
   return out.sort((a,b)=>a.acc-b.acc||b.answered-a.answered).slice(0,limit||5);
  }
  function markChapter(settings,task,doneFlag,now){
-  const next={exams:settings.exams,done:{...settings.done},tasks:{...settings.tasks}};
+  const next={...settings,exams:settings.exams,done:{...settings.done},tasks:{...settings.tasks}};
   if(task.kind==='chapter'){const d={...(next.done[task.examId]||{})};if(doneFlag)d[task.cat]=dayKey(now);else delete d[task.cat];next.done[task.examId]=d;}
   else{const t={...(next.tasks[dayKey(now)]||{})};if(doneFlag)t[task.id]=true;else delete t[task.id];next.tasks={[dayKey(now)]:t};}
   return next;
  }
- return {SETTINGS_KEY,COURSES,LANGS,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,buildPlan,weakSpots,markChapter};
+ return {SETTINGS_KEY,COURSES,LANGS,normalizeTimetable,classesOn,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,buildPlan,weakSpots,markChapter};
 });
