@@ -29,3 +29,7 @@
 - Known catalog issue (not changed here): several question ids in `data/accounting-textbook-index.json` do not match the printed numbers (e.g. the printed QS 6-5 LIFO question is indexed as QS-6-4; printed QS 6-4 is missing). Rules are keyed by the catalog id of the question with the matching title and page. Renaming ids would orphan saved progress, so it needs a migration.
 ## 2026-11-14 (practice: multi-chapter)
 - Practice tab (acc/eco/math): tap several chapter chips to practice them together; "ทั้งหมด" clears the selection. New "ข้อที่ยังไม่ทำ" filter; with "ข้อที่ผิด" also on, it shows both (unanswered + wrong). Deep links still select one chapter. eng/zh unchanged.
+
+## 2026-11-14 (Study Hub, phase 1 of Notion-like structure)
+- Added `hub.html`: Subjects → Chapters. Each subject card shows due/new cards and progress; each chapter shows due cards, cards opened, Practice score, exam badge (from the Today exam list) and direct links to summary, cards, Practice and (accounting) textbook problems. English links to VocaBloom. Read-only: writes nothing to storage. Linked from the homepage.
+- Planned next: own notes and tasks (local only), table views with filter/sort, Notion-like look and layout.

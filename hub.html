@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Study OS Hub — วิชา บท และความคืบหน้า">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<title>Hub — Study OS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:light;--bg:#f8f9fc;--white:#fff;--text:#202445;--muted:#666c88;--line:#eaebf2;--purple:#5b53d7;--deep:#4f47c8;--lav:#f0eeff;--green:#2caa76;--greenbg:#e3f5ed;--orange:#c96a24;--orangebg:#fdf0e5;--red:#c2413b;--redbg:#fbe9e8;--shadow:0 6px 30px rgba(47,54,106,.035)}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--purple:#b9b3ff;--deep:#d7d2ff;--lav:#37365e;--green:#6fd3a5;--greenbg:#1f3a30;--orange:#f3b07a;--orangebg:#3d2a1c;--red:#f19a95;--redbg:#40211f;--shadow:none}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.6}
+.container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,40px) max(18px,env(safe-area-inset-right)) 60px max(18px,env(safe-area-inset-left))}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.brand,h1,h2,h3,.big{font-family:'Outfit',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
+.brand{font-weight:800;font-size:21px;letter-spacing:-.6px;color:var(--text);text-decoration:none}.brand span{color:var(--purple)}
+.top-link{color:var(--purple);background:var(--lav);font-size:14px;font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--purple);outline-offset:3px}
+.hero{padding:30px 0 8px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);font-weight:800;margin:0 0 6px}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.2;margin:0 0 6px;letter-spacing:-.5px}
+.lead{color:var(--muted);margin:0}
+h2{font-size:20px;margin:30px 0 12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 small{font-family:'DM Sans',"IBM Plex Sans Thai",system-ui,sans-serif;font-size:13px;font-weight:500;color:var(--muted)}
+.card{background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px 20px}
+.countdown{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;align-items:center;margin-top:20px}
+.big{font-size:clamp(44px,9vw,64px);font-weight:800;line-height:1;color:var(--purple);grid-row:span 2;min-width:2ch;text-align:center}
+.big small{display:block;font-size:14px;font-weight:600;color:var(--muted);margin-top:6px}
+.cd-title{font-size:19px;font-weight:700;margin:0}.cd-sub{color:var(--muted);margin:0;font-size:14px}
+.others{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.pill{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--white);color:var(--muted)}
+.pill b{color:var(--text)}
+.warn{display:inline-block;font-size:12px;font-weight:700;color:var(--orange);background:var(--orangebg);border-radius:6px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.task{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start}
+.task input{width:28px;height:28px;margin:1px 0 0;accent-color:var(--purple)}
+.task h3{font-size:16px;margin:0;line-height:1.4}.task p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.task .tag{font-size:12px;font-weight:700;color:var(--purple);background:var(--lav);border-radius:6px;padding:1px 8px;margin-right:6px}
+.task.done h3,.task.done p{text-decoration:line-through;opacity:.6}
+.go{font-size:14px;font-weight:700;color:var(--purple);text-decoration:none;white-space:nowrap;padding:4px 0;display:inline-flex;align-items:center;min-height:44px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.acts a{font-size:14px;font-weight:700;color:var(--purple);background:var(--lav);border:1px solid var(--line);border-radius:10px;padding:0 14px;min-height:44px;display:inline-flex;align-items:center;text-decoration:none}
+.acts a.main{background:var(--purple);color:var(--white);border-color:var(--purple)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.course h3{font-size:17px;margin:0 0 10px}
+.nums{display:flex;gap:18px;margin-bottom:12px}.nums div{font-size:13px;color:var(--muted)}.nums b{display:block;font-size:24px;font-family:'Outfit',system-ui,sans-serif;color:var(--text);line-height:1.2}
+.nums .due b{color:var(--red)}.nums .new b{color:var(--purple)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}
+.small{font-size:13px;color:var(--muted);margin:6px 0 10px}
+.weak{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.weak li{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:15px}
+.badge{font-weight:700;font-size:13px;border-radius:6px;padding:2px 9px;background:var(--redbg);color:var(--red);white-space:nowrap}
+.empty{color:var(--muted);font-size:14px;margin:0}
+details.exam{border-top:1px solid var(--line);padding:10px 0}details.exam:first-of-type{border-top:0}
+details.exam summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center;list-style:none;font-weight:600}
+details.exam summary::-webkit-details-marker{display:none}
+.edit{display:grid;gap:10px;padding:12px 0 4px}
+.edit label{font-size:13px;color:var(--muted);display:grid;gap:4px}
+.edit input[type=text],.edit input[type=date],.edit select{font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:42px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips label{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:40px}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+button{font:inherit;font-size:14px;font-weight:700;border-radius:10px;padding:9px 14px;min-height:44px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--purple)}
+button.primary{background:var(--purple);color:var(--white);border-color:var(--purple)}
+button.danger{color:var(--red)}
+.note{margin-top:28px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.status{font-size:14px;color:var(--muted)}.status.err{color:var(--red)}
+@media(max-width:760px){.grid3{grid-template-columns:1fr}}
+
+.crumb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--muted);margin:22px 0 0}
+.crumb[hidden]{display:none}
+.crumb a{color:var(--purple);font-weight:700;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.subj{display:block;text-decoration:none;color:inherit}
+.subj h3{margin:0 0 4px;font-size:18px}.subj .full{margin:0 0 12px;font-size:13px;color:var(--muted)}
+.subj .go{padding:0}
+.chap{display:grid;gap:8px}
+.chap h3{margin:0;font-size:16px;line-height:1.4}
+.chap .meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.chap .meta b{color:var(--text)}.chap .meta .due b{color:var(--red)}
+.tagx{font-size:12px;font-weight:700;color:var(--orange);background:var(--orangebg);border-radius:6px;padding:1px 8px}
+.list{display:grid;gap:12px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<a class="brand" href="index.html">Study <span>OS</span></a>
+<a class="top-link" href="today.html">Today →</a>
+</header>
+<main>
+<section class="hero">
+<p class="eyebrow">Study Hub</p>
+<h1 id="title">วิชาทั้งหมด</h1>
+<p class="lead" id="lead">เลือกวิชาเพื่อดูบท ความคืบหน้า และเริ่มเรียนได้ทันที</p>
+</section>
+<nav class="crumb" id="crumb" aria-label="เส้นทาง" hidden><a href="#">← วิชาทั้งหมด</a></nav>
+<div id="view" class="list"><p class="status">กำลังโหลด…</p></div>
+<p class="note">หน้านี้อ่านความคืบหน้าจากหน้าวิชาในเบราว์เซอร์นี้เท่านั้น ไม่แก้ ไม่ลบ และไม่ส่งข้อมูลออกไปไหน</p>
+</main>
+</div>
+<script src="scripts/study-today.js?v=1"></script>
+<script>
+(function(){
+'use strict';
+const T=window.StudyToday,$=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function read(key){try{return localStorage.getItem(key);}catch{return null;}}
+const settings=T.loadSettings(read(T.SETTINGS_KEY));
+let data={},summaries={},errors=[];
+function compute(){const now=Date.now();summaries={};for(const c of T.COURSES){if(data[c.key])summaries[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);}return now;}
+function link(c,tab,cat){return c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');}
+function examFor(courseKey,catId,now){
+ return settings.exams.filter(e=>e.course===courseKey&&e.cats.includes(catId)).map(e=>({...e,days:T.daysUntil(e.date,now)})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days)[0]||null;
+}
+function subjects(now){
+ $('#title').textContent='วิชาทั้งหมด';$('#lead').textContent='เลือกวิชาเพื่อดูบท ความคืบหน้า และเริ่มเรียนได้ทันที';$('#crumb').hidden=true;
+ const cards=T.COURSES.map(c=>{
+  const s=summaries[c.key];
+  if(!s)return '<div class="card subj"><h3>'+esc(c.name)+'</h3><p class="full">'+esc(c.full)+'</p><p class="empty">'+(errors.includes(c.key)?'โหลดไม่สำเร็จ ลองรีเฟรช':'กำลังโหลด…')+'</p></div>';
+  const pct=s.total?Math.round(s.seen/s.total*100):0,chapters=Object.keys(s.per).length;
+  return '<a class="card subj" href="#'+c.key+'" aria-label="เปิดวิชา'+esc(c.name)+'"><h3>'+esc(c.name)+'</h3><p class="full">'+esc(c.full)+' · '+chapters+' บท</p><div class="nums"><div class="due"><b>'+s.reviewNow+'</b>ครบกำหนด</div><div class="new"><b>'+s.newToday+'</b>ใหม่วันนี้</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><p class="small">เปิดการ์ดแล้ว '+s.seen+'/'+s.total+' ('+pct+'%)</p><span class="go">ดูบทเรียน →</span></a>';
+ });
+ cards.push('<a class="card subj" href="vocabloom/index.html"><h3>ภาษาอังกฤษ</h3><p class="full">English · VocaBloom</p><p class="small">คำศัพท์และการ์ดทวนอยู่ใน VocaBloom</p><span class="go">เปิด VocaBloom →</span></a>');
+ $('#view').className='grid3';$('#view').innerHTML=cards.join('');
+}
+function chapters(c,now){
+ const D=data[c.key],s=summaries[c.key];
+ $('#title').textContent=c.name;$('#lead').textContent=c.full+' · เลือกบทเพื่ออ่านสรุป ทวนการ์ด หรือทำ Practice';$('#crumb').hidden=false;
+ if(!D||!s){$('#view').className='list';$('#view').innerHTML='<p class="status'+(errors.includes(c.key)?' err':'')+'">'+(errors.includes(c.key)?'โหลดข้อมูลวิชาไม่สำเร็จ ลองรีเฟรช':'กำลังโหลด…')+'</p>';return;}
+ const rows=D.cats.map(([id,label])=>{
+  const p=s.per[id],ex=examFor(c.key,id,now),acc=T.accuracy(p);
+  const book=c.key==='acc'&&/^c\d+$/.test(id)?'<a href="accounting-textbook.html?ch='+id.slice(1)+'">โจทย์ตำรา</a>':'';
+  return '<div class="card chap"><h3>'+esc(label)+(ex?' <span class="tagx">สอบ '+esc(ex.title)+' อีก '+(ex.days===0?'วันนี้':ex.days+' วัน')+'</span>':'')+'</h3>'
+   +'<div class="meta"><span class="due">ครบกำหนด <b>'+p.due+'</b></span><span>การ์ด <b>'+p.seen+'/'+p.cards+'</b></span><span>Practice <b>'+(p.quiz?(p.answered?p.correct+'/'+p.answered+' ('+Math.round(acc*100)+'%) จาก '+p.quiz:'ยังไม่ทำ · '+p.quiz+' ข้อ'):'ไม่มี')+'</b></span></div>'
+   +'<div class="acts"><a href="'+link(c,'sum',id)+'">อ่านสรุป</a><a href="'+link(c,'cards',id)+'">การ์ด</a><a class="main" href="'+link(c,'prac',id)+'">Practice</a>'+book+'</div></div>';
+ });
+ $('#view').className='list';$('#view').innerHTML=rows.join('');
+}
+function render(){
+ const now=compute(),key=(location.hash||'').slice(1),c=T.COURSES.find(x=>x.key===key);
+ document.title=(c?c.name+' — ':'')+'Hub — Study OS';
+ c?chapters(c,now):subjects(now);
+}
+window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+render();
+Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();})
+ .then(html=>{data[c.key]=T.parseCourseData(html);}).catch(()=>{errors.push(c.key);}))).then(render);
+})();
+</script>
+</body>
+</html>
