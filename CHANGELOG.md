@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-14 (opt-in automatic sync)
+- Course pages (acc/eco/math/eng/zh) get an opt-in "⟳ อัตโนมัติ" toggle next to the manual sync button. Off by default; no timers or listeners exist until it is turned on. When on, it syncs after page load, 20 s after a change, when the tab is hidden/shown and every 5 min, reusing the existing CAS merge (If-Match, retry on 409/412).
+- Safety: only with the separate Progress Worker (`progress_api`) and a strong ETag/revision header; otherwise it refuses and local data stays untouched. No Cloudflare change was made.
+- Tests: tests/auto-sync.test.cjs, tests/auto-sync-browser.cjs (two simulated devices converge, wrong key, no-ETag Worker); legacy-sync test fixture now tracks only the first button.
+
 ## 2026-11-14 (Monday quiz practice)
 - Added 14 embedded Accounting practice questions for the 16 Nov quiz: 7 on cost flow (ch6: FIFO, weighted average, specific ID, inventory error carry-over, lower of cost and NRV, consistency) and 7 on bank reconciliation (ch8: reconciling items, adjusted balances, NSF/service-charge entries, book error). Questions are appended at the end of the embedded set so existing answer history (indexed by position) is unchanged.
 - Added a 200-question English practice bank: 100 cost flow (Ch06: ownership, cost components, FIFO/weighted average/specific ID, periodic vs perpetual, error carry-over, lower of cost and NRV, turnover, gross profit method) and 100 bank reconciliation (Ch08: reconciling items by side, adjusted balances, journal entries, errors, controls). Numeric items are generated from formulas and every wrong option names a specific mistake. Appended at the end, so saved progress is unchanged.
