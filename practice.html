@@ -116,7 +116,6 @@ h1{margin:8px 0 0}
 <h2>More practice</h2>
 <section class="grid" aria-label="More practice">
  <div class="pc"><h3>📚 Accounting Textbook Exercises</h3><p class="small">403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</p><div class="acts"><a class="main" href="accounting-textbook.html">Open</a></div></div>
- <div class="pc"><h3>🌸 Languages</h3><div class="acts"><a class="main" href="vocabloom/">VocaBloom</a><a href="eng.html">English</a><a href="zh.html">Chinese</a></div></div>
 </section>
 </main>
 </div>
@@ -130,13 +129,16 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function read(k){try{return localStorage.getItem(k);}catch{return null;}}
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');
 const EMOJI={acc:'📒',eco:'📈',math:'🧮'};
-let data={},failed=[];
+let data={},langData={},failed=[];const FLAG={eng:'🇬🇧',zh:'🇨🇳'};
 function render(){
  const now=Date.now(),sum={};
  for(const c of T.COURSES)if(data[c.key])sum[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);
  $('#courses').innerHTML=T.COURSES.map(c=>{const s=sum[c.key];
   return '<div class="pc"><h3>'+EMOJI[c.key]+' '+esc(c.name)+'</h3>'+(s?'<div class="big'+(s.reviewNow?' due':'')+'">'+s.reviewNow+'<small>due</small> <span style="color:var(--text)">'+s.newToday+'</span><small>new</small></div>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
-   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Quiz</a></div></div>';}).join('');
+   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Quiz</a></div></div>';}).join('')
+  +T.LANGS.map(l=>{const s=langData[l.key]?T.summarize(langData[l.key],read(l.mark+'-srs'),null,now):null;
+   return '<div class="pc"><h3>'+FLAG[l.key]+' '+esc(l.name)+'</h3>'+(s?'<div class="big'+(s.reviewNow?' due':'')+'">'+s.reviewNow+'<small>due</small> <span style="color:var(--text)">'+s.newToday+'</span><small>new</small></div>':'<p class="empty" style="padding:0">Loading…</p>')
+    +'<div class="acts"><a class="main" href="'+l.page+'">Cards</a>'+(l.key==='eng'?'<a href="vocabloom/">VocaBloom</a>':'')+'</div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;
  $('#weak').innerHTML=weak.length?'<ul class="weak">'+weak.map(w=>{const c=T.COURSES.find(x=>x.key===w.course),D=data[w.course],cat=[w.cat];
@@ -145,6 +147,7 @@ function render(){
 }
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);
+Promise.all(T.LANGS.map(l=>fetch(l.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
 })();
 </script>

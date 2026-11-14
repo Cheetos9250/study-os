@@ -119,7 +119,9 @@ function subjects(now){
   const pct=s.total?Math.round(s.seen/s.total*100):0,chapters=Object.keys(s.per).length;
   return '<a class="card subj" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="due"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Chapters →</span></a>';
  });
- cards.push('<a class="card subj" href="vocabloom/index.html"><h3>Languages</h3><p class="full">English · Chinese</p><span class="go">VocaBloom →</span></a>');
+ cards.push('<a class="card subj" href="eng.html"><h3>English</h3><p class="full">Vocabulary</p><span class="go">Cards →</span></a>');
+ cards.push('<a class="card subj" href="zh.html"><h3>Chinese</h3><p class="full">Vocabulary</p><span class="go">Cards →</span></a>');
+ cards.push('<a class="card subj" href="vocabloom/index.html"><h3>VocaBloom</h3><p class="full">English app</p><span class="go">Open →</span></a>');
  $('#view').className='grid3';$('#view').innerHTML=cards.join('');
 }
 function chapters(c,now){

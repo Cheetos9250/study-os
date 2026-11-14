@@ -1,0 +1,2 @@
+- Sidebar no longer shows a gap at the top/bottom when Safari bounces on overscroll (colour extends past the viewport; uses `100lvh`).
+- English and Chinese are separate cards (home, Practice, Subjects) with their own due/new counts; Chinese card image key `zh` accepted on restore.

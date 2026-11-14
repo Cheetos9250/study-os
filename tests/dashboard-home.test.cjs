@@ -6,7 +6,9 @@ test('four-tab navigation reaches every main destination',()=>{
  for(const h of ['index.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html'])assert.match(nav,new RegExp("href:'"+h.replace('.','\\.')+"'"),h);
  for(const f of ['index.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html','accounting-textbook.html','acc.html','eco.html','math.html','eng.html','zh.html'])assert.match(read(f),/scripts\/study-nav\.js/,f);
  const practice=read('practice.html');
- for(const h of ['accounting-textbook.html','vocabloom/','eng.html','zh.html'])assert.ok(practice.includes('href="'+h),h);
+ for(const h of ['accounting-textbook.html','vocabloom/'])assert.ok(practice.includes('href="'+h),h);
+ assert.match(practice,/T\.LANGS\.map/);
+ for(const h of ['eng.html','zh.html'])assert.ok(html.includes('href="'+h),'home '+h);
  assert.match(html,/id="welcome-title"/);
  assert.match(read('today.html'),/url=calendar\.html/);
  assert.doesNotMatch(nav,/localStorage|sessionStorage|fetch\(/);
@@ -36,4 +38,12 @@ test('home writes only its own key and the shared Today settings key',()=>{
 });
 test('home has iPad-friendly rules',()=>{
  assert.match(html,/min-height:4[4-8]px/);assert.match(html,/prefers-color-scheme:dark/);assert.match(html,/prefers-reduced-motion/);
+});
+test('English and Chinese are separate decks with their own card images',()=>{
+ const T=require('../scripts/study-today.js');assert.deepEqual(T.LANGS.map(l=>l.page),['eng.html','zh.html']);
+ assert.match(html,/'voc','🇬🇧'/);assert.match(html,/'zh','🇨🇳'/);
+ assert.match(read('scripts/study-progress-restore.js'),/"voc", "zh"/);
+});
+test('sidebar colour extends past the viewport for Safari overscroll',()=>{
+ assert.match(nav,/#studyNav::before,#studyNav::after/);assert.match(nav,/100lvh/);
 });

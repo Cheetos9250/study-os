@@ -73,7 +73,7 @@ h2::before{content:"✦";font-size:.75em;color:var(--accent)}
 .subjects{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .subj{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg);position:relative}
 .subj .cv{height:70px;display:grid;place-items:center;font-size:32px;background-size:cover;background-position:center}.subj .cv.has{font-size:0}
-.s-acc .cv{background-color:#bfe6cf}.s-eco .cv{background-color:#fbd9b5}.s-math .cv{background-color:#d3cffa}.s-voc .cv{background-color:#fbc9dc}
+.s-acc .cv{background-color:#bfe6cf}.s-eco .cv{background-color:#fbd9b5}.s-math .cv{background-color:#d3cffa}.s-voc .cv{background-color:#c9dcfb}.s-zh .cv{background-color:#fbc9c9}
 .subj .pic{position:absolute;top:6px;right:6px;min-width:44px;min-height:44px;border:0;border-radius:8px;background:rgba(255,255,255,.85);color:#333;font-size:15px;cursor:pointer;opacity:0}
 .subj:hover .pic,.subj:focus-within .pic{opacity:1}@media(hover:none){.subj .pic{opacity:.8}}
 .subj .b{padding:12px 14px 14px}.subj h3{font-size:16px;margin:0 0 2px}.subj .sub{font-size:12px;color:var(--muted);margin:0 0 10px}
@@ -184,7 +184,7 @@ $('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/
 function setMode(m){stop();mins=m;left=m*60;showClock();document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.m===m)));}
 $('#pReset').onclick=()=>setMode(mins);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setMode(+b.dataset.m));
 /* ---------- data ---------- */
-let data={},summaries={},loadFailed=0,now=Date.now(),today=T.dayKey(now);
+let data={},summaries={},langData={},langSum={},loadFailed=0,now=Date.now(),today=T.dayKey(now);
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');
 function leftLabel(iso){const d=T.daysUntil(iso,now);return d<0?{t:(-d)+'d late',c:'late'}:d===0?{t:'Today',c:'today'}:{t:d+'d left',c:''};}
 const PRI={High:0,Medium:1,Low:2};
@@ -239,13 +239,17 @@ function renderSubjects(){
   return '<article class="subj s-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-pic="'+c.key+'" aria-label="Change '+esc(c.name)+' image">🖼</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam in '+(ne.d===0?'today':ne.d+' days'):'&nbsp;')+'</p>'
    +(s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
    +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a><a href="hub.html#'+c.key+'">Chapters</a></div></div></article>';});
- cards.push('<article class="subj s-voc"><div class="cv" data-cv="voc" aria-hidden="true">🌸</div><button type="button" class="pic" data-pic="voc" aria-label="Change languages image">🖼</button><div class="b"><h3>Languages</h3><p class="sub">English · Chinese</p><div class="acts"><a class="main" href="vocabloom/">VocaBloom</a><a href="eng.html">English</a><a href="zh.html">Chinese</a></div></div></article>');
+ const lang=(l,cv,emoji,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-pic="'+cv+'" aria-label="Change '+l.name+' image">🖼</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary</p>'
+  +(ls?'<div class="st"><div><b>'+ls.reviewNow+'</b>due</div><div><b>'+ls.newToday+'</b>new</div></div>':'')+'<div class="acts">'+acts+'</div></div></article>';};
+ cards.push(lang(T.LANGS[0],'voc','🇬🇧','<a class="main" href="eng.html">Cards</a><a href="vocabloom/">VocaBloom</a>'));
+ cards.push(lang(T.LANGS[1],'zh','🇨🇳','<a class="main" href="zh.html">Cards</a>'));
  $('#subjects').innerHTML=cards.join('');paintImages();
 }
-function compute(){now=Date.now();today=T.dayKey(now);summaries={};for(const c of T.COURSES)if(data[c.key])summaries[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);}
+function compute(){now=Date.now();today=T.dayKey(now);summaries={};langSum={};for(const c of T.COURSES)if(data[c.key])summaries[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);for(const l of T.LANGS)if(langData[l.key])langSum[l.key]=T.summarize(langData[l.key],read(l.mark+'-srs'),null,now);}
 function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderChips();renderPlan();renderExams();renderTasks();renderSubjects();}
 renderAll();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
+Promise.all(T.LANGS.map(l=>fetch(l.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){compute();renderAll();}});
 paintImages();
 })();
