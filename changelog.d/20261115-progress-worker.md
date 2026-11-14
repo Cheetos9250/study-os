@@ -1,0 +1,1 @@
+- Progress sync Worker release path: `workers/progress/wrangler.jsonc` + manual workflow `deploy-progress-worker.yml` (typed DEPLOY, GitHub secrets, read-only smoke test). Nothing is deployed until the owner runs it; `data/config.json` is unchanged.

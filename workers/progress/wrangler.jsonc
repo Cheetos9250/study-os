@@ -1,0 +1,23 @@
+// Production progress Worker (cards + quiz progress for acc/eco/math/eng/zh).
+// Deployed ONLY by the manual workflow .github/workflows/deploy-progress-worker.yml.
+// The secret PROGRESS_SYNC_KEY is set by that workflow from a GitHub secret; it is never stored here.
+// Fresh SQLite Durable Object namespace: no data is migrated from the legacy study-api KV, which stays untouched.
+{
+  "name": "vocabloom-progress-cas-prod",
+  "main": "../../experiments/prod-progress-cas/worker.mjs",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": true,
+  "durable_objects": {
+    "bindings": [
+      { "name": "PROD_PROGRESS_DO", "class_name": "ProductionProgressDO" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["ProductionProgressDO"] }
+  ],
+  "vars": {
+    "PROGRESS_CAS_ENABLED": "true",
+    "PROGRESS_WRITES_ENABLED": "true",
+    "PROGRESS_MIGRATION_VERIFIED": "true"
+  }
+}
