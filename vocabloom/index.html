@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f7f8ff" />
-  <meta name="description" content="VocaBloom — Learn English vocabulary with pictures, audio, games and spaced repetition." />
-  <title>VocaBloom — Grow your vocabulary</title>
+  <meta name="description" content="WordNest — English and Chinese vocabulary with pictures, audio, games and spaced repetition." />
+  <title>WordNest</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   
   <style>
@@ -69,7 +69,7 @@ body.dark .path-foot b {color:#bfb4ff;}
         <button data-page="home">Home</button><button data-page="learn">Learn</button><button data-page="practice">Games</button><button data-page="review">Review</button><button data-page="library">Library</button><button data-page="progress" aria-label="My progress" title="My progress">Progress</button><button data-page="settings" aria-label="Settings" title="Settings">⚙</button>
       </nav>
       <main id="mainContent" class="content" tabindex="-1"></main>
-      <footer class="main-footer">VocaBloom · Learn a little, every day. <span>Built as a personal learning prototype</span></footer>
+      <footer class="main-footer">WordNest · Learn a little, every day.</footer>
     </div>
   </div>
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
@@ -265,12 +265,13 @@ document.addEventListener('submit',e=>{if(e.target.id==='lessonAnswerForm'){e.pr
 document.addEventListener('input',e=>{if(e.target.id==='librarySearch'){ui.libraryFilter=e.target.value;$('wordList').innerHTML=libraryRowsHTML()}});
 document.addEventListener('change',e=>{if(e.target.id==='libraryCategory'){ui.libraryCategory=e.target.value;$('wordList').innerHTML=libraryRowsHTML()}if(e.target.id==='goalSetting'){data.settings.goal=Number(e.target.value)||10;store();updateChrome();toast('เปลี่ยนเป้าหมายรายวันแล้ว')}if(e.target.id==='importInput'){importData(e.target.files?.[0])}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalLayer').hidden)closeModal()});
-$('soundToggle').addEventListener('click',()=>speak('Welcome to VocaBloom. Learn a little, every day.'));
+$('soundToggle').addEventListener('click',()=>speak('Welcome to WordNest. Learn a little, every day.'));
 render();
 syncNotionWords(false);
 
 </script>
 <script src="./study-integration.js"></script>
 <script src="./unified-progress.js"></script>
+<script src="./wordnest.js"></script>
 </body>
 </html>
