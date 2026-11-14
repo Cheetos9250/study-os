@@ -185,3 +185,12 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Exact-main verification: five push runs, one per workflow, all successful: Node/icon 43473234789, course storage 43473234834, restore 43473234845, accounting 43473235024, backup/basic 43473234966. Pages 43473232907 succeeded. No main run was cancelled in this check.
 - Preserved suite results: 239 Node tests, 3 Python tests, and existing synthetic browser suites (30 course-save / 48 basic-backup / 15 reader / 12 recovery). Runtime source and test job definitions are unchanged; this is test scheduling, not new app functionality.
 - Local semantic checks parsed five YAMLs and proved jobs, permissions, PR paths and manual events unchanged. Final source/diff checks passed. No production automation dispatch, backend deployment, learning-data mutation or language-feature work. Physical iPad and live backend gaps remain as previously recorded.
+
+
+## Cross-tab course-save conflicts — 2026-11-14
+- Reproduced with synthetic data on main: an old queued quiz save replaced a value another tab had saved while the first tab was blocked. No real progress was accessed.
+- The course guard now captures a baseline of its existing progress keys and checks saved bytes before each write/retry. A different saved version is preserved, the draft remains pending and exportable, and the warning asks the learner to keep both copies. Identical already-saved values clear pending state without writing; independent datasets can still retry.
+- Unknown/unreadable initial data is not adopted as a new baseline for an existing value. The guard does not silently merge, reset or offer a force-overwrite action. This is a best-effort check before write, not an atomic transaction across tabs.
+- Added 6 unit cases for queued/direct stale writes, identical values, partial retry, unknown baselines and unrelated courses. Browser coverage adds academic-only multi-tab cases for Accounting/Economics/Mathematics: two saved copies, repeated blocked retry, a stale third tab and recovery's existing conflict refusal. Existing legacy course tests remain compatibility checks.
+- Only course HTML helper-version pins change; learning content and language features are untouched. Normal-flow backup CI now watches helper/CSS-only updates. PR #44/#68 branches remain untouched.
+- Branch: fix/study-os-cross-tab-save-20261114. Local/CI/release results recorded in the associated PR; physical iPad and native tab behavior remain unverified.
