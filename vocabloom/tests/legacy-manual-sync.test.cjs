@@ -90,7 +90,7 @@ for(const filename of pages){
   assert.equal(f.context.store.ans[0],1);
   assert.equal(f.timerCount,0);
   assert.equal(f.visibilityHandlers,0);
-  assert.match(f.button.textContent,/ด้วยตนเอง/);
+  assert.match(f.button.textContent,/manually/);
  });
  test(filename+' requires explicit confirmation before manual GET and PUT',async()=>{
   const denied=fixture(content,{allow:false});
