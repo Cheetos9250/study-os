@@ -43,6 +43,17 @@
             (record.updated !== undefined && typeof record.updated !== "string"))
           throw new Error("Invalid accounting textbook answer data");
       }
+    } else if (key === "studyos.home.v1") {
+      if (value.tasks !== undefined && !Array.isArray(value.tasks)) throw new Error("Invalid home dashboard tasks");
+      for (var t of (value.tasks || [])) {
+        if (!object(t) || typeof t.id !== "string" || typeof t.title !== "string" || t.title.length > 80 ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(String(t.date)) || !["High", "Medium", "Low"].includes(t.pri) ||
+            (t.done !== undefined && typeof t.done !== "boolean"))
+          throw new Error("Invalid home dashboard task");
+      }
+      if (value.focus !== undefined && !object(value.focus)) throw new Error("Invalid home dashboard checklist");
+      if (value.cover !== undefined && (typeof value.cover !== "string" || !/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(value.cover)))
+        throw new Error("Invalid home dashboard cover");
     } else if (key === "vocabloom_mvp_v1") {
       if (!object(value.progress) || !object(value.days) ||
           !Array.isArray(value.custom) || !object(value.settings))
