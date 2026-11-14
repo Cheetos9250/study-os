@@ -47,6 +47,7 @@ test('exams and deadlines may belong to languages or other subjects',()=>{
  assert.deepEqual(s.exams.map(e=>e.id),['p','x']);
  const plan=T.buildPlan(s.exams,{},s,Date.parse('2026-11-16T03:00:00Z'));assert.equal(plan.upcoming.length,2);
  assert.match(read('calendar.html'),/name:'Other \(no cards\)'/);
+});
 test('lesson notes are backed up and validated on restore',()=>{
  assert.ok(require('../scripts/study-progress-backup.js').keys.includes('studyos.notes.v1'));
  assert.match(read('scripts/study-progress-restore.js'),/key === "studyos\.notes\.v1"/);
