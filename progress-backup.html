@@ -13,7 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Outfit:wght@400;500;600;700;800&amp;family=IBM+Plex+Sans+Thai:wght@400;500;700&amp;family=Noto+Sans+Thai:wght@400;500;700&amp;display=swap" rel="stylesheet">
   <style>
     :root{--bg:#f8f9fc;--card:#fff;--ink:#202445;--muted:#606580;--line:#eaebf2;--accent:#5b53d7;--on-accent:#fff}
-    @media(prefers-color-scheme:dark){:root{--bg:#181b2b;--card:#24283c;--ink:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--accent:#a9a2ff;--on-accent:#202445}}
+    @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181b2b;--card:#24283c;--ink:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--accent:#a9a2ff;--on-accent:#202445}}
+:root[data-theme="dark"]{--bg:#181b2b;--card:#24283c;--ink:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--accent:#a9a2ff;--on-accent:#202445}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "DM Sans","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
     main{max-width:650px;margin:0 auto;padding:28px 18px 60px}
@@ -33,6 +34,7 @@
     #status,#checkStatus{min-height:1.5em;overflow-wrap:anywhere;margin-top:12px}
     code{font-size:0.9em;overflow-wrap:anywhere}
   </style>
+<script src="scripts/study-theme.js?v=1"></script>
 </head>
 <body>
   <main>
