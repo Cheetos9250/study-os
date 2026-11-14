@@ -16,3 +16,8 @@ test('course page study controls are English',()=>{
   for(const s of ['Show answer','>Again<small>','New/day: ','All done for today','Tap to see the answer','Front: term'])assert.ok(code.includes(s),f+' '+s);
   for(const th of ['แสดงคำตอบ','การ์ดใหม่/วัน','วันนี้ทบทวนครบแล้ว','ด้านหน้า: หัวข้อ'])assert.ok(!code.includes(th),f+' '+th);}
 });
+test('card pages hide the Notion review box; Cloud sync shows only on request',()=>{
+ const css=read('assets/study-unify.css'),nav=read('scripts/study-nav.js');
+ assert.match(css,/body #sync\{display:none!important\}/);assert.match(css,/html:not\(\.show-sync\) \.cloud-sync-bar\{display:none!important\}/);
+ assert.match(nav,/class="sn-sync"/);assert.match(nav,/get\('sync'\)==='1'/);
+});

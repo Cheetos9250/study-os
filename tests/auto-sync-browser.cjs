@@ -31,7 +31,7 @@ srv.listen(0,async()=>{
  const ans=p=>p.evaluate(()=>{try{return JSON.parse(localStorage.getItem('study-acc')||'{}').ans||{}}catch(e){return {}}});
  const msg=p=>p.locator('.cloud-sync-bar [role=status]').innerText();
  // F) default off: no calls
- let A=await device();await A.page.goto(base+'/acc.html?tab=prac');await A.page.clock.runFor(30000);
+ let A=await device();await A.page.goto(base+'/acc.html?tab=prac&sync=1');await A.page.clock.runFor(30000);
  ok(hits.length===0,'auto off by default: no progress-worker calls ('+hits.length+')');
  ok(await A.page.locator('.cloud-sync-bar button').nth(1).isHidden(),'auto toggle hidden before a key is set');
  // set key (manual flow) then enable auto
@@ -47,7 +47,7 @@ srv.listen(0,async()=>{
  await A.page.waitForFunction(n=>true,0);await new Promise(r=>setTimeout(r,500));
  ok(hits.length>before&&store&&store.study&&store.study.ans&&store.study.ans[k1]!==undefined,'A auto-pushed the answer to the Worker');
  // device B: fresh browser, same key, auto on, loads page -> pulls
- let B=await device();await B.page.goto(base+'/acc.html?tab=prac');
+ let B=await device();await B.page.goto(base+'/acc.html?tab=prac&sync=1');
  await B.page.locator('.cloud-sync-bar button').first().click();await B.page.waitForFunction(()=>/ซิงก์แล้ว/.test(document.querySelector('.cloud-sync-bar [role=status]').textContent));
  let b1=await ans(B.page);ok(b1[k1]!==undefined,'B received A\'s answer via sync');
  await B.page.locator('.cloud-sync-bar button').nth(1).click();
@@ -64,12 +64,12 @@ srv.listen(0,async()=>{
  ok(fa[qa]!==undefined&&fa[qb]!==undefined&&fb[qa]!==undefined&&fb[qb]!==undefined,'both devices converge on both answers');
  ok(fa[k1]===a1[k1],'earlier answer kept');
  // wrong key -> 401, nothing overwritten
- const C=await device();await C.page.goto(base+'/acc.html?tab=prac');
+ const C=await device();await C.page.goto(base+'/acc.html?tab=prac&sync=1');
  C.page.removeAllListeners('dialog');C.page.on('dialog',d=>d.accept(d.type()==='prompt'?'wrong-key':undefined));
  const rv=rev;await C.page.locator('.cloud-sync-bar button').first().click();await C.page.waitForTimeout(600);
  ok(/ไม่ถูกต้อง/.test(await msg(C.page))&&rev===rv,'wrong key rejected, Worker data untouched');
  // worker without ETag: auto refuses, local data unchanged
- noEtag=true;const D=await device();await D.page.goto(base+'/acc.html?tab=prac');
+ noEtag=true;const D=await device();await D.page.goto(base+'/acc.html?tab=prac&sync=1');
  await D.page.locator('.cloud-sync-bar button').first().click();await D.page.waitForTimeout(800);
  const autoD=D.page.locator('.cloud-sync-bar button').nth(1);
  if(await autoD.isVisible()){await autoD.click();await D.page.evaluate(()=>{const st=JSON.parse(localStorage.getItem('study-acc')||'{}').ans||{};const q=QS.find(x=>st[x.id]===undefined);qcats.clear();buildDeck();qpos=deck.findIndex(z=>z.id===q.id);renderQ();});await D.page.locator('.opt').first().click();const before2=rev;await D.page.clock.runFor(21000);await D.page.waitForTimeout(600);

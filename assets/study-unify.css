@@ -31,3 +31,8 @@ body .srs .n{color:var(--accent)}
 body table{background:var(--paper)}
 body th{background:var(--surface)}
 body .sec h2{border-left-color:var(--accent)}
+
+/* Keep the card page clean: the old Notion review box is hidden; Cloud sync shows only when asked for
+   (sidebar "Cloud sync" button or ?sync=1). Nothing is removed from the page or from storage. */
+body #sync{display:none!important}
+html:not(.show-sync) .cloud-sync-bar{display:none!important}
