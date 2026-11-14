@@ -33,7 +33,9 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           for(const course of ['acc','eco','math','eng','zh']){
             const link=page.locator(`a[href="${course}.html"], a[href^="${course}.html?tab=cards"]`).first();
             console.log('Course journey:',engine,width,course);
-            await Promise.all([page.waitForURL(u=>u.pathname.endsWith("/"+course+".html"),{waitUntil:'domcontentloaded'}),link.click()]);
+            // English/Chinese are reached through WordNest now, so open those course pages directly.
+            if(await link.count())await Promise.all([page.waitForURL(u=>u.pathname.endsWith("/"+course+".html"),{waitUntil:'domcontentloaded'}),link.click()]);
+            else await page.goto(base+'/'+course+'.html?tab=cards',{waitUntil:'domcontentloaded'});
             await page.waitForLoadState('domcontentloaded');
             try{await page.locator('.front-t').waitFor();}catch(error){console.error({engine,width,course,url:page.url(),errors,body:await page.locator('body').innerText()});await page.screenshot({path:path.join(output,'failure-'+engine+'-'+width+'-'+course+'.png'),fullPage:true});throw error;}
             await page.locator('.card').click();
