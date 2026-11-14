@@ -72,7 +72,7 @@
  }
  function normalizeExams(list){
   if(!Array.isArray(list))return DEFAULT_EXAMS.map(e=>({...e,cats:[...e.cats]}));
-  return list.filter(e=>e&&typeof e==='object'&&typeof e.id==='string'&&COURSES.some(c=>c.key===e.course)&&Number.isFinite(dateStart(e.date)))
+  return list.filter(e=>e&&typeof e==='object'&&typeof e.id==='string'&&(e.course==='other'||COURSES.some(c=>c.key===e.course)||LANGS.some(c=>c.key===e.course))&&Number.isFinite(dateStart(e.date)))
    .map(e=>({id:e.id,course:e.course,title:String(OLD_TITLES[e.title]||e.title||'Exam').slice(0,80),date:e.date,cats:Array.isArray(e.cats)?e.cats.filter(x=>typeof x==='string'):[],confirmed:!!e.confirmed}))
    .map(upgradeDefault);
  }

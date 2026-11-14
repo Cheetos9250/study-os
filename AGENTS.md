@@ -16,6 +16,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
    - get validation in `scripts/study-progress-restore.js`;
    - get the same label in `progress-restore.html`.
 3. **Avoid merge conflicts.**
+   - Put new tests in a **new test file**. Appending to the same file from two PRs conflicts.
    - Do not edit `CHANGELOG.md` or `NEXT_STEPS.md`.
    - Add a fragment `changelog.d/YYYYMMDD-short-name.md` instead.
    - Do not stack PRs. If an open PR already touches the same files, add to that PR.

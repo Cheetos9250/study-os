@@ -1,0 +1,1 @@
+- Exams/deadlines can belong to English, Chinese or "Other (no cards)" subjects (e.g. EC1 presentation, Excel project); Today chip shows the item title; singular "day".

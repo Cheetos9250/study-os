@@ -228,7 +228,7 @@ function renderChips(){
  const top=T.COURSES.slice().sort((a,b)=>((summaries[b.key]||{}).reviewNow||0)-((summaries[a.key]||{}).reviewNow||0))[0];
  const chips=['<a class="chip" href="'+(dueTotal?link(top,'cards'):'flashcards.html')+'"><b>'+dueTotal+'</b><span>cards due</span></a>',
   '<div class="chip'+(late?' warn':'')+'"><b>'+open.length+'</b><span>tasks'+(late?' · '+late+' late':'')+'</span></div>'];
- if(ne)chips.push('<a class="chip'+(ne.d<=3?' warn':ne.d<=7?' soon':'')+'" href="#exams"><b>'+(ne.d===0?'Today':ne.d)+'</b><span>'+(ne.d===0?'':'days to ')+esc((course(ne.course)||{}).name||'')+' exam</span></a>');
+ if(ne)chips.push('<a class="chip'+(ne.d<=3?' warn':ne.d<=7?' soon':'')+'" href="#exams"><b>'+(ne.d===0?'Today':ne.d)+'</b><span>'+(ne.d===0?'':ne.d===1?'day to ':'days to ')+esc(ne.title)+'</span></a>');
  $('#chips').innerHTML=chips.join('');
 }
 function renderPlan(){
@@ -246,7 +246,7 @@ function renderPlan(){
 }
 function renderExams(){
  const up=upcoming();
- $('#exams').innerHTML=up.length?up.map(e=>'<div class="exam'+(e.d<=3?' urgent':e.d<=7?' soon':'')+'"><div class="n">'+(e.d===0?'Today':e.d+'<small>days</small>')+'</div><p><b>'+esc(e.title)+'</b></p><p class="when">'+esc(shortDay(e.date))+'</p></div>').join(''):'<p class="empty">No upcoming exams.</p>';
+ $('#exams').innerHTML=up.length?up.map(e=>'<div class="exam'+(e.d<=3?' urgent':e.d<=7?' soon':'')+'"><div class="n">'+(e.d===0?'Today':e.d+'<small>'+(e.d===1?'day':'days')+'</small>')+'</div><p><b>'+esc(e.title)+'</b></p><p class="when">'+esc(shortDay(e.date))+'</p></div>').join(''):'<p class="empty">No upcoming exams.</p>';
 }
 let limit=8;
 function renderTasks(){
