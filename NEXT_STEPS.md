@@ -62,5 +62,5 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 
 
 ## Next code review
-- Review queued local course-save retries for conflicting updates from another tab. First reproduce with synthetic academic progress; retain unsaved export and existing no-overwrite recovery rules. Do not claim browser-local writes are atomic across tabs.
+- Cross-tab course-save conflict reproduction is confirmed with synthetic data. Verify/release the baseline-check guard after exact-head CI, academic multi-tab recovery checks and screenshots. Preserve draft export/no-overwrite recovery and do not describe localStorage as atomic across tabs.
 - Continue source/automation recovery reviews only within their existing authorization gates; keep independent active PR #68 and protected PR #44 branches untouched.

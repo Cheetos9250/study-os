@@ -34,3 +34,6 @@ The five course pages now provide explicit failed-save feedback, user-triggered 
 
 ## Current development focus
 Study OS development prioritizes Accounting, Economics, Mathematics and shared study infrastructure. English/Chinese routes remain legacy compatibility surfaces; deeper language-learning feature development belongs to VocaBloom. Regression testing existing language routes does not expand their product scope.
+
+## Multiple tabs
+A course-save guard update is in review to refuse overwriting a saved dataset changed since this page opened. Pending drafts remain exportable and learners keep both copies. It uses a best-effort pre-write check; browser-local storage is not an atomic cross-tab database and this does not provide cross-browser synchronization.
