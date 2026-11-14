@@ -2,6 +2,7 @@
 
 ## 2026-11-14 (Monday quiz practice)
 - Added 14 embedded Accounting practice questions for the 16 Nov quiz: 7 on cost flow (ch6: FIFO, weighted average, specific ID, inventory error carry-over, lower of cost and NRV, consistency) and 7 on bank reconciliation (ch8: reconciling items, adjusted balances, NSF/service-charge entries, book error). Questions are appended at the end of the embedded set so existing answer history (indexed by position) is unchanged.
+- Added periodic-system COGS: 2 Ch06 flashcards (formula; perpetual vs periodic) and 4 questions (formula, why count, multi-item calculation with returns/discounts/freight-in, FIFO periodic). Appended at the end, so saved progress is unchanged.
 - Rewrote 15 older embedded questions (ch3, ch6, ch8, ch9) whose stems were incomplete or unclear (e.g. "Outstanding checks ปรับที่?", "Weighted avg เฉลี่ย 110 ขาย 12"): full scenarios, clearer options, richer feedback. Position, correct option and option count are unchanged, so saved answers stay valid.
 
 ## 2026-11-14
