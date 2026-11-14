@@ -2,6 +2,10 @@
 
 ## 2026-11-14 (Monday quiz practice)
 - Added 14 embedded Accounting practice questions for the 16 Nov quiz: 7 on cost flow (ch6: FIFO, weighted average, specific ID, inventory error carry-over, lower of cost and NRV, consistency) and 7 on bank reconciliation (ch8: reconciling items, adjusted balances, NSF/service-charge entries, book error). Questions are appended at the end of the embedded set so existing answer history (indexed by position) is unchanged.
+- Added a 200-question English practice bank: 100 cost flow (Ch06: ownership, cost components, FIFO/weighted average/specific ID, periodic vs perpetual, error carry-over, lower of cost and NRV, turnover, gross profit method) and 100 bank reconciliation (Ch08: reconciling items by side, adjusted balances, journal entries, errors, controls). Numeric items are generated from formulas and every wrong option names a specific mistake. Appended at the end, so saved progress is unchanged.
+- Translated all 60 embedded Accounting practice questions and feedback to English. Position, correct option and option count are unchanged, so saved answers stay valid. Flashcards, summaries and Notion-synced questions are unchanged.
+- Added periodic-system COGS: 2 Ch06 flashcards (formula; perpetual vs periodic) and 4 questions (formula, why count, multi-item calculation with returns/discounts/freight-in, FIFO periodic). Appended at the end, so saved progress is unchanged.
+- Rewrote 15 older embedded questions (ch3, ch6, ch8, ch9) whose stems were incomplete or unclear (e.g. "Outstanding checks ปรับที่?", "Weighted avg เฉลี่ย 110 ขาย 12"): full scenarios, clearer options, richer feedback. Position, correct option and option count are unchanged, so saved answers stay valid.
 
 ## 2026-11-14
 - PR #77: course saves/retries check the original saved bytes before writing; conflicting progress remains saved and pending drafts stay exportable. Release `4ae71f8`.
