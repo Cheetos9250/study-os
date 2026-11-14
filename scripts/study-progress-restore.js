@@ -77,6 +77,13 @@
             !/^\d{2}:\d{2}$/.test(String(cl.start)) || !/^\d{2}:\d{2}$/.test(String(cl.end)) ||
             (cl.name !== undefined && typeof cl.name !== "string"))
           throw new Error("Invalid timetable");
+    } else if (key === "studyos.notes.v1") {
+      for (var nk of Object.keys(value)) {
+        var note = value[nk];
+        if (!/^[a-z]+:[A-Za-z0-9_-]+$/.test(nk) || !object(note) || typeof note.text !== "string" ||
+            (note.updated !== undefined && typeof note.updated !== "string"))
+          throw new Error("Invalid lesson notes");
+      }
     } else if (key === "studyos.grades.v1") {
       if (!Array.isArray(value.courses)) throw new Error("Invalid grades data");
       for (var gc of value.courses) {
