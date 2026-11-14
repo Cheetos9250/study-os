@@ -57,18 +57,21 @@
  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
  function mount(){
   if(document.getElementById('studyNav'))return;
+  if(course&&typeof URLSearchParams==='function'&&new URLSearchParams(location.search).get('sync')==='1')document.documentElement.classList.add('show-sync');
   var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);
   var nav=document.createElement('nav');nav.id='studyNav';nav.setAttribute('aria-label','Main');
   var h='<a class="sn-brand" href="index.html">Study OS</a><div class="sn-tabs">';
   TABS.forEach(function(t){h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+'><span class="sn-ic" aria-hidden="true">'+t.icon+'</span><span>'+esc(t.label)+'</span></a>';});
   h+='<button type="button" class="sn-more" aria-expanded="false" aria-controls="snFoot"><span class="sn-ic" aria-hidden="true">⋯</span><span>More</span></button></div>';
-  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>';
+  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(course?'<button type="button" class="sn-sync"><span class="sn-ic" aria-hidden="true">☁</span><span>Cloud sync</span></button>':'');
   MORE.forEach(function(m){h+='<a href="'+m.href+'">'+esc(m.label)+'</a>';});
   h+='</div>';
   nav.innerHTML=h;document.body.appendChild(nav);document.documentElement.classList.add('sn-on');
   var more=nav.querySelector('.sn-more');
   more.onclick=function(e){e.stopPropagation();var o=nav.classList.toggle('sn-open');more.setAttribute('aria-expanded',o?'true':'false');};
   document.addEventListener('click',function(e){if(!nav.contains(e.target)){nav.classList.remove('sn-open');more.setAttribute('aria-expanded','false');}});
+  var sy=nav.querySelector('.sn-sync');
+  if(sy)sy.onclick=function(){var on=document.documentElement.classList.toggle('show-sync');nav.classList.remove('sn-open');var bar=document.querySelector('.cloud-sync-bar');if(on&&bar&&bar.scrollIntoView)bar.scrollIntoView({block:'center'});};
   var tb=nav.querySelector('.sn-theme'),T=window.StudyTheme;
   function paint(){if(!T){tb.hidden=true;return;}var m=T.mode();tb.innerHTML='<span class="sn-ic" aria-hidden="true">'+T.ICON[m]+'</span><span>'+esc(T.LABEL[m])+'</span>';tb.setAttribute('aria-label',T.LABEL[m]+' (tap to change)');}
   tb.onclick=function(){if(T){T.cycle();paint();}};paint();
