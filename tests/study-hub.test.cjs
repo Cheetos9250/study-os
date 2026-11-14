@@ -7,6 +7,7 @@ test('hub page is read-only and links courses, chapters and VocaBloom',()=>{
   assert.match(s,/accounting-textbook\.html\?ch=/);
   assert.match(s,/link\(c,'prac'/);
 });
-test('homepage links to the hub',()=>{
-  assert.match(fs.readFileSync('index.html','utf8'),/href="hub\.html"/);
+test('homepage reaches the hub through the shared navigation',()=>{
+  assert.match(fs.readFileSync('index.html','utf8'),/scripts\/study-nav\.js/);
+  assert.match(fs.readFileSync('scripts/study-nav.js','utf8'),/href:'hub\.html'/);
 });

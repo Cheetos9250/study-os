@@ -42,7 +42,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
             assert.ok(Object.keys(JSON.parse(stored).s).length>0);
             await page.reload();await page.locator('.front-t').waitFor();
             assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'rating did not survive reload');
-            assert.equal(await page.locator('.course-links a[href="progress-backup.html"]').count(),1);
+            assert.equal(await page.locator('#studyNav a[href="progress-backup.html"]').count(),1);
             if(await page.locator('[data-tab="prac"]').isVisible()){
               await page.locator('[data-tab="prac"]').click();
               const option=page.locator('#qBody .opt').first(),choice=Number(await option.getAttribute('data-oi'));
@@ -59,7 +59,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
               await page.locator('[data-tab="prac"]').click();await page.locator('.explain').waitFor();
               assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans[0],choice,'quiz answer did not survive reload');
             }
-            await page.locator('.course-links a[href="./"]').click();
+            await page.locator('#studyNav .sn-tab[data-sn="today"]').click();
             await page.locator('#welcome-title').waitFor();
             evidence.push({engine,width,course,navigateRateReloadReturn:'passed'});
           }
@@ -76,7 +76,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           await page.locator('.topnav a[href="index.html"]').click();await page.locator('#welcome-title').waitFor();
           evidence.push({engine,width,textbookAnswerPersistence:'passed',pdfSelected:false});
           await page.evaluate(()=>{localStorage.setItem('study-sync-key','SYNTHETIC-SECRET');localStorage.setItem('study-sync-progress-key-v1','SYNTHETIC-SECRET');});
-          await page.getByRole('link',{name:'Back up progress',exact:true}).click();
+          await page.locator('#studyNav a[href="progress-backup.html"]').evaluate(a=>a.click());await page.waitForURL(u=>u.pathname.endsWith('/progress-backup.html'));
           const before=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
           const downloadPromise=page.waitForEvent('download');
           await page.locator('#download').click();const download=await downloadPromise;

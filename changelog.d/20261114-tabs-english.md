@@ -1,0 +1,5 @@
+- Four-tab navigation (Today · Practice · Subjects · Calendar): left sidebar on wide screens, bottom tab bar on narrow screens; theme and backup/restore under the sidebar footer / "More".
+- New `practice.html` (due cards per subject, weak chapters, textbook, languages) and `calendar.html` (month view + exam schedule editor). `today.html` now redirects to the calendar.
+- English UI on home, practice, calendar, subjects and navigation; shorter, cleaner text. Course pages keep their current UI text for now.
+- Home: taller cover, title below the cover, profile icon without a circle when an image is set (keeps PNG transparency), animated GIF support for cover/icon/card images (max 1.5 MB). Restore accepts GIF/PNG images.
+- Old Thai default exam titles are renamed to English when loaded.

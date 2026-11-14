@@ -43,7 +43,7 @@ test('reader remembers the most recent question and keeps continuation inside a 
 });
 
 test('home and textbook still only advertise chapters 1–9',()=>{
- const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ const home=fs.readFileSync(path.join(root,'practice.html'),'utf8');
  assert.match(home,/403 indexed exercises · Chapters 1–9/);
  assert.match(html,/Textbook Exercises · Chapters 1–9/);
  assert.doesNotMatch(html,/1,361 indexed exercises/);
