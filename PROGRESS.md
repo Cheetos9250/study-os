@@ -194,3 +194,11 @@ PR #44 remains untouched. No Notion sync dispatch, production data changes or ba
 - Added 6 unit cases for queued/direct stale writes, identical values, partial retry, unknown baselines and unrelated courses. Browser coverage adds academic-only multi-tab cases for Accounting/Economics/Mathematics: two saved copies, repeated blocked retry, a stale third tab and recovery's existing conflict refusal. Existing legacy course tests remain compatibility checks.
 - Only course HTML helper-version pins change; learning content and language features are untouched. Normal-flow backup CI now watches helper/CSS-only updates. PR #44/#68 branches remain untouched.
 - Branch: fix/study-os-cross-tab-save-20261114. Local/CI/release results recorded in the associated PR; physical iPad and native tab behavior remain unverified.
+
+
+## Textbook reader cross-tab save protection
+- Separate synthetic reproduction confirmed that the reader could drop another question saved in a second tab when flushing an older in-memory map. This is separate from the course guard.
+- Added raw baseline checks to the reader's existing persist path; conflicting saved answers remain unchanged while the current draft remains dirty and exportable. Unknown/unreadable initial data is not overwritten. Identical saved drafts resolve without a redundant write. No new key, schema, PDF/solution/catalog change or force-overwrite path.
+- Added 3 function-level tests and 6 Chromium/WebKit multi-tab journeys at 390/820/1280px: failed draft, different question saved by another tab, stale third tab, reader draft export and main backup of the saved copy. Existing 15 reader cases remain. Error text is readable in both themes. Physical iPad/PDF/native-tab verification remains pending.
+- PR #77's course protection released as `4ae71f8`; exact-main Pages 43548070051, Node/icon 43548070408, course 43548070429, basic/backup 43548070433 and VocaBloom regression 43548070569 all passed. Live helper/HTML verification is recorded in PR #77.
+- Branch: fix/textbook-cross-tab-save-20261114. Active PR #68 branch/solutions remain untouched; this patch changes only persistence, errors and related QA.
