@@ -75,3 +75,5 @@ The chapters 1–9 reader is published in PR #63. Preserve its private-PDF workf
 - Owner priorities: Today page (released), exam countdown/plan (released), AI Tutor that answers questions and checks answers (not started; needs cost/backend decision).
 - Confirm 26 Nov / 27 Nov / 1 Dec exam scopes with the owner; add `studyos.today.v1` to backup allowlist; deep-link course tabs/chapters from plan tasks.
 - Owner approved moving English vocabulary to VocaBloom and increasing privacy (public repo exposes workers.dev account subdomain). Both touch data/backend and need a reviewed plan.
+
+- Notion auto-sync stopped (owner decision, 2026-11-14). Follow-up: move the English cards into VocaBloom, then delete `data/cards.json`, `data/quiz.json`, `scripts/sync_notion.py` and the Notion tests. Owner-side: revoke the Notion token in GitHub secrets if Notion is no longer used.
