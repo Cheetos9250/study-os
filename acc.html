@@ -569,13 +569,14 @@ window.__xs=(()=>{
       try{ buildDeck(); renderQ(); cardsRow(); if(!shown) renderCard(); }catch(e){}
     } finally { applying=false; }
   }
-  async function sync(manual){
+  async function sync(manual,auto){
     // Deliberate manual click only; never run on page load, visibility or rating.
     if(!manual||busy) return;
     const base=await cfg();
     if(!base){ say('ยังไม่ได้ตั้งค่า api ใน data/config.json'); return; }
-    if(!key()){ askKey(); return; }
-    if(!window.confirm('การซิงก์จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Cloudflare Worker\n\nหาก Worker ยังไม่รองรับ ETag/If-Match การซิงก์แบบเดิมอาจเขียนทับคะแนนเมื่อใช้อีกอุปกรณ์พร้อมกัน กรุณาสำรองคะแนนและหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
+    if(!key()){ if(!auto)askKey(); return; }
+    if(auto&&progressKeyName===LSK){ say('ซิงก์อัตโนมัติใช้ได้เฉพาะกับ Progress Worker แยกต่างหาก'); return; }
+    if(!auto&&!window.confirm('การซิงก์จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Cloudflare Worker\n\nหาก Worker ยังไม่รองรับ ETag/If-Match การซิงก์แบบเดิมอาจเขียนทับคะแนนเมื่อใช้อีกอุปกรณ์พร้อมกัน กรุณาสำรองคะแนนและหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
     busy=true;say('กำลังตรวจเวอร์ชันและซิงก์…',true);
     try{
       const url=base+'/progress/'+D.key;
@@ -590,6 +591,7 @@ window.__xs=(()=>{
         if(!r.ok)throw Error('GET HTTP '+r.status);
         const etag=(r.headers?.get?.('X-Sync-Revision')??r.headers?.get?.('ETag'))||'';
         const revision=/^"[0-9]+"$/.test(etag)?etag:'';
+        if(auto&&!revision)throw Error('Worker ไม่ส่งหมายเลขเวอร์ชัน (ETag) จึงไม่ซิงก์อัตโนมัติ ใช้ปุ่มซิงก์ด้วยตนเองแทน');
         const originalTag=r.headers?.get?.('ETag')||'';
         const customRev=r.headers?.get?.('X-Sync-Revision');
         // A weak tag or malformed application version indicates broken CAS.
@@ -614,10 +616,21 @@ window.__xs=(()=>{
         done=true;break;
       }
       if(!done)throw Error('ข้อมูลเปลี่ยนพร้อมกันเกิน 6 รอบ คะแนนบนเครื่องยังอยู่');
-      say('ซิงก์แล้ว '+hhmm(),true);
+      dirtyFlag=false;say('ซิงก์แล้ว '+hhmm(),true);
     }catch(e){say('ซิงก์ไม่สำเร็จ: '+String(e.message||e));}
     busy=false;paint();
   }
+  /* Opt-in automatic sync: only with the separate Progress Worker (progress_api) and a CAS revision header. */
+  const AUTOK='study-sync-auto-v1';
+  let dirtyFlag=false,autoTimer=null,autoBtn=null;
+  const autoOn=()=>{try{return localStorage.getItem(AUTOK)==='1'}catch(e){return false}};
+  const autoReady=()=>!!(api&&key()&&progressKeyName!==LSK);
+  function schedule(ms){ clearTimeout(autoTimer); autoTimer=setTimeout(()=>{ if(autoOn()&&autoReady()&&!document.hidden||dirtyFlag&&autoOn()&&autoReady()) sync(true,true); },ms); }
+  function setAuto(on){ try{ if(on)localStorage.setItem(AUTOK,'1'); else localStorage.removeItem(AUTOK); }catch(e){ say('บันทึกการตั้งค่าซิงก์อัตโนมัติไม่ได้'); return; } if(on){arm();schedule(500);} else clearTimeout(autoTimer); say(on?'ซิงก์อัตโนมัติเปิดอยู่':'ซิงก์อัตโนมัติปิดอยู่',true); paint(); }
+  let armed=false;
+  function arm(){ if(armed)return; armed=true;
+    setInterval(()=>{ if(!document.hidden&&autoOn()&&autoReady()) sync(true,true); },300000);
+    document.addEventListener('visibilitychange',()=>{ if(!autoOn()||!autoReady())return; if(document.hidden){ if(dirtyFlag) sync(true,true); } else schedule(800); }); }
   function askKey(){
     let k=''; try{ k=window.prompt(progressKeyName===LSK?
      'ใส่รหัส SYNC_KEY สำหรับ Cloudflare Worker เดิม\n\nหน้า Study OS รุ่นเก่าไม่ซิงก์อัตโนมัติอีกต่อไป การใส่รหัสจะขอยืนยันก่อนซิงก์เอง 1 ครั้ง':
@@ -629,7 +642,7 @@ window.__xs=(()=>{
     }catch(e){say('บันทึกรหัสในเครื่องไม่ได้ จึงไม่ซิงก์');return}
     paint(); try{ renderSync(); }catch(e){} sync(true);
   }
-  function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์ด้วยตนเอง':'☁ ตั้งรหัสซิงก์'; }
+  function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์ด้วยตนเอง':'☁ ตั้งรหัสซิงก์'; if(autoBtn){ const can=progressKeyName!==LSK&&!!key(); autoBtn.hidden=!can; autoBtn.textContent=autoOn()?'⟳ อัตโนมัติ: เปิด':'⟳ อัตโนมัติ: ปิด'; autoBtn.setAttribute('aria-pressed',autoOn()); } }
   function mount(){
     box=document.createElement('div');
     box.className='cloud-sync-bar';
@@ -637,14 +650,16 @@ window.__xs=(()=>{
     msgEl=document.createElement('span'); msgEl.setAttribute('role','status');
     btnEl=document.createElement('button'); btnEl.type='button'; btnEl.style.cssText='border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;font-weight:600;padding:2px 4px';
     btnEl.onclick=async()=>{ await cfg(); if(!key()) askKey(); else sync(true); };
-    box.append(msgEl,btnEl); document.body.appendChild(box); paint();
+    autoBtn=document.createElement('button'); autoBtn.type='button'; autoBtn.hidden=true; autoBtn.style.cssText=btnEl.style.cssText;
+    autoBtn.onclick=()=>{ if(autoOn()){ setAuto(false); return; } if(window.confirm('เปิดซิงก์อัตโนมัติ?\n\nเมื่อเปิด หน้านี้จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Progress Worker ของคุณเองเป็นระยะ (ตอนเปิดหน้า หลังตอบ และทุกไม่กี่นาที) โดยรวมข้อมูลทีละรายการและไม่เขียนทับกัน\n\nต้องใช้รหัสเดียวกันทุกเครื่อง ปิดได้ทุกเมื่อด้วยปุ่มเดิม')) setAuto(true); };
+    box.append(msgEl,btnEl,autoBtn); document.body.appendChild(box); paint();
   }
   mount();
-  say('Cloud Sync ปิดอัตโนมัติ',true);
-  cfg().then(()=>{ try{ renderSync(); }catch(e){} });
+  say(autoOn()?'ซิงก์อัตโนมัติเปิดอยู่':'Cloud Sync ปิดอัตโนมัติ',true);
+  cfg().then(()=>{ try{ renderSync(); }catch(e){} paint(); if(autoOn()&&autoReady()){arm();schedule(1500);} });
   // LocalStorage writes still happen immediately in save() and saveS().
   // Do not dispatch background GET/PUT even if the browser already has a SYNC_KEY.
-  return { dirty(){ /* intentionally local-only until explicit opt-in/manual click */ },
+  return { dirty(){ if(autoOn()&&!applying&&autoReady()){ dirtyFlag=true; schedule(20000); } },
     ready(){ return !!(api&&key()); },
     reviewReady(){return !!(contentApi&&contentKey())},
     reviewApi:async()=>{await cfg();return contentApi;},

@@ -32,7 +32,7 @@ function fixture(html,{hasKey=true,allow=true,putOK=true,versioned=false,etagMod
    body:{appendChild(el){nodes.push(el)}},
    createElement(tag){
     const el={tag,style:{},children:[],append(...children){this.children.push(...children)},setAttribute(){},textContent:'',onclick:null};
-    if(tag==='button')button=el;
+    if(tag==='button'&&!button)button=el;
     return el;
    },
    addEventListener(){visibilityHandlers++},
