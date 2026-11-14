@@ -1,0 +1,88 @@
+name: Study progress KV snapshot (encrypted, manual, no writes)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_readonly:
+        description: "I approve read-only capture of the five Study progress keys from the selected PROGRESS KV namespace"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: study-progress-kv-snapshot
+  cancel-in-progress: false
+
+jobs:
+  kv-snapshot:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.confirm_readonly == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm read-only credentials and passphrase before any Cloudflare requests
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.STUDY_CLOUDFLARE_ACCOUNT_ID }}
+          STUDY_PROGRESS_KV_NAMESPACE_ID: ${{ secrets.STUDY_PROGRESS_KV_NAMESPACE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.STUDY_KV_READ_TOKEN }}
+          WORKER_BACKUP_PASSPHRASE: ${{ secrets.WORKER_BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          test "$GITHUB_EVENT_NAME" = workflow_dispatch
+          [[ "$CLOUDFLARE_ACCOUNT_ID" =~ ^[a-fA-F0-9]{32}$ ]] || exit 1
+          [[ "$STUDY_PROGRESS_KV_NAMESPACE_ID" =~ ^[a-fA-F0-9]{32}$ ]] || exit 1
+          test "${#CLOUDFLARE_API_TOKEN}" -ge 10 || { echo "::error::Read-only KV token missing"; exit 1; }
+          test "${#WORKER_BACKUP_PASSPHRASE}" -ge 20 || { echo "::error::Backup passphrase must be 20+ characters"; exit 1; }
+      - name: Read five KV values directly by namespace and key (GET only)
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.STUDY_CLOUDFLARE_ACCOUNT_ID }}
+          STUDY_PROGRESS_KV_NAMESPACE_ID: ${{ secrets.STUDY_PROGRESS_KV_NAMESPACE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.STUDY_KV_READ_TOKEN }}
+          OUTPUT_DIR: ${{ runner.temp }}/study-progress-kv-raw
+        run: |
+          set -euo pipefail
+          node scripts/capture-study-progress-kv.mjs
+      - name: Encrypt and verify captured raw values
+        env:
+          WORKER_BACKUP_PASSPHRASE: ${{ secrets.WORKER_BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          INPUT="$RUNNER_TEMP/study-progress-kv.tar.gz"
+          OUT="$RUNNER_TEMP/study-progress-kv-$GITHUB_RUN_ID.tar.gz.gpg"
+          tar -czf "$INPUT" -C "$RUNNER_TEMP/study-progress-kv-raw" .
+          test -s "$INPUT"
+          gpg --batch --yes --quiet --pinentry-mode loopback --symmetric --cipher-algo AES256 --passphrase-fd 3 --output "$OUT" "$INPUT" 3<<<"$WORKER_BACKUP_PASSPHRASE"
+          gpg --batch --yes --quiet --pinentry-mode loopback --decrypt --passphrase-fd 3 --output "$RUNNER_TEMP/study-progress-kv-roundtrip.tar.gz" "$OUT" 3<<<"$WORKER_BACKUP_PASSPHRASE"
+          cmp --silent "$INPUT" "$RUNNER_TEMP/study-progress-kv-roundtrip.tar.gz" || { echo "::error::Encryption round-trip mismatch"; exit 1; }
+          echo "ENCRYPTED_SNAPSHOT=$OUT" >> "$GITHUB_ENV"
+          {
+            echo "## Study KV progress snapshot"
+            echo "- Read only: exactly five known progress keys"
+            echo "- No Cloudflare or Notion writes"
+            echo "- All raw progress content exists ONLY inside the encrypted artifact"
+            echo "- Encrypted artifact SHA-256: $(sha256sum "$OUT" | cut -d' ' -f1)"
+            echo "- Capture is non-atomic; 404s are NOT proof of permanent key absence"
+            echo "- Artifact retention 7 days; download it to private storage"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Scrub plaintext raw values and temporary archives
+        if: always()
+        run: |
+          for file in "$RUNNER_TEMP/study-progress-kv-raw"/*.raw "$RUNNER_TEMP/study-progress-kv-raw/manifest.json" "$RUNNER_TEMP/study-progress-kv.tar.gz" "$RUNNER_TEMP/study-progress-kv-roundtrip.tar.gz"; do
+            if [ -f "$file" ]; then shred -u "$file" 2>/dev/null || rm -f "$file"; fi
+          done
+          rmdir "$RUNNER_TEMP/study-progress-kv-raw" 2>/dev/null || true
+      - name: Upload encrypted snapshot only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: study-progress-kv-${{ github.run_id }}
+          path: ${{ env.ENCRYPTED_SNAPSHOT }}
+          if-no-files-found: error
+          retention-days: 7
