@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-14 (Notion-style home dashboard)
+- index.html is now a dashboard modelled on the owner's Notion page: cover + avatar, Quick Launch cards, Daily Focus (start/end checklists reset daily + pomodoro), Tasks (own tasks + exam dates, priority badges, filter/sort), Review table (due cards by chapter), Subjects gallery, collapsible links. Old home kept as classic.html.
+- Cover image is chosen in the browser, resized and stored locally only (never uploaded). Own tasks/checklists use the new local key `studyos.home.v1` (not yet in backup allowlist or sync).
+- Closer to Notion: top bar (back/forward), tappable avatar and per-subject card images (all chosen in the browser and stored locally, never uploaded), Tasks toolbar (filter, sort, search, New, Load more), Subjects gallery/table toggle, ⏰ dates.
+- Tests: tests/dashboard-home.test.cjs; legacy home tests now target classic.html.
+
 ## 2026-11-14 (opt-in automatic sync)
 - Course pages (acc/eco/math/eng/zh) get an opt-in "⟳ อัตโนมัติ" toggle next to the manual sync button. Off by default; no timers or listeners exist until it is turned on. When on, it syncs after page load, 20 s after a change, when the tab is hidden/shown and every 5 min, reusing the existing CAS merge (If-Match, retry on 409/412).
 - Safety: only with the separate Progress Worker (`progress_api`) and a strong ETag/revision header; otherwise it refuses and local data stays untouched. No Cloudflare change was made.

@@ -1,120 +1,297 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Study OS — Your workspace for accounting, economics and mathematics">
+<meta name="description" content="Study OS — แดชบอร์ดการเรียนประจำวัน">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<title>Study OS — Academic Dashboard</title>
+<title>Study OS — Dashboard</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
-:root{color-scheme:light;--bg:#f8f9fc;--white:#fff;--text:#202445;--muted:#858aa5;--line:#eaebf2;--purple:#5b53d7;--deep:#4f47c8;--lav:#f0eeff;--green:#2caa76;--orange:#ef9657;--shadow:0 6px 30px rgba(47,54,106,.035);--surface:var(--white);--ink:var(--text);--accent:var(--purple);--soft:var(--lav);--readable-muted:#666c88}
-@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#181b2b;--white:#24283c;--text:#f4f3ff;--muted:#b1b5cc;--line:#3b3d55;--purple:#b9b3ff;--deep:#d7d2ff;--lav:#37365e;--shadow:none;--readable-muted:#b1b5cc}}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
+:root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#7c7a76;--line:#e9e7e3;--panel:#f9f8f6;--blue:#e4f0fb;--green:#e8f0ea;--yellow:#f9f2d9;--purple:#f2eafa;--accent:#2383e2;--red:#e5534b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--mono:'IBM Plex Mono','IBM Plex Sans Thai',ui-monospace,Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a09d98;--line:#333;--panel:#202020;--blue:#1e3445;--green:#223228;--yellow:#3a3420;--purple:#33283f;--accent:#5aa9f0;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.6}
-.container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,44px) max(18px,env(safe-area-inset-right)) 65px max(18px,env(safe-area-inset-left))}
-header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:26px;border-bottom:1px solid var(--line)}
-.brand,h1,h2,h3,.symbol{font-family:'Outfit',"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif}
-.brand{font-weight:800;font-size:21px;letter-spacing:-.6px}.brand span{color:var(--purple)}
-.top-link{color:var(--purple);background:var(--lav);font-size:14px;font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:8px 14px}
-.top-link:hover,.top-link:focus-visible{border-color:var(--deep);color:var(--deep)}
-.hero{padding:46px 0 28px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);font-weight:800;margin:0 0 10px}
-h1{font-size:clamp(32px,6vw,52px);line-height:1.2;letter-spacing:-1px;margin:0 0 15px}
-.lead{color:var(--readable-muted);font-size:clamp(15px,2.3vw,18px);max-width:670px;margin:0}
-h2{font-size:22px;margin:26px 0 16px}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-.subject{display:flex;flex-direction:column;min-height:238px;border:1px solid var(--line);border-radius:12px;background:var(--white);box-shadow:var(--shadow);padding:23px;text-decoration:none;color:var(--text);transition:transform .16s,border-color .16s}
-.subject:hover{transform:translateY(-3px);border-color:var(--purple)}
-.subject:active{transform:translateY(-1px);border-color:var(--deep)}
-.subject:hover .go,.subject:active .go{color:var(--deep)}
-.subject:focus-visible,.secondary:focus-visible,.top-link:focus-visible{outline:3px solid var(--purple);outline-offset:4px}
-.subject .symbol{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;font-size:19px;font-weight:800;margin-bottom:22px}
-.accounting .symbol{background:var(--green);color:#102d22}.economics .symbol{background:var(--orange);color:#50270d}.math .symbol{background:var(--purple);color:var(--white)}
-.subject h3{font-size:20px;margin:0 0 5px;line-height:1.3}.subject p{color:var(--readable-muted);font-size:14px;margin:0 0 16px}.subject .go{margin-top:auto;font-size:14px;font-weight:750;color:var(--purple)}
-.note{border:1px solid var(--line);border-radius:12px;padding:18px 21px;margin-top:26px;color:var(--readable-muted);font-size:14px;background:var(--white);box-shadow:var(--shadow)}
-.note strong{color:var(--text)}
-footer{margin-top:34px;padding-top:24px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;color:var(--readable-muted);font-size:13px}
-.secondary{color:var(--purple);text-decoration:underline;text-underline-offset:3px}.secondary:hover,.secondary:active{color:var(--deep)}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.subject{min-height:190px}.hero{padding:32px 0 16px}header{padding-bottom:20px}}
-@media(prefers-reduced-motion:reduce){.subject{transition:none}.subject:hover,.subject:active{transform:none}}
-.study-tools{display:flex;flex-wrap:wrap;gap:12px 20px;margin-top:24px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--white);font-size:14px}
-.textbook-feature{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px 22px;margin-top:16px;color:var(--text);text-decoration:none;transition:border-color .16s,transform .16s}
-.textbook-feature:hover{border-color:var(--purple);transform:translateY(-2px)}
-.textbook-feature:focus-visible{outline:3px solid var(--purple);outline-offset:4px}
-.textbook-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--lav);color:var(--purple)}
-.textbook-copy h3{font-size:18px;line-height:1.3;margin:0 0 3px}
-.textbook-copy p{font-size:14px;color:var(--readable-muted);margin:0}
-.textbook-open{font-size:14px;font-weight:750;color:var(--purple);white-space:nowrap}
-@media(max-width:760px){.textbook-feature{grid-template-columns:44px minmax(0,1fr);gap:10px 14px;padding:16px}.textbook-open{grid-column:2;white-space:normal}}
-
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Thai',system-ui,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
+.mono,h1,h2,h3,.tag,.tab,.clock{font-family:var(--mono)}
+.cover{position:relative;height:clamp(130px,22vw,210px);background:linear-gradient(120deg,#f6c1d6 0%,#d9b8f2 45%,#9ec5f5 100%) center/cover no-repeat}
+.cover-tools{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:10px;display:flex;gap:8px}
+.cover-tools button{font:600 12px var(--mono);padding:6px 10px;border-radius:8px;border:1px solid rgba(0,0,0,.12);background:rgba(255,255,255,.85);color:#333;cursor:pointer}
+.page{max-width:1000px;margin:0 auto;padding:0 max(18px,env(safe-area-inset-right)) 70px max(18px,env(safe-area-inset-left))}
+.avatar{width:84px;height:84px;margin-top:-42px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:44px;box-shadow:0 0 0 4px var(--bg);position:relative}
+h1{font-size:clamp(30px,5vw,42px);margin:14px 0 2px;letter-spacing:-.5px}
+.sub{color:var(--muted);font-size:14px;margin:0}
+h2{font-size:clamp(20px,3vw,26px);margin:44px 0 16px}h2::before{content:"✦ ";font-size:.8em}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.box{border-radius:16px;padding:18px 20px;background:var(--panel)}
+.box.blue{background:var(--blue)}.box.green{background:var(--green)}.box.yellow{background:var(--yellow)}.box.purple{background:var(--purple)}
+.box h3{font-size:15px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 12px}
+.links{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none}
+.links li{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;min-height:44px}
+.links a,.row a{color:var(--text);text-decoration:underline;text-decoration-color:rgba(127,127,127,.45);text-underline-offset:4px;font-family:var(--mono);font-size:15px}
+.links a:hover,.links a:focus-visible{text-decoration-color:var(--accent)}
+.links .lab{color:var(--muted);font-size:13px}
+.badge{font:600 12px var(--mono);padding:2px 8px;border-radius:6px;background:var(--hi);color:var(--hi-t)}
+.check{display:flex;align-items:center;gap:12px;min-height:44px;font-size:16px;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.check input:checked+span{color:var(--muted);text-decoration:line-through}
+.pomo{border-radius:16px;min-height:300px;color:#fff;background:linear-gradient(180deg,#a07fa0 0%,#6c6ea6 55%,#27468a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tab{border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;min-height:40px}
+.tab[aria-pressed=true]{background:#fff;color:#222}
+.clock{font-size:clamp(56px,10vw,84px);font-weight:600;line-height:1}
+.pbtn{display:flex;gap:10px}.pbtn button{border:0;border-radius:999px;padding:12px 30px;font:600 17px var(--mono);cursor:pointer;min-height:48px;background:#fff;color:#222}
+.pbtn button.ghost{background:rgba(255,255,255,.25);color:#fff;padding:12px 18px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar select,.toolbar input,.toolbar button{font:14px var(--mono);padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);min-height:42px}
+.toolbar button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.toolbar .grow{flex:1;min-width:150px}
+.row{display:grid;grid-template-columns:28px minmax(0,1fr) auto auto 28px;gap:10px;align-items:center;min-height:46px;border-bottom:1px solid var(--line);font-size:15px}
+.row .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)}
+.row .d{font:13px var(--mono);color:var(--accent);white-space:nowrap}.row .d.late{color:var(--red)}.row .d.today{color:#d9730d}
+.tag{font-size:12px;font-weight:600;padding:2px 9px;border-radius:6px;white-space:nowrap}
+.tag.High{background:var(--hi);color:var(--hi-t)}.tag.Medium{background:var(--med);color:var(--med-t)}.tag.Low{background:var(--low);color:var(--low-t)}
+.row input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
+.row .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px;min-height:40px}
+.empty{color:var(--muted);font-size:14px;padding:18px 4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font:600 13px var(--mono);color:var(--muted);text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+td{padding:11px 8px;border-bottom:1px solid var(--line)}td a{color:var(--text);font-family:var(--mono)}
+.wrap{overflow-x:auto}
+.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.gcard{display:block;text-decoration:none;color:var(--text);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.gcard:hover,.gcard:focus-visible{border-color:var(--accent)}
+.gcard .cv{height:92px;display:grid;place-items:center;font-size:40px}
+.gcard .b{padding:12px 14px 14px}.gcard h3{font-size:15px;margin:0 0 4px}.gcard p{margin:0;font-size:13px;color:var(--muted)}
+.c-acc .cv{background:linear-gradient(135deg,#bfe6cf,#8cc8a8)}.c-eco .cv{background:linear-gradient(135deg,#fbd9b5,#f4b27c)}.c-math .cv{background:linear-gradient(135deg,#d3cffa,#a9a2ee)}.c-voc .cv{background:linear-gradient(135deg,#fbc9dc,#f08fb4)}
+details.fold{margin-top:44px}details.fold summary{font:700 clamp(20px,3vw,26px) var(--mono);cursor:pointer;list-style:none;min-height:44px;display:flex;align-items:center;gap:10px}
+details.fold summary::-webkit-details-marker{display:none}details.fold summary::before{content:"▸";font-size:.7em}details.fold[open] summary::before{content:"▾"}
+.note{margin-top:34px;color:var(--muted);font-size:13px}
+.note a{color:var(--muted)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px;height:48px;padding:0 max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left));background:var(--bg);border-bottom:1px solid transparent;font-size:15px}
+.topbar button,.topbar a{min-width:44px;min-height:44px;display:inline-grid;place-items:center;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;text-decoration:none;border-radius:8px}
+.topbar button:hover,.topbar a:hover{background:var(--panel)}
+.topbar .pg{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--text);margin-left:6px}.topbar .sp{flex:1}
+.topbar .pg .mini{width:22px;height:22px;border-radius:50%;background:center/cover var(--panel);display:inline-grid;place-items:center;font-size:14px}
+.avatar{cursor:pointer;border:0;padding:0;background-color:var(--bg);background-size:cover;background-position:center}
+.avatar.img{font-size:0}
+.view-sub{color:var(--muted);font-size:14px;margin:6px 0 0}
+.thead{display:flex;align-items:center;gap:10px;margin-bottom:6px}.thead h3{margin:0;font-size:16px;letter-spacing:.04em}.thead .sp{flex:1}
+.ib{min-width:44px;min-height:44px;border:0;border-radius:8px;background:none;color:var(--accent);font-size:19px;cursor:pointer}.ib:hover,.ib[aria-pressed=true]{background:rgba(35,131,226,.12)}
+.newbtn{min-height:44px;padding:0 18px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:600 15px var(--mono);cursor:pointer}
+.moreBtn{display:block;width:100%;text-align:left;border:0;background:none;color:var(--muted);font:15px var(--mono);min-height:46px;cursor:pointer;padding:0 8px}
+.vtabs{display:flex;gap:4px;margin:0 0 12px;padding:4px;border-radius:999px;background:var(--panel);width:max-content}
+.vtabs button{min-width:44px;min-height:40px;border:0;border-radius:999px;background:none;font-size:18px;cursor:pointer;color:var(--muted)}.vtabs button[aria-pressed=true]{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.gwrap{position:relative}.gwrap .pic{position:absolute;top:8px;right:8px;min-width:44px;min-height:44px;border:0;border-radius:8px;background:rgba(255,255,255,.85);color:#333;font-size:16px;cursor:pointer;opacity:.0;transition:opacity .15s}
+.gwrap:hover .pic,.gwrap:focus-within .pic,.gwrap .pic:focus-visible{opacity:1}
+@media(hover:none){.gwrap .pic{opacity:.85}}
+.gcard .cv{background-size:cover;background-position:center}.gcard .cv.has{font-size:0}
+.gcard .ic{margin-right:6px}
+@media(max-width:820px){.cols{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.row{grid-template-columns:28px minmax(0,1fr) 28px}.row .d,.row .tag{grid-column:2}.row .tag{justify-self:start}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="topbar" role="navigation" aria-label="Page"><button type="button" id="goBack" aria-label="ย้อนกลับ">←</button><button type="button" id="goFwd" aria-label="ไปข้างหน้า">→</button><span class="pg"><span class="mini" id="miniAv">🎓</span><span>Study</span></span><span class="sp"></span><a href="today.html" aria-label="Today" title="Today">📅</a><a href="hub.html" aria-label="Study Hub" title="Study Hub">🗂</a></div>
+<div class="cover" id="cover" role="img" aria-label="ภาพปก">
+ <div class="cover-tools"><button type="button" id="coverPick">เปลี่ยนปก</button><button type="button" id="coverClear" hidden>ลบปก</button><input type="file" id="coverFile" accept="image/*" hidden></div>
+</div>
+<div class="page">
+<button type="button" class="avatar" id="avatar" aria-label="เปลี่ยนไอคอนหน้า">🎓</button><input type="file" id="avFile" accept="image/*" hidden>
 <header>
-<div class="brand">Study <span>OS</span></div>
-<a class="top-link" href="vocabloom/" aria-label="Open VocaBloom language learning">VocaBloom · Languages</a>
+ <h1 id="welcome-title">Study</h1>
+ <p class="sub" id="today">Study OS · แดชบอร์ดประจำวัน</p><p class="view-sub">แตะรูปไอคอน/ปก/การ์ดวิชาเพื่อเปลี่ยนรูป (เก็บในเครื่องนี้เท่านั้น)</p>
 </header>
 <main>
-<section class="hero" aria-labelledby="welcome-title">
-<p class="eyebrow">Academic learning workspace</p>
-<h1 id="welcome-title">Learn smarter.<br>Practice with confidence.</h1>
-<p class="lead">Pick up where you left off with flashcards, lesson summaries and practice questions. Your existing course progress stays in place.</p>
+<h2 class="mono">Quick Launch</h2>
+<section class="cols" aria-label="Quick Launch">
+ <div class="box blue"><h3>🧠 Flashcards</h3>
+  <ul class="links">
+   <li>📅 <a href="today.html">ทบทวนวันนี้ + นับถอยหลังสอบ</a><span class="badge" id="dueBadge" hidden></span></li>
+   <li><span class="lab">เล่นบนเว็บ:</span> <a href="acc.html?tab=cards">บัญชี</a> · <a href="eco.html?tab=cards">เศรษฐศาสตร์</a> · <a href="math.html?tab=cards">คณิตศาสตร์</a></li>
+   <li>🗂 <a href="hub.html">Study Hub: วิชา → บท → ความคืบหน้า</a></li>
+   <li>📚 <a href="accounting-textbook.html">Accounting Textbook Exercises</a><span class="lab">403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</span></li>
+  </ul></div>
+ <div class="box green"><h3>📝 Vocab &amp; Tools</h3>
+  <ul class="links">
+   <li>🌸 <a href="vocabloom/">VocaBloom · Languages</a></li>
+   <li>🔤 <a href="eng.html">English EC1 vocabulary</a></li>
+   <li>🀄 <a href="zh.html">Chinese vocabulary</a></li>
+   <li>💾 <a href="progress-backup.html">Back up progress</a> · <a href="progress-restore.html">Restore progress</a></li>
+  </ul></div>
 </section>
-<a class="textbook-feature today-feature" href="today.html" aria-label="Open Today: due cards, exam countdown and study plan">
-<span class="textbook-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 15l2.5 2.5L16 13"/></svg></span>
-<div class="textbook-copy"><h3>Today</h3><p>Due cards across courses · Exam countdown · Daily study plan</p></div>
-<span class="textbook-open">Open Today →</span>
-</a>
-<a class="textbook-feature hub-feature" href="hub.html" aria-label="Open Study Hub: subjects, chapters and progress">
-<span class="textbook-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 15l2.5 2.5L16 13"/></svg></span>
-<div class="textbook-copy"><h3>Study Hub</h3><p>Subjects → Chapters · Progress per chapter · Jump straight in</p></div>
-<span class="textbook-open">Open Hub →</span>
-</a>
-<section aria-labelledby="subjects-title">
-<h2 id="subjects-title">My courses</h2>
-<div class="grid">
-<a class="subject accounting" href="acc.html" aria-label="Open Foundations of Accounting">
-<span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 4h14v16H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M7 4v16M11 8h5M11 12h5M11 16h3"/></svg></span>
-<h3>Accounting</h3>
-<p>Journals · Adjusting entries · Financial statements · Inventory</p>
-<span class="go">Open course →</span>
-</a>
-<a class="subject economics" href="eco.html" aria-label="Open Economics">
-<span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4v16h16M8 16v-4M12 16V9M16 16v-6"/><path d="m7 9 5-4 4 2 4-4"/></svg></span>
-<h3>Economics</h3>
-<p>Microeconomics · Macroeconomics · Concepts and practice</p>
-<span class="go">Open course →</span>
-</a>
-<a class="subject math" href="math.html" aria-label="Open Math for Life">
-<span class="symbol" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/></svg></span>
-<h3>Mathematics</h3>
-<p>Key formulas · Financial mathematics · Probability</p>
-<span class="go">Open course →</span>
-</a>
-</div>
+
+<h2 class="mono">Daily Focus</h2>
+<section class="cols" aria-label="Daily Focus">
+ <div>
+  <div class="box yellow" id="startBox"><h3>☀️ Start the day</h3><div data-list="start"></div></div>
+  <div class="box purple" id="endBox" style="margin-top:16px"><h3>🌙 End the day</h3><div data-list="end"></div></div>
+ </div>
+ <div class="pomo" aria-label="Pomodoro">
+  <div class="tabs" role="group" aria-label="โหมด"><button class="tab" type="button" data-m="25" aria-pressed="true">pomodoro</button><button class="tab" type="button" data-m="5" aria-pressed="false">short break</button><button class="tab" type="button" data-m="15" aria-pressed="false">long break</button></div>
+  <div class="clock" id="clock" role="timer" aria-live="off">25:00</div>
+  <div class="pbtn"><button type="button" id="pStart">start</button><button type="button" class="ghost" id="pReset" aria-label="รีเซ็ต">↻</button></div>
+ </div>
 </section>
-<a class="textbook-feature" href="accounting-textbook.html" aria-label="Browse accounting textbook exercises by chapter and question number">
-<span class="textbook-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M9 7h7M9 11h5"/></svg></span>
-<div class="textbook-copy"><h3>Accounting Textbook Exercises</h3><p>403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</p></div>
-<span class="textbook-open">Browse exercises →</span>
-</a>
-<aside class="note" aria-label="About learning progress">
-<strong>About your progress:</strong> This page links to your existing courses. It does not move or delete your learning data. Saving and syncing are managed within each course. Check the sync status before switching devices.
-</aside>
-<nav class="study-tools" aria-label="Study tools">
-<a class="secondary" href="progress-backup.html">Back up progress</a>
-<a class="secondary" href="progress-restore.html">Restore progress</a>
-<a class="secondary" href="eng.html">English EC1 vocabulary</a>
-<a class="secondary" href="zh.html">Chinese vocabulary</a>
-</nav>
+
+<section aria-label="Tasks" class="box" style="margin-top:44px">
+ <div class="thead"><span aria-hidden="true">🎯</span><h3 class="mono">Tasks</h3><span class="sp"></span>
+  <button type="button" class="ib" id="bFilter" aria-pressed="false" aria-label="กรอง" title="กรอง">☰</button>
+  <button type="button" class="ib" id="bSort" aria-label="เรียง" title="เรียง">⇅</button>
+  <button type="button" class="ib" id="bSearch" aria-pressed="false" aria-label="ค้นหา" title="ค้นหา">⌕</button>
+  <button type="button" class="newbtn" id="bNew">New</button></div>
+ <form class="toolbar" id="taskForm" hidden>
+  <input class="grow" id="tTitle" placeholder="งานใหม่ เช่น ทำ Assignment" maxlength="80" required aria-label="ชื่องาน">
+  <input type="date" id="tDate" aria-label="วันที่" required>
+  <select id="tPri" aria-label="ความสำคัญ"><option>High</option><option selected>Medium</option><option>Low</option></select>
+  <button class="primary" type="submit">เพิ่ม</button>
+ </form>
+ <div class="toolbar" id="filters" hidden><select id="fCourse" aria-label="กรองตามวิชา"><option value="">ทุกวิชา</option><option value="acc">บัญชี</option><option value="eco">เศรษฐศาสตร์</option><option value="math">คณิตศาสตร์</option><option value="own">งานของฉัน</option></select>
+  <label class="check" style="min-height:42px"><input type="checkbox" id="fDone"><span>แสดงที่เสร็จแล้ว</span></label></div>
+ <div class="toolbar" id="searchBar" hidden><input class="grow" id="fText" placeholder="ค้นหางาน" aria-label="ค้นหางาน"></div>
+ <input type="hidden" id="fSort" value="date">
+ <div id="tasks" role="list"></div>
+ <button type="button" class="moreBtn" id="moreBtn" hidden>↓ Load more</button>
+ <p class="note" style="margin-top:10px">งานของฉันเก็บในเครื่องนี้เท่านั้น (ยังไม่ซิงก์) · วันสอบดึงจากหน้า Today</p>
+</section>
+
+<section aria-label="Review" class="box" style="margin-top:20px"><div class="thead"><span aria-hidden="true">🧠</span><h3 class="mono">Review</h3></div><div class="wrap"><table><thead><tr><th>Lecture</th><th>Subject</th><th>Due</th><th>Seen</th></tr></thead><tbody id="review"><tr><td colspan="4" class="empty">กำลังโหลด…</td></tr></tbody></table></div></section>
+
+<div class="thead" style="margin-top:44px"><span aria-hidden="true">📚</span><h3 class="mono" style="font-size:22px">Subjects</h3></div>
+<div class="vtabs" role="group" aria-label="มุมมอง"><button type="button" id="vG" aria-pressed="true" aria-label="แกลเลอรี">▦</button><button type="button" id="vT" aria-pressed="false" aria-label="ตาราง">▤</button></div>
+<section class="gallery" id="subjects" aria-label="Subjects">
+ <div class="gwrap"><a class="gcard c-acc" href="hub.html#acc"><div class="cv" data-cv="acc" aria-hidden="true">📒</div><div class="b"><h3>Foundations of Accounting</h3><p id="s-acc">บัญชี</p></div></a><button type="button" class="pic" data-pic="acc" aria-label="เปลี่ยนรูปการ์ดบัญชี">🖼</button></div>
+ <div class="gwrap"><a class="gcard c-eco" href="hub.html#eco"><div class="cv" data-cv="eco" aria-hidden="true">📈</div><div class="b"><h3>Principles of Economics</h3><p id="s-eco">เศรษฐศาสตร์</p></div></a><button type="button" class="pic" data-pic="eco" aria-label="เปลี่ยนรูปการ์ดเศรษฐศาสตร์">🖼</button></div>
+ <div class="gwrap"><a class="gcard c-math" href="hub.html#math"><div class="cv" data-cv="math" aria-hidden="true">🧮</div><div class="b"><h3>Mathematics for Life</h3><p id="s-math">คณิตศาสตร์</p></div></a><button type="button" class="pic" data-pic="math" aria-label="เปลี่ยนรูปการ์ดคณิตศาสตร์">🖼</button></div>
+ <div class="gwrap"><a class="gcard c-voc" href="vocabloom/"><div class="cv" data-cv="voc" aria-hidden="true">🌸</div><div class="b"><h3>English &amp; Chinese</h3><p>VocaBloom · คำศัพท์</p></div></a><button type="button" class="pic" data-pic="voc" aria-label="เปลี่ยนรูปการ์ดภาษา">🖼</button></div>
+</section>
+<div class="wrap" id="subjTable" hidden><table><thead><tr><th>Name</th><th>Due</th><th>Seen</th><th>Open</th></tr></thead><tbody id="subjRows"></tbody></table></div>
+<input type="file" id="picFile" accept="image/*" hidden>
+
+<details class="fold"><summary>Calendar and Database</summary>
+ <ul class="links" style="margin-top:8px">
+  <li>📅 <a href="today.html">Today: แผนวันนี้ + วันสอบ</a></li>
+  <li>🗂 <a href="hub.html">Study Hub</a></li>
+  <li>📚 <a href="accounting-textbook.html">Textbook exercises</a></li>
+  <li>🏠 <a href="classic.html">หน้าแรกแบบเดิม</a></li>
+ </ul>
+</details>
+<p class="note">ความคืบหน้าอยู่ในเครื่องนี้ ตรวจสถานะซิงก์ในแต่ละวิชาก่อนสลับอุปกรณ์ · <a href="vocabloom/">Explore language learning with VocaBloom</a></p>
 </main>
-<footer>
-<span>Study OS · Academic workspace</span>
-<a class="secondary" href="vocabloom/">Explore language learning with VocaBloom</a>
-</footer>
 </div>
+<script src="scripts/study-today.js?v=1"></script>
+<script>
+(function(){
+'use strict';
+const T=window.StudyToday,$=s=>document.querySelector(s),KEY='studyos.home.v1';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function read(k){try{return localStorage.getItem(k);}catch{return null;}}
+function load(){try{const v=JSON.parse(read(KEY)||'{}');return v&&typeof v==='object'?v:{};}catch{return {};}}
+let st=load();st.tasks=Array.isArray(st.tasks)?st.tasks:[];st.focus=st.focus&&typeof st.focus==='object'?st.focus:{};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));return true;}catch{alert('บันทึกในเครื่องไม่สำเร็จ (พื้นที่เต็มหรือปิดการเก็บข้อมูล)');return false;}}
+const today=T.dayKey(Date.now());
+const TH=['อา','จ','อ','พ','พฤ','ศ','ส'],MO=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function thDate(iso){const d=new Date(T.dateStart(iso)+7*3600000);return TH[d.getUTCDay()]+' '+d.getUTCDate()+' '+MO[d.getUTCMonth()];}
+$('#today').textContent='Study OS · วัน'+thDate(today).replace(/^(\S+)/,'$1')+' · แดชบอร์ดประจำวัน';
+/* images: chosen in the browser, resized, stored locally only; never uploaded */
+function pickImage(file,maxW,q,cb){const img=new Image(),u=URL.createObjectURL(file);
+ img.onload=()=>{const w=Math.min(maxW,img.width),h=Math.round(img.height*w/img.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);cb(c.toDataURL('image/jpeg',q));};
+ img.onerror=()=>{URL.revokeObjectURL(u);alert('เปิดรูปไม่ได้');};img.src=u;}
+st.covers=st.covers&&typeof st.covers==='object'&&!Array.isArray(st.covers)?st.covers:{};
+const avatar=$('#avatar');
+function paintAvatar(){if(st.avatar){avatar.style.backgroundImage='url('+st.avatar+')';avatar.classList.add('img');$('#miniAv').style.backgroundImage='url('+st.avatar+')';$('#miniAv').textContent='';}else{avatar.style.backgroundImage='';avatar.classList.remove('img');$('#miniAv').style.backgroundImage='';$('#miniAv').textContent='🎓';}}
+avatar.onclick=()=>{if(st.avatar&&confirm('ลบรูปไอคอน? (กดยกเลิกเพื่อเลือกรูปใหม่)')){delete st.avatar;save();paintAvatar();return;}$('#avFile').click();};
+$('#avFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;pickImage(f,256,.85,d=>{const prev=st.avatar;st.avatar=d;if(!save())st.avatar=prev;paintAvatar();});};
+$('#goBack').onclick=()=>history.back();$('#goFwd').onclick=()=>history.forward();
+let picKey=null;
+function paintCovers(){document.querySelectorAll('[data-cv]').forEach(el=>{const d=st.covers[el.dataset.cv];if(d){el.style.backgroundImage='url('+d+')';el.classList.add('has');}else{el.style.backgroundImage='';el.classList.remove('has');}});}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-pic]');if(!b)return;picKey=b.dataset.pic;if(st.covers[picKey]&&confirm('ลบรูปการ์ดนี้? (กดยกเลิกเพื่อเลือกรูปใหม่)')){delete st.covers[picKey];save();paintCovers();return;}$('#picFile').click();});
+$('#picFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f||!picKey)return;const k=picKey;pickImage(f,640,.78,d=>{const prev=st.covers[k];st.covers[k]=d;if(!save()){if(prev)st.covers[k]=prev;else delete st.covers[k];}paintCovers();});};
+const cover=$('#cover');
+function paintCover(){if(st.cover){cover.style.backgroundImage='url('+st.cover+')';$('#coverClear').hidden=false;}else{cover.style.backgroundImage='';$('#coverClear').hidden=true;}}
+$('#coverPick').onclick=()=>$('#coverFile').click();
+$('#coverClear').onclick=()=>{delete st.cover;save();paintCover();};
+$('#coverFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);
+ img.onload=()=>{const w=Math.min(1400,img.width),h=Math.round(img.height*w/img.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);
+  const prev=st.cover;st.cover=c.toDataURL('image/jpeg',.8);if(!save())st.cover=prev;paintCover();};
+ img.onerror=()=>{URL.revokeObjectURL(u);alert('เปิดรูปไม่ได้');};img.src=u;e.target.value='';};
+paintCover();paintAvatar();paintCovers();
+/* daily checklists: reset each day */
+const LISTS={start:['เช็กงานที่ครบกำหนด','เลือก 1 หัวข้อสำคัญ','เปิดสไลด์ก่อนเข้าเรียน'],end:['ทบทวน Flashcards','บันทึกจุดที่ยังไม่เข้าใจ','เตรียมงานวันถัดไป']};
+if(st.focus.day!==today)st.focus={day:today,done:{}};
+function renderFocus(){for(const k of Object.keys(LISTS)){const box=document.querySelector('[data-list="'+k+'"]');
+ box.innerHTML=LISTS[k].map((t,i)=>'<label class="check"><input type="checkbox" data-k="'+k+i+'"'+(st.focus.done[k+i]?' checked':'')+'><span>'+esc(t)+'</span></label>').join('');}}
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;if(e.target.checked)st.focus.done[k]=1;else delete st.focus.done[k];save();});
+renderFocus();
+/* pomodoro: wall-clock based so background throttling does not drift */
+let mins=25,left=25*60,endAt=0,tick=null;
+const clock=$('#clock'),fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function showClock(){clock.textContent=fmt(Math.max(0,left));document.title=(endAt?fmt(Math.max(0,left))+' · ':'')+'Study OS — Dashboard';}
+function stop(){clearInterval(tick);tick=null;endAt=0;$('#pStart').textContent='start';}
+function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){left=0;stop();showClock();$('#pStart').textContent='start';try{navigator.vibrate&&navigator.vibrate(300);}catch{}return;}showClock();}
+$('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();showClock();$('#pStart').textContent='resume';return;}
+ if(left<=0)left=mins*60;endAt=Date.now()+left*1000;tick=setInterval(step,500);$('#pStart').textContent='pause';step();};
+function setMode(m){stop();mins=m;left=m*60;showClock();document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.m===m)));}
+$('#pReset').onclick=()=>setMode(mins);
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setMode(+b.dataset.m));
+/* tasks */
+const ex=T.loadSettings(read(T.SETTINGS_KEY));
+let summaries={},data={};
+function allTasks(){
+ const now=Date.now(),own=st.tasks.map(t=>({...t,src:'own'}));
+ const exams=ex.exams.filter(e=>T.daysUntil(e.date,now)>=-1).map(e=>({id:'exam:'+e.id,title:e.title,date:e.date,pri:'High',course:e.course,icon:'🏫',src:'exam'}));
+ return own.concat(exams);
+}
+const PRI={High:0,Medium:1,Low:2};
+function renderTasks(){
+ const fc=$('#fCourse').value,sort=$('#fSort').value,showDone=$('#fDone').checked;
+ let list=allTasks().filter(t=>showDone||!t.done);
+ const q=$('#fText').value.trim().toLowerCase();if(q)list=list.filter(t=>t.title.toLowerCase().includes(q));
+ if(fc==='own')list=list.filter(t=>t.src==='own');else if(fc)list=list.filter(t=>t.course===fc);
+ list.sort((a,b)=>sort==='pri'?(PRI[a.pri]-PRI[b.pri])||a.date.localeCompare(b.date):a.date.localeCompare(b.date)||PRI[a.pri]-PRI[b.pri]);
+ const shown=list.slice(0,limit);$('#moreBtn').hidden=list.length<=limit;
+ $('#tasks').innerHTML=shown.length?shown.map(t=>{
+  const late=t.date<today&&!t.done,tod=t.date===today;
+  const course=t.course?((T.COURSES.find(c=>c.key===t.course)||{}).name||'')+' · ':'';
+  return '<div class="row" role="listitem"><span aria-hidden="true">'+(t.icon||'📖')+'</span><span class="t" title="'+esc(t.title)+'">'+esc(course+t.title)+'</span><span class="d'+(late?' late':tod?' today':'')+'">'+esc(thDate(t.date))+' ⏰'+(late?' (เลยกำหนด)':tod?' (วันนี้)':'')+'</span><span class="tag '+t.pri+'">'+t.pri+'</span>'
+   +(t.src==='own'?'<input type="checkbox" data-id="'+esc(t.id)+'" aria-label="เสร็จแล้ว: '+esc(t.title)+'"'+(t.done?' checked':'')+'>':'<span></span>')+'</div>';}).join(''):'<p class="empty">ยังไม่มีงาน เพิ่มงานด้านบนได้เลย</p>';
+}
+$('#tasks').addEventListener('change',e=>{const id=e.target.dataset.id;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;save();renderTasks();}});
+$('#taskForm').onsubmit=e=>{e.preventDefault();const title=$('#tTitle').value.trim(),date=$('#tDate').value;if(!title||!date)return;
+ st.tasks.push({id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),title:title.slice(0,80),date,pri:$('#tPri').value,done:false});save();$('#tTitle').value='';renderTasks();};
+['#fCourse','#fDone'].forEach(s=>$(s).addEventListener('change',renderTasks));
+let limit=12;
+const tog=(btn,box)=>{$(btn).onclick=()=>{const h=$(box).hidden;$(box).hidden=!h;$(btn).setAttribute('aria-pressed',String(h));if(h){const f=$(box).querySelector('input,select');if(f)f.focus();}};};
+tog('#bFilter','#filters');tog('#bSearch','#searchBar');
+$('#bNew').onclick=()=>{const h=$('#taskForm').hidden;$('#taskForm').hidden=!h;if(h)$('#tTitle').focus();};
+$('#bSort').onclick=()=>{const v=$('#fSort').value==='date'?'pri':'date';$('#fSort').value=v;$('#bSort').title=v==='date'?'เรียงตามวัน':'เรียงตามความสำคัญ';$('#bSort').setAttribute('aria-label',$('#bSort').title);renderTasks();};
+$('#fText').addEventListener('input',()=>{limit=12;renderTasks();});
+$('#moreBtn').onclick=()=>{limit+=12;renderTasks();};
+$('#tDate').value=today;
+/* review table + subject cards from course progress */
+function renderReview(){
+ let total=0;const rows=[],subjRows=[];
+ for(const c of T.COURSES){const s=summaries[c.key];if(!s)continue;total+=s.reviewNow;
+  subjRows.push('<tr><td><a href="hub.html#'+c.key+'">'+esc(c.name)+'</a></td><td>'+s.reviewNow+'</td><td>'+s.seen+'/'+s.total+'</td><td>'+Object.keys(s.per).length+' บท</td></tr>');
+  const el=$('#s-'+c.key);if(el)el.textContent=c.name+' · ครบกำหนด '+s.reviewNow+' · เปิดแล้ว '+s.seen+'/'+s.total;
+  for(const p of Object.values(s.per))if(p.due>0)rows.push({c,p});}
+ rows.sort((a,b)=>b.p.due-a.p.due);
+ $('#review').innerHTML=rows.length?rows.slice(0,8).map(r=>'<tr><td><a href="'+r.c.page+'?tab=cards&cat='+encodeURIComponent(r.p.id)+'">'+esc(r.p.label)+'</a></td><td>'+esc(r.c.name)+'</td><td>'+r.p.due+'</td><td>'+r.p.seen+'/'+r.p.cards+'</td></tr>').join(''):'<tr><td colspan="4" class="empty">'+(Object.keys(summaries).length?'ไม่มีการ์ดครบกำหนดตอนนี้ 🎉':'กำลังโหลด…')+'</td></tr>';
+ $('#subjRows').innerHTML=subjRows.join('')||'<tr><td colspan="4" class="empty">กำลังโหลด…</td></tr>';
+ const b=$('#dueBadge');if(total>0){b.hidden=false;b.textContent='ครบกำหนด '+total;}else b.hidden=true;
+}
+function compute(){const now=Date.now();summaries={};for(const c of T.COURSES)if(data[c.key])summaries[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);renderReview();}
+Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();if(!Object.keys(data).length)$('#review').innerHTML='<tr><td colspan="4" class="empty">โหลดข้อมูลวิชาไม่สำเร็จ ลองรีเฟรช</td></tr>';});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)compute();});
+function setView(v){st.subjView=v;$('#subjects').hidden=v==='t';$('#subjTable').hidden=v!=='t';$('#vG').setAttribute('aria-pressed',String(v!=='t'));$('#vT').setAttribute('aria-pressed',String(v==='t'));}
+$('#vG').onclick=()=>{setView('g');save();};$('#vT').onclick=()=>{setView('t');save();};
+setView(st.subjView==='t'?'t':'g');
+renderTasks();
+})();
+</script>
 </body>
 </html>

@@ -7,7 +7,7 @@ const root=path.join(__dirname,'..');
 const catalog=JSON.parse(fs.readFileSync(path.join(root,'data/accounting-textbook-index.json'),'utf8'));
 const html=fs.readFileSync(path.join(root,'accounting-textbook.html'),'utf8');
 const accounting=fs.readFileSync(path.join(root,'acc.html'),'utf8');
-const home=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const home=fs.readFileSync(path.join(root,'classic.html'),'utf8');
 
 test('source-linked index has nonempty unique stable references',()=>{
   assert.ok(catalog.meta.sourceUrl.startsWith('https://drive.google.com/file/'));
