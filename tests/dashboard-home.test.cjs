@@ -33,13 +33,17 @@ test('removed sections stay removed (no Quick Launch, no start/end checklists)',
 });
 test('home writes only its own key and the shared Today settings key',()=>{
  const writes=[...html.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]).sort();
- assert.deepEqual(writes,['KEY','T.SETTINGS_KEY']);
+ assert.deepEqual(writes,['BK_META','KEY','T.SETTINGS_KEY']);
+ assert.match(html,/BK_META='studyos\.backup-meta\.v1'/);
+ assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.backup-meta.v1'));
  assert.match(html,/KEY='studyos\.home\.v1'/);
  assert.doesNotMatch(html,/study-sync-key|\.removeItem|\.clear\(|method:\s*['"]PUT|method:\s*['"]POST/);
  assert.doesNotMatch(html,/<img[^>]+src="https?:/i);
 });
 test('home has iPad-friendly rules',()=>{
- assert.match(html,/min-height:4[4-8]px/);assert.match(html,/prefers-color-scheme:dark/);assert.match(html,/prefers-reduced-motion/);
+ // Theme tokens live in the shared stylesheet the page links.
+ const themed=html+(/assets\/study-world\.css/.test(html)?read('assets/study-world.css'):'');
+ assert.match(html,/min-height:4[4-8]px/);assert.match(themed,/prefers-color-scheme:dark/);assert.match(html,/prefers-reduced-motion/);
 });
 test('English and Chinese are separate decks with their own card images',()=>{
  const T=require('../scripts/study-today.js');assert.deepEqual(T.LANGS.map(l=>l.page),['eng.html','zh.html']);

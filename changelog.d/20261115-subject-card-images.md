@@ -1,0 +1,1 @@
+- Fix: subject card images and GIFs on Today show whole again (they were squeezed into a thin strip by the hatching background), and the course name tile (ACC, ECO…) is readable in dark mode.

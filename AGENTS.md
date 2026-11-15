@@ -69,7 +69,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | `studyos.accounting.textbook.progress.v1` | Textbook answers. |
 | `vocabloom_mvp_v1` | WordNest English data. |
 
-Not backed up: `studyos.theme.v1`, `studyos.nav.v1` (collapsed sidebar; both written only by `scripts/study-theme.js`), sync keys (`study-sync-*`), caches.
+Not backed up: `studyos.theme.v1`, `studyos.nav.v1` (collapsed sidebar; both written only by `scripts/study-theme.js`), `studyos.backup-meta.v1` (time **Back up now** was last tapped on Today, written only by `index.html`; drives the Today backup reminder. `progress-backup.html` must stay read-only, CI checks it), sync keys (`study-sync-*`), caches.
 
 ## Tests
 
@@ -94,6 +94,7 @@ node tests/auto-sync-browser.cjs
 - `workers/progress/wrangler.jsonc` and `.github/workflows/deploy-progress-worker.yml` (PR #102, may still be open) deploy `vocabloom-progress-cas-prod`, a compare-and-set progress Worker built from `experiments/prod-progress-cas/worker.mjs`.
 - That deploy needs the owner to add the GitHub secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `PROGRESS_SYNC_KEY`, then run the workflow and type `DEPLOY`. The owner postponed this.
 - After the smoke test passes, add `progress_api` to `data/config.json`. Course pages and WordNest already support it, including auto sync.
+- Owner request (15 Nov 2026, after losing quiz answers when the iPad cleared site data): when cloud sync goes live it must also sync `studyos.today.v1` (timetable, exams, plan ticks), not only course progress. Until then the owner chose device-side protection: `navigator.storage.persist()` on every page and the Today backup reminder.
 - `study-api-cas-staging-only` is a staging prototype. Do not use it for real data.
 
 ## Open items

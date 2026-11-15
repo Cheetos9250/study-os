@@ -526,8 +526,10 @@ const BRC_QUIZ=[
 BRC_QUIZ.forEach((q,i)=>{ let s=(i+1201)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
   const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   QS.push({id:'brc-'+(i+1),cat:q[0],q:q[1],opts:q[2],exp:q[4],order:idx,right:q[3],case:q[5]||''}); });
-let qcats=new Set(), errOnly=/[?&]set=errors\b/.test(location.search), bankErrOnly=/[?&]set=bankerrors\b/.test(location.search), brcOnly=/[?&]set=bankcases\b/.test(location.search), missedOnly=false, unansOnly=false, deck=[], qpos=0, qStat='', qStatErr=false;
-function buildDeck(){ const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!errOnly||String(q.id).startsWith('err-'))&&(!bankErrOnly||String(q.id).startsWith('err-b'))&&(!brcOnly||String(q.id).startsWith('brc-'))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q)))); qpos=0; }
+let qcats=new Set(), errOnly=/[?&]set=errors\b/.test(location.search), bankErrOnly=/[?&]set=bankerrors\b/.test(location.search), brcOnly=/[?&]set=bankcases\b/.test(location.search), missedOnly=false, unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
+function buildDeck(){ const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!errOnly||String(q.id).startsWith('err-'))&&(!bankErrOnly||String(q.id).startsWith('err-b'))&&(!brcOnly||String(q.id).startsWith('brc-'))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+  if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
+  qpos=0; }
 function renderQ(){
   (function(box){ box.innerHTML='';
     [['all','All'],...CATS].forEach(([id,l])=>{
@@ -541,7 +543,7 @@ function renderQ(){
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="errBtn" aria-pressed="'+errOnly+'" type="button">Errors set</button><button class="chip" id="bankErrBtn" aria-pressed="'+bankErrOnly+'" type="button">Bank rec errors</button><button class="chip" id="brcBtn" aria-pressed="'+brcOnly+'" type="button">Bank rec cases</button><button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
+  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button><button class="chip" id="errBtn" aria-pressed="'+errOnly+'" type="button">Errors set</button><button class="chip" id="bankErrBtn" aria-pressed="'+bankErrOnly+'" type="button">Bank rec errors</button><button class="chip" id="brcBtn" aria-pressed="'+brcOnly+'" type="button">Bank rec cases</button><button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+((missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined;
   h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
@@ -565,6 +567,7 @@ function wireQ(){
   const bb=$('#bankErrBtn'); if(bb) bb.onclick=()=>{bankErrOnly=!bankErrOnly;if(bankErrOnly){errOnly=false;brcOnly=false;}qpos=0;buildDeck();renderQ()};
   const cb=$('#brcBtn'); if(cb) cb.onclick=()=>{brcOnly=!brcOnly;if(brcOnly){errOnly=false;bankErrOnly=false;}qpos=0;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;buildDeck();renderQ()};
+  const sh=$('#shufBtn'); if(sh) sh.onclick=()=>{shuffleOn=!shuffleOn;buildDeck();renderQ()};
   const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
 
@@ -885,6 +888,7 @@ window.__xs=(()=>{
 </script>
 <script src="scripts/study-course-mode.js?v=1"></script>
 <script src="scripts/study-quiz-notes.js?v=1"></script>
+<script src="scripts/study-calc.js?v=2"></script>
 <script src="scripts/study-course-nav.js?v=1"></script>
-<script src="scripts/study-nav.js?v=2"></script>
+<script src="scripts/study-nav.js?v=3"></script>
 </html>

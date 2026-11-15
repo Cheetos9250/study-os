@@ -1,0 +1,1 @@
+- Faster page loads: core pages link their fonts in `<head>` with preconnect instead of a chained `@import` inside `assets/study-world.css`; course pages load only the nav's glyphs (Google Fonts `text=`) instead of whole Japanese fonts; the calculator no longer forces an extra layout of the long quiz page while it loads. No storage or behaviour changes.

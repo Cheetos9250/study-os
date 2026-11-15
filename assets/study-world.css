@@ -4,7 +4,7 @@
    (scripts/study-accent.js sets --ah/--as/--al/--ad; defaults below are an ink red).
    Loaded after each core page's own <style>, so these rules win at equal specificity.
    Used by: index, flashcards, practice, hub, calendar, grades. Course pages keep study-unify.css. */
-@import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Mali:wght@500;600;700&display=swap');
+/* Fonts are linked from each page's <head> (preconnect + stylesheet) so they load in parallel, not after this file. */
 
 :root{
  --ah:4;--as:76%;--al:50%;--ad:68%;
@@ -153,7 +153,7 @@ h3 .jersey{margin-right:10px;vertical-align:middle}
  repeating-conic-gradient(from 0deg at 78% 55%,var(--ink) 0 1.4deg,transparent 1.4deg 7deg),
  radial-gradient(circle at 78% 55%,var(--panel) 0 16%,transparent 34%),
  var(--dots),var(--panel);border-bottom:var(--bw) solid var(--ink)}
-.cover[style*="background-image: url"]{background-size:cover;background-position:center}
+.cover[style*="background-image: url"]{background-size:cover;background-position:center;background-repeat:no-repeat}
 .cover-tools button{font:900 13px var(--ui);border-radius:var(--r-s);background:var(--paper);color:var(--text);border:2.5px solid var(--ink);min-height:40px;opacity:1}
 .avatar{border:var(--bw) solid var(--ink)!important;box-shadow:0 0 0 4px var(--bg);background-color:var(--panel)}
 .avatar.img{border:0!important;box-shadow:none}
@@ -163,9 +163,8 @@ h3 .jersey{margin-right:10px;vertical-align:middle}
 .exam .n{font:700 38px/1 var(--num);color:var(--text)}
 .exam .n small{font:700 13px var(--ui);color:var(--muted)}
 .exam.soon .n{color:var(--orange)}.exam.urgent .n{color:var(--acc-t)}
-.exam.urgent{background:var(--hatch),var(--panel)}
-.exam.urgent p,.exam.urgent .when,.exam.urgent .n{background:var(--panel);width:fit-content;padding:0 4px}
-.exam.urgent .n{margin:0 auto}
+/* urgent exam: a hatched band down the left edge; the text stays on clean paper */
+.exam.urgent{background:var(--hatch) left top/14px 100% no-repeat,var(--panel);padding-left:28px}
 
 /* ---------- calendar ---------- */
 .day{border-radius:var(--r);background:var(--panel);border:2px solid var(--ink);font:700 15px var(--num)}

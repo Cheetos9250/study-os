@@ -1,0 +1,1 @@
+- Today: on screens 760 px and wider, the backup reminder sits in the empty space beside the "Study" title instead of taking its own row; shorter wording. Phones keep it under the title.
