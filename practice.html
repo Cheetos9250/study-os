@@ -158,6 +158,7 @@ html.nb-lock,html.nb-lock body{overflow:hidden}
 </section>
 </main>
 </div>
+<script src="scripts/study-review.js?v=1"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-nav.js?v=3"></script>
 <script>
@@ -176,13 +177,16 @@ function render(){
  const now=Date.now(),sum={};
  for(const c of T.COURSES)if(data[c.key])sum[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);
  const ne0=nextExam(now),wideKey=ne0?ne0.course:'';
+ const due={};for(const c of T.COURSES)due[c.key]=window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0;
  $('#courses').innerHTML=T.COURSES.map(c=>{const s=sum[c.key];let q=0,a=0,r=0;if(s)for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}
   return '<div class="pc'+(c.key===wideKey?' wide':'')+'"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
-   +'<div class="acts"><a class="main" href="'+link(c,'prac')+'">Start quiz</a></div></div>';}).join('');
+   +'<div class="acts">'+(due[c.key]?'<a class="main" href="'+link(c,'prac')+'&review=1">Review '+due[c.key]+'</a><a href="'+link(c,'prac')+'">Quiz</a>':'<a class="main" href="'+link(c,'prac')+'">Start quiz</a>')+'</div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;
  const ne=nextExam(now),nc=ne&&T.COURSES.find(x=>x.key===ne.course),wk=(nc&&weak.find(w=>w.course===nc.key))||weak[0];
- if(wk&&(!nc||wk.course===nc.key)){const c=T.COURSES.find(x=>x.key===wk.course);lead('Fix '+esc(wk.label),Math.round(wk.acc*100)+'% correct so far'+(ne&&nc&&nc.key===c.key?' · '+esc(ne.title)+' '+inDays(ne.d):''),link(c,'prac',wk.cat),'Practise '+c.name);}
+ const rvc=T.COURSES.slice().sort((a,b)=>due[b.key]-due[a.key])[0];
+ if(rvc&&due[rvc.key]){lead('Review '+due[rvc.key]+' '+esc(rvc.name)+' question'+(due[rvc.key]>1?'s':''),'Missed or due again today · spaced repetition',link(rvc,'prac')+'&review=1','Start review');}
+ else if(wk&&(!nc||wk.course===nc.key)){const c=T.COURSES.find(x=>x.key===wk.course);lead('Fix '+esc(wk.label),Math.round(wk.acc*100)+'% correct so far'+(ne&&nc&&nc.key===c.key?' · '+esc(ne.title)+' '+inDays(ne.d):''),link(c,'prac',wk.cat),'Practise '+c.name);}
  else if(nc)lead('Warm up: '+esc(nc.name)+' quiz',esc(ne.title)+' '+inDays(ne.d),link(nc,'prac'),'Start '+nc.name+' quiz');
  else lead('Take a '+esc(T.COURSES[0].name)+' quiz','Pick up where you left off',link(T.COURSES[0],'prac'),'Start quiz');
  $('#weak').innerHTML=weak.length?'<ul class="weak">'+weak.map(w=>{const c=T.COURSES.find(x=>x.key===w.course),D=data[w.course],cat=[w.cat];
