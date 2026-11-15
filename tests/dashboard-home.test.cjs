@@ -39,7 +39,9 @@ test('home writes only its own key and the shared Today settings key',()=>{
  assert.doesNotMatch(html,/<img[^>]+src="https?:/i);
 });
 test('home has iPad-friendly rules',()=>{
- assert.match(html,/min-height:4[4-8]px/);assert.match(html,/prefers-color-scheme:dark/);assert.match(html,/prefers-reduced-motion/);
+ // Theme tokens live in the shared stylesheet the page links.
+ const themed=html+(/assets\/study-world\.css/.test(html)?read('assets/study-world.css'):'');
+ assert.match(html,/min-height:4[4-8]px/);assert.match(themed,/prefers-color-scheme:dark/);assert.match(html,/prefers-reduced-motion/);
 });
 test('English and Chinese are separate decks with their own card images',()=>{
  const T=require('../scripts/study-today.js');assert.deepEqual(T.LANGS.map(l=>l.page),['eng.html','zh.html']);
