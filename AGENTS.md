@@ -54,7 +54,7 @@ Shared scripts and styles:
 - `scripts/study-grades.js`: grade maths.
 - `assets/study-unify.css`: gives course pages the site look.
 
-Fonts are DM Sans (body) and Outfit (headings/numbers). The palette is Notion-like: white/#191919, accent #2383e2.
+Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.md`): Kaisei Decol (headings/numbers), Zen Maru Gothic (body), Mali (Thai); ink black on white panels, 3px frames, pen hatching. The accent colour follows the Today cover image via `scripts/study-accent.js` (sessionStorage cache only). Course pages keep `assets/study-unify.css`.
 
 ## localStorage keys (all backed up)
 

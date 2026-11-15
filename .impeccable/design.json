@@ -1,0 +1,712 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-15T03:06:44.933131+00:00",
+  "title": "Design System: Study OS",
+  "extensions": {
+    "colorMeta": {
+      "cover-accent": {
+        "role": "primary",
+        "displayName": "Cover Accent Ink",
+        "canonical": "hsl(var(--ah) var(--as) var(--al)) /* default 4 76% 50% */",
+        "tonalRamp": [
+          "#361816",
+          "#692621",
+          "#a12e25",
+          "#dc3428",
+          "#e26860",
+          "#e59f9a",
+          "#edccc9",
+          "#f8eeed"
+        ]
+      },
+      "cover-accent-night": {
+        "role": "primary",
+        "displayName": "Cover Accent, Night",
+        "canonical": "hsl(var(--ah) var(--as) var(--ad)) /* default 4 76% 68% */",
+        "tonalRamp": [
+          "#361816",
+          "#692621",
+          "#a12e25",
+          "#dc3528",
+          "#e26960",
+          "#e59f9a",
+          "#edccca",
+          "#f8eeed"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#111111",
+        "tonalRamp": [
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dbdbdb",
+          "#f2f2f2"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dbdbdb",
+          "#f2f2f2"
+        ]
+      },
+      "page-ground": {
+        "role": "neutral",
+        "displayName": "Page Ground",
+        "canonical": "#f4f4f2",
+        "tonalRamp": [
+          "#282824",
+          "#494941",
+          "#6a6a5d",
+          "#8c8c78",
+          "#a8a899",
+          "#c3c3bb",
+          "#ddddd9",
+          "#f3f3f2"
+        ]
+      },
+      "paper-recess": {
+        "role": "neutral",
+        "displayName": "Paper Recess",
+        "canonical": "#f0f0ee",
+        "tonalRamp": [
+          "#282825",
+          "#484842",
+          "#69695e",
+          "#8a8a7b",
+          "#a6a69b",
+          "#c2c2bc",
+          "#ddddda",
+          "#f3f3f2"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#505050",
+        "tonalRamp": [
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dbdbdb",
+          "#f2f2f2"
+        ]
+      },
+      "soft-rule": {
+        "role": "neutral",
+        "displayName": "Soft Rule",
+        "canonical": "#dcdcda",
+        "tonalRamp": [
+          "#272726",
+          "#464644",
+          "#666661",
+          "#85857f",
+          "#a3a39e",
+          "#c1c1be",
+          "#dcdcdb",
+          "#f2f2f2"
+        ]
+      },
+      "halftone-grey": {
+        "role": "neutral",
+        "displayName": "Halftone Grey",
+        "canonical": "#b9b9b9",
+        "tonalRamp": [
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#a1a1a1",
+          "#bfbfbf",
+          "#dbdbdb",
+          "#f2f2f2"
+        ]
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "#0e0e0f",
+        "tonalRamp": [
+          "#262627",
+          "#434346",
+          "#616166",
+          "#7e7e86",
+          "#9e9ea4",
+          "#bebec1",
+          "#dadadc",
+          "#f2f2f2"
+        ]
+      },
+      "night-panel": {
+        "role": "neutral",
+        "displayName": "Night Panel",
+        "canonical": "#171718",
+        "tonalRamp": [
+          "#262627",
+          "#444446",
+          "#626265",
+          "#808085",
+          "#9f9fa2",
+          "#bebec0",
+          "#dbdbdc",
+          "#f2f2f2"
+        ]
+      },
+      "night-recess": {
+        "role": "neutral",
+        "displayName": "Night Recess",
+        "canonical": "#1f1f21",
+        "tonalRamp": [
+          "#262627",
+          "#434346",
+          "#616166",
+          "#7e7e86",
+          "#9e9ea3",
+          "#bebec1",
+          "#dbdbdc",
+          "#f2f2f2"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#f0f0ee",
+        "tonalRamp": [
+          "#282825",
+          "#484842",
+          "#69695e",
+          "#8a8a7b",
+          "#a6a69b",
+          "#c2c2bc",
+          "#ddddda",
+          "#f3f3f2"
+        ]
+      },
+      "night-graphite": {
+        "role": "neutral",
+        "displayName": "Night Graphite",
+        "canonical": "#a9a9a6",
+        "tonalRamp": [
+          "#272726",
+          "#464644",
+          "#656562",
+          "#848480",
+          "#a2a29f",
+          "#c0c0be",
+          "#dcdcdb",
+          "#f2f2f2"
+        ]
+      },
+      "night-halftone": {
+        "role": "neutral",
+        "displayName": "Night Halftone",
+        "canonical": "#4a4a4c",
+        "tonalRamp": [
+          "#262627",
+          "#444445",
+          "#626265",
+          "#808084",
+          "#a0a0a2",
+          "#bfbfc0",
+          "#dbdbdc",
+          "#f2f2f2"
+        ]
+      },
+      "tone-accounting": {
+        "role": "secondary",
+        "displayName": "Tone Accounting",
+        "canonical": "#8fb2f4",
+        "tonalRamp": [
+          "#152138",
+          "#1e396c",
+          "#204fa7",
+          "#2064e4",
+          "#5a8be7",
+          "#96b3e8",
+          "#c8d5ef",
+          "#ecf0f8"
+        ]
+      },
+      "tone-economics": {
+        "role": "secondary",
+        "displayName": "Tone Economics",
+        "canonical": "#f4ad7f",
+        "tonalRamp": [
+          "#382214",
+          "#6d3c1d",
+          "#a8551e",
+          "#e76d1e",
+          "#e99158",
+          "#e9b695",
+          "#efd7c7",
+          "#f8f1ec"
+        ]
+      },
+      "tone-math": {
+        "role": "secondary",
+        "displayName": "Tone Math",
+        "canonical": "#b49bf0",
+        "tonalRamp": [
+          "#201636",
+          "#362268",
+          "#4b27a0",
+          "#5e2ada",
+          "#8661e0",
+          "#b09ae4",
+          "#d4caed",
+          "#f0edf8"
+        ]
+      },
+      "tone-english": {
+        "role": "secondary",
+        "displayName": "Tone English",
+        "canonical": "#f2909f",
+        "tonalRamp": [
+          "#37151b",
+          "#6b1f2b",
+          "#a42337",
+          "#e02441",
+          "#e55d71",
+          "#e798a4",
+          "#eec9ce",
+          "#f8edee"
+        ]
+      },
+      "tone-chinese": {
+        "role": "secondary",
+        "displayName": "Tone Chinese",
+        "canonical": "#f2cf55",
+        "tonalRamp": [
+          "#393014",
+          "#6e5c1c",
+          "#aa8a1d",
+          "#e9bb1c",
+          "#eaca57",
+          "#ead795",
+          "#efe6c7",
+          "#f8f6ec"
+        ]
+      },
+      "signal-red": {
+        "role": "neutral",
+        "displayName": "Signal Red",
+        "canonical": "#c21f2f",
+        "tonalRamp": [
+          "#36171a",
+          "#672229",
+          "#9f2834",
+          "#d92c3d",
+          "#df626f",
+          "#e39ba2",
+          "#eccace",
+          "#f7edee"
+        ]
+      },
+      "signal-orange": {
+        "role": "neutral",
+        "displayName": "Signal Orange",
+        "canonical": "#a8500c",
+        "tonalRamp": [
+          "#392414",
+          "#6e401c",
+          "#aa5a1c",
+          "#ea751b",
+          "#eb9756",
+          "#eaba94",
+          "#f0d9c7",
+          "#f8f1ec"
+        ]
+      },
+      "signal-green": {
+        "role": "neutral",
+        "displayName": "Signal Green",
+        "canonical": "#1f7448",
+        "tonalRamp": [
+          "#1a3326",
+          "#296044",
+          "#349362",
+          "#3dc780",
+          "#6fd29f",
+          "#a2dcbe",
+          "#cee9db",
+          "#eef6f2"
+        ]
+      },
+      "alert-tint": {
+        "role": "neutral",
+        "displayName": "Alert Tint",
+        "canonical": "#ffdcdc",
+        "tonalRamp": [
+          "#3c1111",
+          "#741515",
+          "#b51212",
+          "#fa0b0b",
+          "#f74b4b",
+          "#f18e8e",
+          "#f3c4c4",
+          "#f9ebeb"
+        ]
+      },
+      "alert-tint-ink": {
+        "role": "neutral",
+        "displayName": "Alert Tint Ink",
+        "canonical": "#8a1622",
+        "tonalRamp": [
+          "#36171a",
+          "#672229",
+          "#9f2834",
+          "#d92b3d",
+          "#df626f",
+          "#e39ba3",
+          "#eccace",
+          "#f7edee"
+        ]
+      },
+      "caution-tint": {
+        "role": "neutral",
+        "displayName": "Caution Tint",
+        "canonical": "#fff0b3",
+        "tonalRamp": [
+          "#3c3311",
+          "#746215",
+          "#b59512",
+          "#faca0b",
+          "#f7d54b",
+          "#f1dd8e",
+          "#f3eac4",
+          "#f9f7eb"
+        ]
+      },
+      "caution-tint-ink": {
+        "role": "neutral",
+        "displayName": "Caution Tint Ink",
+        "canonical": "#5c4500",
+        "tonalRamp": [
+          "#3c3111",
+          "#745d15",
+          "#b58c12",
+          "#fabe0b",
+          "#f7cc4b",
+          "#f1d88e",
+          "#f3e7c4",
+          "#f9f6eb"
+        ]
+      },
+      "calm-tint": {
+        "role": "neutral",
+        "displayName": "Calm Tint",
+        "canonical": "#d9efe0",
+        "tonalRamp": [
+          "#1e2f23",
+          "#31583e",
+          "#428557",
+          "#51b370",
+          "#7ec494",
+          "#abd4b8",
+          "#d2e5d8",
+          "#eff5f1"
+        ]
+      },
+      "calm-tint-ink": {
+        "role": "neutral",
+        "displayName": "Calm Tint Ink",
+        "canonical": "#1b5131",
+        "tonalRamp": [
+          "#1c3124",
+          "#2d5d40",
+          "#3a8c5c",
+          "#46be77",
+          "#76cc99",
+          "#a6d8bb",
+          "#d0e7d9",
+          "#eff6f2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Counts, countdowns, scores, grades, the clock."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings followed by a 3px ink rule."
+      },
+      "bubble": {
+        "displayName": "Bubble",
+        "purpose": "The line spoken in the lead speech bubble."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text; Mali covers Thai."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel and plan-item titles."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, section links, scoreboard labels."
+      },
+      "label-caps": {
+        "displayName": "Label caps",
+        "purpose": "Calendar weekday and grade-table column headers only."
+      },
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "Course tags and kind badges."
+      }
+    },
+    "shadows": [
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 6px var(--acc-soft)",
+        "purpose": "With a 3px ink outline at 3px offset on focusable controls."
+      },
+      {
+        "name": "icon-ring",
+        "value": "0 0 0 4px var(--bg)",
+        "purpose": "Separates the Today icon from the cover edge."
+      },
+      {
+        "name": "overflow-menu",
+        "value": "0 12px 30px -8px rgba(0,0,0,.3)",
+        "purpose": "Bottom-bar More popover only."
+      }
+    ],
+    "textures": [
+      {
+        "name": "hatch",
+        "value": "repeating-linear-gradient(-45deg,var(--acc) 0 1.5px,transparent 1.5px 8px)",
+        "purpose": "Accent pen hatching: marks now."
+      },
+      {
+        "name": "hatch-ink",
+        "value": "repeating-linear-gradient(-45deg,var(--halftone) 0 1.5px,transparent 1.5px 8px)",
+        "purpose": "Grey hatching: secondary tone."
+      },
+      {
+        "name": "dots",
+        "value": "radial-gradient(circle,var(--halftone) 1.2px,transparent 1.6px) 0 0/7px 7px",
+        "purpose": "Halftone dots: hover tone and default cover."
+      },
+      {
+        "name": "speed-lines",
+        "value": "repeating-conic-gradient(from 0deg at 78% 55%,var(--ink) 0 1.4deg,transparent 1.4deg 7deg)",
+        "purpose": "Default Today cover with no owner image."
+      }
+    ],
+    "strokes": [
+      {
+        "name": "frame",
+        "value": "3px",
+        "purpose": "Panels, section rules, lead controls, nav edge (--bw)."
+      },
+      {
+        "name": "control",
+        "value": "2.5px",
+        "purpose": "Buttons, jerseys, segmented control."
+      },
+      {
+        "name": "field",
+        "value": "2px",
+        "purpose": "Inputs, rows, calendar cells, tags."
+      },
+      {
+        "name": "pill",
+        "value": "1.5px",
+        "purpose": "Status pills and badges."
+      }
+    ],
+    "motion": [],
+    "accentRuntime": {
+      "source": "scripts/study-accent.js",
+      "properties": [
+        "--ah",
+        "--as",
+        "--al",
+        "--ad",
+        "--acc-ink-l",
+        "--acc-text"
+      ],
+      "defaults": {
+        "--ah": "4",
+        "--as": "76%",
+        "--al": "50%",
+        "--ad": "68%"
+      },
+      "rule": "Hue/saturation from the cover's dominant saturated hue; --al solved for 4.5:1 white text (or near-black ink on warm/light hues), --ad for 6.5:1 near-black text, --acc-text for 3:1 on white."
+    },
+    "breakpoints": [
+      {
+        "name": "rail",
+        "value": "900px"
+      },
+      {
+        "name": "grid-2col",
+        "value": "700px"
+      },
+      {
+        "name": "lead-stack",
+        "value": "560px"
+      },
+      {
+        "name": "grid-1col",
+        "value": "480px"
+      }
+    ],
+    "openItems": [
+      "Authored motion moment: none yet; only the reduced-motion kill switch exists.",
+      "Line-weight hierarchy: 3 / 2.5 / 2 / 1.5px strokes in use without a settled level rule."
+    ],
+    "scope": "Core pages index, flashcards, practice, hub, calendar, grades and scripts/study-nav.js. Course pages and vocabloom/ keep assets/study-unify.css."
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled main action; hover re-inks it in the cover accent.",
+      "html": "<button class=\"ds-btn-primary\">Start quiz</button>",
+      "css": ".ds-btn-primary{font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;font-weight:700;font-size:14px;min-height:42px;padding:0 16px;border-radius:6px;border:2.5px solid var(--ink,#111);background:var(--ink,#111);color:var(--accent-ink,#fff);cursor:pointer;transition:background .15s}.ds-btn-primary:hover{background:var(--acc,#e02c1f);color:var(--acc-ink,#fff)}.ds-btn-primary:focus-visible{outline:3px solid var(--focus,#111);outline-offset:3px;box-shadow:0 0 0 6px var(--acc-soft,#fbe9e8)}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action on paper with an ink outline.",
+      "html": "<button class=\"ds-btn-outline\">Practice</button>",
+      "css": ".ds-btn-outline{font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;font-weight:700;font-size:14px;min-height:42px;padding:0 16px;border-radius:6px;border:2.5px solid var(--ink,#111);background:var(--panel,#fff);color:var(--text,#111);cursor:pointer}.ds-btn-outline:hover{background:var(--panel-2,#f0f0ee)}.ds-btn-outline:focus-visible{outline:3px solid var(--focus,#111);outline-offset:3px;box-shadow:0 0 0 6px var(--acc-soft,#fbe9e8)}"
+    },
+    {
+      "name": "Go Button",
+      "kind": "button",
+      "refersTo": "button-go",
+      "description": "The single lead action on a page, in the cover accent.",
+      "html": "<a class=\"ds-go\" href=\"#\">Start Accounting quiz</a>",
+      "css": ".ds-go{font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;font-weight:900;font-size:15px;min-height:46px;padding:0 22px;border-radius:6px;background:var(--acc,#e02c1f);color:var(--acc-ink,#fff);border:3px solid var(--ink,#111);display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}.ds-go:hover{filter:brightness(1.05)}.ds-go:focus-visible{outline:3px solid var(--focus,#111);outline-offset:3px;box-shadow:0 0 0 6px var(--acc-soft,#fbe9e8)}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Paper field with a 2px ink stroke and accent caret.",
+      "html": "<input class=\"ds-input\" placeholder=\"Add a task\">",
+      "css": ".ds-input{font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;font-size:14px;min-height:44px;padding:0 10px;border-radius:6px;border:2px solid var(--ink,#111);background:var(--panel,#fff);color:var(--text,#111);caret-color:var(--acc,#e02c1f)}.ds-input::placeholder{color:var(--muted,#505050)}.ds-input:focus-visible{outline:3px solid var(--focus,#111);outline-offset:3px;box-shadow:0 0 0 6px var(--acc-soft,#fbe9e8)}"
+    },
+    {
+      "name": "Course Tag",
+      "kind": "chip",
+      "refersTo": "course-tag",
+      "description": "Course-tone tag with black text and an ink outline.",
+      "html": "<span class=\"ds-tag\" style=\"--team:#8fb2f4\">Accounting</span> <span class=\"ds-tag\" style=\"--team:#f4ad7f\">Economics</span>",
+      "css": ".ds-tag{display:inline-block;font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;font-weight:900;font-size:11px;line-height:1.6;padding:0 8px;border-radius:4px;border:2px solid var(--ink,#111);background:var(--team,#ececec);color:#111}"
+    },
+    {
+      "name": "Ink Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "The manga frame: 3px ink, 2px corners, no shadow; the now variant is accent-hatched.",
+      "html": "<div class=\"ds-panel\"><b class=\"ds-n\">0</b><span>Cards due</span></div><div class=\"ds-panel ds-now\"><b class=\"ds-n ds-ko\">1</b><span class=\"ds-ko\">day to exam</span></div>",
+      "css": ".ds-panel{display:inline-flex;flex-direction:column;gap:2px;min-width:150px;margin:4px;padding:16px 18px;background:var(--panel,#fff);color:var(--text,#111);border:3px solid var(--ink,#111);border-radius:2px;font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;font-weight:900;font-size:14px}.ds-now{background:repeating-linear-gradient(-45deg,var(--acc,#e02c1f) 0 1.5px,transparent 1.5px 8px),var(--panel,#fff)}.ds-n{font:700 52px/1.05 'Kaisei Decol',serif}.ds-ko{background:var(--panel,#fff);width:fit-content;padding:0 4px}"
+    },
+    {
+      "name": "Speech-Bubble Lead Panel",
+      "kind": "custom",
+      "refersTo": "speech-bubble",
+      "description": "Signature: the next step spoken from an ink bubble in a hatched frame, with one Go action.",
+      "html": "<section class=\"ds-lead\"><div class=\"ds-bub\"><b>Warm up: Accounting quiz</b><span>Accounting quiz in 1 day</span></div><a class=\"ds-lead-go\" href=\"#\">Start</a></section>",
+      "css": ".ds-lead{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:18px 20px 26px;border:3px solid var(--ink,#111);border-radius:2px;background:repeating-linear-gradient(-45deg,var(--acc,#e02c1f) 0 1.5px,transparent 1.5px 8px),var(--panel,#fff);font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;}.ds-bub{position:relative;isolation:isolate;max-width:420px;background:var(--panel,#fff);border:3px solid var(--ink,#111);border-radius:50%;padding:18px 34px 20px;text-align:center;color:var(--text,#111)}.ds-bub::before{content:'';position:absolute;z-index:-1;left:16%;bottom:-24px;width:30px;height:40px;background:var(--ink,#111);clip-path:polygon(0 0,100% 0,6% 100%)}.ds-bub::after{content:'';position:absolute;z-index:1;left:calc(16% + 4.5px);bottom:-16.5px;width:20px;height:30px;background:var(--panel,#fff);clip-path:polygon(0 0,100% 0,6% 100%)}.ds-bub b{display:block;font:700 24px/1.25 'Kaisei Decol',serif}.ds-bub span{display:block;color:var(--muted,#505050);font-weight:700;font-size:14px}.ds-lead-go{font-weight:900;font-size:15px;min-height:46px;padding:0 22px;border-radius:6px;background:var(--acc,#e02c1f);color:var(--acc-ink,#fff);border:3px solid var(--ink,#111);display:inline-flex;align-items:center;text-decoration:none}.ds-lead-go:focus-visible{outline:3px solid var(--focus,#111);outline-offset:3px}"
+    },
+    {
+      "name": "Navigation Rail",
+      "kind": "nav",
+      "refersTo": "nav-tab-active",
+      "description": "White rail with an ink edge; the current page is a black pill.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-brand\">Study <b>OS</b></div><a class=\"ds-tab\" aria-current=\"page\" href=\"#\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M2 12h2M20 12h2\"/></svg>Today</a><a class=\"ds-tab\" href=\"#\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"7\" y=\"3\" width=\"13\" height=\"15\" rx=\"1\"/><path d=\"M4 7v13h12\"/></svg>Flashcards</a></nav>",
+      "css": ".ds-nav{width:224px;padding:20px 12px;background:var(--panel,#fff);color:var(--text,#111);border-right:3px solid var(--ink,#111);display:flex;flex-direction:column;gap:2px;font-family:'Zen Maru Gothic','Mali',system-ui,sans-serif;}.ds-brand{font:700 25px/1 'Kaisei Decol',serif;padding:4px 12px 22px}.ds-brand b{color:var(--acc-t,var(--acc,#e02c1f));margin-left:.25em}.ds-tab{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;border-radius:6px;font-weight:700;font-size:15px;color:var(--muted,#474747);text-decoration:none}.ds-tab:hover{background:#efefed;color:var(--text,#111)}.ds-tab[aria-current=page]{background:var(--ink,#111);color:var(--paper,#fff);font-weight:900}.ds-tab:focus-visible{outline:3px solid var(--focus,#111);outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Ink Manga Page",
+    "overview": "\n**Creative North Star: \"The Ink Manga Page\"**\n\nEvery core page reads as a page of black-and-white seinen line art. Content sits in heavy ink panel frames on white paper; what is \"now\" (the urgent exam, today's calendar cell, the current class, the wide panel) is toned with diagonal pen hatching; secondary tone is grey hatching and halftone dots. The next action on each page is spoken from a speech bubble with a solid ink tail, and every other panel follows it.\n\nOne colour is allowed on the page, and it is not chosen by the designer: it is sampled from the owner's Today cover image, so the whole site re-inks itself when the cover changes. With no cover, the default is an ink red. The dark theme is the same page inverted: near-black paper, off-white ink. Course tones (five pale categorical colours) mark which subject a tag, class block or subject cover belongs to, always with black text on them.\n\nDensity is a study tool, not a dashboard: one wide panel per row of narrower ones (manga page rhythm, not an equal tile grid), large Kaisei Decol numerals first, short UI labels in Zen Maru Gothic. The old Notion-pastel look (emoji tiles, pastel gradients, sparkle headings, equal grids) is the confirmed anti-reference.",
+    "keyCharacteristics": [
+      "3px ink panel frames with near-square 2px corners; no soft shadows on panels.",
+      "Pen hatching in the cover accent marks \"now\"; grey hatching and halftone dots are secondary tone.",
+      "A speech-bubble lead panel opens every core page with the next step.",
+      "One accent colour, derived from the owner's cover, with contrast computed at runtime.",
+      "Kaisei Decol for display and numerals; Zen Maru Gothic (Mali for Thai) for UI.",
+      "Dark theme is an inverted page, not a separate palette."
+    ],
+    "rules": [
+      {
+        "name": "The Borrowed Ink Rule",
+        "body": "The accent is never hard-coded. Every accent shade is built from `--ah`/`--as`/`--al`/`--ad`; a new surface reads `var(--acc)`, `var(--acc-ink)`, `var(--acc-soft)`, `var(--acc-t)` and nothing else, so it re-inks with the cover.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Colour Rule",
+        "body": "Black is the primary colour (primary buttons, active nav). The accent is reserved for urgency, \"now\" hatching and the single lead action on a page.",
+        "section": "colors"
+      },
+      {
+        "name": "The Black-On-Tone Rule",
+        "body": "Text on a course tone is always `#111`, in dark mode too.",
+        "section": "colors"
+      },
+      {
+        "name": "The Numbers In Kaisei Rule",
+        "body": "Every count, countdown, score, grade and clock is set in Kaisei Decol; UI words never are.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Eyebrow Rule",
+        "body": "Uppercase small caps label table columns and weekdays only; they never sit above a heading as a kicker.",
+        "section": "typography"
+      },
+      {
+        "name": "The Drawn Depth Rule",
+        "body": "\"Now\" is shown by hatching, never by a shadow or glow. Text placed on hatching sits on a paper knockout (`.ko`, or `background: var(--panel)` with 0 4px padding).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** frame every panel in 3px ink with 2px corners on paper.",
+      "**Do** build accent colours only from `--ah`/`--as`/`--al`/`--ad` (via `--acc`, `--acc-ink`, `--acc-soft`, `--acc-t`) so the page follows the cover.",
+      "**Do** open each core page with the speech-bubble lead panel and one Go action.",
+      "**Do** mark \"now\" with accent hatching and put text on hatching over a paper knockout.",
+      "**Do** set counts, countdowns, scores and the clock in Kaisei Decol; UI words in Zen Maru Gothic.",
+      "**Do** keep black for primary buttons and the active nav pill; reserve the accent for urgency and the lead action.",
+      "**Do** print `#111` on course tones in both themes."
+    ],
+    "donts": [
+      "**Don't** use soft drop shadows or glows on panels; depth is drawn.",
+      "**Don't** hard-code an accent hex or hue in page CSS.",
+      "**Don't** return to the Notion-pastel look: emoji icons or emoji tiles, pastel gradients, sparkle headings, equal tile grids.",
+      "**Don't** put an uppercase eyebrow or kicker above a heading.",
+      "**Don't** set the accent as small body text on paper; use `--acc-t` (large or bold text only).",
+      "**Don't** round panels beyond 2px or controls beyond 6px."
+    ]
+  }
+}

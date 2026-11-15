@@ -10,7 +10,7 @@
           "assets/study-world.css"
         ],
         "createdAt": "2026-11-15T02:34:09.575Z",
-        "reason": "owner chose shoujo manga direction: cover focus lines are the signature screentone effect"
+        "reason": "owner chose manga line-art direction: cover speed lines are the signature effect"
       },
       {
         "rule": "border-accent-on-rounded",
@@ -28,7 +28,7 @@
           "index.html"
         ],
         "createdAt": "2026-11-15T02:34:17.225Z",
-        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+        "reason": "owner chose manga line-art direction: speed lines from the shared study-world.css cover are the signature"
       },
       {
         "rule": "repeating-stripes-gradient",
@@ -37,7 +37,7 @@
           "flashcards.html"
         ],
         "createdAt": "2026-11-15T02:34:17.232Z",
-        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+        "reason": "owner chose manga line-art direction: speed lines from the shared study-world.css cover are the signature"
       },
       {
         "rule": "repeating-stripes-gradient",
@@ -46,7 +46,7 @@
           "practice.html"
         ],
         "createdAt": "2026-11-15T02:34:17.239Z",
-        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+        "reason": "owner chose manga line-art direction: speed lines from the shared study-world.css cover are the signature"
       },
       {
         "rule": "repeating-stripes-gradient",
@@ -55,7 +55,7 @@
           "hub.html"
         ],
         "createdAt": "2026-11-15T02:34:17.245Z",
-        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+        "reason": "owner chose manga line-art direction: speed lines from the shared study-world.css cover are the signature"
       },
       {
         "rule": "repeating-stripes-gradient",
@@ -64,7 +64,7 @@
           "calendar.html"
         ],
         "createdAt": "2026-11-15T02:34:17.253Z",
-        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+        "reason": "owner chose manga line-art direction: speed lines from the shared study-world.css cover are the signature"
       },
       {
         "rule": "repeating-stripes-gradient",
@@ -73,7 +73,7 @@
           "grades.html"
         ],
         "createdAt": "2026-11-15T02:34:17.261Z",
-        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+        "reason": "owner chose manga line-art direction: speed lines from the shared study-world.css cover are the signature"
       },
       {
         "rule": "cramped-padding",
