@@ -9,10 +9,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Hub — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
-:root{color-scheme:light;--bg:#fff;--white:#f9f8f6;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--purple:#2383e2;--deep:#1a6fc4;--lav:#e4f0fb;--green:#2f8f5b;--greenbg:#d9ead9;--orange:#d9730d;--orangebg:#f5e6b0;--red:#d6453d;--redbg:#fadddb;--shadow:none}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--white:#212121;--text:#ececec;--muted:#a8a5a0;--line:#333;--purple:#5aa9f0;--deep:#8cc4f5;--lav:#1e3445;--green:#6fcf9b;--greenbg:#26422a;--orange:#f0a050;--orangebg:#4d4115;--red:#ff8a80;--redbg:#5a2a27;--shadow:none}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--white:#212121;--text:#ececec;--muted:#a8a5a0;--line:#333;--purple:#5aa9f0;--deep:#8cc4f5;--lav:#1e3445;--green:#6fcf9b;--greenbg:#26422a;--orange:#f0a050;--orangebg:#4d4115;--red:#ff8a80;--redbg:#5a2a27;--shadow:none}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55}
 .container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,40px) max(18px,env(safe-area-inset-right)) 60px max(18px,env(safe-area-inset-left))}
@@ -88,6 +84,7 @@ button.danger{color:var(--red)}
 .notebox textarea:focus{outline:2px solid var(--purple);outline-offset:1px}
 .notemeta{font-size:12px;color:var(--muted);margin:4px 0 0;min-height:16px}
 </style>
+<link rel="stylesheet" href="assets/study-world.css?v=1">
 <script src="scripts/study-theme.js?v=2"></script>
 </head>
 <body>
@@ -122,10 +119,10 @@ function subjects(now){
   const s=summaries[c.key];
   if(!s)return '<div class="card subj"><h3>'+esc(c.name)+'</h3><p class="full">'+esc(c.full)+'</p><p class="empty">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p></div>';
   const pct=s.total?Math.round(s.seen/s.total*100):0,chapters=Object.keys(s.per).length;
-  return '<a class="card subj" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="due"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Lessons →</span></a>';
+  return '<a class="card subj t-'+c.key+'" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3><span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="'+(s.reviewNow?'due':'')+'"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Lessons →</span></a>';
  });
- cards.push('<a class="card subj" href="vocabloom/index.html?lang=en"><h3>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
- cards.push('<a class="card subj" href="vocabloom/index.html?lang=zh"><h3>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj t-eng" href="vocabloom/index.html?lang=en"><h3><span class="jersey sm" aria-hidden="true">EN</span>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj t-zh" href="vocabloom/index.html?lang=zh"><h3><span class="jersey sm" aria-hidden="true">ZH</span>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
  $('#view').className='grid3';$('#view').innerHTML=cards.join('');
 }
 function chapters(c,now){
@@ -146,7 +143,7 @@ function chapters(c,now){
 const NOTES_KEY='studyos.notes.v1';let notes={},openNote=null;
 try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}
 const noteText=k=>notes[k]&&typeof notes[k].text==='string'?notes[k].text:'';
-function noteBtn(k){const has=noteText(k).trim();return '<button type="button" class="notebtn'+(has?' has':'')+'" data-note="'+esc(k)+'" aria-expanded="'+(openNote===k)+'">'+(has?'📝 Notes':'+ Notes')+'</button>';}
+function noteBtn(k){const has=noteText(k).trim();return '<button type="button" class="notebtn'+(has?' has':'')+'" data-note="'+esc(k)+'" aria-expanded="'+(openNote===k)+'">'+(has?'Edit notes':'+ Notes')+'</button>';}
 function noteBox(k){if(openNote!==k)return '';const n=notes[k];return '<div class="notebox"><textarea data-note-text="'+esc(k)+'" maxlength="20000" placeholder="Write notes for this chapter…" aria-label="Notes">'+esc(noteText(k))+'</textarea><p class="notemeta" data-note-meta="'+esc(k)+'">'+(n&&n.updated?'Saved '+new Date(n.updated).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</p></div>';}
 let noteTimer=null;
 function saveNote(k,text){if(text.trim())notes[k]={text:text.slice(0,20000),updated:new Date().toISOString()};else delete notes[k];

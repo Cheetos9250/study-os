@@ -9,10 +9,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Calendar — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
-:root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--panel:#f9f8f6;--accent:#2383e2;--red:#d6453d;--orange:#d9730d;--green:#2f8f5b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--blue-soft:#e4f0fb;--mono:'Outfit','DM Sans','IBM Plex Sans Thai',system-ui,sans-serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
@@ -32,7 +28,6 @@ h1{font-size:clamp(28px,5vw,38px);margin:0;letter-spacing:-.5px;line-height:1.1}
 .chip b{font:700 24px var(--mono)}.chip span{font-size:14px;color:var(--muted)}
 .chip.warn b{color:var(--red)}.chip.soon b{color:var(--orange)}
 h2{font-size:clamp(19px,3vw,24px);margin:40px 0 14px;display:flex;align-items:center;gap:8px}
-h2::before{content:"✦";font-size:.75em;color:var(--accent)}
 .sec-link{margin-left:auto;font:500 13px var(--mono);color:var(--accent);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
 .top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
 .box{border-radius:16px;padding:16px 18px;background:var(--panel)}
@@ -86,7 +81,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .toolbar input.grow{flex:1;min-width:160px}
 .plan .acts{margin-top:6px}.plan .acts a{min-height:36px}
 .show-done{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;color:var(--muted);margin-left:auto}
-.cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}.cal-head h3{margin:0;font-size:17px;flex:1}
+.cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}.cal-head h2{margin:0;font-size:18px;flex:1}.cal-head h2::after{content:none}
 .cal-head button{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:600 16px var(--mono);cursor:pointer}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .dow{font:600 12px var(--mono);color:var(--muted);text-align:center;padding:4px 0}
@@ -120,6 +115,7 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 
 
 </style>
+<link rel="stylesheet" href="assets/study-world.css?v=1">
 <script src="scripts/study-theme.js?v=2"></script>
 </head>
 <body>
@@ -127,7 +123,7 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 <h1>Calendar</h1>
 <main>
 <section class="box" aria-label="Month" style="margin-top:20px">
- <div class="cal-head"><button type="button" id="calPrev" aria-label="Previous month">‹</button><h3 id="calTitle" aria-live="polite"></h3><button type="button" id="calToday">Today</button><button type="button" id="calNext" aria-label="Next month">›</button></div>
+ <div class="cal-head"><button type="button" id="calPrev" aria-label="Previous month">‹</button><h2 id="calTitle" aria-live="polite"></h2><button type="button" id="calToday">Today</button><button type="button" id="calNext" aria-label="Next month">›</button></div>
  <div class="cal" id="cal"></div>
  <div class="dayList" id="dayList"></div>
 </section>
@@ -165,7 +161,7 @@ let now=Date.now(),today=T.dayKey(now);const tp=parts(today);let vy=tp.y,vm=tp.m
 function itemsOn(iso){
  return T.classesOn(settings.timetable,iso).filter(x=>!x.skip).map(x=>({k:'c',text:x.start+'–'+x.end+' '+x.name}))
   .concat(settings.exams.filter(e=>e.date===iso).map(e=>({k:'e',text:e.title})))
-  .concat(homeTasks().filter(t=>t.date===iso).map(t=>({k:t.done?'d':'t',text:t.title+(t.done?' ✓':'')})));
+  .concat(homeTasks().filter(t=>t.date===iso).map(t=>({k:t.done?'d':'t',text:t.title+(t.done?' (done)':'')})));
 }
 function renderCal(){
  $('#calTitle').textContent=MO[vm]+' '+vy;
@@ -176,7 +172,7 @@ function renderCal(){
   h+='<button type="button" class="day'+(iso===today?' today':'')+'" data-iso="'+iso+'" aria-pressed="'+(iso===sel)+'" aria-label="'+d+' '+MO[vm]+(ex?', '+ex+' exam':'')+(tk?', '+tk+' task':'')+'">'+d+'<span class="dots">'+(ex?'<i class="e"></i>':'')+(tk?'<i></i>':'')+'</span></button>';}
  $('#cal').innerHTML=h;
  const it=itemsOn(sel);
- $('#dayList').innerHTML='<h3>'+shortDay(sel)+(sel===today?' · Today':'')+'</h3>'+(it.length?'<ul>'+it.map(x=>'<li>'+(x.k==='e'?'📝 ':x.k==='c'?'🏫 ':'📌 ')+esc(x.text)+'</li>').join('')+'</ul>':'<p class="empty" style="padding:4px 0">Nothing.</p>');
+ $('#dayList').innerHTML='<h3>'+shortDay(sel)+(sel===today?' · Today':'')+'</h3>'+(it.length?'<ul>'+it.map(x=>'<li><span class="kind k-'+x.k+'">'+(x.k==='e'?'Exam':x.k==='c'?'Class':'Task')+'</span>'+esc(x.text)+'</li>').join('')+'</ul>':'<p class="empty" style="padding:4px 0">Nothing.</p>');
 }
 $('#cal').addEventListener('click',e=>{const b=e.target.closest('[data-iso]');if(!b)return;sel=b.dataset.iso;renderCal();});
 $('#calPrev').onclick=()=>{vm--;if(vm<0){vm=11;vy--;}renderCal();};

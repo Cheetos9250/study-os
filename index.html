@@ -9,10 +9,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Today — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
-:root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--panel:#f9f8f6;--accent:#2383e2;--red:#d6453d;--orange:#d9730d;--green:#2f8f5b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--blue-soft:#e4f0fb;--mono:'Outfit','DM Sans','IBM Plex Sans Thai',system-ui,sans-serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
@@ -33,7 +29,6 @@ h1{font-size:clamp(30px,5vw,40px);margin:0;letter-spacing:-.5px;line-height:1.1}
 .chip b{font:700 24px var(--mono)}.chip span{font-size:14px;color:var(--muted)}
 .chip.warn b{color:var(--red)}.chip.soon b{color:var(--orange)}
 h2{font-size:clamp(19px,3vw,24px);margin:40px 0 14px;display:flex;align-items:center;gap:8px}
-h2::before{content:"✦";font-size:.75em;color:var(--accent)}
 .sec-link{margin-left:auto;font:500 13px var(--mono);color:var(--accent);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
 .top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
 .box{border-radius:16px;padding:16px 18px;background:var(--panel)}
@@ -95,6 +90,61 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .show-done{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;color:var(--muted);margin-left:auto}
 
 </style>
+<link rel="stylesheet" href="assets/study-world.css?v=1">
+<style>
+/* Today: scoreboard, game clock, fixtures, teams (after study-world.css) */
+.head{margin-top:-46px;gap:12px}
+.avatar{width:96px;height:96px;border-radius:14px;box-shadow:0 0 0 4px var(--bg),var(--shadow);font-size:48px}
+.avatar.img{border-radius:0;box-shadow:none}
+.date{font-weight:500;margin-top:6px}
+.chips.scoreboard{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.6fr);gap:0;margin:22px 0 0;padding:0;overflow:hidden}
+.sb{display:flex;flex-direction:column;justify-content:space-between;gap:6px;padding:14px 20px 16px;min-height:118px;text-decoration:none;color:inherit;position:relative}
+.sb+.sb{border-left:1px solid var(--board-line)}
+a.sb:hover{background:var(--board-2)}
+.sb .l{font:700 12px/1.2 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--board-mute)}
+.sb .n{font:800 clamp(48px,6.5vw,68px)/.9 var(--num);color:var(--board-num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.sb .n small{font:700 15px var(--ui);color:var(--board-ink);margin-left:8px;letter-spacing:0}
+.sb .s{font:500 13px/1.35 var(--ui);color:var(--board-ink);min-height:1.35em}
+.sb.alert .n{color:var(--board-alert)}
+.sb.alert .l::after{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--board-alert);margin-left:8px;vertical-align:1px}
+.sb .row2{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.sb .fx{font:700 16px/1.25 var(--ui);color:var(--board-ink)}
+.sb .fx span{display:block;font-weight:500;font-size:13px;color:var(--board-mute)}
+.pomo{background:var(--board);color:var(--board-ink);border-radius:12px;min-height:250px;gap:16px;padding:20px 18px;box-shadow:0 10px 26px -14px rgba(6,30,20,.55)}
+.pomo .tabs{display:inline-flex;gap:0;padding:3px;border-radius:10px;background:rgba(0,0,0,.22);flex-wrap:nowrap}
+.pomo .tab{border:0;border-radius:8px;color:var(--board-mute);font:600 13px var(--ui);padding:0 12px;min-height:40px;background:none}
+.pomo .tab[aria-pressed=true]{background:var(--board-ink);color:var(--board)}
+.clock{font:800 clamp(72px,10vw,108px)/.9 var(--num);color:var(--board-num);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.pbtn button{border-radius:10px;font:700 16px var(--ui);min-height:48px;background:var(--board-num);color:#1d1600;text-transform:capitalize}
+.pbtn button.ghost{background:rgba(255,255,255,.1);color:var(--board-ink);display:inline-grid;place-items:center;padding:0 16px}
+.pbtn button.ghost svg{width:20px;height:20px}
+.plan li{grid-template-columns:28px minmax(0,1fr);padding:14px 0}
+.plan h3{font-size:16px;font-weight:600}
+.classes{gap:8px}
+.cls{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-s);gap:10px;padding:8px 14px 8px 8px}
+.cls b{font:800 17px var(--num);letter-spacing:.02em;color:var(--text)}
+.cls .tag{margin:0}
+.cls.now{box-shadow:inset 0 0 0 2px var(--accent)}
+.exams{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.exam{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;padding:12px 14px}
+.exam .n{min-width:52px;text-align:center}
+.exam .n small{display:block;margin:4px 0 0}
+.exam p{margin:0;font-size:14px}.exam .when{font-size:13px}
+.subjects{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.subj{border-radius:var(--r);overflow:hidden}
+.subj .cv{height:clamp(110px,14vw,150px);background-color:var(--team);color:var(--team-ink);font:800 44px/1 var(--num);letter-spacing:.03em;justify-items:start;align-items:end;padding:12px 14px}
+.subj .cv.has{font-size:0;padding:0}
+.subj .pic{background:rgba(10,20,15,.6);border-radius:8px;opacity:1;display:inline-grid;place-items:center}
+.subj .pic svg{width:20px;height:20px}
+.subj h3{font-size:17px;font-weight:700}
+.subj .st b{font:800 26px/1 var(--num)}
+.bar{height:6px;border-radius:3px}.bar i{background:var(--team,var(--green))}
+.row .xdel svg{width:18px;height:18px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .avatar{background-color:var(--panel-2)}}
+:root[data-theme="dark"] .avatar{background-color:var(--panel-2)}
+@media(max-width:820px){.chips.scoreboard{grid-template-columns:1fr 1fr}.sb.next{grid-column:1/-1;border-left:0;border-top:1px solid var(--board-line)}}
+@media(max-width:420px){.sb{padding:12px 14px 14px;min-height:104px}.exam{grid-template-columns:auto minmax(0,1fr)}.exam .jersey{display:none}}
+</style>
 <script src="scripts/study-theme.js?v=2"></script>
 </head>
 <body>
@@ -106,7 +156,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
  <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon">🎓</button>
  <div><h1 id="welcome-title">Study</h1><p class="date" id="today">Study OS</p></div>
 </header>
-<div class="chips" id="chips" aria-label="Summary"></div>
+<div class="chips scoreboard board" id="chips" aria-label="Scoreboard"></div>
 <main>
 <h2>Today</h2>
 <div class="classes" id="classes" aria-label="Classes today"></div>
@@ -115,7 +165,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
  <div class="pomo" aria-label="Pomodoro timer">
   <div class="tabs" role="group" aria-label="Mode"><button class="tab" type="button" data-m="25" aria-pressed="true">pomodoro</button><button class="tab" type="button" data-m="5" aria-pressed="false">short break</button><button class="tab" type="button" data-m="15" aria-pressed="false">long break</button></div>
   <div class="clock" id="clock" role="timer" aria-live="off">25:00</div>
-  <div class="pbtn"><button type="button" id="pStart">start</button><button type="button" class="ghost" id="pReset" aria-label="Reset">↻</button></div>
+  <div class="pbtn"><button type="button" id="pStart">start</button><button type="button" class="ghost" id="pReset" aria-label="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button></div>
  </div>
 </section>
 
@@ -226,9 +276,12 @@ function renderChips(){
  const dueTotal=Object.values(summaries).reduce((n,s)=>n+(s?s.reviewNow:0),0);
  const open=st.tasks.filter(t=>!t.done),late=open.filter(t=>t.date<today).length,ne=upcoming()[0];
  const top=T.COURSES.slice().sort((a,b)=>((summaries[b.key]||{}).reviewNow||0)-((summaries[a.key]||{}).reviewNow||0))[0];
- const chips=['<a class="chip" href="'+(dueTotal?link(top,'cards'):'flashcards.html')+'"><b>'+dueTotal+'</b><span>cards due</span></a>',
-  '<div class="chip'+(late?' warn':'')+'"><b>'+open.length+'</b><span>tasks'+(late?' · '+late+' late':'')+'</span></div>'];
- if(ne)chips.push('<a class="chip'+(ne.d<=3?' warn':ne.d<=7?' soon':'')+'" href="#exams"><b>'+(ne.d===0?'Today':ne.d)+'</b><span>'+(ne.d===0?'':ne.d===1?'day to ':'days to ')+esc(ne.title)+'</span></a>');
+ const topN=top&&summaries[top.key]?summaries[top.key].reviewNow:0;
+ const cells=['<a class="sb" href="'+(dueTotal?link(top,'cards'):'flashcards.html')+'"><span class="l">Cards due</span><span class="n">'+dueTotal+'</span><span class="s">'+(dueTotal?esc(top.name)+' has '+topN:'All caught up')+'</span></a>',
+  '<a class="sb'+(late?' alert':'')+'" href="#tasks"><span class="l">Tasks</span><span class="n">'+open.length+'</span><span class="s">'+(late?late+' late':open.length?'Open':'Nothing open')+'</span></a>'];
+ if(ne){const c=course(ne.course);cells.push('<a class="sb next'+(ne.d<=3?' alert':'')+'" href="#exams"><span class="l">Next exam</span><span class="row2"><span class="n">'+(ne.d===0?'Today':ne.d+'<small>'+(ne.d===1?'day':'days')+'</small>')+'</span><span class="fx">'+esc(ne.title)+'<span>'+esc(shortDay(ne.date))+(c?' · '+esc(c.name):'')+'</span></span></span></a>');}
+ else cells.push('<div class="sb next"><span class="l">Next exam</span><span class="n">–</span><span class="s">No upcoming exams</span></div>');
+ const chips=cells;
  $('#chips').innerHTML=chips.join('');
 }
 function renderPlan(){
@@ -240,13 +293,13 @@ function renderPlan(){
   if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
   else if(c&&t.kind==='chapter')acts='<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a><a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="accounting-textbook.html?ch='+t.cat.slice(1)+'">Textbook</a>':'');
   else if(c)acts='<a class="main" href="'+link(c,'prac')+'">Practice</a>';
-  return '<li class="'+(done?'done':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c?'<span class="tag">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</div></li>';}).join('')+'</ul>'
+  return '<li class="'+(done?'done':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</div></li>';}).join('')+'</ul>'
   :'<p class="empty">Nothing planned. Free time? Go to Practice.</p>';
  $('#planBox').querySelectorAll('input[type=checkbox]').forEach(b=>b.onchange=()=>{settings=T.markChapter(settings,plan.tasks[+b.dataset.i],b.checked,Date.now());saveSettings();renderAll();});
 }
 function renderExams(){
  const up=upcoming();
- $('#exams').innerHTML=up.length?up.map(e=>'<div class="exam'+(e.d<=3?' urgent':e.d<=7?' soon':'')+'"><div class="n">'+(e.d===0?'Today':e.d+'<small>'+(e.d===1?'day':'days')+'</small>')+'</div><p><b>'+esc(e.title)+'</b></p><p class="when">'+esc(shortDay(e.date))+'</p></div>').join(''):'<p class="empty">No upcoming exams.</p>';
+ $('#exams').innerHTML=up.length?up.map(e=>{const c=course(e.course);return '<div class="exam'+(e.d<=3?' urgent':e.d<=7?' soon':'')+(c?' t-'+c.key:'')+'"><div class="n">'+(e.d===0?'Today':e.d+'<small>'+(e.d===1?'day':'days')+'</small>')+'</div><div><p><b>'+esc(e.title)+'</b></p><p class="when">'+esc(shortDay(e.date))+'</p></div>'+(c?'<span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>':'')+'</div>';}).join(''):'<p class="empty">No upcoming exams.</p>';
 }
 let limit=8;
 function renderTasks(){
@@ -254,7 +307,7 @@ function renderTasks(){
  const list=st.tasks.filter(t=>showDone||!t.done).sort((a,b)=>a.date.localeCompare(b.date)||PRI[a.pri]-PRI[b.pri]);
  const shown=list.slice(0,limit);$('#moreBtn').hidden=list.length<=limit;
  $('#tasks').innerHTML=shown.length?shown.map(t=>{const l=leftLabel(t.date);
-  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+esc(t.title)+'</span><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);font-size:18px;min-height:44px;cursor:pointer">✕</button></div>';}).join(''):'<p class="empty">No tasks.</p>';
+  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+esc(t.title)+'</span><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);min-height:44px;min-width:40px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';}).join(''):'<p class="empty">No tasks.</p>';
 }
 $('#tasks').addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.id;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;save();renderAll();}});
 $('#tasks').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t&&confirm('Delete "'+t.title+'"?')){st.tasks=st.tasks.filter(x=>x.id!==id);save();renderAll();}});
@@ -265,14 +318,15 @@ $('#taskForm').onsubmit=e=>{e.preventDefault();const title=$('#tTitle').value.tr
 $('#fDone').addEventListener('change',()=>{limit=8;renderTasks();});
 $('#moreBtn').onclick=()=>{limit+=8;renderTasks();};
 $('#tDate').value=today;
+const DOTS='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg>';
 function renderSubjects(){
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key],ne=upcoming().find(e=>e.course===c.key);
-  const emoji={acc:'📒',eco:'📈',math:'🧮'}[c.key],pct=s&&s.total?Math.round(s.seen/s.total*100):0;
-  return '<article class="subj s-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">⋯</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam '+(ne.d===0?'today':ne.d===1?'tomorrow':'in '+ne.d+' days'):'&nbsp;')+'</p>'
+  const pct=s&&s.total?Math.round(s.seen/s.total*100):0;
+  return '<article class="subj s-'+c.key+' t-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+esc(c.full)+'</div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">'+DOTS+'</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam '+(ne.d===0?'today':ne.d===1?'tomorrow':'in '+ne.d+' days'):'&nbsp;')+'</p>'
    +(s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
    +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a><a href="hub.html#'+c.key+'">Lessons</a></div></div></article>';});
- const lang=(l,cv,emoji,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+emoji+'</div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">⋯</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary</p>'
+ const lang=(l,cv,flag,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+' t-'+l.key+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+(l.key==='eng'?'EN':'ZH')+'</div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">'+DOTS+'</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary <span aria-hidden="true">'+flag+'</span></p>'
   +(ls?'<div class="st"><div><b>'+ls.reviewNow+'</b>due</div><div><b>'+ls.newToday+'</b>new</div></div>':'')+'<div class="acts">'+acts+'</div></div></article>';};
  cards.push(lang(T.LANGS[0],'voc','🇬🇧','<a class="main" href="'+T.LANGS[0].app+'">WordNest</a>'));
  cards.push(lang(T.LANGS[1],'zh','🇨🇳','<a class="main" href="'+T.LANGS[1].app+'">WordNest</a>'));
@@ -284,7 +338,7 @@ function renderClasses(){
  if(!settings.timetable.length){$('#classes').innerHTML='';return;}
  const d=new Date(now+7*3600000),hm=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
  $('#classes').innerHTML=list.length?list.map(x=>{const c=x.course&&(T.COURSES.concat(T.LANGS).find(k=>k.key===x.course));const href=c?(c.app||link(c,'sum')):'calendar.html';
-  return '<a class="cls'+(hm>=x.start&&hm<x.end?' now':hm>=x.end?' done':'')+'" href="'+href+'"><b>'+x.start+'–'+x.end+'</b>'+esc(x.name)+(x.code?'<span>'+esc(x.code)+'</span>':'')+'</a>';}).join('')
+  return '<a class="cls'+(hm>=x.start&&hm<x.end?' now':hm>=x.end?' done':'')+(c?' t-'+c.key:'')+'" href="'+href+'">'+(c?'<span class="jersey sm" aria-hidden="true">'+esc(c.full||c.key.toUpperCase())+'</span>':'')+'<b>'+x.start+'–'+x.end+'</b>'+esc(x.name)+(x.code?'<span>'+esc(x.code)+'</span>':'')+'</a>';}).join('')
   :'<span class="cls"><span>No classes today</span></span>';
 }
 function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}

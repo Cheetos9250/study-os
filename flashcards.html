@@ -9,10 +9,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Flashcards — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
-:root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--panel:#f9f8f6;--accent:#2383e2;--red:#d6453d;--orange:#d9730d;--green:#2f8f5b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--blue-soft:#e4f0fb;--mono:'Outfit','DM Sans','IBM Plex Sans Thai',system-ui,sans-serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
@@ -32,7 +28,6 @@ h1{font-size:clamp(28px,5vw,38px);margin:0;letter-spacing:-.5px;line-height:1.1}
 .chip b{font:700 24px var(--mono)}.chip span{font-size:14px;color:var(--muted)}
 .chip.warn b{color:var(--red)}.chip.soon b{color:var(--orange)}
 h2{font-size:clamp(19px,3vw,24px);margin:40px 0 14px;display:flex;align-items:center;gap:8px}
-h2::before{content:"✦";font-size:.75em;color:var(--accent)}
 .sec-link{margin-left:auto;font:500 13px var(--mono);color:var(--accent);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
 .top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
 .box{border-radius:16px;padding:16px 18px;background:var(--panel)}
@@ -103,6 +98,7 @@ h1{margin:8px 0 0}
 .small{font-size:12px;color:var(--muted);margin:8px 0 0}
 
 </style>
+<link rel="stylesheet" href="assets/study-world.css?v=1">
 <script src="scripts/study-theme.js?v=2"></script>
 </head>
 <body>
@@ -124,13 +120,13 @@ const T=window.StudyToday,$=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function read(k){try{return localStorage.getItem(k);}catch{return null;}}
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');
-const EMOJI={acc:'📒',eco:'📈',math:'🧮'};
-let data={},langData={},failed=[];const FLAG={eng:'🇬🇧',zh:'🇨🇳'};
+const ICON={acc:'<span class="jersey sm t-acc" aria-hidden="true">ACC</span>',eco:'<span class="jersey sm t-eco" aria-hidden="true">ECO</span>',math:'<span class="jersey sm t-math" aria-hidden="true">MATH</span>'};
+let data={},langData={},failed=[];const LANGICON={eng:'<span class="jersey sm t-eng" aria-hidden="true">EN</span>',zh:'<span class="jersey sm t-zh" aria-hidden="true">ZH</span>'};
 function render(){
  const now=Date.now();
  const box=(emoji,name,s,acts,err)=>'<div class="pc"><h3>'+emoji+' '+esc(name)+'</h3>'+(s?'<div class="big'+(s.reviewNow?' due':'')+'">'+s.reviewNow+'<small>due</small> <span style="color:var(--text)">'+s.newToday+'</span><small>new</small></div>':'<p class="empty" style="padding:0">'+(err?'Could not load':'Loading…')+'</p>')+'<div class="acts">'+acts+'</div></div>';
- $('#courses').innerHTML=T.COURSES.map(c=>box(EMOJI[c.key],c.name,data[c.key]?T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now):null,'<a class="main" href="'+link(c,'cards')+'">Study</a>',failed.includes(c.key))).join('');
- $('#langs').innerHTML=T.LANGS.map(l=>box(FLAG[l.key],l.name,langData[l.key]?T.summarize(langData[l.key],read(l.mark+'-srs'),null,now):null,'<a class="main" href="'+l.app+'">Open WordNest</a>',false)).join('');
+ $('#courses').innerHTML=T.COURSES.map(c=>box(ICON[c.key],c.name,data[c.key]?T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now):null,'<a class="main" href="'+link(c,'cards')+'">Study</a>',failed.includes(c.key))).join('');
+ $('#langs').innerHTML=T.LANGS.map(l=>box(LANGICON[l.key],l.name,langData[l.key]?T.summarize(langData[l.key],read(l.mark+'-srs'),null,now):null,'<a class="main" href="'+l.app+'">Open WordNest</a>',false)).join('');
 }
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);

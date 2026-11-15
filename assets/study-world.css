@@ -1,0 +1,146 @@
+/* Study OS visual system: "Sports Day scoreboard".
+   Courses are teams with fixed colours, exams are fixtures, today's numbers sit on a scoreboard.
+   Loaded after each core page's own <style>, so these rules win at equal specificity.
+   Used by: index, flashcards, practice, hub, calendar, grades. Course pages keep study-unify.css. */
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Big+Shoulders+Display:wght@700;800&display=swap');
+
+:root{
+ color-scheme:light;
+ --ui:'Bai Jamjuree','Sukhumvit Set','Thonburi',system-ui,-apple-system,sans-serif;
+ --num:'Big Shoulders Display','Bai Jamjuree',system-ui,sans-serif;
+ --mono:var(--ui);
+ --bg:#eef1ee;--panel:#ffffff;--panel-2:#f6f8f6;--text:#111613;--muted:#56605a;--line:#d9dfda;--line-strong:#bcc5bf;
+ --accent:#0f5136;--accent-ink:#ffffff;--link:#0d6a45;--focus:#1d6ff2;
+ --red:#c0262d;--orange:#b5510b;--green:#1d7a4a;
+ --hi:#fbe1e0;--hi-t:#8c1c21;--med:#fdefc2;--med-t:#664a00;--low:#dbefe1;--low-t:#1b5634;--blue-soft:#e2ebe6;
+ --board:#0f3b2c;--board-2:#174b39;--board-line:rgba(255,255,255,.12);--board-ink:#eef3ef;--board-mute:#a8c3b5;--board-num:#ffd23f;--board-alert:#ff7a6e;
+ --t-acc:#1d5bd6;--t-eco:#c4500b;--t-math:#6b35d1;--t-eng:#c42838;--t-zh:#f2bd00;--t-zh-ink:#2b2100;
+ --shadow:0 1px 2px rgba(16,24,20,.06),0 6px 18px -10px rgba(16,24,20,.22);
+ --r:10px;--r-s:8px;
+ /* hub.html legacy names */
+ --purple:var(--accent);--deep:var(--link);--greenbg:var(--low);--lav:var(--blue-soft);--white:var(--panel);--redbg:var(--hi);--orangebg:var(--med);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ color-scheme:dark;
+ --bg:#0b100e;--panel:#141a17;--panel-2:#19211d;--text:#e5ebe7;--muted:#9ba7a0;--line:#26302b;--line-strong:#36423c;
+ --accent:#46c487;--accent-ink:#04140c;--link:#6fdaa5;--focus:#7fb2ff;
+ --red:#ff8079;--orange:#f3a35b;--green:#62d395;
+ --hi:#4a1c1d;--hi-t:#ffb9b4;--med:#43380f;--med-t:#f4d877;--low:#173723;--low-t:#a6dcb8;--blue-soft:#1a2721;
+ --board:#0d2e22;--board-2:#123b2c;--board-line:rgba(255,255,255,.10);
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px -12px rgba(0,0,0,.7);
+}}
+:root[data-theme="dark"]{
+ color-scheme:dark;
+ --bg:#0b100e;--panel:#141a17;--panel-2:#19211d;--text:#e5ebe7;--muted:#9ba7a0;--line:#26302b;--line-strong:#36423c;
+ --accent:#46c487;--accent-ink:#04140c;--link:#6fdaa5;--focus:#7fb2ff;
+ --red:#ff8079;--orange:#f3a35b;--green:#62d395;
+ --hi:#4a1c1d;--hi-t:#ffb9b4;--med:#43380f;--med-t:#f4d877;--low:#173723;--low-t:#a6dcb8;--blue-soft:#1a2721;
+ --board:#0d2e22;--board-2:#123b2c;--board-line:rgba(255,255,255,.10);
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px -12px rgba(0,0,0,.7);
+}
+
+/* ---------- base ---------- */
+html{background:var(--bg)}
+body{font-family:var(--ui);background:var(--bg);color:var(--text);line-height:1.55;font-size:16px}
+h1,h2,h3,.mono{font-family:var(--ui)}
+::selection{background:var(--board-num);color:#1a1400}
+input,select,textarea,button{font-family:var(--ui)}
+input,textarea{caret-color:var(--accent)}
+a{text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+input[type=checkbox]{accent-color:var(--accent)}
+.page{max-width:1080px}
+.page,.container{padding-bottom:96px}
+
+h1{font:800 clamp(40px,6vw,58px)/.95 var(--num);letter-spacing:0;margin:0}
+h2{font:700 19px/1.3 var(--ui);margin:44px 0 14px;display:flex;align-items:center;gap:12px;letter-spacing:0}
+h2::before{content:none!important}
+h2::after{content:"";flex:1;height:1px;background:var(--line);order:1}
+h2 .sec-link,h2 small,h2 a{order:2}
+.sec-link{margin-left:0;font:600 14px var(--ui);color:var(--link)}
+.date,.lead{color:var(--muted);font-size:15px}
+
+/* ---------- panels and lists ---------- */
+.box,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px}
+.pc,.course,.subj{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.empty{color:var(--muted)}
+.row{border-bottom-color:var(--line)}
+.row .t{font-family:var(--ui);font-weight:500}
+
+/* ---------- controls ---------- */
+.acts a,.btns button,.add,.mini,.toolbar select,.toolbar input,.toolbar button,.cal-head button,button.notebtn{border-radius:var(--r-s);border:1px solid var(--line-strong);background:var(--panel);color:var(--text);font-family:var(--ui)}
+.acts a{font-weight:600;font-size:14px;min-height:42px;padding:0 14px}
+.plan .acts a{min-height:40px}
+.acts a:hover,.btns button:hover,.add:hover,.mini:hover,.cal-head button:hover{border-color:var(--text)}
+.acts a.main,.toolbar .primary,.btns .primary,button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.acts a.main:hover,.toolbar .primary:hover,.btns .primary:hover,button.primary:hover{filter:brightness(1.08)}
+.btns .danger,.mini.danger,button.danger{color:var(--red)}
+.toolbar select,.toolbar input{background:var(--panel-2)}
+.toolbar ::placeholder,.edit ::placeholder{color:var(--muted)}
+
+/* chips used as small facts (not the scoreboard) */
+.chip{border-radius:var(--r-s);background:var(--panel);border:1px solid var(--line)}
+.chip b{font:800 28px/1 var(--num)}
+.left{font:600 12px var(--ui);background:var(--blue-soft);color:var(--text)}
+.left.late{background:var(--hi);color:var(--hi-t)}.left.today{background:var(--med);color:var(--med-t)}
+.pri{font:600 12px var(--ui)}
+.badge{font:600 12px var(--ui);background:var(--hi);color:var(--hi-t)}
+
+/* ---------- teams ---------- */
+.t-acc{--team:var(--t-acc);--team-ink:#fff}
+.t-eco{--team:var(--t-eco);--team-ink:#fff}
+.t-math{--team:var(--t-math);--team-ink:#fff}
+.t-eng,.t-voc{--team:var(--t-eng);--team-ink:#fff}
+.t-zh{--team:var(--t-zh);--team-ink:var(--t-zh-ink)}
+.tag{display:inline-block;font:700 11px/1.6 var(--ui);letter-spacing:.02em;padding:1px 8px;border-radius:5px;background:var(--team,var(--blue-soft));color:var(--team-ink,var(--text));margin-right:8px;vertical-align:1px}
+.jersey{flex:none;display:inline-grid;place-items:center;min-width:44px;height:44px;padding:0 6px;border-radius:8px;background:var(--team,var(--board));color:var(--team-ink,#fff);font:800 17px/1 var(--num);letter-spacing:.02em}
+.jersey.sm{min-width:34px;height:30px;font-size:14px;border-radius:6px}
+
+h3 .jersey{margin-right:10px;vertical-align:middle}
+.pc h3,.card h3{display:flex;align-items:center;gap:0;font-weight:700}
+.kind{display:inline-block;font:700 11px/1.6 var(--ui);letter-spacing:.03em;text-transform:uppercase;padding:0 7px;border-radius:5px;margin-right:8px;background:var(--blue-soft);color:var(--text)}
+.kind.k-e{background:var(--hi);color:var(--hi-t)}.kind.k-c{background:var(--board);color:var(--board-num)}
+.nums .due b{color:var(--red)}.nums div:not(.due) b{color:var(--text)}
+.subj .bar i,.card .bar i{background:var(--team,var(--green))}
+
+/* ---------- boards (scoreboard, game clock) ---------- */
+.board{background:var(--board);color:var(--board-ink);border-radius:12px;box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 10px 26px -14px rgba(6,30,20,.55)}
+
+/* ---------- cover (owner image; default = lane stripes in team colours) ---------- */
+.cover{background:
+ linear-gradient(to bottom,transparent 46%,var(--t-acc) 46% 55%,#fff 55% 56%,var(--t-eco) 56% 65%,#fff 65% 66%,var(--t-math) 66% 75%,#fff 75% 76%,var(--t-eng) 76% 85%,#fff 85% 86%,var(--t-zh) 86% 95%,#fff 95% 96%,transparent 96%),
+ var(--board)}
+.cover[style*="background-image: url"]{background-size:cover;background-position:center}
+.cover-tools button{font:600 13px var(--ui);border-radius:var(--r-s);background:rgba(10,20,15,.72);color:#fff;border:1px solid rgba(255,255,255,.25);min-height:40px}
+.cover-tools button:hover{background:rgba(10,20,15,.9)}
+.avatar{box-shadow:0 0 0 4px var(--bg);background-color:var(--panel)}
+
+/* ---------- exams (fixtures) ---------- */
+.exam{border-left:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.exam .n{font:800 40px/1 var(--num);color:var(--text)}
+.exam .n small{font:600 13px var(--ui);color:var(--muted)}
+.exam.soon,.exam.urgent{border-left-color:var(--line)}
+.exam.soon .n{color:var(--orange)}.exam.urgent .n{color:var(--red)}
+
+/* ---------- calendar ---------- */
+.day{border-radius:var(--r-s);background:var(--panel);border-color:var(--line);font:600 15px var(--num);font-family:var(--num)}
+.day.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.day[aria-pressed=true]{background:var(--board);color:var(--board-num);border-color:var(--board)}
+.dots i{background:var(--accent)}.dots i.e{background:var(--red)}
+.day[aria-pressed=true] .dots i{background:var(--board-num)}.day[aria-pressed=true] .dots i.e{background:var(--board-alert)}
+.dow{font:600 12px var(--ui);letter-spacing:.04em;text-transform:uppercase}
+.wd{background:var(--panel);border-radius:var(--r-s);border-color:var(--line)}
+.wd.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.wd h4{font:700 12px var(--ui);letter-spacing:.04em;text-transform:uppercase}
+.cl{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;position:relative;padding-left:12px}
+.cl::before{content:"";position:absolute;left:4px;top:6px;bottom:6px;width:3px;border-radius:2px;background:var(--team,var(--line-strong))}
+.cl b{font:700 15px var(--num);letter-spacing:.02em}
+
+/* ---------- grades ---------- */
+.course .big,.pc .big,.big{font-family:var(--num);font-weight:800}
+.letter{font:800 20px var(--num);background:var(--board);color:var(--board-num);border-radius:6px}
+.items th{font:600 12px var(--ui);text-transform:uppercase;letter-spacing:.04em}
+.items input{font-family:var(--ui);background:var(--panel-2)}
+.need span{font:600 12px var(--ui);background:var(--panel-2);border:1px solid var(--line)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
