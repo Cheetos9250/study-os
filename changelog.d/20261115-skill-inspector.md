@@ -1,0 +1,1 @@
+- Tooling: installed NVIDIA SkillSpector's `skill-inspector` skill for Claude Code (`.claude/skills/skill-inspector`), for reviewing agent skills before install. It uses the `skillspector` CLI when present (`uv tool install git+https://github.com/NVIDIA/SkillSpector.git`), otherwise falls back to manual review. No site changes.
