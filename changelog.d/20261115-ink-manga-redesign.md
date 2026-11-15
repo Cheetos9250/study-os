@@ -1,0 +1,3 @@
+- Redesign of the core pages (Today, Flashcards, Practice, Lessons, Calendar, Grades) and the navigation in a black-and-white manga line-art style: ink panel frames, pen hatching, Kaisei Decol / Zen Maru Gothic (Mali for Thai), drawn line icons instead of emoji. Shared styles live in `assets/study-world.css`.
+- The accent colour follows the Today cover image (`scripts/study-accent.js`): it reads the cover, picks its main colour and a shade that keeps text readable; it caches in sessionStorage only, so no new localStorage key and nothing new in backups.
+- Every core page opens with a speech-bubble "next step" (next exam, cards to review, weakest chapter, chapters in exam scope, next class, grade needed). Functions, element ids and storage keys are unchanged.
