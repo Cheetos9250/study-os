@@ -163,9 +163,8 @@ h3 .jersey{margin-right:10px;vertical-align:middle}
 .exam .n{font:700 38px/1 var(--num);color:var(--text)}
 .exam .n small{font:700 13px var(--ui);color:var(--muted)}
 .exam.soon .n{color:var(--orange)}.exam.urgent .n{color:var(--acc-t)}
-.exam.urgent{background:var(--hatch),var(--panel)}
-.exam.urgent p,.exam.urgent .when,.exam.urgent .n{background:var(--panel);width:fit-content;padding:0 4px}
-.exam.urgent .n{margin:0 auto}
+/* urgent exam: a hatched band down the left edge; the text stays on clean paper */
+.exam.urgent{background:var(--hatch) left top/14px 100% no-repeat,var(--panel);padding-left:28px}
 
 /* ---------- calendar ---------- */
 .day{border-radius:var(--r);background:var(--panel);border:2px solid var(--ink);font:700 15px var(--num)}
