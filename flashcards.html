@@ -98,12 +98,14 @@ h1{margin:8px 0 0}
 .small{font-size:12px;color:var(--muted);margin:8px 0 0}
 
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=1">
+<link rel="stylesheet" href="assets/study-world.css?v=2">
 <script src="scripts/study-theme.js?v=2"></script>
+<script src="scripts/study-accent.js?v=1"></script>
 </head>
 <body>
 <div class="page">
 <h1>Flashcards</h1>
+<section class="lead-panel" id="lead" aria-label="Next step" hidden></section>
 <main>
 <h2>Subjects</h2>
 <section class="grid" id="courses" aria-label="Flashcards by subject"></section>
@@ -122,10 +124,18 @@ function read(k){try{return localStorage.getItem(k);}catch{return null;}}
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');
 const ICON={acc:'<span class="jersey sm t-acc" aria-hidden="true">ACC</span>',eco:'<span class="jersey sm t-eco" aria-hidden="true">ECO</span>',math:'<span class="jersey sm t-math" aria-hidden="true">MATH</span>'};
 let data={},langData={},failed=[];const LANGICON={eng:'<span class="jersey sm t-eng" aria-hidden="true">EN</span>',zh:'<span class="jersey sm t-zh" aria-hidden="true">ZH</span>'};
+function nextExam(now){const st=T.loadSettings(read(T.SETTINGS_KEY));return st.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d||a.date.localeCompare(b.date))[0]||null;}
+const inDays=d=>d===0?'today':d===1?'in 1 day':'in '+d+' days';
+function lead(say,sub,href,label){const el=$('#lead');if(!say){el.hidden=true;return;}el.hidden=false;el.innerHTML='<div class="bub"><b>'+say+'</b>'+(sub?'<span>'+sub+'</span>':'')+'</div><a class="go" href="'+href+'">'+esc(label)+'</a>';}
 function render(){
  const now=Date.now();
- const box=(emoji,name,s,acts,err)=>'<div class="pc"><h3>'+emoji+' '+esc(name)+'</h3>'+(s?'<div class="big'+(s.reviewNow?' due':'')+'">'+s.reviewNow+'<small>due</small> <span style="color:var(--text)">'+s.newToday+'</span><small>new</small></div>':'<p class="empty" style="padding:0">'+(err?'Could not load':'Loading…')+'</p>')+'<div class="acts">'+acts+'</div></div>';
+ const box=(emoji,name,s,acts,err)=>'<div class="pc"><h3>'+emoji+esc(name)+'</h3>'+(s?'<div class="big'+(s.reviewNow?' due':'')+'">'+s.reviewNow+'<small>due</small> <span style="color:var(--text)">'+s.newToday+'</span><small>new</small></div>':'<p class="empty" style="padding:0">'+(err?'Could not load':'Loading…')+'</p>')+'<div class="acts">'+acts+'</div></div>';
  $('#courses').innerHTML=T.COURSES.map(c=>box(ICON[c.key],c.name,data[c.key]?T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now):null,'<a class="main" href="'+link(c,'cards')+'">Study</a>',failed.includes(c.key))).join('');
+ const sums=T.COURSES.map(c=>({c,s:data[c.key]?T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now):null})).filter(x=>x.s),ne=nextExam(now);
+ if(sums.length){const due=sums.slice().sort((a,b)=>b.s.reviewNow-a.s.reviewNow)[0],ex=ne&&sums.find(x=>x.c.key===ne.course);
+  if(due.s.reviewNow){const e=ne&&ne.course===due.c.key?ne:null;lead(esc(due.c.name)+': '+due.s.reviewNow+' cards due',e?esc(e.title)+' '+inDays(e.d):'Clear them before new cards',link(due.c,'cards'),'Study '+due.c.name);}
+  else if(ex)lead(esc(ne.title)+' '+inDays(ne.d),'No cards due. Learn new '+esc(ex.c.name)+' cards',link(ex.c,'cards'),'Study '+ex.c.name);
+  else{const nw=sums.find(x=>x.s.newToday)||sums[0];lead('All caught up','Learn new '+esc(nw.c.name)+' cards',link(nw.c,'cards'),'Study '+nw.c.name);}}
  $('#langs').innerHTML=T.LANGS.map(l=>box(LANGICON[l.key],l.name,langData[l.key]?T.summarize(langData[l.key],read(l.mark+'-srs'),null,now):null,'<a class="main" href="'+l.app+'">Open WordNest</a>',false)).join('');
 }
 render();

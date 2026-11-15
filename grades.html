@@ -134,8 +134,9 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 .x{border:0;background:none;color:var(--muted);font-size:16px;min-width:40px;min-height:40px;cursor:pointer}
 .hint{font-size:12px;color:var(--muted);margin:6px 0 0}
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=1">
+<link rel="stylesheet" href="assets/study-world.css?v=2">
 <script src="scripts/study-theme.js?v=2"></script>
+<script src="scripts/study-accent.js?v=1"></script>
 </head>
 <body>
 <div class="page">
@@ -167,7 +168,8 @@ function render(){
    +'</tbody></table>'
    +'<div class="res-more"></div>'
    +'<div class="row-btns"><button type="button" class="mini" data-add-item>+ Item</button><button type="button" class="mini" data-edit>Name / credits</button><button type="button" class="mini danger" data-del-course>Delete course</button></div></section>';}).join('')
-  :'<p class="empty">No courses yet. Add a course, then enter each graded item and its weight.</p>';
+  :'<div class="box empty-panel"><p><b>No courses yet.</b> Add a course, then enter each graded item and its weight. Or import the grades link you were given.</p><div class="btns"><button type="button" class="add primary" data-empty-add>+ Add course</button><button type="button" class="add" data-empty-import>Import from link</button></div></div>';
+ $('#addCourse').parentElement.hidden=!st.courses.length;
  paint();
 }
 /* Results only: inputs are never rebuilt while typing, so focus and the iPad keyboard stay put. */
@@ -188,6 +190,7 @@ document.addEventListener('click',e=>{const t=e.target;
  else if(t.matches('[data-del-item]')){const c=course(t),id=t.closest('[data-item]').dataset.item;c.items=c.items.filter(x=>x.id!==id);save();render();}
  else if(t.matches('[data-del-course]')){const c=course(t);if(confirm('Delete '+c.name+'?')){st.courses=st.courses.filter(x=>x!==c);save();render();}}
  else if(t.matches('[data-edit]')){const c=course(t);const n=prompt('Course name',c.name);if(n===null)return;const cr=G.num(prompt('Credits',c.credits));c.name=n.trim().slice(0,60)||c.name;if(cr!=null&&cr>0&&cr<=12)c.credits=cr;save();render();}});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-empty-add],[data-empty-import]');if(!b)return;$(b.hasAttribute('data-empty-add')?'#addCourse':'#pasteGrades').click();});
 $('#addCourse').onclick=()=>{const n=prompt('Course name');if(!n)return;const cr=G.num(prompt('Credits','3'));st.courses.push({id:'g'+Date.now().toString(36),name:n.trim().slice(0,60),credits:cr>0&&cr<=12?cr:3,items:[],scale:G.DEFAULT_SCALE});save();render();};
 /* One-time import from a link: grades.html#grades=<base64url JSON>. The fragment never reaches the server. */
 /* Same link can be pasted with "Import from link" (home-screen apps keep separate storage from Safari). */

@@ -14,14 +14,14 @@ Redesign: the old Notion-pastel look (emoji icons, sparkle headings, pastel grad
 
 ## Direction contract
 
-THESIS: Study OS is a shoujo manga page. Each screen is laid out as ink-framed panels, the next exam speaks from a speech bubble, and pink screentone marks what is "now". Refuses the category default of a pastel Notion dashboard of equal emoji tiles. Chosen by the owner from four rendered anime directions (retro 90s, shoujo, shounen, slice-of-life).
+THESIS: Study OS is a black-and-white manga page in ink line art. Heavy ink panel frames, pen hatching and halftone mark what is "now", and the next action on each page is spoken from a speech bubble. One accent colour is taken from the owner's own cover image, so the whole site re-inks itself when the cover changes. Refuses the pastel Notion dashboard of equal emoji tiles. The owner moved from shoujo to a more masculine line-art manga and asked for cover-driven colour.
 
-OWN-WORLD: White paper and near-black ink (3px panel frames, square-ish 4px corners), pill buttons with ink outlines, black pill for the primary action and the active nav tab, hot pink (#d63369) for urgency and Start. Screentone dots (pink for focus/today, grey for secondary). Display and numerals in Kaisei Decol; UI in Zen Maru Gothic with Mali for Thai. Each course keeps one pastel tone (Accounting blue, Economics peach, Math lilac, English pink, Chinese lemon) on tags, pill tiles and subject covers. Dark theme = inverted page: ink-black paper, light ink lines, maroon tone. No drop shadows, no gradients except the cover's focus lines.
+OWN-WORLD: White paper (#fff panels on #f4f4f2), near-black ink, 3px square panel frames (2px corners), 6px-radius ink-outlined buttons, black for primary and active nav, the cover accent for urgency, Start and the lead action. Textures: diagonal pen hatching in the accent, grey hatching and halftone dots as secondary tone, ink speed lines on the default cover. Display and numerals in Dela Gothic One; UI in Zen Kaku Gothic New with Kanit for Thai. Course tones (Accounting blue, Economics orange, Math violet, English rose, Chinese yellow) on tags, tiles and hatched subject covers. Dark theme = inverted page. scripts/study-accent.js derives hue/saturation from the cover and picks lightness so text on the accent stays at AA in both themes.
 
-STORY: Open Today, read three panels (cards due, tasks, the next exam in a bubble), tick the first plan item, start the timer, then go to cards or practice. Every page uses the same frames, pills and course tones.
+STORY: Each page opens with the next step in a bubble (Today: next exam; Flashcards: most cards due; Practice: weakest chapter before the next exam; Lessons: exam scope), then the working panels.
 
-FIRST VIEWPORT: White rail with an ink edge (bottom bar on narrow screens). Owner's cover image (default: pink screentone with white focus lines) with round icon, "Study" in Kaisei Decol and the date. Below, a row of three manga panels: Cards due, Tasks (grey tone), and a wide pink panel holding a speech bubble "Next exam / title / N days!". Then Today: plan panel (left) beside the pink-toned timer panel with the time in a framed box (right).
+FIRST VIEWPORT: White rail with ink edge (bottom bar on narrow screens). Owner cover (default: ink speed lines on halftone) with square icon, "Study" in Dela Gothic One and the date. Three panels: number-first Cards due, hatched Tasks, and a wide accent-hatched panel with a bubble "Accounting quiz in / 1 day!". Then plan (actions right-aligned) beside the hatched timer with the time in a framed box.
 
-FORM: Shoujo manga page; re-roll 1 with the owner's anime steer, owner picked from four rendered options (not the dealt index). seed:64d6548c4fa5ee25
+FORM: Ink manga (seinen line art); owner steer after the shoujo pick, not the dealt index. seed:64d6548c4fa5ee25
 
-SIGNATURE: The next exam spoken from a speech bubble, plus screentone marking "today/now" across pages (cover, timer, calendar today cell, today column).
+SIGNATURE: Cover-driven accent ink plus the speech-bubble lead panel on every core page.

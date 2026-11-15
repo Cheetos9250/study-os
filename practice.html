@@ -98,12 +98,14 @@ h1{margin:8px 0 0}
 .small{font-size:12px;color:var(--muted);margin:8px 0 0}
 
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=1">
+<link rel="stylesheet" href="assets/study-world.css?v=2">
 <script src="scripts/study-theme.js?v=2"></script>
+<script src="scripts/study-accent.js?v=1"></script>
 </head>
 <body>
 <div class="page">
 <h1>Practice</h1>
+<section class="lead-panel" id="lead" aria-label="Next step" hidden></section>
 <main>
 <h2>Quizzes</h2>
 <section class="grid" id="courses" aria-label="Quizzes by subject"></section>
@@ -127,6 +129,9 @@ function read(k){try{return localStorage.getItem(k);}catch{return null;}}
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');
 const ICON={acc:'<span class="jersey sm t-acc" aria-hidden="true">ACC</span>',eco:'<span class="jersey sm t-eco" aria-hidden="true">ECO</span>',math:'<span class="jersey sm t-math" aria-hidden="true">MATH</span>'};
 let data={},langData={},failed=[];
+function nextExam(now){const st=T.loadSettings(read(T.SETTINGS_KEY));return st.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d||a.date.localeCompare(b.date))[0]||null;}
+const inDays=d=>d===0?'today':d===1?'in 1 day':'in '+d+' days';
+function lead(say,sub,href,label){const el=$('#lead');if(!say){el.hidden=true;return;}el.hidden=false;el.innerHTML='<div class="bub"><b>'+say+'</b>'+(sub?'<span>'+sub+'</span>':'')+'</div><a class="go" href="'+href+'">'+esc(label)+'</a>';}
 function render(){
  const now=Date.now(),sum={};
  for(const c of T.COURSES)if(data[c.key])sum[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);
@@ -135,6 +140,10 @@ function render(){
    +'<div class="acts"><a class="main" href="'+link(c,'prac')+'">Start quiz</a></div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;
+ const ne=nextExam(now),nc=ne&&T.COURSES.find(x=>x.key===ne.course),wk=(nc&&weak.find(w=>w.course===nc.key))||weak[0];
+ if(wk&&(!nc||wk.course===nc.key)){const c=T.COURSES.find(x=>x.key===wk.course);lead(esc(wk.label)+': '+Math.round(wk.acc*100)+'% correct',(ne&&nc&&nc.key===c.key?'Practise before '+esc(ne.title)+' ('+inDays(ne.d)+')':'Your weakest chapter in '+esc(c.name)),link(c,'prac',wk.cat),'Practise '+c.name);}
+ else if(nc)lead(esc(ne.title)+' '+inDays(ne.d),'Warm up with a '+esc(nc.name)+' quiz',link(nc,'prac'),'Start '+nc.name+' quiz');
+ else lead('Pick up where you left off','Start an '+esc(T.COURSES[0].name)+' quiz',link(T.COURSES[0],'prac'),'Start quiz');
  $('#weak').innerHTML=weak.length?'<ul class="weak">'+weak.map(w=>{const c=T.COURSES.find(x=>x.key===w.course),D=data[w.course],cat=[w.cat];
   return '<li><span><b>'+esc(w.courseName)+'</b> · '+esc(w.label)+' <span class="badge">'+Math.round(w.acc*100)+'%</span></span><span class="acts"><a class="main" href="'+link(c,'prac',cat?cat[0]:'')+'">Practice</a></span></li>';}).join('')+'</ul>'
   :'<p class="empty">No weak chapters yet.</p>';

@@ -84,8 +84,9 @@ button.danger{color:var(--red)}
 .notebox textarea:focus{outline:2px solid var(--purple);outline-offset:1px}
 .notemeta{font-size:12px;color:var(--muted);margin:4px 0 0;min-height:16px}
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=1">
+<link rel="stylesheet" href="assets/study-world.css?v=2">
 <script src="scripts/study-theme.js?v=2"></script>
+<script src="scripts/study-accent.js?v=1"></script>
 </head>
 <body>
 <div class="container">
@@ -95,6 +96,8 @@ button.danger{color:var(--red)}
 <p class="lead" id="lead" hidden></p>
 </section>
 <nav class="crumb" id="crumb" aria-label="Breadcrumb" hidden><a href="#">← Lessons</a></nav>
+<section class="lead-panel" id="nextStep" aria-label="Next step" hidden></section>
+<h2 id="secTitle">Subjects</h2>
 <div id="view" class="list"><p class="status">Loading…</p></div>
 </main>
 </div>
@@ -114,7 +117,9 @@ function examFor(courseKey,catId,now){
  return settings.exams.filter(e=>e.course===courseKey&&e.cats.includes(catId)).map(e=>({...e,days:T.daysUntil(e.date,now)})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days)[0]||null;
 }
 function subjects(now){
- $('#title').textContent='Lessons';$('#crumb').hidden=true;
+ $('#title').textContent='Lessons';$('#crumb').hidden=true;$('#secTitle').hidden=false;
+ {const ne=settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d)[0],c=ne&&T.COURSES.find(x=>x.key===ne.course),box=$('#nextStep');
+  if(c){const sc=(ne.cats||[]).length?' · scope: '+ne.cats.map(x=>x.replace(/^c/,'Ch')).join(', '):'';box.hidden=false;box.innerHTML='<div class="bub"><b>'+esc(ne.title)+(ne.d===0?' today':' in '+ne.d+(ne.d===1?' day':' days'))+'</b><span>Read the '+esc(c.name)+' lessons'+esc(sc)+'</span></div><a class="go" href="#'+c.key+'">Open '+esc(c.name)+'</a>';}else box.hidden=true;}
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key];
   if(!s)return '<div class="card subj"><h3>'+esc(c.name)+'</h3><p class="full">'+esc(c.full)+'</p><p class="empty">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p></div>';
@@ -127,7 +132,7 @@ function subjects(now){
 }
 function chapters(c,now){
  const D=data[c.key],s=summaries[c.key];
- $('#title').textContent=c.name;$('#crumb').hidden=false;
+ $('#title').textContent=c.name;$('#crumb').hidden=false;$('#secTitle').hidden=true;$('#nextStep').hidden=true;
  if(!D||!s){$('#view').className='list';$('#view').innerHTML='<p class="status'+(errors.includes(c.key)?' err':'')+'">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p>';return;}
  const rows=D.cats.map(([id,label])=>{
   const p=s.per[id],ex=examFor(c.key,id,now),acc=T.accuracy(p);
