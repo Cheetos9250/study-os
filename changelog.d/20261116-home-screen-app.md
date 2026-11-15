@@ -1,0 +1,1 @@
+- Home Screen app: added `manifest.webmanifest` (standalone, start `index.html`, scope the site folder), 192/512 px icons and the iOS web-app meta on every main page, so Study OS opens full screen without browser bars when launched from its Home Screen icon. No storage changes.

@@ -1,0 +1,16 @@
+{
+  "name": "Study OS",
+  "short_name": "Study OS",
+  "description": "Personal study planner: today, flashcards, practice, lessons, calendar.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e0e0f",
+  "theme_color": "#0e0e0f",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
