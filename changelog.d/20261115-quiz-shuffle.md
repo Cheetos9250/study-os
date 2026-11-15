@@ -1,0 +1,1 @@
+- Quiz pages (Accounting, Economics, Math → Practice): a **Shuffle** button next to Missed / Unanswered puts the questions in random order. It works with the chapter, Missed and Unanswered filters; answering keeps the order; tapping it again goes back to the normal order. Saved answers are not changed.
