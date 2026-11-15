@@ -38,7 +38,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 | `index.html` | **Today**. Shows the cover and icon (local images; animated GIFs and https or Google Drive image links work), summary chips, today's classes, today's plan, a Pomodoro timer, exam countdowns, the owner's tasks and subject cards. |
 | `flashcards.html` | Due/new cards per subject. English and Chinese open WordNest. |
 | `practice.html` | Quizzes per subject, weak chapters, WordNest English games, the accounting textbook. |
-| `hub.html` | **Lessons**: subject → chapters → Lesson / Cards / Practice. |
+| `hub.html` | **Lessons**: subject → chapters → Lesson / Cards / Practice / Notes. |
 | `calendar.html` | Month view, weekly **timetable** (edit + import), **exam schedule** editor. |
 | `grades.html` | Weighted course items, letter per course scale, "needed on the rest", estimated GPA. |
 | `acc/eco/math/eng/zh.html` | Course pages. Data is embedded as `const D={...}` (one huge line; never rewrite it with regex). Each page shows one mode via `?tab=cards|sum|prac` (`scripts/study-course-mode.js`) and has its own sync engine. |
@@ -65,6 +65,7 @@ Fonts are DM Sans (body) and Outfit (headings/numbers). The palette is Notion-li
 | `studyos.home.v1` | Owner tasks, cover, icon, card images. |
 | `studyos.today.v1` | Exams, plan ticks, timetable. `markChapter` must keep the other fields. |
 | `studyos.grades.v1` | Grades. |
+| `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). |
 | `studyos.accounting.textbook.progress.v1` | Textbook answers. |
 | `vocabloom_mvp_v1` | WordNest English data. |
 
@@ -99,6 +100,6 @@ node tests/auto-sync-browser.cjs
 
 - Syllabi received so far: Accounting (3 credits; final Thu 26 Nov 09:00–12:00 covers Ch5–9; weights 10/10/10/10/30/30) and EC1 (no final exam; group presentation in week 16, about Wed 18 Nov).
 - Still needed: syllabi for Math, Excel ("Using Spreadsheet Software for Accounting"), Global Citizenship and Economics. They give credits, Economics/Math final scope and grade weights. Grade data goes to the owner as an import link, never committed.
-- Remaining Thai UI text: sync and Notion messages on course pages (tests assert the exact strings), and parts of WordNest.
-- Planned features: notes per subject, Google Classroom import (needs an OAuth client the owner would create), AI tutor (costs money).
-- Old draft PRs #1, #41–#47, #57, #58, #68 should be reviewed and closed or finished.
+- UI is English everywhere a user normally goes. Thai remains only in study content (cards, summaries) and in admin/staging tools under `vocabloom/`.
+- Planned features: Google Classroom import (needs an OAuth client the owner would create), AI tutor (costs money).
+- PR #68 (79 worked textbook answers, 50 PDF-reviewed) is waiting for the owner to decide whether to release the reviewed answers.
