@@ -214,7 +214,7 @@ test('P2: existing Auto Sync opt-in is cleared once without clearing scores or k
  assert.equal(fixture.second,true,'Manual later opt-in must remain enabled');
 });
 test('P2: key prompt explicitly discloses immediate sync and dark links are readable',()=>{
- assert.ok(cloud.includes('ระบบจะซิงก์ทันที 1 รอบ'));
- assert.ok(cloud.includes('อ่านและเขียนข้อมูลทั้ง 5 วิชา'));
+ assert.ok(cloud.includes('one sync runs right away'));
+ assert.ok(cloud.includes('reads and writes data for all 5 subjects'));
  assert.ok(html.includes('body.dark .text-link { color:#c4baff; }'));
 });

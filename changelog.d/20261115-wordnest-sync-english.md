@@ -1,0 +1,1 @@
+- English UI: WordNest Settings → Unified Learning Sync panel (unified-progress.js) and its messages.
