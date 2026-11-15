@@ -19,5 +19,5 @@ test('practice calculator does arithmetic without eval',()=>{
 });
 test('calculator is on the quiz pages and the textbook exercises',()=>{
  for(const f of ['acc.html','eco.html','math.html','accounting-textbook.html'])
-  assert.match(fs.readFileSync(path.join(__dirname,'..',f),'utf8'),/scripts\/study-calc\.js\?v=1/,f);
+  assert.match(fs.readFileSync(path.join(__dirname,'..',f),'utf8'),/scripts\/study-calc\.js\?v=\d+/,f);
 });

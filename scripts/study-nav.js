@@ -92,7 +92,6 @@
  function mount(){
   if(document.getElementById('studyNav'))return;
   if(course&&typeof URLSearchParams==='function'&&new URLSearchParams(location.search).get('sync')==='1')document.documentElement.classList.add('show-sync');
-  if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap';document.head.appendChild(fl);}
   var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);
   var nav=document.createElement('nav');nav.id='studyNav';nav.setAttribute('aria-label','Main');
   var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><button type="button" class="sn-fold" aria-pressed="false"></button><div class="sn-tabs">';
@@ -101,7 +100,7 @@
   h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(course?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
   MORE.forEach(function(m){h+='<a href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
   h+='</div>';
-  nav.innerHTML=h;document.body.appendChild(nav);document.documentElement.classList.add('sn-on');
+  nav.innerHTML=h;document.body.appendChild(nav);if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){/* Course pages: load only the glyphs the nav shows (Google Fonts text=), a few KB instead of whole Japanese fonts. */var tx=nav.textContent.replace(/\s+/g,'');var u={};tx.split('').forEach(function(c){u[c]=1;});var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap&text='+encodeURIComponent(Object.keys(u).sort().join('')+'0123456789');document.head.appendChild(fl);}document.documentElement.classList.add('sn-on');
   var more=nav.querySelector('.sn-more');
   more.onclick=function(e){e.stopPropagation();var o=nav.classList.toggle('sn-open');more.setAttribute('aria-expanded',o?'true':'false');};
   document.addEventListener('click',function(e){if(!nav.contains(e.target)){nav.classList.remove('sn-open');more.setAttribute('aria-expanded','false');}});

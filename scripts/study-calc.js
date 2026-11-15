@@ -100,7 +100,8 @@
   document.body.appendChild(panel);document.body.appendChild(btn);
   exp=panel.querySelector('.c-exp');res=panel.querySelector('.c-res');tp=panel.querySelector('.c-tape');
   /* sit to the left of the quiz Notes button when there is one */
-  var nb=document.getElementById('qnBtn');if(nb)document.documentElement.style.setProperty('--calc-right',(nb.offsetWidth+28)+'px');
+  /* read the size after the first paint, so it does not force an extra layout of the long page while loading */
+  requestAnimationFrame(function(){setTimeout(function(){var nb=document.getElementById('qnBtn');if(nb)document.documentElement.style.setProperty('--calc-right',(nb.offsetWidth+28)+'px');},0);});
   btn.onclick=function(){setOpen(panel.hidden);};
   panel.querySelector('.c-x').onclick=function(){setOpen(false);};
   panel.querySelector('.c-keys').addEventListener('click',function(e){var b=e.target.closest('button');if(b)press(b.dataset.k);});

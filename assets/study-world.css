@@ -4,7 +4,7 @@
    (scripts/study-accent.js sets --ah/--as/--al/--ad; defaults below are an ink red).
    Loaded after each core page's own <style>, so these rules win at equal specificity.
    Used by: index, flashcards, practice, hub, calendar, grades. Course pages keep study-unify.css. */
-@import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Mali:wght@500;600;700&display=swap');
+/* Fonts are linked from each page's <head> (preconnect + stylesheet) so they load in parallel, not after this file. */
 
 :root{
  --ah:4;--as:76%;--al:50%;--ad:68%;
