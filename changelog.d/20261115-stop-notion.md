@@ -1,0 +1,1 @@
+- Notion retired (owner decision, 15 Nov 2026). Course pages and WordNest read cards and questions only from the saved `data/quiz.json` and `data/cards.json` snapshot. No data was removed. Notion wording removed from the UI.

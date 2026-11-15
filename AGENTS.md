@@ -88,7 +88,7 @@ node tests/auto-sync-browser.cjs
 
 - Not live yet. Today the owner moves data with Back up / Restore.
 - Live `study-api` Worker:
-  - serves Notion quiz/cards plus legacy progress, with unconditional writes;
+  - serves Notion quiz/cards (no longer read by the site — Notion retired 15 Nov 2026; pages use only `data/quiz.json` / `data/cards.json`) plus legacy progress, with unconditional writes;
   - must not be replaced;
   - is used through `data/config.json` → `api`.
 - `workers/progress/wrangler.jsonc` and `.github/workflows/deploy-progress-worker.yml` (PR #102, may still be open) deploy `vocabloom-progress-cas-prod`, a compare-and-set progress Worker built from `experiments/prod-progress-cas/worker.mjs`.
@@ -97,6 +97,8 @@ node tests/auto-sync-browser.cjs
 - `study-api-cas-staging-only` is a staging prototype. Do not use it for real data.
 
 ## Open items
+
+- Notion is retired (owner, 15 Nov 2026). Do not re-add Notion loading. New cards/questions would be edited in `data/*.json` or a future in-site editor.
 
 - Syllabi received so far: Accounting (3 credits; final Thu 26 Nov 09:00–12:00 covers Ch5–9; weights 10/10/10/10/30/30) and EC1 (no final exam; group presentation in week 16, about Wed 18 Nov).
 - Still needed: syllabi for Math, Excel ("Using Spreadsheet Software for Accounting"), Global Citizenship and Economics. They give credits, Economics/Math final scope and grade weights. Grade data goes to the owner as an import link, never committed.

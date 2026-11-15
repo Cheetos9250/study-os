@@ -239,7 +239,7 @@ function renderCard(){
   const q=queues(fcat); cur=q.L[0]||q.R[0]||q.N[0]||null; shown=false;
   $('#srsCounts').innerHTML='<span class="n"><b>'+q.N.length+'</b>new</span><span class="l"><b>'+q.L.length+'</b>learning</span><span class="d"><b>'+q.R.length+'</b>due</span>';
   const total=CARDS.filter(inScope).length, seen=CARDS.filter(c=>inScope(c)&&srs[c.mid]).length;
-  $('#count').textContent='Started '+seen+'/'+total+(extN?' · Notion '+extN:'');
+  $('#count').textContent='Started '+seen+'/'+total+(extN?' · extra '+extN:'');
   const st=$('#stage'), show=$('#showBtn'), rt=$('#rate4');
   if(!cur){
     const waits=CARDS.filter(c=>inScope(c)&&srs[c.mid]).map(c=>srs[c.mid].due).filter(d=>d>Date.now());
@@ -421,10 +421,8 @@ async function syncNotion(){
   syncing=false;
 }
 $('#syncBtn').onclick=syncNotion;
-if(window.claude&&window.claude.use){
-  window.claude.use("user").then(u=>u?u.isOwner():false).then(v=>{owner=!!v;renderSync();}).catch(()=>{});
-  window.claude.use("mcp").then(m=>{mcp=m;renderSync();loadExt();loadExtQ();}).catch(()=>{loadStatic();});
-}else{ loadStatic(); }
+// Notion is no longer used (owner decision, 15 Nov 2026): cards and questions come only from the saved snapshot.
+loadStatic();
 
 /* ---------- extra cards from the Notion "Flashcards" table ---------- */
 const SUBJ={acc:'Accounting',math:'Math for Life',eco:'Economics',eng:'English Vocab',zh:'Chinese'}[D.key];
@@ -503,10 +501,8 @@ async function loadStatic(){
   await 0;
   if(!SUBJ) return;
   try{
-    let api='';
-    try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok) api=String((await c.json()).api||'').replace(/\/+$/,''); }catch(e){}
     const getJ=async(name)=>{
-      if(api){ try{ const r=await fetch(api+'/'+name); if(r.ok){ const j=await r.json(); if(j&&Array.isArray(j.rows)) return j; } }catch(e){} }
+      // Notion is no longer used (owner decision, 15 Nov 2026): read only the saved snapshot in data/.
       const r=await fetch('data/'+name+'.json',{cache:'no-store'}); if(!r.ok) throw new Error(name+' '+r.status); return r.json();
     };
     const [q,c]=await Promise.all([getJ('quiz'), getJ('cards').catch(()=>null)]);
@@ -514,7 +510,7 @@ async function loadStatic(){
     setExtQ(rows); try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
     if(c&&c.rows){ const cr=c.rows.filter(x=>x.Subject===SUBJ); setExt(cr); try{ localStorage.setItem(EXT_KEY,JSON.stringify(cr)); }catch(e){} cardsRow(); if(!shown) renderCard(); }
     const n=QS.filter(x=>String(x.id).startsWith('n-')).length;
-    qStat=(q.live?'Loaded live from Notion':'Loaded from the data file')+' · added '+n+' questions · updated '+(q.updated||'-'); qStatErr=false;
+    qStat='Saved questions · added '+n+' questions · updated '+(q.updated||'-'); qStatErr=false;
     if(qpos>=QS.length) qpos=0; buildDeck(); renderQ();
   }catch(e){}
 }
