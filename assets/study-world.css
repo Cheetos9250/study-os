@@ -153,7 +153,7 @@ h3 .jersey{margin-right:10px;vertical-align:middle}
  repeating-conic-gradient(from 0deg at 78% 55%,var(--ink) 0 1.4deg,transparent 1.4deg 7deg),
  radial-gradient(circle at 78% 55%,var(--panel) 0 16%,transparent 34%),
  var(--dots),var(--panel);border-bottom:var(--bw) solid var(--ink)}
-.cover[style*="background-image: url"]{background-size:cover;background-position:center}
+.cover[style*="background-image: url"]{background-size:cover;background-position:center;background-repeat:no-repeat}
 .cover-tools button{font:900 13px var(--ui);border-radius:var(--r-s);background:var(--paper);color:var(--text);border:2.5px solid var(--ink);min-height:40px;opacity:1}
 .avatar{border:var(--bw) solid var(--ink)!important;box-shadow:0 0 0 4px var(--bg);background-color:var(--panel)}
 .avatar.img{border:0!important;box-shadow:none}
