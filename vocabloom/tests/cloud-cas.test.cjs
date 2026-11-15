@@ -112,7 +112,7 @@ test('Canceling manual legacy consent sends no PUT',async()=>{
  const f=fixture({mode:'legacy',allowLegacy:false});await f.run(true);
  assert.equal(f.confirmations(),1);
  assert.equal(f.requests.filter(x=>x.method==='PUT').length,0);
- assert.ok(f.status().includes('ยกเลิก'));
+ assert.ok(f.status().includes('cancelled'));
 });
 test('Manual legacy fallback requires one consent and sends five PUTs',async()=>{
  const f=fixture({mode:'legacy',allowLegacy:true});await f.run(true);
@@ -134,7 +134,7 @@ test('Six repeated conflict responses fail with local data intact',async()=>{
  assert.equal(f.CLOUD.remoteStatus,'error');
  assert.equal(JSON.stringify(f.updates.get('acc')),before);
  assert.equal(f.requests.filter(x=>x.method==='PUT').length,6);
- assert.ok(f.status().includes('6 รอบ'));
+ assert.ok(f.status().includes('6 tries'));
 });
 test('Auto Sync button delegates to endpoint-aware opt-in, never unsafe direct toggle',()=>{
  const first=src.indexOf("if(el.dataset.action==='cloud-auto')");
@@ -172,7 +172,7 @@ test('Background sync rechecks permission after async API resolution disables in
  assert.equal(f.CLOUD.remoteStatus,'error');
  assert.equal(f.requests.length,0,'Must not send even a credentialed GET after disable');
  assert.deepEqual([...f.remote.values()].map(x=>x.revision),before);
- assert.match(f.status(),/Auto Sync ปิดอยู่/);
+ assert.match(f.status(),/Auto Sync is off/);
 });
 test('Auto Sync OFF during an in-flight GET blocks all subsequent PUT requests',async()=>{
  const f=fixture({disableAfterGet:true});
@@ -190,7 +190,7 @@ test('Auto Sync OFF after an acknowledged PUT stops remaining subject writes',as
  assert.equal(f.remote.get('acc').revision,1);
  assert.equal(f.remote.get('eco').revision,0);
  assert.equal(f.remote.get('zh').revision,0);
- assert.match(f.status(),/1\/5 วิชา/);
+ assert.match(f.status(),/1\/5 subjects/);
 });
 test('An explicitly requested manual sync is not silently mistaken for background consent',async()=>{
  const f=fixture({disableOnApiResolve:true});
