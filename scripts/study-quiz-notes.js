@@ -33,6 +33,8 @@
  +'@media(min-width:1000px){#qn{top:0;right:0;bottom:0;width:min(380px,32vw);border-width:0 0 0 3px}html.qn-open body{padding-right:min(380px,32vw)!important}html.qn-open #qnBtn{display:none}}'
  /* narrow screens: the lower part of the screen, above the tab bar; the quiz scrolls above it */
  +'@media(max-width:999.98px){#qn{left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));height:min(46vh,420px);border-width:3px 0 3px}html.qn-open body{padding-bottom:calc(72px + min(46vh,420px) + env(safe-area-inset-bottom))!important}#qnBtn{bottom:calc(84px + env(safe-area-inset-bottom))}html.qn-open #qnBtn{display:none}}'
+ +'html.qn-ready:not(.qn-open) body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}'
+ +'@media(max-width:899.98px){html.qn-ready:not(.qn-open) body{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}}'
  +'@media print{#qn,#qnBtn{display:none}}';
  var PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4.5l5 5L9 20H4v-5z"/><path d="M12.5 6.5l5 5"/></svg>';
  var X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
@@ -58,7 +60,7 @@
   panel=document.createElement('aside');panel.id='qn';panel.hidden=true;panel.setAttribute('aria-label','Chapter notes');
   var opts='<option value="general">General</option>'+cats().map(function(c){return '<option value="'+esc(c[0])+'">'+esc(c[1])+'</option>';}).join('');
   panel.innerHTML='<div class="qn-bar"><h2 class="qn-t">Notes</h2><select aria-label="Chapter">'+opts+'</select><button type="button" class="qn-x" aria-label="Close notes">'+X+'</button><span class="qn-s" role="status"></span></div><textarea maxlength="'+MAX+'" spellcheck="true" aria-label="Chapter notes"></textarea>';
-  document.body.appendChild(panel);document.body.appendChild(btn);
+  document.body.appendChild(panel);document.body.appendChild(btn);document.documentElement.classList.add('qn-ready');
   ta=panel.querySelector('textarea');sel=panel.querySelector('select');st=panel.querySelector('.qn-s');
   btn.onclick=function(){setOpen(true);};
   panel.querySelector('.qn-x').onclick=function(){setOpen(false);};

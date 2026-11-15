@@ -11,9 +11,9 @@
   {id:'calendar',href:'calendar.html',icon:'calendar',label:'Calendar'}
  ];
  var MORE=[
-  {href:'grades.html',label:'Grades'},
-  {href:'progress-backup.html',label:'Back up'},
-  {href:'progress-restore.html',label:'Restore'}
+  {href:'grades.html',label:'Grades',icon:'grades'},
+  {href:'progress-backup.html',label:'Back up',icon:'backup'},
+  {href:'progress-restore.html',label:'Restore',icon:'restore'}
  ];
  var file=(location.pathname.split('/').pop()||'index.html').toLowerCase();
  // Course pages show one mode (?tab=cards|sum|prac); highlight the matching section.
@@ -28,6 +28,11 @@
   lessons:'<path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 20.5v-15M8 8h7M8 11.5h5"/>',
   calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   more:'<circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/>',
+  grades:'<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
+  backup:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/>',
+  restore:'<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4.5 17.5v2h15v-2"/>',
+  fold:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9 4.5v15M15.5 9.5 13 12l2.5 2.5"/>',
+  unfold:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9 4.5v15M13 9.5l2.5 2.5L13 14.5"/>',
   sync:'<path d="M7 18.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 9.2 4.7 4.7 0 0 0 7 18.5z"/>',
   auto:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/>',
   dark:'<path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>',
@@ -58,11 +63,19 @@
  +' #studyNav .sn-foot{margin-top:auto;display:grid;gap:2px;border-top:2px solid var(--sn-line);padding-top:12px}'
  +' #studyNav .sn-foot a,#studyNav .sn-foot button{padding:0 12px;font-size:14px;color:var(--sn-mute);width:100%;text-align:left}'
  +' #studyNav .sn-foot a:hover,#studyNav .sn-foot button:hover{background:var(--sn-hi);color:var(--sn-fg)}'
+ +' #studyNav .sn-fold{display:flex;padding:0 12px;font-size:14px;color:var(--sn-mute);width:100%;text-align:left}'
+ +' #studyNav .sn-fold:hover{background:var(--sn-hi);color:var(--sn-fg)}'
+ +' html.sn-on.sn-collapsed body{padding-left:76px!important}'
+ +' html.sn-collapsed #studyNav{width:76px;padding-left:max(10px,env(safe-area-inset-left));padding-right:10px}'
+ +' html.sn-collapsed #studyNav .sn-brand{padding:4px 0 22px;justify-content:center}'
+ +' html.sn-collapsed #studyNav .sn-brand .sn-bt{display:none}html.sn-collapsed #studyNav .sn-brand b{margin:0}'
+ +' html.sn-collapsed #studyNav .sn-tab,html.sn-collapsed #studyNav .sn-foot a,html.sn-collapsed #studyNav .sn-foot button,html.sn-collapsed #studyNav .sn-fold{justify-content:center;padding:0}'
+ +' html.sn-collapsed #studyNav .sn-tab span,html.sn-collapsed #studyNav .sn-foot span,html.sn-collapsed #studyNav .sn-fold span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'
  +'}'
  +'@media(max-width:899.98px){'
  +' html.sn-on body{padding-bottom:calc(72px + env(safe-area-inset-bottom))!important}'
  +' #studyNav{left:0;right:0;bottom:0;border-top:3px solid var(--sn-line);padding:4px max(6px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));display:flex}'
- +' #studyNav .sn-brand{display:none}'
+ +' #studyNav .sn-brand,#studyNav .sn-fold{display:none!important}'
  +' #studyNav::after{content:"";position:absolute;left:0;right:0;top:100%;height:100vh;background:var(--sn-bg);pointer-events:none}'
  +' #studyNav .sn-tabs{display:flex;flex:1}'
  +' #studyNav .sn-tab,#studyNav .sn-more{flex:1;flex-direction:column;gap:3px;justify-content:center;font-size:11.5px;padding:6px 2px;min-height:56px}'
@@ -80,12 +93,12 @@
   if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap';document.head.appendChild(fl);}
   var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);
   var nav=document.createElement('nav');nav.id='studyNav';nav.setAttribute('aria-label','Main');
-  var h='<a class="sn-brand" href="index.html">Study<b>OS</b></a><div class="sn-tabs">';
-  TABS.forEach(function(t){h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+'>'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
+  var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><div class="sn-tabs">';
+  TABS.forEach(function(t){h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+' title="'+esc(t.label)+'">'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
   h+='<button type="button" class="sn-more" aria-expanded="false" aria-controls="snFoot">'+svg('more')+'<span>More</span></button></div>';
   h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(course?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
-  MORE.forEach(function(m){h+='<a href="'+m.href+'">'+esc(m.label)+'</a>';});
-  h+='</div>';
+  MORE.forEach(function(m){h+='<a href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
+  h+='<button type="button" class="sn-fold" aria-pressed="false"></button></div>';
   nav.innerHTML=h;document.body.appendChild(nav);document.documentElement.classList.add('sn-on');
   var more=nav.querySelector('.sn-more');
   more.onclick=function(e){e.stopPropagation();var o=nav.classList.toggle('sn-open');more.setAttribute('aria-expanded',o?'true':'false');};
@@ -95,6 +108,9 @@
   var tb=nav.querySelector('.sn-theme'),T=window.StudyTheme;
   function paint(){if(!T){tb.hidden=true;return;}var m=T.mode();tb.innerHTML=svg(m)+'<span>'+esc(T.LABEL[m])+'</span>';tb.setAttribute('aria-label',T.LABEL[m]+' (tap to change)');}
   tb.onclick=function(){if(T){T.cycle();paint();}};paint();
+  var fb=nav.querySelector('.sn-fold');
+  function paintFold(){var on=!!(T&&T.collapsed&&T.collapsed());fb.innerHTML=svg(on?'unfold':'fold')+'<span>'+(on?'Expand sidebar':'Collapse sidebar')+'</span>';fb.setAttribute('aria-pressed',String(on));fb.title=on?'Expand sidebar':'Collapse sidebar';}
+  if(!T||!T.setCollapsed)fb.hidden=true;else{fb.onclick=function(){T.setCollapsed(!T.collapsed());paintFold();};paintFold();}
  }
  window.StudyNav={TABS:TABS,active:active};
  if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
