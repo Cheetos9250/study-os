@@ -13,6 +13,8 @@
  function setCollapsed(on){collapsed=!!on;root.classList.toggle('sn-collapsed',collapsed);try{if(collapsed)localStorage.setItem(NAV_KEY,'collapsed');else localStorage.removeItem(NAV_KEY);}catch(e){}return collapsed;}
  var ICON={auto:'🌓',dark:'🌙',light:'☀️'},LABEL={auto:'Theme: Auto',dark:'Theme: Dark',light:'Theme: Light'},NEXT={auto:'dark',dark:'light',light:'auto'};
  function cycle(){mode=NEXT[mode];apply(mode);try{if(mode==='auto')localStorage.removeItem(KEY);else localStorage.setItem(KEY,mode);}catch(e){}return mode;}
+ /* Ask the browser to keep this site's data instead of clearing it under storage pressure (iPadOS honours this best for home-screen apps). */
+ try{if(navigator.storage&&navigator.storage.persisted&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist();}).catch(function(){});}catch(e){}
  window.StudyTheme={mode:function(){return mode;},cycle:cycle,ICON:ICON,LABEL:LABEL,collapsed:function(){return collapsed;},setCollapsed:setCollapsed};
  function mount(){
   if(document.getElementById('studyThemeBtn')||document.getElementById('studyNav')||document.querySelector('script[src*="study-nav.js"]'))return;

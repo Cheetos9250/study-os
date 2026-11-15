@@ -91,6 +91,7 @@
           a.click();
           a.remove();
           setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+          try { window.localStorage.setItem("studyos.backup-meta.v1", JSON.stringify({ last: new Date().toISOString(), sets: count })); } catch (e) {}
           status.textContent = "Created a backup with " + count + " data sets. Save it privately to Files/iCloud Drive and check it below.";
         } catch (error) {
           status.textContent = "Cannot create a backup: " + error.message;

@@ -92,6 +92,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 </style>
 <link rel="stylesheet" href="assets/study-world.css?v=5">
 <style>
+.bk{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:18px 0 0;padding:12px 14px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel)}
+.bk svg{width:22px;height:22px;flex:none}
+.bk p{margin:0;flex:1;min-width:220px;font-size:14px;line-height:1.45}.bk p b{display:block;font-size:15px}
+.bk .acts{margin:0}
 /* Today: ink manga panels, speech bubble, hatched timer (after study-world.css) */
 .cover{height:clamp(170px,26vw,280px)}
 .head{margin-top:-48px;gap:12px}
@@ -177,6 +181,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
  <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 24 32 12l28 12-28 12z" fill="var(--panel)" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M16 30v12c0 4 7 9 16 9s16-5 16-9V30" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M54 27v15" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M50 46l4-5 4 5-4 5z" fill="currentColor"/><path d="M20 40l4 4M26 43l4 3M34 43l4-2M40 41l4-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
  <div><h1 id="welcome-title">Study</h1><p class="date" id="today">Study OS</p></div>
 </header>
+<div class="bk" id="backupNudge" role="status" hidden></div>
 <div class="chips scoreboard" id="chips" aria-label="Scoreboard"></div>
 <main>
 <h2>Today</h2>
@@ -362,7 +367,22 @@ function renderClasses(){
   return '<a class="cls'+(hm>=x.start&&hm<x.end?' now':hm>=x.end?' done':'')+(c?' t-'+c.key:'')+'" href="'+href+'">'+(c?'<span class="jersey sm" aria-hidden="true">'+esc(c.full||c.key.toUpperCase())+'</span>':'')+'<b>'+x.start+'–'+x.end+'</b>'+esc(x.name)+(x.code?'<span>'+esc(x.code)+'</span>':'')+'</a>';}).join('')
   :'<span class="cls"><span>No classes today</span></span>';
 }
-function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
+/* ---------- backup reminder: iPadOS can clear website data (in-app browsers, 7 days unused in Safari) ---------- */
+function renderBackupNudge(){
+ const el=$('#backupNudge');if(!el)return;
+ let snooze='';try{snooze=sessionStorage.getItem('studyos.backup-snooze')||'';}catch{}
+ const has=T.COURSES.concat(T.LANGS).some(c=>read(c.mark+'-srs')||read('study-'+c.key))||st.tasks.length||settings.timetable.length;
+ let last=null;try{const m=JSON.parse(read('studyos.backup-meta.v1')||'null');if(m&&typeof m.last==='string')last=Date.parse(m.last);}catch{}
+ const days=last?Math.floor((Date.now()-last)/864e5):null;
+ if(!has||snooze===today||(days!==null&&days<3)){el.hidden=true;return;}
+ const app=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+ el.hidden=false;
+ el.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/></svg>'
+  +'<p><b>'+(days===null?'Your progress has no backup yet':'Last backup '+days+' days ago')+'</b>This iPad keeps your answers only in this browser, and it can clear them'+(app?'.':' (in-app browsers, or 7 days without opening the site). Adding Study OS to the Home Screen keeps it safer.')+'</p>'
+  +'<div class="acts"><a class="main" href="progress-backup.html">Back up now</a><a href="#" id="bkLater">Later</a></div>';
+ $('#bkLater').onclick=e=>{e.preventDefault();try{sessionStorage.setItem('studyos.backup-snooze',today);}catch{}el.hidden=true;};
+}
+function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
 renderAll();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
 Promise.all(T.LANGS.map(l=>fetch(l.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});
