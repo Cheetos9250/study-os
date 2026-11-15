@@ -4,13 +4,13 @@
    (scripts/study-accent.js sets --ah/--as/--al/--ad; defaults below are an ink red).
    Loaded after each core page's own <style>, so these rules win at equal specificity.
    Used by: index, flashcards, practice, hub, calendar, grades. Course pages keep study-unify.css. */
-@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Kanit:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&family=Zen+Maru+Gothic:wght@500;700;900&family=Mali:wght@500;600;700&display=swap');
 
 :root{
  --ah:4;--as:76%;--al:50%;--ad:68%;
  color-scheme:light;
- --ui:'Zen Kaku Gothic New','Kanit','Sukhumvit Set',system-ui,-apple-system,sans-serif;
- --num:'Dela Gothic One','Zen Kaku Gothic New','Kanit',sans-serif;
+ --ui:'Zen Maru Gothic','Mali','Sukhumvit Set',system-ui,-apple-system,sans-serif;
+ --num:'Kaisei Decol','Zen Maru Gothic','Mali',serif;
  --mono:var(--ui);
  --bg:#f4f4f2;--panel:#ffffff;--panel-2:#f0f0ee;--text:#111111;--muted:#505050;--line:#111111;--line-soft:#dcdcda;--line-strong:#111111;
  --ink:#111111;--paper:#ffffff;
@@ -69,11 +69,11 @@ input[type=checkbox]{accent-color:var(--acc)}
 .page,.container{padding-bottom:96px}
 
 /* page heads: one rhythm on every core page */
-h1{font:400 clamp(36px,5vw,50px)/1.1 var(--num);letter-spacing:0;margin:0}
+h1{font:700 clamp(36px,5vw,50px)/1.1 var(--num);letter-spacing:0;margin:0}
 .page>h1,.hero h1{margin-top:8px}
 .hero{padding-top:max(24px,env(safe-area-inset-top))!important;padding-bottom:0!important}
 .container{padding-top:0!important}
-h2{font:400 20px/1.3 var(--num);margin:40px 0 12px;display:flex;align-items:center;gap:12px;letter-spacing:0}
+h2{font:700 20px/1.3 var(--num);margin:40px 0 12px;display:flex;align-items:center;gap:12px;letter-spacing:0}
 h2::before{content:none!important}
 h2::after{content:"";flex:1;height:var(--bw);background:var(--ink);order:1}
 h2 .sec-link,h2 small,h2 a{order:2}
@@ -91,7 +91,7 @@ h2 .sec-link,h2 small,h2 a{order:2}
 /* lead panel: the next action on each page, spoken from a bubble */
 .lead-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;margin:18px 0 0;padding:18px 20px 26px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--hatch),var(--panel)}
 .lead-panel .bub{max-width:560px}
-.lead-panel .bub b{display:block;font:400 clamp(20px,2.6vw,26px)/1.25 var(--num)}
+.lead-panel .bub b{display:block;font:700 clamp(20px,2.6vw,26px)/1.25 var(--num)}
 .lead-panel .bub span{display:block;color:var(--muted);font-weight:700;font-size:14px}
 .lead-panel .go{font:900 15px var(--ui);min-height:46px;padding:0 22px;border-radius:var(--r-s);background:var(--acc);color:var(--acc-ink);border:var(--bw) solid var(--ink);display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}
 @media(max-width:560px){.lead-panel{grid-template-columns:1fr}.lead-panel .go{justify-self:start}}
@@ -110,7 +110,7 @@ h2 .sec-link,h2 small,h2 a{order:2}
 .cal-head button svg{width:20px;height:20px;display:block}
 
 .chip{border-radius:var(--r);background:var(--panel);border:var(--bw) solid var(--ink)}
-.chip b{font:400 28px/1 var(--num)}
+.chip b{font:700 28px/1 var(--num)}
 .left{font:700 12px var(--ui);background:var(--blue-soft);color:var(--text);border:1.5px solid var(--ink);border-radius:4px}
 .left.late{background:var(--hi);color:var(--hi-t)}.left.today{background:var(--med);color:var(--med-t)}
 .pri{font:700 12px var(--ui);border:1.5px solid var(--ink);border-radius:4px}
@@ -119,13 +119,13 @@ h2 .sec-link,h2 small,h2 a{order:2}
 /* ---------- course tones ---------- */
 .t-acc{--team:var(--t-acc)}.t-eco{--team:var(--t-eco)}.t-math{--team:var(--t-math)}.t-eng,.t-voc{--team:var(--t-eng)}.t-zh{--team:var(--t-zh)}
 .tag{display:inline-block;font:900 11px/1.6 var(--ui);padding:0 8px;border-radius:4px;border:2px solid var(--ink);background:var(--team,var(--blue-soft));color:#111;margin-right:8px;vertical-align:1px}
-.jersey{flex:none;display:inline-grid;place-items:center;min-width:46px;height:38px;padding:0 8px;border-radius:4px;border:2.5px solid var(--ink);background:var(--team,var(--acc-soft));color:#111;font:400 14px/1 var(--num)}
+.jersey{flex:none;display:inline-grid;place-items:center;min-width:46px;height:38px;padding:0 8px;border-radius:4px;border:2.5px solid var(--ink);background:var(--team,var(--acc-soft));color:#111;font:700 14px/1 var(--num)}
 .jersey.sm{min-width:42px;height:30px;font-size:12px;padding:0 7px}
 h3 .jersey{margin-right:10px;vertical-align:middle}
 .pc h3,.card h3{display:flex;align-items:center;gap:0;font-weight:900}
 .kind{display:inline-block;font:900 11px/1.6 var(--ui);padding:0 7px;border-radius:4px;border:1.5px solid var(--ink);margin-right:8px;background:var(--blue-soft);color:var(--text)}
 .kind.k-e{background:var(--hi);color:var(--hi-t)}.kind.k-c{background:var(--acc-soft)}
-.nums b{font-family:var(--num)!important;font-weight:400!important}
+.nums b{font-family:var(--num)!important;font-weight:700!important}
 .nums .due b{color:var(--red)}.nums div:not(.due) b{color:var(--text)}
 .bar{height:10px;border-radius:2px;border:2px solid var(--ink);background:var(--panel)}
 .bar i{background:var(--ink)}
@@ -146,13 +146,13 @@ h3 .jersey{margin-right:10px;vertical-align:middle}
 
 /* ---------- exams ---------- */
 .exam.soon,.exam.urgent{border-left-color:var(--ink)}
-.exam .n{font:400 38px/1 var(--num);color:var(--text)}
+.exam .n{font:700 38px/1 var(--num);color:var(--text)}
 .exam .n small{font:700 13px var(--ui);color:var(--muted)}
 .exam.soon .n{color:var(--orange)}.exam.urgent .n{color:var(--acc)}
 .exam.urgent{background:var(--hatch),var(--panel)}
 
 /* ---------- calendar ---------- */
-.day{border-radius:var(--r);background:var(--panel);border:2px solid var(--ink);font:400 15px var(--num)}
+.day{border-radius:var(--r);background:var(--panel);border:2px solid var(--ink);font:700 15px var(--num)}
 .day.out{opacity:.35}
 .day.today{background:var(--hatch),var(--panel);box-shadow:none;border-width:3px}
 .day[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
@@ -163,11 +163,11 @@ h3 .jersey{margin-right:10px;vertical-align:middle}
 .wd.today{background:var(--hatch),var(--panel);box-shadow:none;border-width:3px}
 .wd h4{font:900 12px var(--ui);letter-spacing:.04em;text-transform:uppercase}
 .cl{background:var(--team,var(--panel-2));color:#111;border:2px solid var(--ink);border-radius:4px}
-.cl b{font:400 13px var(--num)}
+.cl b{font:700 13px var(--num)}
 
 /* ---------- grades ---------- */
-.course .big,.pc .big,.big{font-family:var(--num);font-weight:400}
-.letter{font:400 20px var(--num);background:var(--acc);color:var(--acc-ink);border:2.5px solid var(--ink);border-radius:4px}
+.course .big,.pc .big,.big{font-family:var(--num);font-weight:700}
+.letter{font:700 20px var(--num);background:var(--acc);color:var(--acc-ink);border:2.5px solid var(--ink);border-radius:4px}
 .items th{font:900 12px var(--ui);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--ink)}
 .items td{border-bottom:2px solid var(--line-soft)}
 .need span{font:700 12px var(--ui);background:var(--panel);border:2px solid var(--ink);border-radius:4px}

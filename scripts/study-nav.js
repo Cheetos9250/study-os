@@ -35,7 +35,7 @@
  };
  function svg(k){return '<svg class="sn-ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+(ICONS[k]||'')+'</svg>';}
  var css=''
- +'#studyNav{--sn-bg:#fff;--sn-fg:#111;--sn-mute:#474747;--sn-line:#111;--sn-hi:#efefed;--sn-on:var(--acc,#d43a2a);--sn-pill:#111;--sn-pill-ink:#fff;font-family:"Zen Kaku Gothic New","Kanit",system-ui,-apple-system,sans-serif;position:fixed;z-index:70;background:var(--sn-bg);color:var(--sn-fg);box-sizing:border-box}'
+ +'#studyNav{--sn-bg:#fff;--sn-fg:#111;--sn-mute:#474747;--sn-line:#111;--sn-hi:#efefed;--sn-on:var(--acc,#d43a2a);--sn-pill:#111;--sn-pill-ink:#fff;font-family:"Zen Maru Gothic","Mali",system-ui,-apple-system,sans-serif;position:fixed;z-index:70;background:var(--sn-bg);color:var(--sn-fg);box-sizing:border-box}'
  +'@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #studyNav{--sn-bg:#0e0e0f;--sn-fg:#f0f0ee;--sn-mute:#a9a9a6;--sn-line:#f0f0ee;--sn-hi:#232325;--sn-on:var(--acc,#ff8a7a);--sn-pill:#f0f0ee;--sn-pill-ink:#0e0e0f}}'
  +':root[data-theme="dark"] #studyNav{--sn-bg:#0e0e0f;--sn-fg:#f0f0ee;--sn-mute:#a9a9a6;--sn-line:#f0f0ee;--sn-hi:#232325;--sn-on:var(--acc,#ff8a7a);--sn-pill:#f0f0ee;--sn-pill-ink:#0e0e0f}'
  +'#studyNav a,#studyNav button{color:inherit;text-decoration:none;font:inherit;background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:8px;min-height:44px;box-sizing:border-box}'
@@ -48,8 +48,8 @@
  +'@media(min-width:900px){'
  +' html.sn-on body{padding-left:224px!important}'
  +' #studyNav{left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
- +' #studyNav .sn-brand{font:400 24px/1 "Dela Gothic One",sans-serif;padding:4px 12px 22px;min-height:0}'
- +' #studyNav .sn-brand b{color:var(--sn-on);font-weight:400;margin-left:.25em}'
+ +' #studyNav .sn-brand{font:700 25px/1 "Kaisei Decol",serif;padding:4px 12px 22px;min-height:0}'
+ +' #studyNav .sn-brand b{color:var(--sn-on);font-weight:700;margin-left:.25em}'
  /* Safari rubber-band scrolling moves fixed elements; extend the sidebar colour above and below so no gap shows */
  +' #studyNav::before,#studyNav::after{content:"";position:absolute;left:0;right:-1px;height:100vh;background:var(--sn-bg);border-right:3px solid var(--sn-line);pointer-events:none}'
  +' #studyNav::before{bottom:100%}#studyNav::after{top:100%}'
@@ -77,7 +77,7 @@
  function mount(){
   if(document.getElementById('studyNav'))return;
   if(course&&typeof URLSearchParams==='function'&&new URLSearchParams(location.search).get('sync')==='1')document.documentElement.classList.add('show-sync');
-  if(!document.querySelector('link[href*="Zen+Kaku+Gothic+New"],style[data-world]')){var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap';document.head.appendChild(fl);}
+  if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap';document.head.appendChild(fl);}
   var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);
   var nav=document.createElement('nav');nav.id='studyNav';nav.setAttribute('aria-label','Main');
   var h='<a class="sn-brand" href="index.html">Study<b>OS</b></a><div class="sn-tabs">';

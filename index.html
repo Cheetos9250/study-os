@@ -90,7 +90,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .show-done{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;color:var(--muted);margin-left:auto}
 
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=2">
+<link rel="stylesheet" href="assets/study-world.css?v=3">
 <style>
 /* Today: ink manga panels, speech bubble, hatched timer (after study-world.css) */
 .cover{height:clamp(170px,26vw,280px)}
@@ -101,7 +101,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .sb{display:flex;flex-direction:column;justify-content:flex-start;gap:2px;padding:12px 18px 14px;min-height:124px;text-decoration:none;color:inherit;background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r)}
 .sb:nth-child(2){background:var(--hatch-ink),var(--panel)}
 a.sb:hover{background:var(--dots),var(--panel)}
-.sb .n{font:400 clamp(46px,6vw,62px)/1.05 var(--num);color:var(--text);font-variant-numeric:tabular-nums}
+.sb .n{font:700 clamp(46px,6vw,62px)/1.05 var(--num);color:var(--text);font-variant-numeric:tabular-nums}
 .sb .l{font:900 14px/1.2 var(--ui);color:var(--text)}
 .sb .s{font:500 13px/1.35 var(--ui);color:var(--muted);margin-top:auto}
 .sb.alert .n{color:var(--acc)}
@@ -117,7 +117,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 .pomo .tab{border:0;border-radius:0;color:var(--text);font:900 13px var(--ui);padding:0 12px;min-height:40px;background:none}
 .pomo .tab+.tab{border-left:2px solid var(--ink)}
 .pomo .tab[aria-pressed=true]{background:var(--ink);color:var(--paper)}
-.clock{font:400 clamp(58px,7.6vw,80px)/1.05 var(--num);color:var(--text);background:var(--panel);border:var(--bw) solid var(--ink);padding:6px 20px 8px;font-variant-numeric:tabular-nums}
+.clock{font:700 clamp(58px,7.6vw,80px)/1.05 var(--num);color:var(--text);background:var(--panel);border:var(--bw) solid var(--ink);padding:6px 20px 8px;font-variant-numeric:tabular-nums}
 .pbtn button{border-radius:6px;font:900 16px var(--ui);min-height:48px;background:var(--acc);color:var(--acc-ink);border:var(--bw) solid var(--ink);text-transform:capitalize}
 .pbtn button.ghost{background:var(--panel);color:var(--text);display:inline-grid;place-items:center;padding:0 14px}
 .pbtn button.ghost svg{width:20px;height:20px}
@@ -126,7 +126,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 .plan h3{font-size:16px;font-weight:900;margin:0}
 .classes{gap:8px}
 .cls{background:var(--panel);border:2.5px solid var(--ink);border-radius:6px;gap:10px;padding:6px 16px 6px 6px}
-.cls b{font:400 14px var(--num);color:var(--text)}
+.cls b{font:700 14px var(--num);color:var(--text)}
 .cls.now{background:var(--hatch),var(--panel)}
 .exams{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media(min-width:1000px){.exams{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -139,13 +139,13 @@ a.sb:hover{background:var(--dots),var(--panel)}
 @media(min-width:1100px){.subjects{grid-template-columns:repeat(5,minmax(0,1fr))}.subjects .subj,.subjects .subj:nth-child(n+4){grid-column:auto}}
 @media(max-width:560px){.subjects{grid-template-columns:1fr}.subjects .subj,.subjects .subj:nth-child(n+4){grid-column:auto}}
 .subj{overflow:hidden}
-.subj .cv{height:clamp(104px,12vw,140px);background:var(--hatch-ink),var(--team);color:#111;font:400 34px/1 var(--num);justify-items:start;align-items:end;padding:12px 14px;border-bottom:var(--bw) solid var(--ink)}
+.subj .cv{height:clamp(104px,12vw,140px);background:var(--hatch-ink),var(--team);color:#111;font:700 34px/1 var(--num);justify-items:start;align-items:end;padding:12px 14px;border-bottom:var(--bw) solid var(--ink)}
 .subj .cv.has{font-size:0;padding:0}
 .subj .pic{background:var(--paper);color:var(--text);border:2.5px solid var(--ink);border-radius:6px;opacity:1;display:inline-grid;place-items:center}
 .subj .pic svg{width:20px;height:20px}
 .subj h3{font-size:17px;font-weight:900}
 .subj .acts{gap:6px}.subj .acts a{padding:0 11px;min-height:40px;font-size:13px}
-.subj .st b{font:400 24px/1 var(--num)}
+.subj .st b{font:700 24px/1 var(--num)}
 .row .xdel svg{width:18px;height:18px}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .subj .cv{color:#111}}
 :root[data-theme="dark"] .subj .cv{color:#111}
