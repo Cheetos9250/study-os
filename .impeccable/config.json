@@ -1,0 +1,89 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "assets/study-world.css"
+        ],
+        "createdAt": "2026-11-15T02:34:09.575Z",
+        "reason": "owner chose shoujo manga direction: cover focus lines are the signature screentone effect"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "assets/study-world.css"
+        ],
+        "createdAt": "2026-11-15T02:34:09.582Z",
+        "reason": "speech-bubble tail drawn as CSS border triangle, not an accent border"
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-15T02:34:17.225Z",
+        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "flashcards.html"
+        ],
+        "createdAt": "2026-11-15T02:34:17.232Z",
+        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "practice.html"
+        ],
+        "createdAt": "2026-11-15T02:34:17.239Z",
+        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "hub.html"
+        ],
+        "createdAt": "2026-11-15T02:34:17.245Z",
+        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "calendar.html"
+        ],
+        "createdAt": "2026-11-15T02:34:17.253Z",
+        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+      },
+      {
+        "rule": "repeating-stripes-gradient",
+        "value": "*",
+        "files": [
+          "grades.html"
+        ],
+        "createdAt": "2026-11-15T02:34:17.261Z",
+        "reason": "owner chose shoujo manga direction: focus lines from shared study-world.css cover are the signature"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-15T02:34:17.268Z",
+        "reason": "cover is an image area with an absolute button; Pomodoro tabs are a pill segmented control"
+      }
+    ]
+  }
+}

@@ -14,14 +14,14 @@ Redesign: the old Notion-pastel look (emoji icons, sparkle headings, pastel grad
 
 ## Direction contract
 
-THESIS: The semester is a Sports Day season (กีฬาสี). Each course is a team with its own colour, exams are fixtures, and today's numbers are posted on a scoreboard. Refuses the category default of a pastel Notion dashboard of equal emoji tiles.
+THESIS: Study OS is a shoujo manga page. Each screen is laid out as ink-framed panels, the next exam speaks from a speech bubble, and pink screentone marks what is "now". Refuses the category default of a pastel Notion dashboard of equal emoji tiles. Chosen by the owner from four rendered anime directions (retro 90s, shoujo, shounen, slice-of-life).
 
-OWN-WORLD: Scoreboard green (#0f3b2c family) owns the navigation rail and every "board" (scoreboard, game clock); numerals in a condensed sign face (Big Shoulders Display) in scoreboard yellow on the board. Cool chalk-white ground, white panels, near-black ink; dark theme is a night stadium (deep green-black ground). Team colours: Accounting blue, Economics orange, Math purple, English red, Chinese yellow, used as solid stripes, bands and tags. UI text in Bai Jamjuree (Thai-designed Latin+Thai family). Line icons, no emoji chrome, no gradients.
+OWN-WORLD: White paper and near-black ink (3px panel frames, square-ish 4px corners), pill buttons with ink outlines, black pill for the primary action and the active nav tab, hot pink (#d63369) for urgency and Start. Screentone dots (pink for focus/today, grey for secondary). Display and numerals in Kaisei Decol; UI in Zen Maru Gothic with Mali for Thai. Each course keeps one pastel tone (Accounting blue, Economics peach, Math lilac, English pink, Chinese lemon) on tags, pill tiles and subject covers. Dark theme = inverted page: ink-black paper, light ink lines, maroon tone. No drop shadows, no gradients except the cover's focus lines.
 
-STORY: Open Today, read the scoreboard (cards due, tasks, next fixture) in one glance, take the first plan item, start the game clock, then go to cards or practice. Every page shows the same teams in the same colours.
+STORY: Open Today, read three panels (cards due, tasks, the next exam in a bubble), tick the first plan item, start the timer, then go to cards or practice. Every page uses the same frames, pills and course tones.
 
-FIRST VIEWPORT: Green rail left (bottom bar on narrow screens). Owner's cover image (default: team-colour lane stripes) with icon and "Study" + date. Directly below, a full-width scoreboard board: three cells, label above, large yellow numerals, the next fixture cell widest and red-flagged when 3 days or fewer. Below it, Today: plan list (left, team tags, primary action per item) beside the game clock board (right).
+FIRST VIEWPORT: White rail with an ink edge (bottom bar on narrow screens). Owner's cover image (default: pink screentone with white focus lines) with round icon, "Study" in Kaisei Decol and the date. Below, a row of three manga panels: Cards due, Tasks (grey tone), and a wide pink panel holding a speech bubble "Next exam / title / N days!". Then Today: plan panel (left) beside the pink-toned timer panel with the time in a framed box (right).
 
-FORM: Scoreboard / colour sports day; own grounded candidate 7 of 7. seed:64d6548c4fa5ee25
+FORM: Shoujo manga page; re-roll 1 with the owner's anime steer, owner picked from four rendered options (not the dealt index). seed:64d6548c4fa5ee25
 
-SIGNATURE: The scoreboard strip, with the same board treatment reused for the Pomodoro game clock and team-colour stripes on every subject row across pages.
+SIGNATURE: The next exam spoken from a speech bubble, plus screentone marking "today/now" across pages (cover, timer, calendar today cell, today column).
