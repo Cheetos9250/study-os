@@ -115,13 +115,14 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 
 
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=3">
+<link rel="stylesheet" href="assets/study-world.css?v=4">
 <script src="scripts/study-theme.js?v=2"></script>
-<script src="scripts/study-accent.js?v=1"></script>
+<script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
 <div class="page">
 <h1>Calendar</h1>
+<section class="lead-panel" id="lead" aria-label="Next step"></section>
 <main>
 <section class="box" aria-label="Month" style="margin-top:20px">
  <div class="cal-head"><button type="button" id="calPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><h2 id="calTitle" aria-live="polite"></h2><button type="button" id="calToday">Today</button><button type="button" id="calNext" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
@@ -165,7 +166,7 @@ function itemsOn(iso){
   .concat(homeTasks().filter(t=>t.date===iso).map(t=>({k:t.done?'d':'t',text:t.title+(t.done?' (done)':'')})));
 }
 function renderCal(){
- $('#calTitle').textContent=MO[vm]+' '+vy;
+ $('#calTitle').textContent=(innerWidth<420?MO[vm].slice(0,3):MO[vm])+' '+vy;
  const startDow=new Date(Date.UTC(vy,vm,1)).getUTCDay(),dim=new Date(Date.UTC(vy,vm+1,0)).getUTCDate();
  let h=DOW.map(d=>'<div class="dow">'+d+'</div>').join('');
  for(let i=0;i<startDow;i++)h+='<div></div>';
@@ -235,7 +236,19 @@ function importTimetable(text){const m=String(text||'').trim().match(/#timetable
  settings.timetable=list;if(save())$('#ttStatus').textContent='Imported '+list.length+' classes.';return true;}
 if(/^#timetable=/.test(location.hash)){importTimetable(location.hash);history.replaceState(null,'',location.pathname+location.search);}
 $('#pasteClass').onclick=()=>{const v=prompt('Paste the timetable link');if(v===null)return;if(!importTimetable(v))$('#ttStatus').textContent='That is not a timetable link.';render();};
-function render(){const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id||d.dataset.cid);renderCal();renderWeek();renderExams();open.forEach(id=>{openExam(id);const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;});}
+function renderLead(){
+ const d=new Date(Date.now()+7*3600000),hm=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
+ const next=T.classesOn(settings.timetable,today).filter(x=>!x.skip&&x.end>hm)[0];
+ const ex=settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d)[0];
+ let say,sub,btn;
+ if(next){say=(next.start<=hm?'Now: ':'Next: ')+esc(next.name);sub=next.start+'–'+next.end+(next.code?' · '+esc(next.code):'');btn='<a class="go" href="#cal">See today</a>';}
+ else if(!settings.timetable.length){say='Add your timetable';sub='Then Today shows each class as it comes';btn='<button type="button" class="go" data-go="pasteClass">Import from link</button>';}
+ else if(ex){say=esc(ex.title)+(ex.d===0?' today':' in '+ex.d+(ex.d===1?' day':' days'));sub='No more classes today';btn='<a class="go" href="#examList">Exam schedule</a>';}
+ else{say='No more classes today';sub='Plan the week below';btn='<a class="go" href="#addExam">Add an exam</a>';}
+ $('#lead').innerHTML='<div class="bub"><b>'+say+'</b><span>'+sub+'</span></div>'+btn;
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-go]');if(b){const t=document.getElementById(b.dataset.go);if(t)t.click();}});
+function render(){renderLead();const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id||d.dataset.cid);renderCal();renderWeek();renderExams();open.forEach(id=>{openExam(id);const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;});}
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){settings=T.loadSettings(read(T.SETTINGS_KEY));render();}});

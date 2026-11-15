@@ -90,7 +90,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .show-done{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;color:var(--muted);margin-left:auto}
 
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=3">
+<link rel="stylesheet" href="assets/study-world.css?v=4">
 <style>
 /* Today: ink manga panels, speech bubble, hatched timer (after study-world.css) */
 .cover{height:clamp(170px,26vw,280px)}
@@ -104,14 +104,16 @@ a.sb:hover{background:var(--dots),var(--panel)}
 .sb .n{font:700 clamp(46px,6vw,62px)/1.05 var(--num);color:var(--text);font-variant-numeric:tabular-nums}
 .sb .l{font:900 14px/1.2 var(--ui);color:var(--text)}
 .sb .s{font:500 13px/1.35 var(--ui);color:var(--muted);margin-top:auto}
-.sb.alert .n{color:var(--acc)}
+.sb.alert .n{color:var(--acc-t)}
 .sb.next{background:var(--hatch),var(--panel);padding:12px 14px 14px;justify-content:space-between}
 .sb.next .bub{padding:10px 24px 12px;max-width:520px}
 .sb.next .bub .fx{display:block;font:900 16px/1.3 var(--ui)}
-.sb.next .bub .n{display:block;font-size:clamp(32px,4vw,42px);color:var(--acc)}
+.sb.next .bub .n{display:block;font-size:clamp(32px,4vw,42px);color:var(--acc-t)}
 .sb.next .bub .n small{font:900 16px var(--ui);color:var(--text);margin-left:6px}
-.sb.next .s{padding-left:70px;color:var(--text);font-weight:900}
-.top{align-items:stretch}
+.sb.next .s{align-self:flex-end;color:var(--text);font-weight:900;margin-top:6px}
+.top{align-items:start}
+.avatar .mark{width:64px;height:64px;color:var(--text)}.avatar.img .mark{display:none}
+.sb:nth-child(2) .s,.sb:nth-child(2) .l,.sb.next .s{background:var(--panel);width:fit-content;padding:0 4px}
 .pomo{color:var(--text);border:var(--bw) solid var(--ink);border-radius:var(--r);min-height:250px;gap:14px;padding:20px 18px;background:var(--hatch),var(--panel)}
 .pomo .tabs{display:inline-flex;gap:0;padding:0;border:2.5px solid var(--ink);border-radius:6px;background:var(--panel);flex-wrap:nowrap;overflow:hidden}
 .pomo .tab{border:0;border-radius:0;color:var(--text);font:900 13px var(--ui);padding:0 12px;min-height:40px;background:none}
@@ -139,8 +141,10 @@ a.sb:hover{background:var(--dots),var(--panel)}
 @media(min-width:1100px){.subjects{grid-template-columns:repeat(5,minmax(0,1fr))}.subjects .subj,.subjects .subj:nth-child(n+4){grid-column:auto}}
 @media(max-width:560px){.subjects{grid-template-columns:1fr}.subjects .subj,.subjects .subj:nth-child(n+4){grid-column:auto}}
 .subj{overflow:hidden}
-.subj .cv{height:clamp(104px,12vw,140px);background:var(--hatch-ink),var(--team);color:#111;font:700 34px/1 var(--num);justify-items:start;align-items:end;padding:12px 14px;border-bottom:var(--bw) solid var(--ink)}
+.subj .cv{height:clamp(104px,12vw,140px);background:linear-gradient(var(--team),var(--team)) 0 0/100% 10px no-repeat,repeating-linear-gradient(-45deg,var(--team) 0 2.2px,transparent 2.2px 8px),var(--panel);color:var(--text);font:700 34px/1 var(--num);justify-items:start;align-items:end;padding:12px 14px;border-bottom:var(--bw) solid var(--ink)}
 .subj .cv.has{font-size:0;padding:0}
+.subj .cv .mono{background:var(--panel);padding:2px 8px 0;border:2.5px solid var(--ink);border-bottom:0;line-height:1}
+.subj .lk{display:inline-flex;align-items:center;min-height:42px;font:900 14px var(--ui);color:var(--link);text-decoration:none;margin-left:4px}
 .subj .pic{background:var(--paper);color:var(--text);border:2.5px solid var(--ink);border-radius:6px;opacity:1;display:inline-grid;place-items:center}
 .subj .pic svg{width:20px;height:20px}
 .subj h3{font-size:17px;font-weight:900}
@@ -162,7 +166,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 @media(max-width:420px){.sb{padding:12px 14px 14px;min-height:110px}}
 </style>
 <script src="scripts/study-theme.js?v=2"></script>
-<script src="scripts/study-accent.js?v=1"></script>
+<script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
 <div class="cover" id="cover" role="img" aria-label="Cover">
@@ -170,7 +174,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 </div>
 <div class="page">
 <header class="head">
- <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon">🎓</button>
+ <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 24 32 12l28 12-28 12z" fill="var(--panel)" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M16 30v12c0 4 7 9 16 9s16-5 16-9V30" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M54 27v15" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M50 46l4-5 4 5-4 5z" fill="currentColor"/><path d="M20 40l4 4M26 43l4 3M34 43l4-2M40 41l4-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
  <div><h1 id="welcome-title">Study</h1><p class="date" id="today">Study OS</p></div>
 </header>
 <div class="chips scoreboard" id="chips" aria-label="Scoreboard"></div>
@@ -340,10 +344,10 @@ function renderSubjects(){
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key],ne=upcoming().find(e=>e.course===c.key);
   const pct=s&&s.total?Math.round(s.seen/s.total*100):0;
-  return '<article class="subj s-'+c.key+' t-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true">'+esc(c.full)+'</div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">'+DOTS+'</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam '+(ne.d===0?'today':ne.d===1?'tomorrow':'in '+ne.d+' days'):'&nbsp;')+'</p>'
+  return '<article class="subj s-'+c.key+' t-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true"><span class="mono">'+esc(c.full)+'</span></div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">'+DOTS+'</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam '+(ne.d===0?'today':ne.d===1?'tomorrow':'in '+ne.d+' days'):'&nbsp;')+'</p>'
    +(s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
-   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a><a href="hub.html#'+c.key+'">Lessons</a></div></div></article>';});
- const lang=(l,cv,_flag,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+' t-'+l.key+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true">'+(l.key==='eng'?'EN':'ZH')+'</div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">'+DOTS+'</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary · WordNest</p>'
+   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a></div><a class="lk" href="hub.html#'+c.key+'">Lessons →</a></div></article>';});
+ const lang=(l,cv,_flag,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+' t-'+l.key+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true"><span class="mono">'+(l.key==='eng'?'EN':'ZH')+'</span></div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">'+DOTS+'</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary · WordNest</p>'
   +(ls?'<div class="st"><div><b>'+ls.reviewNow+'</b>due</div><div><b>'+ls.newToday+'</b>new</div></div>':'')+'<div class="acts">'+acts+'</div></div></article>';};
  cards.push(lang(T.LANGS[0],'voc','🇬🇧','<a class="main" href="'+T.LANGS[0].app+'">WordNest</a>'));
  cards.push(lang(T.LANGS[1],'zh','🇨🇳','<a class="main" href="'+T.LANGS[1].app+'">WordNest</a>'));

@@ -9,9 +9,15 @@
  function rgb(h,s,l){s/=100;l/=100;var k=function(n){return (n+h/30)%12;},a=s*Math.min(l,1-l),f=function(n){return l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));};return [f(0),f(8),f(4)];}
  function lum(c){c=c.map(function(v){return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);});return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];}
  /* Lightness that keeps white text on the accent at 4.5:1 (light theme) and near-black text at 6:1 (dark theme). */
- function shades(h,s){var l=50;while(l>18&&(1.05)/(lum(rgb(h,s,l))+0.05)<4.6)l--;var d=55;while(d<88&&(lum(rgb(h,s,d))+0.05)/(0.0065+0.05)<6.5)d++;return {l:l,d:d};}
- var PROPS=['--ah','--as','--al','--ad'];
- function apply(h,s){if(h==null){PROPS.forEach(function(p){root.style.removeProperty(p);});return;}var t=shades(h,s);root.style.setProperty('--ah',String(Math.round(h)));root.style.setProperty('--as',Math.round(s)+'%');root.style.setProperty('--al',t.l+'%');root.style.setProperty('--ad',t.d+'%');}
+ function shades(h,s){var l=50;while(l>18&&(1.05)/(lum(rgb(h,s,l))+0.05)<4.6)l--;var ink='#fff';
+  /* warm and light hues would turn brown under white text: keep them bright and print dark ink on them instead */
+  if(l<42){ink='#111';l=54;while(l<80&&(lum(rgb(h,s,l))+0.05)/(0.0056+0.05)<4.8)l++;}
+  var d=55;while(d<88&&(lum(rgb(h,s,d))+0.05)/(0.0065+0.05)<6.5)d++;
+  /* accent used as text on white stays readable as large text (3:1) */
+  var t=l;while(t>18&&(1.05)/(lum(rgb(h,s,t))+0.05)<3.2)t--;
+  return {l:l,d:d,ink:ink,t:t};}
+ var PROPS=['--ah','--as','--al','--ad','--acc-ink-l','--acc-text'];
+ function apply(h,s){if(h==null){PROPS.forEach(function(p){root.style.removeProperty(p);});return;}var t=shades(h,s);root.style.setProperty('--ah',String(Math.round(h)));root.style.setProperty('--as',Math.round(s)+'%');root.style.setProperty('--al',t.l+'%');root.style.setProperty('--ad',t.d+'%');root.style.setProperty('--acc-ink-l',t.ink);root.style.setProperty('--acc-text','hsl('+Math.round(h)+' '+Math.round(s)+'% '+t.t+'%)');}
  function cover(){try{var v=JSON.parse(localStorage.getItem('studyos.home.v1')||'{}');return v&&typeof v.cover==='string'?v.cover:'';}catch(e){return '';}}
  function key(src){var n=src.length,h=0;for(var i=0;i<n;i+=Math.max(1,Math.floor(n/512)))h=(h*31+src.charCodeAt(i))|0;return n+':'+h;}
  function readCache(){try{return JSON.parse(sessionStorage.getItem(CACHE)||'null');}catch(e){return null;}}

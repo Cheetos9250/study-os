@@ -98,9 +98,9 @@ h1{margin:8px 0 0}
 .small{font-size:12px;color:var(--muted);margin:8px 0 0}
 
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=3">
+<link rel="stylesheet" href="assets/study-world.css?v=4">
 <script src="scripts/study-theme.js?v=2"></script>
-<script src="scripts/study-accent.js?v=1"></script>
+<script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
 <div class="page">
@@ -113,8 +113,8 @@ h1{margin:8px 0 0}
 <section class="box" id="weak" aria-label="Weak chapters"><p class="empty">Loading…</p></section>
 <h2>More practice</h2>
 <section class="grid" aria-label="More practice">
- <div class="pc"><h3><span class="jersey sm t-eng" aria-hidden="true">EN</span>English games · WordNest</h3><div class="acts"><a class="main" href="vocabloom/?lang=en">Play</a></div></div>
- <div class="pc"><h3><span class="jersey sm t-acc" aria-hidden="true">ACC</span>Accounting Textbook Exercises</h3><p class="small">403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</p><div class="acts"><a class="main" href="accounting-textbook.html">Open</a></div></div>
+ <div class="pc strip"><h3><span class="jersey sm t-eng" aria-hidden="true">EN</span>English games · WordNest</h3><div class="acts"><a class="main" href="vocabloom/?lang=en">Play</a></div></div>
+ <div class="pc strip"><h3><span class="jersey sm t-acc" aria-hidden="true">ACC</span>Accounting Textbook Exercises</h3><p class="small">403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</p><div class="acts"><a class="main" href="accounting-textbook.html">Open</a></div></div>
 </section>
 </main>
 </div>
@@ -135,15 +135,16 @@ function lead(say,sub,href,label){const el=$('#lead');if(!say){el.hidden=true;re
 function render(){
  const now=Date.now(),sum={};
  for(const c of T.COURSES)if(data[c.key])sum[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);
+ const ne0=nextExam(now),wideKey=ne0?ne0.course:'';
  $('#courses').innerHTML=T.COURSES.map(c=>{const s=sum[c.key];let q=0,a=0,r=0;if(s)for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}
-  return '<div class="pc"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
+  return '<div class="pc'+(c.key===wideKey?' wide':'')+'"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
    +'<div class="acts"><a class="main" href="'+link(c,'prac')+'">Start quiz</a></div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;
  const ne=nextExam(now),nc=ne&&T.COURSES.find(x=>x.key===ne.course),wk=(nc&&weak.find(w=>w.course===nc.key))||weak[0];
- if(wk&&(!nc||wk.course===nc.key)){const c=T.COURSES.find(x=>x.key===wk.course);lead(esc(wk.label)+': '+Math.round(wk.acc*100)+'% correct',(ne&&nc&&nc.key===c.key?'Practise before '+esc(ne.title)+' ('+inDays(ne.d)+')':'Your weakest chapter in '+esc(c.name)),link(c,'prac',wk.cat),'Practise '+c.name);}
- else if(nc)lead(esc(ne.title)+' '+inDays(ne.d),'Warm up with a '+esc(nc.name)+' quiz',link(nc,'prac'),'Start '+nc.name+' quiz');
- else lead('Pick up where you left off','Start an '+esc(T.COURSES[0].name)+' quiz',link(T.COURSES[0],'prac'),'Start quiz');
+ if(wk&&(!nc||wk.course===nc.key)){const c=T.COURSES.find(x=>x.key===wk.course);lead('Fix '+esc(wk.label),Math.round(wk.acc*100)+'% correct so far'+(ne&&nc&&nc.key===c.key?' · '+esc(ne.title)+' '+inDays(ne.d):''),link(c,'prac',wk.cat),'Practise '+c.name);}
+ else if(nc)lead('Warm up: '+esc(nc.name)+' quiz',esc(ne.title)+' '+inDays(ne.d),link(nc,'prac'),'Start '+nc.name+' quiz');
+ else lead('Take a '+esc(T.COURSES[0].name)+' quiz','Pick up where you left off',link(T.COURSES[0],'prac'),'Start quiz');
  $('#weak').innerHTML=weak.length?'<ul class="weak">'+weak.map(w=>{const c=T.COURSES.find(x=>x.key===w.course),D=data[w.course],cat=[w.cat];
   return '<li><span><b>'+esc(w.courseName)+'</b> · '+esc(w.label)+' <span class="badge">'+Math.round(w.acc*100)+'%</span></span><span class="acts"><a class="main" href="'+link(c,'prac',cat?cat[0]:'')+'">Practice</a></span></li>';}).join('')+'</ul>'
   :'<p class="empty">No weak chapters yet.</p>';

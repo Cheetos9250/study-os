@@ -134,14 +134,15 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 .x{border:0;background:none;color:var(--muted);font-size:16px;min-width:40px;min-height:40px;cursor:pointer}
 .hint{font-size:12px;color:var(--muted);margin:6px 0 0}
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=3">
+<link rel="stylesheet" href="assets/study-world.css?v=4">
 <script src="scripts/study-theme.js?v=2"></script>
-<script src="scripts/study-accent.js?v=1"></script>
+<script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
 <div class="page">
 <h1>Grades</h1>
-<div class="gpa" id="gpa"></div>
+<section class="lead-panel" id="lead" aria-label="Next step"></section>
+<div class="gpa" id="gpa" style="margin-top:18px"></div>
 <main>
 <div id="courses"></div>
 <div class="btns"><button type="button" class="add" id="addCourse">+ Add course</button><button type="button" class="add" id="pasteGrades">Import from link</button></div>
@@ -168,13 +169,19 @@ function render(){
    +'</tbody></table>'
    +'<div class="res-more"></div>'
    +'<div class="row-btns"><button type="button" class="mini" data-add-item>+ Item</button><button type="button" class="mini" data-edit>Name / credits</button><button type="button" class="mini danger" data-del-course>Delete course</button></div></section>';}).join('')
-  :'<div class="box empty-panel"><p><b>No courses yet.</b> Add a course, then enter each graded item and its weight. Or import the grades link you were given.</p><div class="btns"><button type="button" class="add primary" data-empty-add>+ Add course</button><button type="button" class="add" data-empty-import>Import from link</button></div></div>';
- $('#addCourse').parentElement.hidden=!st.courses.length;
- paint();
+  :'';
+  paint();
 }
 /* Results only: inputs are never rebuilt while typing, so focus and the iPad keyboard stay put. */
 function paint(){
  const sum=G.gpa(st.courses);
+ {let say,sub,btn;
+  if(!st.courses.length){say='Add your first course';sub='Then enter each graded item and its weight, or import your grades link';btn='<button type="button" class="go" data-empty-add>+ Add course</button>';}
+  else{let best=null;for(const c of st.courses){const r=G.result(c);if(r.remaining>0){const n=r.needs.find(x=>x.need>0&&x.need<=100);if(n&&(!best||n.need>best.n.need))best={c,n};}}
+   if(best){say=esc(best.c.name)+': '+fmt(best.n.need)+'% on the rest';sub='for '+(/^[AEF]/.test(best.n.letter)?'an ':'a ')+esc(best.n.letter);}
+   else{say=sum.credits?'Estimated GPA '+sum.gpa.toFixed(2):'Enter your scores';sub=sum.credits?'Across '+sum.credits+' credits':'Fill in each graded item as you get it back';}
+   btn='<button type="button" class="go" data-empty-add>+ Add course</button>';}
+  $('#lead').innerHTML='<div class="bub"><b>'+say+'</b><span>'+sub+'</span></div>'+btn;}
  $('#gpa').innerHTML='<div class="chip"><b>'+(sum.credits?sum.gpa.toFixed(2):'–')+'</b><span>estimated GPA</span></div><div class="chip"><b>'+sum.credits+'</b><span>credits counted</span></div>';
  for(const c of st.courses){const el=document.querySelector('.course[data-id="'+CSS.escape(c.id)+'"]');if(!el)continue;const r=G.result(c);
   el.querySelector('.res-score').innerHTML='<span class="big">'+fmt(r.earned)+'<small style="font-size:13px;color:var(--muted)"> / '+fmt(r.doneWeight)+' pts</small></span> '+(r.letter?'<span class="letter">'+r.letter+'</span>':'');
