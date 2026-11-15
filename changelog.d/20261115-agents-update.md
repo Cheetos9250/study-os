@@ -1,0 +1,1 @@
+- AGENTS.md: open items updated (English UI done, notes key, #68 decision pending).
