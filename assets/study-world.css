@@ -49,8 +49,8 @@
 
 /* ---------- line-art textures ---------- */
 :root{
- --hatch:repeating-linear-gradient(-45deg,var(--acc) 0 1.1px,transparent 1.1px 7px);
- --hatch-ink:repeating-linear-gradient(-45deg,var(--halftone) 0 1.2px,transparent 1.2px 6px);
+ --hatch:repeating-linear-gradient(-45deg,var(--acc) 0 1.5px,transparent 1.5px 8px);
+ --hatch-ink:repeating-linear-gradient(-45deg,var(--halftone) 0 1.5px,transparent 1.5px 8px);
  --dots:radial-gradient(circle,var(--halftone) 1.2px,transparent 1.6px) 0 0/7px 7px;
 }
 .now-tone{background:var(--hatch),var(--panel)}
@@ -99,12 +99,14 @@ h2 .sec-link,h2 small,h2 a{order:2}
 
 /* inner pages: one wide "now" panel, the rest narrower (manga page rhythm) */
 .grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px}
-.grid>.wide,.grid3>.wide{grid-column:span 2;background:var(--hatch),var(--panel)}
-.grid>.wide h3,.grid>.wide .big,.grid>.wide .small,.grid3>.wide h3,.grid3>.wide .full,.grid3>.wide .nums{background:var(--panel);width:fit-content;padding:0 4px}
-.grid>.strip{grid-column:span 2}
+/* text stays on clean paper; the hatch fills the right third of the wide panel */
+.grid>.wide,.grid3>.wide{grid-column:span 2;background:linear-gradient(90deg,var(--panel) 0 60%,var(--ink) 60% calc(60% + 3px),transparent calc(60% + 3px)),var(--hatch),var(--panel)}
+.grid>.wide>*,.grid3>.wide>*{max-width:56%}
+.grid>.strip,.grid3>.strip{grid-column:span 2}
+.grid[aria-label="More practice"]{align-items:start}
 .grid3{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 @media(max-width:700px){.grid,.grid3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-@media(max-width:480px){.grid,.grid3{grid-template-columns:1fr!important}.grid>.wide,.grid3>.wide,.grid>.strip{grid-column:auto}}
+@media(max-width:480px){.grid,.grid3{grid-template-columns:1fr!important}.grid>.wide,.grid3>.wide,.grid>.strip,.grid3>.strip{grid-column:auto}}
 
 /* ---------- controls ---------- */
 .acts a,.btns button,.add,.mini,.toolbar select,.toolbar input,.toolbar button,.cal-head button,button.notebtn{border-radius:var(--r-s);border:2.5px solid var(--ink);background:var(--panel);color:var(--text);font-family:var(--ui);font-weight:700}

@@ -134,7 +134,7 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 .x{border:0;background:none;color:var(--muted);font-size:16px;min-width:40px;min-height:40px;cursor:pointer}
 .hint{font-size:12px;color:var(--muted);margin:6px 0 0}
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=4">
+<link rel="stylesheet" href="assets/study-world.css?v=5">
 <script src="scripts/study-theme.js?v=2"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
@@ -181,7 +181,7 @@ function paint(){
    if(best){say=esc(best.c.name)+': '+fmt(best.n.need)+'% on the rest';sub='for '+(/^[AEF]/.test(best.n.letter)?'an ':'a ')+esc(best.n.letter);}
    else{say=sum.credits?'Estimated GPA '+sum.gpa.toFixed(2):'Enter your scores';sub=sum.credits?'Across '+sum.credits+' credits':'Fill in each graded item as you get it back';}
    btn='<button type="button" class="go" data-empty-add>+ Add course</button>';}
-  $('#lead').innerHTML='<div class="bub"><b>'+say+'</b><span>'+sub+'</span></div>'+btn;}
+  $('#lead').innerHTML='<div class="bub"><b>'+say+'</b><span>'+sub+'</span></div>'+btn;$('#addCourse').hidden=!st.courses.length;}
  $('#gpa').innerHTML='<div class="chip"><b>'+(sum.credits?sum.gpa.toFixed(2):'–')+'</b><span>estimated GPA</span></div><div class="chip"><b>'+sum.credits+'</b><span>credits counted</span></div>';
  for(const c of st.courses){const el=document.querySelector('.course[data-id="'+CSS.escape(c.id)+'"]');if(!el)continue;const r=G.result(c);
   el.querySelector('.res-score').innerHTML='<span class="big">'+fmt(r.earned)+'<small style="font-size:13px;color:var(--muted)"> / '+fmt(r.doneWeight)+' pts</small></span> '+(r.letter?'<span class="letter">'+r.letter+'</span>':'');

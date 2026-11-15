@@ -84,7 +84,7 @@ button.danger{color:var(--red)}
 .notebox textarea:focus{outline:2px solid var(--purple);outline-offset:1px}
 .notemeta{font-size:12px;color:var(--muted);margin:4px 0 0;min-height:16px}
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=4">
+<link rel="stylesheet" href="assets/study-world.css?v=5">
 <script src="scripts/study-theme.js?v=2"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
@@ -127,8 +127,8 @@ function subjects(now){
   const pct=s.total?Math.round(s.seen/s.total*100):0,chapters=Object.keys(s.per).length;
   return '<a class="card subj t-'+c.key+(c.key===wideKey?' wide':'')+'" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3><span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="'+(s.reviewNow?'due':'')+'"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Lessons →</span></a>';
  });
- cards.push('<a class="card subj t-eng" href="vocabloom/index.html?lang=en"><h3><span class="jersey sm" aria-hidden="true">EN</span>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
- cards.push('<a class="card subj t-zh" href="vocabloom/index.html?lang=zh"><h3><span class="jersey sm" aria-hidden="true">ZH</span>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj strip t-eng" href="vocabloom/index.html?lang=en"><h3><span class="jersey sm" aria-hidden="true">EN</span>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj strip t-zh" href="vocabloom/index.html?lang=zh"><h3><span class="jersey sm" aria-hidden="true">ZH</span>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
  $('#view').className='grid3';$('#view').innerHTML=cards.join('');
 }
 function chapters(c,now){
