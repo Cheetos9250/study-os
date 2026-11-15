@@ -68,7 +68,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;fl
  .jump-bar{display:none}
 }
 </style>
-<script src="scripts/study-theme.js?v=2"></script>
+<script src="scripts/study-theme.js?v=3"></script>
 </head>
 <body>
 <div class="shell">
@@ -164,6 +164,6 @@ $('export').addEventListener('click',exportProgress);$('import').addEventListene
 $('forgetPdf').addEventListener('click',async()=>{if(!confirm('Remove the stored textbook PDF from this browser? Your answers will remain saved.'))return;try{await bookDelete();if(pdfDoc)await pdfDoc.destroy();pdfDoc=null;sourceBlob=null;pageCache.clear();setPdfState('PDF needed',false);$('fileHint').textContent='Choose PDF again to read questions; your answers are still saved.';paint();}catch(e){error('Could not remove stored PDF: '+e.message);}});
 (async()=>{try{const [c,g]=await Promise.all([fetch('data/accounting-textbook-index.json',{cache:'no-cache'}),fetch('data/accounting-textbook-geometry.json',{cache:'no-cache'})]);if(!c.ok||!g.ok)throw new Error('Question data could not be loaded.');catalog=await c.json();geometry=await g.json();if(!Array.isArray(catalog.items)||!Array.isArray(catalog.chapters)||!geometry.items)throw new Error('Question data format is invalid');records=catalog.items.filter(x=>!x.sectionOnly&&/^[1-9]$/.test(String(x.chapter)));options();syncCounts();let resumeId='';try{resumeId=localStorage.getItem(LAST_KEY)||'';}catch{}const link=new URLSearchParams(location.search),linkQ=records.find(x=>x.id===link.get('q')),linkCh=/^[1-9]$/.test(link.get('ch')||'')?link.get('ch'):'',linkType=['Quick Study','Exercise','Problem A','Problem B'].includes(link.get('type'))?link.get('type'):'';const resumed=records.find(x=>x.id===resumeId);const saved=linkQ||(linkCh?null:resumed);if(saved){$('chapter').value=saved.chapter;openQuestion(saved.id);}else{if(linkCh){$('chapter').value=linkCh;if(linkType)$('kind').value=linkType;}filteredChanged();}restoring=true;setPdfState('กำลังเปิดตำรา…',false);paint();try{const f=await bookGet();if(f)await loadPdf(f,false);else setPdfState('PDF needed',false);}catch(e){setPdfState('PDF needed',false);error('Saved PDF could not be restored. Choose your PDF again.');}finally{restoring=false;paint();} }catch(e){error(e.message||'Could not start this course');$('questionTitle').textContent='Course unavailable';}})();
 </script>
-<script src="scripts/study-nav.js?v=1"></script>
+<script src="scripts/study-nav.js?v=2"></script>
 </body>
 </html>

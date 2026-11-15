@@ -52,8 +52,8 @@
  +'#studyNav .sn-more{display:none}'
  +'@media(min-width:900px){'
  +' html.sn-on body{padding-left:224px!important}'
- +' #studyNav{left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
- +' #studyNav .sn-brand{font:700 25px/1 "Kaisei Decol",serif;padding:4px 12px 22px;min-height:0}'
+ +' #studyNav{left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
+ +' #studyNav .sn-brand{font:700 25px/1 "Kaisei Decol",serif;padding:4px 12px 22px;min-height:0;margin-right:46px}'
  +' #studyNav .sn-brand b{color:var(--sn-on);font-weight:700;margin-left:.25em}'
  /* Safari rubber-band scrolling moves fixed elements; extend the sidebar colour above and below so no gap shows */
  +' #studyNav::before,#studyNav::after{content:"";position:absolute;left:0;right:-1px;height:100vh;background:var(--sn-bg);border-right:3px solid var(--sn-line);pointer-events:none}'
@@ -63,13 +63,15 @@
  +' #studyNav .sn-foot{margin-top:auto;display:grid;gap:2px;border-top:2px solid var(--sn-line);padding-top:12px}'
  +' #studyNav .sn-foot a,#studyNav .sn-foot button{padding:0 12px;font-size:14px;color:var(--sn-mute);width:100%;text-align:left}'
  +' #studyNav .sn-foot a:hover,#studyNav .sn-foot button:hover{background:var(--sn-hi);color:var(--sn-fg)}'
- +' #studyNav .sn-fold{display:flex;padding:0 12px;font-size:14px;color:var(--sn-mute);width:100%;text-align:left}'
+ +' #studyNav .sn-fold{position:absolute;top:max(14px,env(safe-area-inset-top));right:10px;display:flex;justify-content:center;width:40px;min-height:40px;padding:0;color:var(--sn-mute);border:2px solid var(--sn-line)!important;border-radius:6px}'
+ +' #studyNav .sn-fold span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'
  +' #studyNav .sn-fold:hover{background:var(--sn-hi);color:var(--sn-fg)}'
  +' html.sn-on.sn-collapsed body{padding-left:76px!important}'
  +' html.sn-collapsed #studyNav{width:76px;padding-left:max(10px,env(safe-area-inset-left));padding-right:10px}'
- +' html.sn-collapsed #studyNav .sn-brand{padding:4px 0 22px;justify-content:center}'
+ +' html.sn-collapsed #studyNav .sn-brand{padding:4px 0 10px;justify-content:center;margin-right:0}'
+ +' html.sn-collapsed #studyNav .sn-fold{position:static;margin:0 auto 14px}'
  +' html.sn-collapsed #studyNav .sn-brand .sn-bt{display:none}html.sn-collapsed #studyNav .sn-brand b{margin:0}'
- +' html.sn-collapsed #studyNav .sn-tab,html.sn-collapsed #studyNav .sn-foot a,html.sn-collapsed #studyNav .sn-foot button,html.sn-collapsed #studyNav .sn-fold{justify-content:center;padding:0}'
+ +' html.sn-collapsed #studyNav .sn-tab,html.sn-collapsed #studyNav .sn-foot a,html.sn-collapsed #studyNav .sn-foot button{justify-content:center;padding:0}'
  +' html.sn-collapsed #studyNav .sn-tab span,html.sn-collapsed #studyNav .sn-foot span,html.sn-collapsed #studyNav .sn-fold span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'
  +'}'
  +'@media(max-width:899.98px){'
@@ -93,12 +95,12 @@
   if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap';document.head.appendChild(fl);}
   var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);
   var nav=document.createElement('nav');nav.id='studyNav';nav.setAttribute('aria-label','Main');
-  var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><div class="sn-tabs">';
+  var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><button type="button" class="sn-fold" aria-pressed="false"></button><div class="sn-tabs">';
   TABS.forEach(function(t){h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+' title="'+esc(t.label)+'">'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
   h+='<button type="button" class="sn-more" aria-expanded="false" aria-controls="snFoot">'+svg('more')+'<span>More</span></button></div>';
   h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(course?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
   MORE.forEach(function(m){h+='<a href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
-  h+='<button type="button" class="sn-fold" aria-pressed="false"></button></div>';
+  h+='</div>';
   nav.innerHTML=h;document.body.appendChild(nav);document.documentElement.classList.add('sn-on');
   var more=nav.querySelector('.sn-more');
   more.onclick=function(e){e.stopPropagation();var o=nav.classList.toggle('sn-open');more.setAttribute('aria-expanded',o?'true':'false');};

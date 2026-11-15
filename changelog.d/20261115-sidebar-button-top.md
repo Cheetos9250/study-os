@@ -1,0 +1,1 @@
+- Sidebar: the Collapse/Expand button now sits at the top, next to "Study OS", so Safari's toolbar can no longer hide it. The sidebar is never taller than the visible screen, so Grades, Back up and Restore stay reachable. Shared scripts are cache-busted (`study-nav.js?v=2`, `study-theme.js?v=3`) so iPads load the new menu.
