@@ -2,8 +2,10 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..');
 const pages=['index','hub','practice','calendar','progress-backup','progress-restore','accounting-textbook','acc','eco','math','eng','zh'];
 for(const f of pages)test(f+'.html supports manual light/dark and loads the theme script',()=>{
- const s=fs.readFileSync(path.join(root,f+'.html'),'utf8');
+ let s=fs.readFileSync(path.join(root,f+'.html'),'utf8');
  assert.match(s,/scripts\/study-theme\.js/);
+ // Core pages take their theme tokens from the shared stylesheet they link.
+ if(/assets\/study-world\.css/.test(s))s+=fs.readFileSync(path.join(root,'assets/study-world.css'),'utf8');
  assert.match(s,/:root:not\(\[data-theme="light"\]\)/);
  assert.match(s,/:root\[data-theme="dark"\]/);
 });

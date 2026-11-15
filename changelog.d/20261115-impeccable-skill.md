@@ -1,0 +1,1 @@
+- Tooling: installed the Impeccable UI/UX skill for Claude Code (`.claude/skills/impeccable`, five `impeccable-*` subagents, design hook in `.claude/settings.json`). Upstream v4.9.1, engine 0.1.24. The engine binary is not committed; the launcher downloads and checksum-verifies it on first run. No site changes.
