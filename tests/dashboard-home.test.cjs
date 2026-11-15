@@ -33,7 +33,9 @@ test('removed sections stay removed (no Quick Launch, no start/end checklists)',
 });
 test('home writes only its own key and the shared Today settings key',()=>{
  const writes=[...html.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]).sort();
- assert.deepEqual(writes,['KEY','T.SETTINGS_KEY']);
+ assert.deepEqual(writes,['BK_META','KEY','T.SETTINGS_KEY']);
+ assert.match(html,/BK_META='studyos\.backup-meta\.v1'/);
+ assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.backup-meta.v1'));
  assert.match(html,/KEY='studyos\.home\.v1'/);
  assert.doesNotMatch(html,/study-sync-key|\.removeItem|\.clear\(|method:\s*['"]PUT|method:\s*['"]POST/);
  assert.doesNotMatch(html,/<img[^>]+src="https?:/i);

@@ -375,11 +375,12 @@ function renderClasses(){
   :'<span class="cls"><span>No classes today</span></span>';
 }
 /* ---------- backup reminder: iPadOS can clear website data (in-app browsers, 7 days unused in Safari) ---------- */
+const BK_META='studyos.backup-meta.v1';
 function renderBackupNudge(){
  const el=$('#backupNudge');if(!el)return;
  let snooze='';try{snooze=sessionStorage.getItem('studyos.backup-snooze')||'';}catch{}
  const has=T.COURSES.concat(T.LANGS).some(c=>read(c.mark+'-srs')||read('study-'+c.key))||st.tasks.length||settings.timetable.length;
- let last=null;try{const m=JSON.parse(read('studyos.backup-meta.v1')||'null');if(m&&typeof m.last==='string')last=Date.parse(m.last);}catch{}
+ let last=null;try{const m=JSON.parse(read(BK_META)||'null');if(m&&typeof m.last==='string')last=Date.parse(m.last);}catch{}
  const days=last?Math.floor((Date.now()-last)/864e5):null;
  if(!has||snooze===today||(days!==null&&days<3)){el.hidden=true;return;}
  const app=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
@@ -387,6 +388,8 @@ function renderBackupNudge(){
  el.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/></svg>'
   +'<p><b>'+(days===null?'Your progress has no backup yet':'Last backup '+days+' days ago')+'</b>Answers live only in this browser, which can clear them'+(app?'.':' (in-app browsers, or 7 days unused). The Home Screen app keeps them safer.')+'</p>'
   +'<div class="acts"><a class="main" href="progress-backup.html">Back up now</a><a href="#" id="bkLater">Later</a></div>';
+ /* the backup page stays read-only (CI guard), so Today notes the time when Back up now is tapped */
+ el.querySelector('a.main').onclick=()=>{try{localStorage.setItem(BK_META,JSON.stringify({last:new Date().toISOString(),from:'today'}));}catch{}};
  $('#bkLater').onclick=e=>{e.preventDefault();try{sessionStorage.setItem('studyos.backup-snooze',today);}catch{}el.hidden=true;};
 }
 function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}

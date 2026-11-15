@@ -1,7 +1,8 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
-test('backup page records when the last backup file was made',()=>{
- assert.match(read('progress-backup.html'),/localStorage\.setItem\("studyos\.backup-meta\.v1", JSON\.stringify\(\{ last: new Date\(\)\.toISOString\(\)/);
+test('backup page stays read-only; Today records when Back up now is tapped',()=>{
+ assert.doesNotMatch(read('progress-backup.html'),/localStorage\.(?:setItem|removeItem)/);
+ assert.match(read('index.html'),/a\.main'\)\.onclick=\(\)=>\{try\{localStorage\.setItem\(BK_META/);
  assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.backup-meta.v1'),'reminder setting is not study data');
 });
 test('Today shows a backup reminder after 3 days without a backup, only when there is progress',()=>{
