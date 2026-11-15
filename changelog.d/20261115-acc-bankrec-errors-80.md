@@ -1,0 +1,1 @@
+- Accounting practice: 80 more bank reconciliation error questions (`err-b21`–`err-b100`): book errors (transpositions, slides), bank errors, correcting entries, adjusted bank/book balances. Bank rec errors set is now 100 questions. Generator kept in `scripts/gen-bankrec-errors.py` (fixed seed).

@@ -1,0 +1,1 @@
+- Accounting practice: 20 English bank reconciliation error questions (book errors, bank errors, correcting entries, adjusted balances) with a **Bank rec errors** filter (`acc.html?tab=prac&set=bankerrors`); they are also part of the Errors set.
