@@ -65,21 +65,21 @@
   btn=document.createElement('button');btn.type='button';btn.id='qnBtn';btn.setAttribute('aria-controls','qn');btn.setAttribute('aria-expanded','false');btn.innerHTML=PEN+'<span>Notes</span>';
   panel=document.createElement('aside');panel.id='qn';panel.hidden=true;panel.setAttribute('aria-label','Chapter notes');
   var opts='<option value="general">General</option>'+cats().map(function(c){return '<option value="'+esc(c[0])+'">'+esc(c[1])+'</option>';}).join('');
-  panel.innerHTML='<div class="qn-bar"><h2 class="qn-t">Notes</h2><select aria-label="Chapter">'+opts+'</select><button type="button" class="qn-x qn-f" aria-pressed="false" aria-label="Full screen"></button><button type="button" class="qn-x" aria-label="Close notes">'+X+'</button><span class="qn-s" role="status"></span><p class="qn-hint">Swipe right on the quiz to open notes full screen; swipe left to go back.</p></div><textarea maxlength="'+MAX+'" spellcheck="true" aria-label="Chapter notes"></textarea>';
+  panel.innerHTML='<div class="qn-bar"><h2 class="qn-t">Notes</h2><select aria-label="Chapter">'+opts+'</select><button type="button" class="qn-x qn-f" aria-pressed="false" aria-label="Full screen"></button><button type="button" class="qn-x" aria-label="Close notes">'+X+'</button><span class="qn-s" role="status"></span><p class="qn-hint">Swipe from the right towards the left to open notes full screen; swipe right to go back.</p></div><textarea maxlength="'+MAX+'" spellcheck="true" aria-label="Chapter notes"></textarea>';
   document.body.appendChild(panel);document.body.appendChild(btn);document.documentElement.classList.add('qn-ready');
   ta=panel.querySelector('textarea');sel=panel.querySelector('select');st=panel.querySelector('.qn-s');
   btn.onclick=function(){setOpen(true);};
   panel.querySelector('.qn-x:not(.qn-f)').onclick=function(){setOpen(false);};
   panel.querySelector('.qn-f').onclick=function(){if(panel.hidden)setOpen(true);setFull(!panel.classList.contains('full'));ta.focus({preventScroll:true});};
   setFull(false);
-  /* swipe right anywhere on the quiz: notes open full screen; swipe left on the full-screen notes: back to the quiz.
-     Swipes that start at the screen edges are left to Safari (back/forward). */
+  /* swipe from the right side towards the left: notes open full screen; swipe right on the full-screen notes: back to the quiz.
+     The outermost edge strips are left to Safari's own back/forward gestures. */
   var sx=0,sy=0,st0=0,on=false;
-  document.addEventListener('touchstart',function(e){if(e.touches.length!==1){on=false;return;}var t=e.touches[0];on=t.clientX>28&&t.clientX<innerWidth-28;sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});
+  document.addEventListener('touchstart',function(e){if(e.touches.length!==1){on=false;return;}var t=e.touches[0];on=t.clientX>16&&t.clientX<innerWidth-16;sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});
   document.addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Date.now()-st0>700||Math.abs(dx)<90||Math.abs(dy)>Math.abs(dx)*0.5)return;
    var full=panel.classList.contains('full'),inPanel=panel.contains(e.target);
-   if(dx>0&&!full&&!inPanel){if(panel.hidden)setOpen(true);setFull(true);ta.focus({preventScroll:true});}
-   else if(dx<0&&full){setFull(false);setOpen(false);}},{passive:true});
+   if(dx<0&&!full&&!inPanel&&sx>innerWidth*0.45){if(panel.hidden)setOpen(true);setFull(true);ta.focus({preventScroll:true});}
+   else if(dx>0&&full&&sx>28){setFull(false);setOpen(false);}},{passive:true});
   sel.onchange=function(){flush();chap=sel.value;pinned=chap!==current();load();ta.focus();};
   ta.addEventListener('input',function(){status('Saving…');clearTimeout(timer);timer=setTimeout(save,500);});
   ta.addEventListener('blur',flush);

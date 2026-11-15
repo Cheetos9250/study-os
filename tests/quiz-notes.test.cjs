@@ -17,10 +17,10 @@ test('quiz notes use the backed-up lesson notes key, one note per chapter, and r
 test('Lessons page re-reads notes before saving, so quiz notes are kept',()=>{
  assert.match(read('hub.html'),/function saveNote\(k,text\)\{try\{const o=JSON\.parse\(localStorage\.getItem\(NOTES_KEY\)/);
 });
-test('quiz notes open full screen on a swipe right and leave screen edges to Safari',()=>{
+test('quiz notes open full screen on a right-to-left swipe and leave screen edges to Safari',()=>{
  const s=read('scripts/study-quiz-notes.js');
- assert.match(s,/addEventListener\('touchstart'[\s\S]*?t\.clientX>28&&t\.clientX<innerWidth-28/);
- assert.match(s,/if\(dx>0&&!full&&!inPanel\)\{if\(panel\.hidden\)setOpen\(true\);setFull\(true\)/);
- assert.match(s,/else if\(dx<0&&full\)\{setFull\(false\);setOpen\(false\);\}/);
+ assert.match(s,/addEventListener\('touchstart'[\s\S]*?t\.clientX>16&&t\.clientX<innerWidth-16/);
+ assert.match(s,/if\(dx<0&&!full&&!inPanel&&sx>innerWidth\*0\.45\)\{if\(panel\.hidden\)setOpen\(true\);setFull\(true\)/);
+ assert.match(s,/else if\(dx>0&&full&&sx>28\)\{setFull\(false\);setOpen\(false\);\}/);
  assert.match(s,/aria-label="Full screen"/);
 });
