@@ -152,7 +152,8 @@ const noteText=k=>notes[k]&&typeof notes[k].text==='string'?notes[k].text:'';
 function noteBtn(k){const has=noteText(k).trim();return '<button type="button" class="notebtn'+(has?' has':'')+'" data-note="'+esc(k)+'" aria-expanded="'+(openNote===k)+'">'+(has?'Edit notes':'+ Notes')+'</button>';}
 function noteBox(k){if(openNote!==k)return '';const n=notes[k];return '<div class="notebox"><textarea data-note-text="'+esc(k)+'" maxlength="20000" placeholder="Write notes for this chapter…" aria-label="Notes">'+esc(noteText(k))+'</textarea><p class="notemeta" data-note-meta="'+esc(k)+'">'+(n&&n.updated?'Saved '+new Date(n.updated).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</p></div>';}
 let noteTimer=null;
-function saveNote(k,text){if(text.trim())notes[k]={text:text.slice(0,20000),updated:new Date().toISOString()};else delete notes[k];
+function saveNote(k,text){try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}
+ if(text.trim())notes[k]={text:text.slice(0,20000),updated:new Date().toISOString()};else delete notes[k];
  let ok=true;try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch{ok=false;}
  const m=document.querySelector('[data-note-meta="'+CSS.escape(k)+'"]');if(m)m.textContent=ok?(text.trim()?'Saved':'Empty note removed'):'Could not save (storage full)';}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-note]');if(!b)return;openNote=openNote===b.dataset.note?null:b.dataset.note;render();const t=document.querySelector('[data-note-text="'+CSS.escape(b.dataset.note)+'"]');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}});

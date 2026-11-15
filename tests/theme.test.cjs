@@ -9,9 +9,11 @@ for(const f of pages)test(f+'.html supports manual light/dark and loads the them
  assert.match(s,/:root:not\(\[data-theme="light"\]\)/);
  assert.match(s,/:root\[data-theme="dark"\]/);
 });
-test('theme script writes only its own key and is not part of backups',()=>{
+test('theme script writes only its own keys and they are not part of backups',()=>{
  const s=fs.readFileSync(path.join(root,'scripts/study-theme.js'),'utf8');
- assert.deepEqual([...s.matchAll(/setItem\(([^,]+),/g)].map(m=>m[1]),['KEY']);
+ assert.deepEqual([...s.matchAll(/setItem\(([^,]+),/g)].map(m=>m[1]).sort(),['KEY','NAV_KEY']);
+ assert.match(s,/NAV_KEY='studyos\.nav\.v1'/);
+ assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.nav.v1'));
  assert.match(s,/KEY='studyos\.theme\.v1'/);
  assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.theme.v1'));
 });

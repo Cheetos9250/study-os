@@ -83,6 +83,15 @@
         ],
         "createdAt": "2026-11-15T02:34:17.268Z",
         "reason": "cover is an image area with an absolute button; Pomodoro tabs are a pill segmented control"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "practice.html"
+        ],
+        "createdAt": "2026-11-15T06:52:26.948Z",
+        "reason": "notebook tabs are a segmented control with flush buttons by design"
       }
     ]
   }

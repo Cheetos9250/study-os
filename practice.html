@@ -99,6 +99,28 @@ h1{margin:8px 0 0}
 
 </style>
 <link rel="stylesheet" href="assets/study-world.css?v=5">
+<style>
+/* Practice notebook: one big ruled page per subject, saved in studyos.notes.v1 (backed up) */
+.nb{border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel)}
+.nb-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border-bottom:var(--bw) solid var(--ink)}
+.nb-tabs{display:inline-flex;border:2.5px solid var(--ink);border-radius:6px;overflow:hidden}
+.nb-tabs button{border:0;background:var(--panel);color:var(--text);font:900 14px var(--ui);min-height:40px;padding:0 14px;cursor:pointer}
+.nb-tabs button+button{border-left:2px solid var(--ink)}
+.nb-tabs button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.nb-status{font:700 14px var(--ui);color:var(--muted);margin-left:auto}
+.nb-status.err{color:var(--red)}
+.nb-bar .nb-btn{border:2.5px solid var(--ink);border-radius:6px;background:var(--panel);color:var(--text);font:900 14px var(--ui);min-height:40px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.nb-bar .nb-btn svg{width:18px;height:18px}
+.nb-text{display:block;width:100%;min-height:max(420px,58vh);resize:vertical;border:0;margin:0;padding:6px 22px 32px 22px;font:500 16px/34px var(--ui);color:var(--text);background:repeating-linear-gradient(to bottom,transparent 0 33px,var(--line-soft) 33px 34px) 0 6px/100% 34px local,var(--panel);caret-color:var(--acc)}
+.nb-text:focus{outline:none}
+.nb:focus-within{box-shadow:0 0 0 4px var(--acc-soft)}
+.nb-text::placeholder{color:var(--muted)}
+/* focus mode: the notebook takes the whole screen */
+.nb.full{position:fixed;inset:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));z-index:95;display:flex;flex-direction:column}
+.nb.full .nb-text{flex:1;min-height:0;resize:none}
+html.nb-lock,html.nb-lock body{overflow:hidden}
+@media(max-width:520px){.nb-status{width:100%;order:3;margin-left:0}.nb-text{padding:6px 14px 28px;font-size:16px}}
+</style>
 <script src="scripts/study-theme.js?v=2"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
@@ -109,6 +131,15 @@ h1{margin:8px 0 0}
 <main>
 <h2>Quizzes</h2>
 <section class="grid" id="courses" aria-label="Quizzes by subject"></section>
+<h2>Notes</h2>
+<section class="nb" id="nb" aria-label="Practice notes">
+ <div class="nb-bar">
+  <div class="nb-tabs" role="group" aria-label="Notebook"><button type="button" data-nb="general" aria-pressed="true">General</button><button type="button" data-nb="acc" aria-pressed="false">ACC</button><button type="button" data-nb="eco" aria-pressed="false">ECO</button><button type="button" data-nb="math" aria-pressed="false">MATH</button></div>
+  <span class="nb-status" id="nbStatus" role="status">Saved on this device</span>
+  <button type="button" class="nb-btn" id="nbFull" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
+ </div>
+ <textarea class="nb-text" id="nbText" maxlength="100000" spellcheck="true" placeholder="Write anything: formulas, mistakes to remember, worked steps…" aria-label="Notes"></textarea>
+</section>
 <h2>Weak chapters</h2>
 <section class="box" id="weak" aria-label="Weak chapters"><p class="empty">Loading…</p></section>
 <h2>More practice</h2>
@@ -152,6 +183,30 @@ function render(){
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+})();
+
+/* ---------- practice notebook (studyos.notes.v1, keys practice:<book>; backed up) ---------- */
+(function(){
+'use strict';
+const KEY='studyos.notes.v1',$=s=>document.querySelector(s),box=$('#nb'),ta=$('#nbText'),st=$('#nbStatus'),full=$('#nbFull');
+let book='general',timer=null;
+function all(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch{return {};}}
+const count=t=>t.length.toLocaleString('en-US')+' characters';
+function load(){const n=all()['practice:'+book];ta.value=n&&typeof n.text==='string'?n.text:'';st.classList.remove('err');st.textContent=ta.value?'Saved · '+count(ta.value):'Saved on this device';}
+/* re-read before every write so notes written on the Lessons page (or another tab) are kept */
+function save(){clearTimeout(timer);timer=null;const notes=all(),k='practice:'+book,text=ta.value.slice(0,100000);
+ if(text.trim())notes[k]={text,updated:new Date().toISOString()};else delete notes[k];
+ try{localStorage.setItem(KEY,JSON.stringify(notes));st.classList.remove('err');st.textContent='Saved · '+count(text);}
+ catch{st.classList.add('err');st.textContent='Not saved: storage is full';}}
+ta.addEventListener('input',()=>{st.classList.remove('err');st.textContent='Saving…';clearTimeout(timer);timer=setTimeout(save,500);});
+ta.addEventListener('blur',()=>{if(timer)save();});
+window.addEventListener('pagehide',()=>{if(timer)save();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&timer)save();else if(!document.hidden&&!timer&&document.activeElement!==ta)load();});
+box.querySelectorAll('[data-nb]').forEach(b=>b.onclick=()=>{if(timer)save();book=b.dataset.nb;box.querySelectorAll('[data-nb]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));load();ta.focus();});
+function setFull(on){box.classList.toggle('full',on);document.documentElement.classList.toggle('nb-lock',on);full.setAttribute('aria-pressed',String(on));full.querySelector('span').textContent=on?'Done':'Full screen';if(on)ta.focus();}
+full.onclick=()=>setFull(!box.classList.contains('full'));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&box.classList.contains('full'))setFull(false);});
+load();
 })();
 </script>
 </body>
