@@ -87,7 +87,7 @@ node tests/auto-sync-browser.cjs
 ## Sync status (cross-device)
 
 - **Live since 16 Nov 2026.** The owner deployed `vocabloom-progress-cas-prod` (smoke test passed) and `data/config.json` has `progress_api`. Each device needs the sync key once (nav → Cloud sync → Set sync key). Back up / Restore still works as before.
-- Client ready (16 Nov 2026): `scripts/study-cloud.js` (`window.StudyCloud`) on Today, Calendar, Practice, Flashcards and Lessons syncs all five courses plus the `today` subject (`studyos.today.v1`) through `progress_api` only, with CAS and per-item merges; the nav's **Cloud sync** opens its dialog. Sync caches `study-sync-today-base-v1` / `study-sync-last-v1` are not backed up. The Worker accepts the extra subject `today` with its own schema.
+- Client ready (16 Nov 2026): `scripts/study-cloud.js` (`window.StudyCloud`) on Today, Calendar, Practice, Flashcards and Lessons syncs all five courses plus the `today` subject (`studyos.today.v1` and `studyos.notes.v1` as `today.notes`, 340 KB guard) through `progress_api` only, with CAS and per-item merges; the nav's **Cloud sync** opens its dialog. Sync caches `study-sync-today-base-v1` / `study-sync-last-v1` are not backed up. The Worker accepts the extra subject `today` with its own schema.
 - Live `study-api` Worker:
   - serves Notion quiz/cards (no longer read by the site — Notion retired 15 Nov 2026; pages use only `data/quiz.json` / `data/cards.json`) plus legacy progress, with unconditional writes;
   - must not be replaced;

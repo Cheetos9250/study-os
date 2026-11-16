@@ -160,7 +160,7 @@ html.nb-lock,html.nb-lock body{overflow:hidden}
 </div>
 <script src="scripts/study-review.js?v=1"></script>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-cloud.js?v=1"></script>
+<script src="scripts/study-cloud.js?v=2"></script>
 <script src="scripts/study-nav.js?v=4"></script>
 <script>
 (function(){
@@ -211,11 +211,12 @@ function load(){const n=all()['practice:'+book];ta.value=n&&typeof n.text==='str
 /* re-read before every write so notes written on the Lessons page (or another tab) are kept */
 function save(){clearTimeout(timer);timer=null;const notes=all(),k='practice:'+book,text=ta.value.slice(0,100000);
  if(text.trim())notes[k]={text,updated:new Date().toISOString()};else delete notes[k];
- try{localStorage.setItem(KEY,JSON.stringify(notes));st.classList.remove('err');st.textContent='Saved · '+count(text);}
+ try{localStorage.setItem(KEY,JSON.stringify(notes));st.classList.remove('err');st.textContent='Saved · '+count(text);window.StudyCloud&&StudyCloud.dirty();}
  catch{st.classList.add('err');st.textContent='Not saved: storage is full';}}
 ta.addEventListener('input',()=>{st.classList.remove('err');st.textContent='Saving…';clearTimeout(timer);timer=setTimeout(save,500);});
 ta.addEventListener('blur',()=>{if(timer)save();});
 window.addEventListener('pagehide',()=>{if(timer)save();});
+addEventListener('studycloud:applied',()=>{if(!timer&&document.activeElement!==ta)load();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&timer)save();else if(!document.hidden&&!timer&&document.activeElement!==ta)load();});
 box.querySelectorAll('[data-nb]').forEach(b=>b.onclick=()=>{if(timer)save();book=b.dataset.nb;box.querySelectorAll('[data-nb]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));load();ta.focus();});
 function setFull(on){box.classList.toggle('full',on);document.documentElement.classList.toggle('nb-lock',on);full.setAttribute('aria-pressed',String(on));full.querySelector('span').textContent=on?'Done':'Full screen';if(on)ta.focus();}

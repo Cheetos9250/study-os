@@ -1,0 +1,1 @@
+- Cloud sync now carries notes (`studyos.notes.v1`: quiz chapter notes, Lessons notes, the Practice notebook) inside the planner subject, merged per note (newer edit wins when both devices changed it). Auto sync turns itself on once a device has the sync key, including a key set from a course page's sync bar; Off in the Cloud sync dialog is remembered.
