@@ -106,7 +106,7 @@
   if(reviewNow)tasks.push({id:'review',kind:'review',title:'Review due cards',detail:reviewNow+' cards'});
   const upcoming=exams.map(e=>({...e,days:daysUntil(e.date,now)})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days||a.date.localeCompare(b.date));
   upcoming.forEach((e,i)=>{
-   const sum=summaries[e.course];if(!sum)return;if(i>0&&(e.days>14||upcoming[0].days<=3))return; // focus on an imminent exam
+   const sum=summaries[e.course];if(!sum)return;if(i>0&&(e.days>14||(upcoming[0].days<=3&&upcoming[0].days>0)))return; // focus on an imminent exam (on exam day, keep the next ones moving)
    const done=settings.done[e.id]||{};
    if(e.days===0){tasks.push({id:e.id+':day',kind:'exam',examId:e.id,course:e.course,title:'Exam today: '+e.title,detail:'Quick summary + missed questions'});return;}
    const scope=e.cats.map(id=>sum.per[id]).filter(Boolean);
@@ -117,7 +117,7 @@
    const studyDays=Math.max(1,e.days-1);
    let k=Math.ceil(remaining.length/studyDays);if(i>0)k=Math.min(k,1);
    remaining.slice(0,k).forEach(p=>tasks.push({id:e.id+':'+p.id,kind:'chapter',examId:e.id,course:e.course,cat:p.id,
-    title:p.label,exam:e.title,detail:'Summary → Cards → Practice',reason:reason(p),done:done[p.id]===today}));
+    title:p.label,exam:e.title,days:e.days,detail:'Summary → Cards → Practice',reason:reason(p),done:done[p.id]===today}));
   });
   return {today,tasks,upcoming};
  }
