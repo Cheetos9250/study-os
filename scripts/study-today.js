@@ -22,7 +22,8 @@
  const DEFAULT_EXAMS=Object.freeze([
   {id:'acc-quiz-20261116',course:'acc',title:'Accounting quiz',date:'2026-11-16',cats:['c6','c8'],confirmed:true},
   {id:'acc-final-20261126',course:'acc',title:'Accounting final',date:'2026-11-26',cats:['c5','c6','c7','c8','c9'],confirmed:true},
-  {id:'eco-final-20261127',course:'eco',title:'Economics final',date:'2026-11-27',cats:['g','i','b','a','d'],confirmed:false},
+  {id:'gc-video-20261120',course:'other',title:'Global Citizenship: group video due',date:'2026-11-20',cats:[],confirmed:true},
+  {id:'eco-final-20261127',course:'eco',title:'Economics final',date:'2026-11-27',cats:['g','i','b','a','d'],confirmed:true},
   {id:'math-final-20261201',course:'math',title:'Math final',date:'2026-12-01',cats:['c5','c6','c7'],confirmed:false}
  ]);
  const sod=t=>Math.floor((t+TZ)/DAY)*DAY-TZ;
@@ -68,6 +69,8 @@
  // The 2026 syllabus puts Ch5–9 after the midterm: upgrade the old untouched default (Ch6–9, unconfirmed) only.
  function upgradeDefault(e){
   if(e.id==='acc-final-20261126'&&!e.confirmed&&e.cats.join()==='c6,c7,c8,c9')return {...e,cats:['c5','c6','c7','c8','c9'],confirmed:true};
+  // Economics outline (16 Nov 2026): final covers the post-midterm macro topics already in the default scope.
+  if(e.id==='eco-final-20261127'&&!e.confirmed&&e.cats.join()==='g,i,b,a,d')return {...e,confirmed:true};
   return e;
  }
  function normalizeExams(list){
@@ -87,9 +90,15 @@
    .sort((a,b)=>a.day-b.day||a.start.localeCompare(b.start));
  }
  function classesOn(timetable,iso){const t=dateStart(iso);if(!Number.isFinite(t))return [];const dow=new Date(t+7*3600000).getUTCDay();return normalizeTimetable(timetable).filter(x=>x.day===dow);}
+ // Defaults that existed before seenDefaults was tracked; later defaults are added once to saved schedules.
+ const FIRST_DEFAULTS=['acc-quiz-20261116','acc-final-20261126','eco-final-20261127','math-final-20261201'];
  function loadSettings(raw){
   const s=readJSON(raw,{});
-  return {exams:normalizeExams(s.exams),done:s.done&&typeof s.done==='object'?s.done:{},tasks:s.tasks&&typeof s.tasks==='object'?s.tasks:{},timetable:normalizeTimetable(s.timetable)};
+  const exams=normalizeExams(s.exams);
+  const seen=Array.isArray(s.seenDefaults)?s.seenDefaults.filter(x=>typeof x==='string'):FIRST_DEFAULTS;
+  if(Array.isArray(s.exams))for(const d of DEFAULT_EXAMS)if(!seen.includes(d.id)&&!exams.some(e=>e.id===d.id))exams.push({...d,cats:[...d.cats]});
+  const seenDefaults=[...new Set([...seen,...DEFAULT_EXAMS.map(d=>d.id)])];
+  return {exams,done:s.done&&typeof s.done==='object'?s.done:{},tasks:s.tasks&&typeof s.tasks==='object'?s.tasks:{},timetable:normalizeTimetable(s.timetable),seenDefaults};
  }
  function buildPlan(exams,summaries,settings,now){
   const today=dayKey(now),tasks=[];

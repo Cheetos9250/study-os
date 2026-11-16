@@ -1,0 +1,1 @@
+- Calendar defaults from the new syllabi: Global Citizenship group video due 20 Nov (added once to saved schedules via `seenDefaults`; deleting it keeps it gone); Economics final scope marked confirmed. AGENTS.md lists all six syllabi.
