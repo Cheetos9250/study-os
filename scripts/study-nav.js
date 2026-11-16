@@ -95,9 +95,10 @@
   var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);
   var nav=document.createElement('nav');nav.id='studyNav';nav.setAttribute('aria-label','Main');
   var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><button type="button" class="sn-fold" aria-pressed="false"></button><div class="sn-tabs">';
-  TABS.forEach(function(t){h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+' title="'+esc(t.label)+'">'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
+  var FOCUS=!!(window.StudyTheme&&window.StudyTheme.focus&&window.StudyTheme.focus());
+  TABS.forEach(function(t){if(FOCUS&&t.id==='cards'&&active!=='cards')return;h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+' title="'+esc(t.label)+'">'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
   h+='<button type="button" class="sn-more" aria-expanded="false" aria-controls="snFoot">'+svg('more')+'<span>More</span></button></div>';
-  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+((course||window.StudyCloud)?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
+  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(window.StudyTheme&&window.StudyTheme.setFocus?'<button type="button" class="sn-focus" aria-pressed="'+FOCUS+'" title="Show or hide summaries and flashcards">'+svg('cards')+'<span>'+(FOCUS?'Show cards &amp; summaries':'Hide cards &amp; summaries')+'</span></button>':'')+((course||window.StudyCloud)?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
   MORE.forEach(function(m){h+='<a href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
   h+='</div>';
   nav.innerHTML=h;document.body.appendChild(nav);if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){/* Course pages: load only the glyphs the nav shows (Google Fonts text=), a few KB instead of whole Japanese fonts. */var tx=nav.textContent.replace(/\s+/g,'');var u={};tx.split('').forEach(function(c){u[c]=1;});var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap&text='+encodeURIComponent(Object.keys(u).sort().join('')+'0123456789');document.head.appendChild(fl);}document.documentElement.classList.add('sn-on');
@@ -106,6 +107,7 @@
   document.addEventListener('click',function(e){if(!nav.contains(e.target)){nav.classList.remove('sn-open');more.setAttribute('aria-expanded','false');}});
   var sy=nav.querySelector('.sn-sync');
   if(sy)sy.onclick=function(){if(!course&&window.StudyCloud){nav.classList.remove('sn-open');window.StudyCloud.open();return;}var on=document.documentElement.classList.toggle('show-sync');nav.classList.remove('sn-open');var bar=document.querySelector('.cloud-sync-bar');if(on&&bar&&bar.scrollIntoView)bar.scrollIntoView({block:'center'});};
+  var fo=nav.querySelector('.sn-focus');if(fo)fo.onclick=function(){window.StudyTheme.setFocus(!window.StudyTheme.focus());location.reload();};
   var tb=nav.querySelector('.sn-theme'),T=window.StudyTheme;
   function paint(){if(!T){tb.hidden=true;return;}var m=T.mode();tb.innerHTML=svg(m)+'<span>'+esc(T.LABEL[m])+'</span>';tb.setAttribute('aria-label',T.LABEL[m]+' (tap to change)');}
   tb.onclick=function(){if(T){T.cycle();paint();}};paint();

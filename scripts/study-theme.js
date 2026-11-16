@@ -1,5 +1,5 @@
-/* Study OS screen settings: theme auto (follow device) / dark / light, and the collapsed sidebar.
-   Writes only its own two keys (studyos.theme.v1, studyos.nav.v1); neither is study data or part of backups.
+/* Study OS screen settings: theme auto (follow device) / dark / light, the collapsed sidebar, and focus mode.
+   Writes only its own three keys (studyos.theme.v1, studyos.nav.v1, studyos.focus.v1); none is study data or part of backups.
    Loaded in <head>, so a collapsed sidebar is applied before the first paint. */
 (function(){
  'use strict';
@@ -11,11 +11,16 @@
  try{collapsed=localStorage.getItem(NAV_KEY)==='collapsed';}catch(e){}
  if(collapsed)root.classList.add('sn-collapsed');
  function setCollapsed(on){collapsed=!!on;root.classList.toggle('sn-collapsed',collapsed);try{if(collapsed)localStorage.setItem(NAV_KEY,'collapsed');else localStorage.removeItem(NAV_KEY);}catch(e){}return collapsed;}
+ /* Focus mode (default on): the owner studies with practice questions and notes, so summaries and flashcards are hidden. Data is untouched. */
+ var FOCUS_KEY='studyos.focus.v1',focus=true;
+ try{focus=localStorage.getItem(FOCUS_KEY)!=='off';}catch(e){}
+ if(focus)root.classList.add('focus');
+ function setFocus(on){focus=!!on;root.classList.toggle('focus',focus);try{localStorage.setItem(FOCUS_KEY,focus?'on':'off');}catch(e){}return focus;}
  var ICON={auto:'🌓',dark:'🌙',light:'☀️'},LABEL={auto:'Theme: Auto',dark:'Theme: Dark',light:'Theme: Light'},NEXT={auto:'dark',dark:'light',light:'auto'};
  function cycle(){mode=NEXT[mode];apply(mode);try{if(mode==='auto')localStorage.removeItem(KEY);else localStorage.setItem(KEY,mode);}catch(e){}return mode;}
  /* Ask the browser to keep this site's data instead of clearing it under storage pressure (iPadOS honours this best for home-screen apps). */
  try{if(navigator.storage&&navigator.storage.persisted&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist();}).catch(function(){});}catch(e){}
- window.StudyTheme={mode:function(){return mode;},cycle:cycle,ICON:ICON,LABEL:LABEL,collapsed:function(){return collapsed;},setCollapsed:setCollapsed};
+ window.StudyTheme={mode:function(){return mode;},cycle:cycle,ICON:ICON,LABEL:LABEL,collapsed:function(){return collapsed;},setCollapsed:setCollapsed,focus:function(){return focus;},setFocus:setFocus};
  function mount(){
   if(document.getElementById('studyThemeBtn')||document.getElementById('studyNav')||document.querySelector('script[src*="study-nav.js"]'))return;
   var b=document.createElement('button');b.id='studyThemeBtn';b.type='button';

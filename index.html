@@ -182,7 +182,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 }
 @media(max-width:420px){.sb{padding:12px 14px 14px;min-height:110px}}
 </style>
-<script src="scripts/study-theme.js?v=3"></script>
+<script src="scripts/study-theme.js?v=4"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
@@ -232,7 +232,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=3"></script>
-<script src="scripts/study-nav.js?v=4"></script>
+<script src="scripts/study-nav.js?v=5"></script>
 <script>
 (function(){
 'use strict';
@@ -322,7 +322,7 @@ function renderChips(){
  const topN=top&&summaries[top.key]?summaries[top.key].reviewNow:0;
  /* quiz review (spaced repetition) comes first: the owner mostly studies with quizzes */
  const qd=T.COURSES.map(c=>({c,n:window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0})).sort((a,b)=>b.n-a.n),quizDue=qd.reduce((n,x)=>n+x.n,0),qTop=qd[0];
- const cells=['<a class="sb" href="'+(quizDue?link(qTop.c,'prac')+'&review=1':dueTotal?link(top,'cards'):'practice.html')+'"><span class="n">'+quizDue+'</span><span class="l">Quiz review</span><span class="s">'+(quizDue?esc(qTop.c.name)+' has '+qTop.n+(dueTotal?' · '+dueTotal+' cards due':''):dueTotal?dueTotal+' cards due':'All caught up')+'</span></a>',
+ const cells=['<a class="sb" href="'+(quizDue?link(qTop.c,'prac')+'&review=1':dueTotal&&!FOCUS?link(top,'cards'):'practice.html')+'"><span class="n">'+quizDue+'</span><span class="l">Quiz review</span><span class="s">'+(quizDue?esc(qTop.c.name)+' has '+qTop.n+(dueTotal&&!FOCUS?' · '+dueTotal+' cards due':''):dueTotal&&!FOCUS?dueTotal+' cards due':'All caught up')+'</span></a>',
   '<a class="sb'+(late?' alert':'')+'" href="#tasks"><span class="n">'+open.length+'</span><span class="l">Tasks</span><span class="s">'+(late?late+' late':open.length?'Open':'Nothing open')+'</span></a>'];
  if(ne){const c=course(ne.course);cells.push('<a class="sb next'+(ne.d<=3?' alert':'')+'" href="#exams" aria-label="Next exam: '+esc(ne.title)+'"><span class="bub"><span class="fx">'+esc(ne.title)+(ne.d===0?'':' in')+'</span><span class="n">'+(ne.d===0?'Today!':ne.d+'<small>'+(ne.d===1?'day':'days')+'</small>'+(ne.d<=3?'!':''))+'</span></span><span class="s">'+esc(shortDay(ne.date))+(c?' · '+esc(c.name):'')+'</span></a>');}
  else cells.push('<a class="sb next" href="calendar.html"><span class="bub"><span class="fx">No exams coming up</span></span><span class="s">Add one in Calendar</span></a>');
@@ -330,11 +330,13 @@ function renderChips(){
  $('#chips').innerHTML=chips.join('');
 }
 /* one line under each plan item: why it is on today's list */
-const sub=t=>t.kind==='chapter'?'For '+t.exam+(t.days!=null?' in '+t.days+(t.days===1?' day':' days'):'')+(t.reason?' · '+t.reason:''):(t.detail||'');
+const FOCUS=document.documentElement.classList.contains('focus');
+const sub=t=>t.kind==='chapter'?'For '+t.exam+(t.days!=null?' in '+t.days+(t.days===1?' day':' days'):'')+(t.reason?' · '+(FOCUS?t.reason.replace(/ · \d+ new cards/,''):t.reason):''):(t.detail||'');
 function renderPlan(){
  const plan=T.buildPlan(settings.exams,summaries,settings,now),doneToday=settings.tasks[plan.today]||{},p=parts(plan.today);
  /* quiz review (spaced repetition) leads the plan: missed questions come back on schedule */
  if(window.StudyReview){const qd=T.COURSES.map(x=>({x,n:StudyReview.countRaw(read('study-'+x.key),now)})).filter(y=>y.n).sort((a,b)=>b.n-a.n);
+  if(FOCUS)plan.tasks=plan.tasks.filter(t=>t.kind!=='review');
   const n=qd.reduce((s,y)=>s+y.n,0);if(n)plan.tasks.unshift({id:'quiz-review',kind:'quiz',course:qd[0].x.key,title:'Review '+n+' question'+(n>1?'s':'')+' due',detail:qd.map(y=>y.x.name+' '+y.n).join(' · ')+' · missed or due again today',top:qd[0].x});}
  $('#today').textContent=DAYS[dowOf(plan.today)]+', '+p.d+' '+MO[p.m];
  if(!Object.keys(summaries).length){$('#planBox').innerHTML='<p class="empty">'+(loadFailed?'Could not load subjects. Refresh to retry.':'Loading…')+'</p>';return;}
@@ -342,7 +344,7 @@ function renderPlan(){
   const c=t.course?course(t.course):null,done=t.kind==='chapter'?t.done:!!doneToday[t.id];let acts='';
   if(t.kind==='quiz')acts='<a class="main" href="'+link(t.top,'prac')+'&review=1">Start review</a>';
   else if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
-  else if(c&&t.kind==='chapter')acts='<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a><a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="accounting-textbook.html?ch='+t.cat.slice(1)+'">Textbook</a>':'');
+  else if(c&&t.kind==='chapter')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="accounting-textbook.html?ch='+t.cat.slice(1)+'">Textbook</a>':'');
   else if(c)acts='<a class="main" href="'+link(c,'prac')+'">Practice</a>';
   return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
   :'<p class="empty">Nothing planned. Free time? Go to Practice.</p>';
@@ -375,8 +377,9 @@ function renderSubjects(){
   const s=summaries[c.key],ne=upcoming().find(e=>e.course===c.key);
   const pct=s&&s.total?Math.round(s.seen/s.total*100):0;
   return '<article class="subj s-'+c.key+' t-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true"><span class="cvm">'+esc(c.full)+'</span></div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">'+DOTS+'</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam '+(ne.d===0?'today':ne.d===1?'tomorrow':'in '+ne.d+' days'):'&nbsp;')+'</p>'
-   +(s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
-   +'<div class="acts"><a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a></div><a class="lk" href="hub.html#'+c.key+'">Lessons →</a></div></article>';});
+   +(s&&FOCUS?(()=>{let q=0,a=0,r=0;for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}const qp=q?Math.round(a/q*100):0;return '<div class="st"><div><b>'+a+'</b>done</div><div><b>'+(a?Math.round(r/a*100):0)+'%</b>correct</div></div><div class="bar" role="img" aria-label="'+qp+'% of questions done"><i style="width:'+qp+'%"></i></div>';})()
+   :s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
+   +'<div class="acts">'+(FOCUS?'<a class="main" href="'+link(c,'prac')+'">Practice</a>':'<a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a>')+'</div><a class="lk" href="hub.html#'+c.key+'">Lessons →</a></div></article>';});
  const lang=(l,cv,_flag,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+' t-'+l.key+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true"><span class="cvm">'+(l.key==='eng'?'EN':'ZH')+'</span></div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">'+DOTS+'</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary · WordNest</p>'
   +(ls?'<div class="st"><div><b>'+ls.reviewNow+'</b>due</div><div><b>'+ls.newToday+'</b>new</div></div>':'')+'<div class="acts">'+acts+'</div></div></article>';};
  cards.push(lang(T.LANGS[0],'voc','🇬🇧','<a class="main" href="'+T.LANGS[0].app+'">WordNest</a>'));
@@ -388,7 +391,7 @@ function renderClasses(){
  const list=T.classesOn(settings.timetable,today).filter(x=>!x.skip);
  if(!settings.timetable.length){$('#classes').innerHTML='';return;}
  const d=new Date(now+7*3600000),hm=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
- $('#classes').innerHTML=list.length?list.map(x=>{const c=x.course&&(T.COURSES.concat(T.LANGS).find(k=>k.key===x.course));const href=c?(c.app||link(c,'sum')):'calendar.html';
+ $('#classes').innerHTML=list.length?list.map(x=>{const c=x.course&&(T.COURSES.concat(T.LANGS).find(k=>k.key===x.course));const href=c?(c.app||link(c,FOCUS?'prac':'sum')):'calendar.html';
   return '<a class="cls'+(hm>=x.start&&hm<x.end?' now':hm>=x.end?' done':'')+(c?' t-'+c.key:'')+'" href="'+href+'">'+(c?'<span class="jersey sm" aria-hidden="true">'+esc(c.full||c.key.toUpperCase())+'</span>':'')+'<b>'+x.start+'–'+x.end+'</b>'+esc(x.name)+(x.code?'<span>'+esc(x.code)+'</span>':'')+'</a>';}).join('')
   :'<span class="cls"><span>No classes today</span></span>';
 }

@@ -94,7 +94,7 @@ button.danger{color:var(--red)}
 .notemeta{font-size:12px;color:var(--muted);margin:4px 0 0;min-height:16px}
 </style>
 <link rel="stylesheet" href="assets/study-world.css?v=8">
-<script src="scripts/study-theme.js?v=3"></script>
+<script src="scripts/study-theme.js?v=4"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
@@ -112,7 +112,7 @@ button.danger{color:var(--red)}
 </div>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=3"></script>
-<script src="scripts/study-nav.js?v=4"></script>
+<script src="scripts/study-nav.js?v=5"></script>
 <script>
 (function(){
 'use strict';
@@ -130,12 +130,12 @@ function subjects(now){
  $('#title').textContent='Lessons';$('#crumb').hidden=true;$('#secTitle').hidden=false;
  const wideKey=(settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d)[0]||{}).course||'';
  {const ne=settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d)[0],c=ne&&T.COURSES.find(x=>x.key===ne.course),box=$('#nextStep');
-  if(c){const sc=(ne.cats||[]).length?' · scope: '+ne.cats.map(x=>x.replace(/^c/,'Ch')).join(', '):'';box.hidden=false;const chs=(ne.cats||[]).map(x=>x.replace(/^c/,'Ch'));box.innerHTML='<div class="bub"><b>'+(chs.length?'Read '+esc(chs.slice(0,3).join(' + '))+(chs.length>3?' …':''):'Read '+esc(c.name))+'</b><span>'+esc(ne.title)+(ne.d===0?' today':' in '+ne.d+(ne.d===1?' day':' days'))+'</span></div><a class="go" href="#'+c.key+'">Open '+esc(c.name)+'</a>';}else box.hidden=true;}
+  if(c){const sc=(ne.cats||[]).length?' · scope: '+ne.cats.map(x=>x.replace(/^c/,'Ch')).join(', '):'';box.hidden=false;const chs=(ne.cats||[]).map(x=>x.replace(/^c/,'Ch'));const verb=document.documentElement.classList.contains('focus')?'Practise ':'Read ';box.innerHTML='<div class="bub"><b>'+(chs.length?verb+esc(chs.slice(0,3).join(' + '))+(chs.length>3?' …':''):verb+esc(c.name))+'</b><span>'+esc(ne.title)+(ne.d===0?' today':' in '+ne.d+(ne.d===1?' day':' days'))+'</span></div><a class="go" href="#'+c.key+'">Open '+esc(c.name)+'</a>';}else box.hidden=true;}
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key];
   if(!s)return '<div class="card subj"><h3>'+esc(c.name)+'</h3><p class="full">'+esc(c.full)+'</p><p class="empty">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p></div>';
   const pct=s.total?Math.round(s.seen/s.total*100):0,chapters=Object.keys(s.per).length;
-  return '<a class="card subj t-'+c.key+(c.key===wideKey?' wide':'')+'" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3><span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="'+(s.reviewNow?'due':'')+'"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Lessons →</span></a>';
+  return '<a class="card subj t-'+c.key+(c.key===wideKey?' wide':'')+'" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3><span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p>'+(document.documentElement.classList.contains('focus')?(()=>{let q=0,a=0,r=0;for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}const qp=q?Math.round(a/q*100):0;return '<div class="nums"><div><b>'+a+'</b>done</div><div class="new"><b>'+(a?Math.round(r/a*100):0)+'%</b>correct</div></div><div class="bar" aria-hidden="true"><i style="width:'+qp+'%"></i></div>';})():'<div class="nums"><div class="'+(s.reviewNow?'due':'')+'"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div>')+'<span class="go">Lessons →</span></a>';
  });
  cards.push('<a class="card subj strip t-eng" href="vocabloom/index.html?lang=en"><h3><span class="jersey sm" aria-hidden="true">EN</span>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
  cards.push('<a class="card subj strip t-zh" href="vocabloom/index.html?lang=zh"><h3><span class="jersey sm" aria-hidden="true">ZH</span>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
@@ -149,8 +149,8 @@ function chapters(c,now){
   const p=s.per[id],ex=examFor(c.key,id,now),acc=T.accuracy(p);
   const book=c.key==='acc'&&/^c\d+$/.test(id)?'<a href="accounting-textbook.html?ch='+id.slice(1)+'">Textbook</a>':'';
   return '<div class="card chap"><h3>'+esc(label)+(ex?' <span class="tagx">'+esc(ex.title)+' · '+(ex.days===0?'today':ex.days+'d')+'</span>':'')+'</h3>'
-   +'<div class="meta"><span class="due">Due <b>'+p.due+'</b></span><span>Cards <b>'+p.seen+'/'+p.cards+'</b></span><span>Quiz <b>'+(p.quiz?(p.answered?Math.round(acc*100)+'%':'–'):'–')+'</b></span></div>'
-   +'<div class="acts"><a class="main" href="'+link(c,'sum',id)+'">Lesson</a><a href="'+link(c,'cards',id)+'">Cards</a><a href="'+link(c,'prac',id)+'">Practice</a>'+book+noteBtn(c.key+':'+id)+'</div>'+noteBox(c.key+':'+id)+'</div>';
+   +'<div class="meta">'+(document.documentElement.classList.contains('focus')?'':'<span class="due">Due <b>'+p.due+'</b></span><span>Cards <b>'+p.seen+'/'+p.cards+'</b></span>')+'<span>Quiz <b>'+(p.quiz?(p.answered?Math.round(acc*100)+'%':'–'):'–')+'</b></span></div>'
+   +'<div class="acts">'+(document.documentElement.classList.contains('focus')?'<a class="main" href="'+link(c,'prac',id)+'">Practice</a>':'<a class="main" href="'+link(c,'sum',id)+'">Lesson</a><a href="'+link(c,'cards',id)+'">Cards</a><a href="'+link(c,'prac',id)+'">Practice</a>')+book+noteBtn(c.key+':'+id)+'</div>'+noteBox(c.key+':'+id)+'</div>';
  });
  rows.unshift('<div class="card chap"><h3>General notes</h3><div class="acts">'+noteBtn(c.key+':general')+'</div>'+noteBox(c.key+':general')+'</div>');
  $('#view').className='list';$('#view').innerHTML=rows.join('');

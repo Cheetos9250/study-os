@@ -62,7 +62,7 @@ input[type=file]{display:none}
 <link rel="stylesheet" href="assets/study-world.css?v=8">
 </head>
 <body>
-<script src="scripts/study-theme.js?v=3"></script>
+<script src="scripts/study-theme.js?v=4"></script>
 <main class="ps-page">
 <h1>My PDF sets</h1>
 <p class="ps-sub">Practise from your own question PDFs (for example your teacher's practice sets). Files stay on this device only — they are not uploaded anywhere.</p>
@@ -169,6 +169,6 @@ $('removeSet').onclick=async()=>{ const s=data.sets[cur]; if(!s||!confirm('Remov
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
 renderSets(); const first=Object.keys(data.sets)[0]; if(first) addEventListener('load',()=>select(first));
 </script>
-<script src="scripts/study-nav.js?v=4"></script>
+<script src="scripts/study-nav.js?v=5"></script>
 </body>
 </html>
