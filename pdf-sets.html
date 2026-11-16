@@ -63,7 +63,7 @@ input[type=file]{display:none}
 <link rel="stylesheet" href="assets/study-world.css?v=8">
 </head>
 <body>
-<script src="scripts/study-theme.js?v=4"></script>
+<script src="scripts/study-theme.js?v=5"></script>
 <main class="ps-page">
 <h1>My PDF sets</h1>
 <p class="ps-sub">All your PDFs in one place: teacher's practice sets, the accounting textbook, IFRS chapters. Files stay on this device only — they are not uploaded anywhere.</p>
@@ -207,6 +207,6 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
 (async()=>{ try{ if(!data.sets[BOOK_ID]&&await bookIdb('get')){ data.sets[BOOK_ID]={name:'Accounting textbook (24e)',course:'acc',n:0,pages:1210,page:{},opts:{},ans:{},key:{},notes:{},added:Date.now()}; save(); } }catch(e){}
   renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
-<script src="scripts/study-nav.js?v=5"></script>
+<script src="scripts/study-nav.js?v=6"></script>
 </body>
 </html>
