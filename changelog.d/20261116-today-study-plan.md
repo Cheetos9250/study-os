@@ -1,0 +1,1 @@
+- Today's plan says what to study and why: quiz questions due for review come first (with a Start review link), every item has one line explaining it ("For Accounting final in 10 days · 55% correct · 12 new cards"), chapter links sit under the text, and on an exam day the plan also keeps one chapter going for the next exams (1–3 days before an exam it still gets full focus).

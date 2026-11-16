@@ -140,6 +140,8 @@ a.sb:hover{background:var(--dots),var(--panel)}
 .pbtn button.ghost svg{width:20px;height:20px}
 .plan li{grid-template-columns:28px minmax(0,1fr) auto;align-items:center;padding:14px 0}
 .plan li .acts{margin:0;justify-content:flex-end}
+/* chapter items carry 3–4 links: put them under the text so the title keeps its width */
+.plan li.stack{grid-template-columns:28px minmax(0,1fr)}.plan li.stack .acts{grid-column:2;justify-content:flex-start;margin-top:8px}
 .plan h3{font-size:16px;font-weight:900;margin:0}
 .classes{gap:8px}
 .cls{background:var(--panel);border:2.5px solid var(--ink);border-radius:6px;gap:10px;padding:6px 16px 6px 6px}
@@ -327,16 +329,22 @@ function renderChips(){
  const chips=cells;
  $('#chips').innerHTML=chips.join('');
 }
+/* one line under each plan item: why it is on today's list */
+const sub=t=>t.kind==='chapter'?'For '+t.exam+(t.days!=null?' in '+t.days+(t.days===1?' day':' days'):'')+(t.reason?' · '+t.reason:''):(t.detail||'');
 function renderPlan(){
  const plan=T.buildPlan(settings.exams,summaries,settings,now),doneToday=settings.tasks[plan.today]||{},p=parts(plan.today);
+ /* quiz review (spaced repetition) leads the plan: missed questions come back on schedule */
+ if(window.StudyReview){const qd=T.COURSES.map(x=>({x,n:StudyReview.countRaw(read('study-'+x.key),now)})).filter(y=>y.n).sort((a,b)=>b.n-a.n);
+  const n=qd.reduce((s,y)=>s+y.n,0);if(n)plan.tasks.unshift({id:'quiz-review',kind:'quiz',course:qd[0].x.key,title:'Review '+n+' question'+(n>1?'s':'')+' due',detail:qd.map(y=>y.x.name+' '+y.n).join(' · ')+' · missed or due again today',top:qd[0].x});}
  $('#today').textContent=DAYS[dowOf(plan.today)]+', '+p.d+' '+MO[p.m];
  if(!Object.keys(summaries).length){$('#planBox').innerHTML='<p class="empty">'+(loadFailed?'Could not load subjects. Refresh to retry.':'Loading…')+'</p>';return;}
  $('#planBox').innerHTML=plan.tasks.length?'<ul class="plan">'+plan.tasks.map((t,i)=>{
   const c=t.course?course(t.course):null,done=t.kind==='chapter'?t.done:!!doneToday[t.id];let acts='';
-  if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
+  if(t.kind==='quiz')acts='<a class="main" href="'+link(t.top,'prac')+'&review=1">Start review</a>';
+  else if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
   else if(c&&t.kind==='chapter')acts='<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a><a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="accounting-textbook.html?ch='+t.cat.slice(1)+'">Textbook</a>':'');
   else if(c)acts='<a class="main" href="'+link(c,'prac')+'">Practice</a>';
-  return '<li class="'+(done?'done':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3></div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
+  return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
   :'<p class="empty">Nothing planned. Free time? Go to Practice.</p>';
  $('#planBox').querySelectorAll('input[type=checkbox]').forEach(b=>b.onchange=()=>{settings=T.markChapter(settings,plan.tasks[+b.dataset.i],b.checked,Date.now());saveSettings();renderAll();});
 }
