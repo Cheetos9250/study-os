@@ -17,7 +17,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),http=r
    try{for(const width of [390,820,1280])for(const colorScheme of ['light','dark']){
     const context=await browser.newContext({viewport:{width,height:1000},colorScheme});
     const requests=[],errors=[];
-    await context.route('**/*',route=>{const r=route.request();if(r.method()!=='GET')requests.push(r.method());return r.method()==='GET'&&new URL(r.url()).origin===base?route.continue():route.abort();});
+    await context.route('**/*',route=>{const r=route.request();if(r.method()!=='GET')requests.push(r.method());/* checker covers the original-PDF mode: withhold the rewritten practice versions (data/textbook-sos) */ if(new URL(r.url()).pathname.startsWith('/data/textbook-sos/'))return route.abort();return r.method()==='GET'&&new URL(r.url()).origin===base?route.continue():route.abort();});
     const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
     await page.goto(base+'/accounting-textbook.html',{waitUntil:'domcontentloaded'});
     await page.locator('.q-item').first().waitFor({state:'attached'});
