@@ -1,0 +1,36 @@
+name: Textbook practice versions
+on:
+  pull_request:
+    paths:
+      - data/textbook-sos/**
+      - scripts/textbook-sos/**
+      - tests/textbook-sos*.cjs
+      - .github/workflows/textbook-sos.yml
+  push:
+    branches: [main]
+    paths:
+      - data/textbook-sos/**
+      - scripts/textbook-sos/**
+      - tests/textbook-sos*.cjs
+      - .github/workflows/textbook-sos.yml
+concurrency:
+  group: study-os-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+jobs:
+  textbook-sos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regenerate data and confirm it matches the committed files
+        run: |
+          for f in scripts/textbook-sos/ch*.py; do PYTHONDONTWRITEBYTECODE=1 python3 -I "$f" >/dev/null; done
+          git diff --exit-code -- data/textbook-sos
+      - name: Full regression
+        run: node --test tests/*.test.cjs vocabloom/tests/*.test.cjs
