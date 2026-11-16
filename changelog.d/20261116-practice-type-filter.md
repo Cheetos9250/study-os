@@ -1,0 +1,1 @@
+- Accounting practice: **All types / Multiple choice / Written** chips split the pool by question type (counts per chapter follow the choice; remembered for the browser session; `?type=mcq|written`).
