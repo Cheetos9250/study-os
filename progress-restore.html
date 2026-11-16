@@ -85,6 +85,7 @@
     if (key === "studyos.today.v1") return "Exam schedule, plan ticks and timetable";
     if (key === "studyos.grades.v1") return "Grades and GPA";
     if (key === "studyos.notes.v1") return "Lesson notes";
+    if (key === "studyos.pdfsets.v1") return "PDF practice answers";
     var courses = {acc:"Accounting",eco:"Economics",math:"Mathematics",eng:"English",zh:"Chinese"};
     if (key.startsWith("study-")) return courses[key.slice(6)] + " quiz history";
     var prefix = key.replace(/-(srs|typ)$/, "");

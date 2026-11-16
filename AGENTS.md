@@ -68,6 +68,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). |
 | `studyos.accounting.textbook.progress.v1` | Textbook answers. |
 | `vocabloom_mvp_v1` | WordNest English data. |
+| `studyos.pdfsets.v1` | **My PDF sets** (`pdf-sets.html`): per uploaded PDF its name, subject, detected question count, my answers and answer key. The PDFs themselves are in IndexedDB `studyos-pdf-sets-v1` on the device only (not backed up, never uploaded). |
 
 Not backed up: `studyos.theme.v1`, `studyos.nav.v1` (collapsed sidebar; both written only by `scripts/study-theme.js`), `studyos.backup-meta.v1` (time **Back up now** was last tapped on Today, written only by `index.html`; drives the Today backup reminder. `progress-backup.html` must stay read-only, CI checks it), sync keys (`study-sync-*`), caches.
 

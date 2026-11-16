@@ -84,6 +84,17 @@
             (note.updated !== undefined && typeof note.updated !== "string"))
           throw new Error("Invalid lesson notes");
       }
+    } else if (key === "studyos.pdfsets.v1") {
+      if (!object(value.sets)) throw new Error("Invalid PDF practice answers");
+      for (var ps of Object.keys(value.sets)) {
+        var set = value.sets[ps];
+        if (!/^p[a-z0-9]{1,12}$/.test(ps) || !object(set) || typeof set.name !== "string" ||
+            !Number.isInteger(set.n) || set.n < 0 || set.n > 500 || !object(set.ans) || !object(set.key))
+          throw new Error("Invalid PDF practice answers");
+        for (var part of [set.ans, set.key])
+          for (var qn of Object.keys(part))
+            if (!/^\d{1,3}$/.test(qn) || !/^[a-e]$/.test(String(part[qn]))) throw new Error("Invalid PDF practice answers");
+      }
     } else if (key === "studyos.grades.v1") {
       if (!Array.isArray(value.courses)) throw new Error("Invalid grades data");
       for (var gc of value.courses) {
