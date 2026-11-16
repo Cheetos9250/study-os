@@ -50,7 +50,7 @@
  function load(){var n=all()[key()];ta.value=n&&typeof n.text==='string'?n.text:'';sel.value=chap;ta.placeholder='Notes for '+label(chap)+'. They also show on the Lessons page.';status(ta.value?'Saved · '+ta.value.length.toLocaleString('en-US')+' characters':'Saved on this device');}
  function save(){clearTimeout(timer);timer=null;var notes=all(),k=key(),text=ta.value.slice(0,MAX);
   if(text.trim())notes[k]={text:text,updated:new Date().toISOString()};else delete notes[k];
-  try{localStorage.setItem(KEY,JSON.stringify(notes));status('Saved · '+text.length.toLocaleString('en-US')+' characters');}
+  try{localStorage.setItem(KEY,JSON.stringify(notes));if(window.StudyCloud)window.StudyCloud.dirty();status('Saved · '+text.length.toLocaleString('en-US')+' characters');}
   catch(e){status('Not saved: storage is full',true);}}
  function flush(){if(timer)save();}
  /* chapter of the question on screen: the page shows its label in .qmeta; map it back to the chapter id */

@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
 test('quiz pages load the chapter notes panel before the nav scripts',()=>{
  for(const f of ['acc.html','eco.html','math.html']){
-  const s=read(f);assert.match(s,/<script src="scripts\/study-course-mode\.js\?v=1"><\/script>\s*<script src="scripts\/study-quiz-notes\.js\?v=1"><\/script>(?:\s*<script src="scripts\/[a-z-]+\.js\?v=\d+"><\/script>)*\s*<script src="scripts\/study-course-nav\.js\?v=1"><\/script>/,f);
+  const s=read(f);assert.match(s,/<script src="scripts\/study-course-mode\.js\?v=1"><\/script>\s*<script src="scripts\/study-quiz-notes\.js\?v=\d+"><\/script>(?:\s*<script src="scripts\/[a-z-]+\.js\?v=\d+"><\/script>)*\s*<script src="scripts\/study-course-nav\.js\?v=1"><\/script>/,f);
  }
 });
 test('quiz notes use the backed-up lesson notes key, one note per chapter, and re-read before writing',()=>{

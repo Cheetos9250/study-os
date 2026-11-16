@@ -1,0 +1,1 @@
+- Cloud sync also carries the Today cover, icon and card images, Tasks and Grades, as a new Worker subject `home` (up to about 1.8 MB, merged per task, per image slot and per course). It needs one more run of the deploy workflow; until then the client skips it. Cloud sync also runs on Grades and on the Accounting, Economics and Math quiz pages, so quiz notes upload from there.

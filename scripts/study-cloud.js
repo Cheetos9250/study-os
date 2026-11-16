@@ -11,7 +11,7 @@
   'use strict';
   var PROGRESS_LSK = 'study-sync-progress-key-v1', AUTOK = 'study-sync-auto-v1',
       BASEK = 'study-sync-today-base-v1', LASTK = 'study-sync-last-v1', TODAYK = 'studyos.today.v1', NOTESK = 'studyos.notes.v1',
-      MAXB = 340000;
+      MAXB = 340000, HOMEK = 'studyos.home.v1', GRADESK = 'studyos.grades.v1', HBASEK = 'study-sync-home-base-v1', MAXH = 1850000;
   var J = function (v) { return JSON.stringify(v === undefined ? null : v); };
   var obj = function (v) { return !!v && typeof v === 'object' && !Array.isArray(v); };
 
@@ -79,8 +79,25 @@
     return out;
   }
 
+  /* Today home (tasks by id, cover/icon, card images per course) and grades (courses by id) */
+  function mergeHome(base, local, remote) {
+    var b = obj(base) ? base : null, rest = function (o) { var r = {}; Object.keys(o || {}).forEach(function (k) { if (k !== 'tasks' && k !== 'covers') r[k] = o[k]; }); return r; };
+    var out = merge3map(b ? rest(b) : null, rest(local), rest(remote));
+    if (Array.isArray(local.tasks) || Array.isArray(remote.tasks))
+      out.tasks = values(merge3map(b && Array.isArray(b.tasks) ? byId(b.tasks) : null, byId(local.tasks), byId(remote.tasks)));
+    if (obj(local.covers) || obj(remote.covers))
+      out.covers = merge3map(b && obj(b.covers) ? b.covers : null, obj(local.covers) ? local.covers : {}, obj(remote.covers) ? remote.covers : {});
+    return out;
+  }
+  function mergeGrades(base, local, remote) {
+    var out = Object.assign({}, remote, local);
+    if (Array.isArray(local.courses) || Array.isArray(remote.courses))
+      out.courses = values(merge3map(base && Array.isArray(base.courses) ? byId(base.courses) : null, byId(local.courses), byId(remote.courses)));
+    return out;
+  }
+
   /* ---------- browser part ---------- */
-  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map, mergeNotes: mergeNotes }; return; }
+  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map, mergeNotes: mergeNotes, mergeHome: mergeHome, mergeGrades: mergeGrades }; return; }
   var T = root.StudyToday;
   var ls = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -106,6 +123,7 @@
   function subjects() {
     var list = [{ id: 'today' }];
     (T ? T.COURSES.concat(T.LANGS) : []).forEach(function (c) { if (c.key && c.mark) list.push({ id: c.key, mark: c.mark }); });
+    list.push({ id: 'home' });                                                // last: a server without it (404) is skipped
     return list;
   }
   function readCourse(s) {
@@ -127,13 +145,31 @@
       if (++attempt > 6) throw Error('data kept changing; try again');
       return fetch(url, { headers: hdr, cache: 'no-store' }).then(function (r) {
         if (r.status === 401) { var e = Error('wrong sync key'); e.auth = true; throw e; }
+        if (r.status === 404 && s.id === 'home') return false;                 // Worker not updated yet: skip images/tasks/grades
         if (!r.ok) throw Error('read failed (HTTP ' + r.status + ')');
         var rev = r.headers.get('X-Sync-Revision') || '';
         if (!/^"[0-9]+"$/.test(rev)) throw Error('server sent no revision; nothing was written');
         return r.json().then(function (remote) {
           if (!obj(remote)) throw Error('server data is invalid');
           var cur, body, after;
-          if (s.id === 'today') {
+          if (s.id === 'home') {
+            var hraw = ls.get(HOMEK), graw = ls.get(GRADESK), lh = {}, lg = {}, hb = null;
+            try { var ph = JSON.parse(hraw || '{}'); if (obj(ph)) lh = ph; } catch (e) {}
+            try { var pg = JSON.parse(graw || '{}'); if (obj(pg)) lg = pg; } catch (e) {}
+            try { hb = JSON.parse(ls.get(HBASEK) || 'null'); } catch (e) {}
+            var mh = mergeHome(hb && hb.home, lh, obj(remote.home) ? remote.home : {});
+            var mg = mergeGrades(hb && obj(hb.grades) ? hb.grades : null, lg, obj(remote.grades) ? remote.grades : {});
+            body = { home: mh, grades: mg };
+            if (new TextEncoder().encode(J(body)).length > MAXH) throw Error('cover and card images are too big to sync (over 1.8 MB); use an image link for big GIFs');
+            after = function () {
+              if (ls.get(HOMEK) !== hraw || ls.get(GRADESK) !== graw) return 'retry';
+              var ch = false;
+              if (J(lh) !== J(mh)) { ls.set(HOMEK, J(mh)); ch = true; }
+              if (J(lg) !== J(mg) && (graw || Object.keys(mg).length)) { ls.set(GRADESK, J(mg)); ch = true; }
+              ls.set(HBASEK, J(body));
+              return ch;
+            };
+          } else if (s.id === 'today') {
             var raw = ls.get(TODAYK), local = T.loadSettings(raw), base = null, nraw = ls.get(NOTESK), lnotes = {};
             try { base = JSON.parse(ls.get(BASEK) || 'null'); } catch (e) {}
             try { var pn = JSON.parse(nraw || '{}'); if (obj(pn)) lnotes = pn; } catch (e) {}
@@ -226,7 +262,7 @@
         var has = !!(api && key());
         d.innerHTML = '<h2 id="cloudTitle" style="margin:0 0 6px;font:700 22px var(--num,serif)">Cloud sync</h2>'
           + '<p id="cloudMsg" role="status" style="margin:0 0 12px;color:var(--muted,#555)">' + label().replace(/</g, '&lt;') + '</p>'
-          + (api ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Quiz answers, review schedule, flashcards, notes, exams, plan ticks and the timetable sync automatically: when a page opens, after changes and every few minutes.</p>' : '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">The sync server has not been switched on for this site yet.</p>')
+          + (api ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Quiz answers, review schedule, flashcards, notes, exams, plan ticks, the timetable, tasks, grades and the cover, icon and card images sync automatically: when a page opens, after changes and every few minutes.</p>' : '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">The sync server has not been switched on for this site yet.</p>')
           + '<div style="display:flex;flex-wrap:wrap;gap:8px">'
           + (api ? (has ? '<button type="button" data-a="now" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sync now</button><button type="button" data-a="auto" aria-pressed="' + autoOn() + '" style="' + btn + '">Auto sync: ' + (autoOn() ? 'on' : 'off') + '</button><button type="button" data-a="key" style="' + btn + '">Change key</button>' : '<button type="button" data-a="key" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Set sync key</button>') : '')
           + '<button type="button" data-a="close" style="' + btn + '">Close</button></div>';
