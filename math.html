@@ -170,7 +170,7 @@ td:first-child{font-weight:500;min-width:7.5em}
     <div id="qBody"></div>
   </section>
 </div>
-<script src="scripts/study-review.js?v=1"></script>
+<script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-progress-backup.js?v=20261113-compare"></script>
 <script src="scripts/study-course-storage.js?v=20261114-cross-tab"></script>
 <script>
@@ -317,11 +317,13 @@ const QS = D.quiz.map((q,i)=>{ const o={id:i,cat:q[0],q:q[1],opts:q[2],exp:q[4]|
   const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   o.order=idx; o.right=q[3]; return o; });
 /* quiz review (spaced repetition) */
-let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set();
+let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showRetired=false;
+const retired=q=>!!(window.StudyReview&&StudyReview.isRetired(store,q.id,reviewStart));
+const retChip=()=>{const n=QS.filter(retired).length;return n?'<button class="chip" id="retBtn" aria-pressed="'+showRetired+'" type="button" title="Answered right 4 times in a row; back for review in 30–90 days">Retired<span class="n">'+n+'</span></button>':'';};
 const reviewFresh=x=>reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart;
 const revChip=()=>'<button class="chip" id="revBtn" aria-pressed="'+reviewOnly+'" type="button">Review due<span class="n">'+(window.StudyReview?QS.filter(q=>StudyReview.isDue(store,q.id,Date.now())).length:0)+'</span></button>';
 let qcats=new Set(), missedOnly=false, unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
-function buildDeck(){ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!reviewOnly||dueSet.has(String(q.id)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(){ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; }
 function renderQ(){
@@ -329,7 +331,9 @@ function renderQ(){
     [['all','All'],...CATS].forEach(([id,l])=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip';
       b.setAttribute('aria-pressed', id==='all'?!qcats.size:qcats.has(id));
-      b.innerHTML=esc(l)+'<span class="n">'+(id==='all'?QS.length:QS.filter(q=>q.cat===id).length)+'</span>';
+      const inCat=id==='all'?[]:QS.filter(q=>q.cat===id), mastered=inCat.length&&inCat.every(retired);
+      if(mastered) b.title='Mastered: every question here is retired';
+      b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+(id==='all'?QS.length:inCat.length)+'</span>';
       b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); buildDeck();renderQ(); };
       box.appendChild(b); });
   })($('#qCats'));
@@ -337,8 +341,8 @@ function renderQ(){
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button><button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
-  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
+  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>!qcats.size||qcats.has(q.cat)).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
   h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
@@ -358,6 +362,7 @@ function wireQ(){
   const rb=$('#revBtn'); if(rb) rb.onclick=()=>{reviewOnly=!reviewOnly;reviewStart=Date.now();qpos=0;buildDeck();renderQ()};
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;buildDeck();renderQ()};
+  const rt=$('#retBtn'); if(rt) rt.onclick=()=>{showRetired=!showRetired;qpos=0;buildDeck();renderQ()};
   const sh=$('#shufBtn'); if(sh) sh.onclick=()=>{shuffleOn=!shuffleOn;buildDeck();renderQ()};
   const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rv={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }

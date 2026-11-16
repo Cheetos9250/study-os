@@ -2,12 +2,14 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const R=require('../scripts/study-review.js');const DAY=86400000;
 const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
-test('wrong answers come back tomorrow; each correct answer waits longer, capped at 30 days',()=>{
+test('wrong answers come back tomorrow; each correct answer waits longer, capped at 90 days',()=>{
   const now=Date.UTC(2026,10,16,5);const sod=R.sod(now);
   assert.deepEqual(R.next(undefined,false,now),[0,sod+DAY]);
   assert.deepEqual(R.next(undefined,true,now),[1,sod+3*DAY]);
   assert.deepEqual(R.next([1,0],true,now),[2,sod+7*DAY]);
-  assert.deepEqual(R.next([4,0],true,now),[4,sod+30*DAY]);
+  assert.deepEqual(R.next([3,0],true,now),[4,sod+30*DAY]);
+  assert.deepEqual(R.next([4,0],true,now),[5,sod+90*DAY]);
+  assert.deepEqual(R.next([5,0],true,now),[5,sod+90*DAY]);
   assert.deepEqual(R.next([3,0],false,now),[0,sod+DAY]);
 });
 test('earlier answers get a schedule without touching answers; only answered, due questions count',()=>{

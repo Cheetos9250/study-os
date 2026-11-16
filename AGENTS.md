@@ -61,7 +61,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | Key | What |
 |---|---|
 | `<mark>-srs`, `<mark>-typ` | Flashcard SRS. Marks: `acc-flashcards-v1`, `econ-flashcards-v1`, `math-flashcards-v1`, `eng-vocab-v1`, `zh-vocab-v1`. |
-| `study-<course>` | Quiz answers (`ans`, `ats`) and the quiz review schedule `rv` (`id → [box, dueMs]`, `scripts/study-review.js`). |
+| `study-<course>` | Quiz answers (`ans`, `ats`) and the quiz review schedule `rv` (`id → [box, dueMs]`, `scripts/study-review.js`; gaps 1/3/7/14/30/90 days, box ≥ 4 = retired). |
 | `studyos.home.v1` | Owner tasks, cover, icon, card images. |
 | `studyos.today.v1` | Exams, plan ticks, timetable. `markChapter` must keep the other fields. |
 | `studyos.grades.v1` | Grades. |
