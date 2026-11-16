@@ -9,6 +9,6 @@ test('PDF sets answers key is backed up, labelled and validated',()=>{
 test('pdf-sets page keeps files on the device and links from Practice',()=>{
   const s=R('pdf-sets.html');
   assert.match(s,/indexedDB\.open\(DB,1\)/); assert.match(s,/KEY='studyos\.pdfsets\.v1'/);
-  assert.doesNotMatch(s,/fetch\(/,'no uploads'); assert.match(s,/isEvalSupported:false/);
+  assert.deepEqual([...s.matchAll(/fetch\(([^)]*)\)/g)].map(m=>m[1]),["'data/accounting-textbook-index.json'"],'only reads the exercise index; never uploads'); assert.match(s,/isEvalSupported:false/);
   assert.match(R('practice.html'),/href="pdf-sets\.html"/);
 });

@@ -54,6 +54,7 @@ h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px)}
 .ps-ch button.ps-key{box-shadow:inset 0 0 0 3px #1a7f37}
 .ps-note{font-size:13px;opacity:.75;margin:8px 0}
 .ps-keybox{display:grid;gap:6px;margin:8px 0}
+.ps-notes{width:100%;min-height:150px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit;font:15px inherit;padding:8px;margin:4px 0 12px}.ps-tools{border-bottom:1px solid var(--line);margin-bottom:10px}.ps-pg{width:100%;margin:0 0 8px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;color:#999;font:700 18px var(--mono);overflow:hidden}.ps-pg canvas{margin:0}
 .ps-keybox textarea{width:100%;min-height:70px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit;font:14px var(--mono);padding:8px}
 .ps-empty{border:1px dashed var(--line);border-radius:14px;padding:22px;text-align:center;opacity:.85}
 .ps-err{color:#c4321c;font-size:14px}
@@ -65,7 +66,7 @@ input[type=file]{display:none}
 <script src="scripts/study-theme.js?v=3"></script>
 <main class="ps-page">
 <h1>My PDF sets</h1>
-<p class="ps-sub">Practise from your own question PDFs (for example your teacher's practice sets). Files stay on this device only — they are not uploaded anywhere.</p>
+<p class="ps-sub">All your PDFs in one place: teacher's practice sets, the accounting textbook, IFRS chapters. Files stay on this device only — they are not uploaded anywhere.</p>
 <div class="ps-bar">
  <button class="ps-btn ps-primary" id="addBtn" type="button">＋ Add PDF</button>
  <label class="ps-note" for="course">Subject</label>
@@ -79,13 +80,21 @@ input[type=file]{display:none}
  <div class="ps-work">
   <div class="ps-viewer" id="viewer" aria-label="Original PDF pages"></div>
   <aside class="ps-sheet" aria-label="Answer sheet">
+   <div class="ps-tools">
+    <div class="ps-bar"><b id="pageNow">Page 1</b><input id="pageInput" type="number" min="1" inputmode="numeric" aria-label="Go to page" style="width:90px"><button class="ps-btn" id="pageGo" type="button">Go</button></div>
+    <div class="ps-bar" id="exBar" hidden><select id="exSel" class="ps-btn" aria-label="Go to exercise" style="max-width:100%"></select></div>
+    <label class="ps-note" for="pageNotes">Working for this page (saved on this device)</label>
+    <textarea id="pageNotes" class="ps-notes" maxlength="20000" placeholder="Write your working here…"></textarea>
+   </div>
+   <div id="sheetPart">
    <h2>Answer sheet</h2>
    <div class="ps-score" id="score"></div>
    <div class="ps-bar" role="group" aria-label="Mode"><button class="ps-btn" id="modeAns" type="button" aria-pressed="true">My answers</button><button class="ps-btn" id="modeKey" type="button" aria-pressed="false">Answer key</button></div>
    <p class="ps-note" id="modeNote"></p>
    <div class="ps-keybox" id="keyBox" hidden><textarea id="keyText" placeholder="Paste a key, e.g. 1b 2d 3a … or bdab…" aria-label="Paste answer key"></textarea><button class="ps-btn" id="keyApply" type="button">Use this key</button></div>
    <div id="qs"></div>
-   <div class="ps-bar" style="margin-top:10px"><button class="ps-btn" id="wrongOnly" type="button" aria-pressed="false">Wrong only</button><button class="ps-btn" id="clearAns" type="button">Clear my answers</button><button class="ps-btn" id="removeSet" type="button">Remove PDF</button></div>
+   </div>
+   <div class="ps-bar" style="margin-top:10px"><span id="ansTools" style="display:contents"><button class="ps-btn" id="wrongOnly" type="button" aria-pressed="false">Wrong only</button><button class="ps-btn" id="clearAns" type="button">Clear my answers</button></span><button class="ps-btn" id="removeSet" type="button">Remove PDF</button></div>
   </aside>
  </div>
 </section>
@@ -101,6 +110,13 @@ function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){
 function db(){ return new Promise((res,rej)=>{ if(!('indexedDB' in window)) return rej(new Error('This browser cannot store files.')); const r=indexedDB.open(DB,1); r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(STORE)) r.result.createObjectStore(STORE); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
 async function idb(op,key,val){ const d=await db(); return new Promise((res,rej)=>{ const tx=d.transaction(STORE,op==='get'?'readonly':'readwrite'); const st=tx.objectStore(STORE); const rq=op==='get'?st.get(key):op==='put'?st.put(val,key):st.delete(key); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); tx.oncomplete=()=>d.close(); }); }
 const COURSE={eco:'Economics',math:'Mathematics',acc:'Accounting',other:'Other'};
+/* The accounting textbook PDF is shared with Textbook Exercises (its own IndexedDB), so it is stored once. */
+const BOOK_ID='ptextbook', BOOK_DB='studyos-accounting-pdf-v1', BOOK_STORE='book';
+function bookDb(){ return new Promise((res,rej)=>{ const r=indexedDB.open(BOOK_DB,1); r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(BOOK_STORE)) r.result.createObjectStore(BOOK_STORE); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function bookIdb(op,val){ const d=await bookDb(); return new Promise((res,rej)=>{ const tx=d.transaction(BOOK_STORE,op==='get'?'readonly':'readwrite'); const st=tx.objectStore(BOOK_STORE); const rq=op==='get'?st.get('pdf'):op==='put'?st.put(val,'pdf'):st.delete('pdf'); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); tx.oncomplete=()=>d.close(); }); }
+async function getBlob(id){ if(id===BOOK_ID){ const b=await bookIdb('get'); return b||null; } const rec=await idb('get',id); return rec&&rec.blob; }
+let INDEX=null; async function loadIndex(){ if(INDEX) return INDEX; try{ const r=await fetch('data/accounting-textbook-index.json'); INDEX=r.ok?await r.json():{items:[],chapters:[]}; }catch(e){ INDEX={items:[],chapters:[]}; } return INDEX; }
+
 function setId(f){ let h=0; const s=f.name+'|'+f.size; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return 'p'+(h>>>0).toString(36); }
 function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function letters(q,s){ return 'abcde'.slice(0,Math.max(4,Math.min(5,(s.opts&&s.opts[q])||4))).split(''); }
@@ -121,9 +137,11 @@ async function openPdf(blob){ if(!window.pdfjsLib) throw new Error('PDF reader c
 async function addFiles(files){
   $('err').textContent=''; const course=$('course').value; let firstId=null;
   for(const f of files){ try{ if(!/\.pdf$/i.test(f.name)&&f.type!=='application/pdf') throw new Error(f.name+' is not a PDF.');
-      const id=setId(f); const pdf=await openPdf(f); const a=await analyse(pdf); await pdf.destroy();
-      await idb('put',id,{blob:f,name:f.name,added:Date.now()});
-      const old=data.sets[id]||{}; data.sets[id]={name:f.name.replace(/\.pdf$/i,'').replace(/_/g,' '),course,n:Math.max(a.n,old.n||0),page:a.page,opts:a.opts,ans:old.ans||{},key:old.key||{},added:old.added||Date.now()}; firstId=firstId||id;
+      const pdf=await openPdf(f); const pages=pdf.numPages; const book=pages>60; const isText=pages===1210;
+      const a=book?{n:0,page:{},opts:{}}:await analyse(pdf); await pdf.destroy();
+      const id=isText?BOOK_ID:setId(f);
+      if(isText) await bookIdb('put',f); else await idb('put',id,{blob:f,name:f.name,added:Date.now()});
+      const old=data.sets[id]||{}; data.sets[id]={name:isText?'Accounting textbook (24e)':f.name.replace(/\.pdf$/i,'').replace(/_/g,' '),course:isText?'acc':course,n:Math.max(a.n,old.n||0),pages,page:a.page,opts:a.opts,ans:old.ans||{},key:old.key||{},notes:old.notes||{},added:old.added||Date.now()}; firstId=firstId||id;
     }catch(e){ $('err').textContent=(e&&e.message)||'Could not open this file.'; } }
   save(); renderSets(); if(firstId) select(firstId);
 }
@@ -131,19 +149,32 @@ function stats(s){ const keyN=Object.keys(s.key).length; let ok=0,ans=0; for(con
 function renderSets(){
   const ids=Object.keys(data.sets).sort((a,b)=>(data.sets[a].course+data.sets[a].name).localeCompare(data.sets[b].course+data.sets[b].name));
   $('emptyMsg').hidden=!!ids.length;
-  $('sets').innerHTML=ids.map(id=>{ const s=data.sets[id],st=stats(s); return '<button class="ps-set" type="button" data-id="'+id+'" aria-current="'+(id===cur)+'"><b>'+esc(s.name)+'</b><small>'+COURSE[s.course]+' · '+s.n+' questions · '+st.ans+' answered'+(st.keyN?' · '+st.ok+' correct':'')+'</small></button>'; }).join('');
+  $('sets').innerHTML=ids.map(id=>{ const s=data.sets[id],st=stats(s); return '<button class="ps-set" type="button" data-id="'+id+'" aria-current="'+(id===cur)+'"><b>'+esc(s.name)+'</b><small>'+COURSE[s.course]+' · '+(s.n?s.n+' questions · '+st.ans+' answered':(s.pages||0)+' pages'+(Object.keys(s.notes||{}).length?' · '+Object.keys(s.notes).length+' pages with notes':''))+(st.keyN?' · '+st.ok+' correct':'')+'</small></button>'; }).join('');
   $('sets').querySelectorAll('.ps-set').forEach(b=>b.onclick=()=>select(b.dataset.id));
 }
+let doc=null, io=null, seen=null, curPage=1, notesTimer=null;
 async function select(id){
-  cur=id; renderSets(); const s=data.sets[id]; if(!s) return; $('workArea').hidden=false; $('setName').textContent=s.name; $('setInfo').textContent=COURSE[s.course]+' · '+s.n+' questions detected'; renderSheet();
-  const v=$('viewer'); v.innerHTML='<p class="ps-note">Opening PDF…</p>';
-  try{ const rec=await idb('get',id); if(!rec) throw new Error('This PDF is no longer stored on this device. Add it again — your answers are kept.'); const pdf=await openPdf(rec.blob); v.innerHTML='';
-    for(let p=1;p<=pdf.numPages;p++){ if(cur!==id) break; const page=await pdf.getPage(p); const vp=page.getViewport({scale:1}); const scale=Math.min(2.2,Math.max(1,(v.clientWidth||800)/vp.width)*(window.devicePixelRatio||1)); const vp2=page.getViewport({scale}); const c=document.createElement('canvas'); c.width=vp2.width; c.height=vp2.height; c.id='pg'+p; c.setAttribute('aria-label','Page '+p); v.appendChild(c); await page.render({canvasContext:c.getContext('2d'),viewport:vp2}).promise; }
-    await pdf.destroy();
+  if(notesTimer) flushNotes();
+  cur=id; curPage=1; renderSets(); const s=data.sets[id]; if(!s) return; s.notes=s.notes||{}; $('workArea').hidden=false; $('setName').textContent=s.name;
+  $('setInfo').textContent=COURSE[s.course]+(s.n?' · '+s.n+' questions detected':'')+(s.pages?' · '+s.pages+' pages':''); renderSheet();
+  const v=$('viewer'); v.innerHTML='<p class="ps-note">Opening PDF…</p>'; if(io) io.disconnect(); if(seen) seen.disconnect(); if(doc){ try{ await doc.destroy(); }catch(e){} doc=null; }
+  try{ const blob=await getBlob(id); if(!blob) throw new Error('This PDF is not stored on this device yet. Tap Add PDF and choose it again — your answers and notes are kept.');
+    const pdf=await openPdf(blob); if(cur!==id){ pdf.destroy(); return; } doc=pdf; if(!s.pages){ s.pages=pdf.numPages; save(); $('setInfo').textContent+=' · '+s.pages+' pages'; }
+    const first=await pdf.getPage(1); const vp=first.getViewport({scale:1}); const ratio=vp.height/vp.width; v.innerHTML='';
+    for(let p=1;p<=pdf.numPages;p++){ const d=document.createElement('div'); d.className='ps-pg'; d.id='pg'+p; d.dataset.p=p; d.style.aspectRatio=String(1/ratio); d.setAttribute('aria-label','Page '+p); d.innerHTML='<span>'+p+'</span>'; v.appendChild(d); }
+    const draw=async d=>{ if(d.dataset.done||!doc||cur!==id) return; d.dataset.done='1'; const page=await doc.getPage(+d.dataset.p); const w=d.clientWidth||800; const scale=Math.min(2.4,(w/page.getViewport({scale:1}).width)*Math.min(2,window.devicePixelRatio||1)); const vp2=page.getViewport({scale}); const c=document.createElement('canvas'); c.width=vp2.width; c.height=vp2.height; await page.render({canvasContext:c.getContext('2d'),viewport:vp2}).promise; if(d.dataset.done) d.replaceChildren(c); };
+    io=new IntersectionObserver(es=>es.forEach(e=>{ const d=e.target; if(e.isIntersecting) draw(d).catch(()=>{ delete d.dataset.done; }); else if(d.dataset.done){ delete d.dataset.done; d.innerHTML='<span>'+d.dataset.p+'</span>'; } }),{rootMargin:'1500px 0px'});
+    seen=new IntersectionObserver(es=>{ const vis=es.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(vis){ const p=+vis.target.dataset.p; if(p!==curPage){ if(notesTimer) flushNotes(); curPage=p; showPage(); } } },{threshold:[0.35,0.6]});
+    v.querySelectorAll('.ps-pg').forEach(d=>{ io.observe(d); seen.observe(d); });
   }catch(e){ v.innerHTML='<p class="ps-err">'+esc(e.message||'Could not open the PDF.')+'</p>'; }
 }
+function goPage(p){ const el=$('pg'+p); if(el) el.scrollIntoView({behavior:'auto',block:'start'}); }
+function flushNotes(){ clearTimeout(notesTimer); notesTimer=null; const s=data.sets[cur]; if(!s) return; const t=$('pageNotes').value; s.notes=s.notes||{}; if(t.trim()) s.notes[curPage]=t; else delete s.notes[curPage]; save(); }
+function showPage(){ const s=data.sets[cur]; if(!s) return; $('pageNow').textContent='Page '+curPage+(s.pages?' of '+s.pages:''); $('pageNotes').value=(s.notes&&s.notes[curPage])||''; $('pageInput').placeholder=String(curPage); }
 function renderSheet(){
   const s=data.sets[cur]; if(!s) return; const st=stats(s);
+  $('sheetPart').hidden=!s.n; $('ansTools').hidden=!s.n; $('toSheet').textContent=s.n?'Answer sheet ↓':'Page tools ↓'; showPage();
+  $('exBar').hidden=cur!==BOOK_ID; if(cur===BOOK_ID&&!$('exSel').options.length) loadIndex().then(ix=>{ const sel=$('exSel'); sel.innerHTML='<option value="">Go to exercise…</option>'+(ix.chapters||[]).filter(c=>c.group==='chapter').map(c=>'<optgroup label="Ch '+c.chapter+' · '+esc(c.name)+'">'+(ix.items||[]).filter(i=>i.chapter===c.chapter&&i.pdfPage).map(i=>'<option value="'+i.pdfPage+'">'+esc(i.id.replace(/-/,' ')+' · '+i.title)+'</option>').join('')+'</optgroup>').join(''); });
   $('score').textContent=st.keyN?st.ok+' / '+Math.max(st.ans,0)+' correct':st.ans+' / '+s.n+' answered';
   $('modeAns').setAttribute('aria-pressed',String(mode==='ans')); $('modeKey').setAttribute('aria-pressed',String(mode==='key')); $('wrongOnly').setAttribute('aria-pressed',String(wrongOnly));
   $('keyBox').hidden=mode!=='key';
@@ -157,6 +188,12 @@ function renderSheet(){
   $('qs').querySelectorAll('.ps-n').forEach(b=>b.onclick=()=>{ const p=s.page&&s.page[b.dataset.q], el=p&&$('pg'+p); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); });
 }
 $('addBtn').onclick=()=>$('file').click();
+$('pageGo').onclick=()=>{ const p=parseInt($('pageInput').value,10); if(p>=1) goPage(p); };
+$('pageInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('pageGo').click(); } });
+$('exSel').onchange=()=>{ const p=+$('exSel').value; if(p) goPage(p); };
+$('pageNotes').addEventListener('input',()=>{ clearTimeout(notesTimer); notesTimer=setTimeout(flushNotes,500); });
+$('pageNotes').addEventListener('blur',()=>{ if(notesTimer) flushNotes(); });
+addEventListener('pagehide',()=>{ if(notesTimer) flushNotes(); });
 $('toSheet').onclick=()=>document.querySelector('.ps-sheet').scrollIntoView({behavior:'smooth',block:'start'});
 $('file').onchange=()=>{ const fs=[...($('file').files||[])]; $('file').value=''; if(fs.length) addFiles(fs); };
 $('modeAns').onclick=()=>{ mode='ans'; renderSheet(); }; $('modeKey').onclick=()=>{ mode='key'; renderSheet(); };
@@ -165,9 +202,10 @@ $('keyApply').onclick=()=>{ const s=data.sets[cur]; if(!s) return; const t=$('ke
   if(pairs.length) pairs.forEach(m=>{ if(+m[1]>=1&&+m[1]<=s.n) s.key[+m[1]]=m[2]; }); else [...t.replace(/[^a-e]/g,'')].forEach((L,i)=>{ if(i<s.n) s.key[i+1]=L; });
   save(); mode='ans'; renderSheet(); renderSets(); };
 $('clearAns').onclick=()=>{ const s=data.sets[cur]; if(!s||!confirm('Clear your answers for this set? The answer key is kept.')) return; s.ans={}; save(); renderSheet(); renderSets(); };
-$('removeSet').onclick=async()=>{ const s=data.sets[cur]; if(!s||!confirm('Remove "'+s.name+'" and its answers from this device?')) return; try{ await idb('del',cur); }catch(e){} delete data.sets[cur]; save(); cur=null; $('workArea').hidden=true; renderSets(); };
+$('removeSet').onclick=async()=>{ const s=data.sets[cur]; if(!s||!confirm('Remove "'+s.name+'" and its answers from this device?'+(cur===BOOK_ID?' The textbook PDF is also removed from Textbook Exercises.':''))) return; try{ if(cur===BOOK_ID) await bookIdb('del'); else await idb('del',cur); }catch(e){} delete data.sets[cur]; save(); cur=null; $('workArea').hidden=true; renderSets(); };
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
-renderSets(); const first=Object.keys(data.sets)[0]; if(first) addEventListener('load',()=>select(first));
+(async()=>{ try{ if(!data.sets[BOOK_ID]&&await bookIdb('get')){ data.sets[BOOK_ID]={name:'Accounting textbook (24e)',course:'acc',n:0,pages:1210,page:{},opts:{},ans:{},key:{},notes:{},added:Date.now()}; save(); } }catch(e){}
+  renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
 <script src="scripts/study-nav.js?v=4"></script>
 </body>

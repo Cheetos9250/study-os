@@ -1,0 +1,1 @@
+- My PDF sets now holds big PDFs too: the accounting textbook (shared with Textbook Exercises, added once) and IFRS chapter files. Pages load as you scroll, with Go to page, Go to exercise (textbook) and per-page working notes saved on the device.
