@@ -100,6 +100,14 @@
             if (!/^\d{1,5}$/.test(pn) || typeof set.notes[pn] !== "string") throw new Error("Invalid PDF practice answers");
         }
       }
+    } else if (key === "studyos.excel.v1") {
+      if ((value.done !== undefined && !object(value.done)) || (value.ans !== undefined && !object(value.ans)))
+        throw new Error("Invalid Excel lesson progress");
+      for (var xs of Object.keys(value.done || {}))
+        if (!/^[a-z][0-9]{1,2}$/.test(xs) || value.done[xs] !== true) throw new Error("Invalid Excel lesson progress");
+      for (var xq of Object.keys(value.ans || {}))
+        if (!/^x\d{1,3}$/.test(xq) || !Number.isInteger(value.ans[xq]) || value.ans[xq] < 0 || value.ans[xq] > 9)
+          throw new Error("Invalid Excel lesson progress");
     } else if (key === "studyos.grades.v1") {
       if (!Array.isArray(value.courses)) throw new Error("Invalid grades data");
       for (var gc of value.courses) {

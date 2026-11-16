@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — Excel: build a basic dashboard with tables, PivotTables and slicers">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Excel · Basic dashboard — Study OS</title>
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--mono)}
+.xl-page{max-width:980px;margin:0 auto;padding:22px max(16px,env(safe-area-inset-right)) 110px max(16px,env(safe-area-inset-left))}
+h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px)}
+.xl-sub{margin:0 0 14px;opacity:.75;font-size:14px}
+.xl-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.xl-btn{font:600 14px var(--mono);min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.xl-btn[aria-pressed="true"],.xl-btn.xl-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.xl-progress{display:flex;align-items:center;gap:10px;margin:0 0 16px;font-size:14px}
+.xl-meter{flex:1;height:10px;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.xl-meter i{display:block;height:100%;width:0;background:var(--text)}
+.xl-part{margin:0 0 22px}
+.xl-part>h2{font-size:20px;margin:0 0 4px}
+.xl-part>p{margin:0 0 10px;opacity:.8;font-size:14px}
+.xl-step{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px;background:var(--bg)}
+.xl-step h3{display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;font-size:16px}
+.xl-step h3 label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;flex:1}
+.xl-step input[type=checkbox]{width:22px;height:22px;flex:none;margin:1px 0 0;accent-color:var(--text)}
+.xl-step.done h3{opacity:.6}
+.xl-step ol,.xl-step ul{margin:6px 0 0;padding-left:22px}
+.xl-step li{margin:3px 0}
+.xl-step p{margin:6px 0}
+kbd,code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;border:1px solid var(--line);border-radius:6px;padding:1px 5px;overflow-wrap:anywhere}
+.xl-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;margin:8px 0}
+.xl-fields div{border:1px dashed var(--line);border-radius:10px;padding:6px 9px;font-size:13px}
+.xl-fields b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65}
+.xl-tip{border-left:4px solid var(--text);padding:6px 10px;margin:8px 0;font-size:14px;background:color-mix(in srgb,var(--text) 6%,transparent);border-radius:0 8px 8px 0}
+.xl-layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:12px;margin:8px 0}
+.xl-layout div{border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.xl-layout .xl-wide{grid-column:1/-1;font-weight:700}
+.xl-q{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px}
+.xl-q p{margin:0 0 8px;font-weight:600}
+.xl-opts{display:grid;gap:6px}
+.xl-opt{text-align:left;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;cursor:pointer}
+.xl-opt.right{outline:3px solid #2f9e44}
+.xl-opt.wrong{outline:3px solid #e03131}
+.xl-exp{margin:8px 0 0;font-size:14px;opacity:.85}
+.xl-score{font:700 16px var(--mono);margin:0 0 12px}
+</style>
+<link rel="stylesheet" href="assets/study-world.css?v=8">
+</head>
+<body>
+<script src="scripts/study-theme.js?v=5"></script>
+<main class="xl-page">
+<h1>Excel · Basic dashboard</h1>
+<p class="xl-sub">Excel Applications for Business · build an Income &amp; Expenditure Dashboard from bank transactions: tables, data validation, XLOOKUP, six PivotTables, data bars, slicers and headline numbers. The teacher said the final asks you to build this.</p>
+<div class="xl-tabs" role="tablist" aria-label="Sections">
+ <button class="xl-btn" type="button" data-tab="steps" aria-pressed="true">Step by step</button>
+ <button class="xl-btn" type="button" data-tab="exam" aria-pressed="false">Exam tips</button>
+ <button class="xl-btn" type="button" data-tab="quiz" aria-pressed="false">Quiz</button>
+</div>
+
+<section id="tab-steps">
+<div class="xl-progress"><span id="doneTxt">0 of 0 steps done</span><span class="xl-meter" aria-hidden="true"><i id="doneBar"></i></span><button class="xl-btn" type="button" id="resetSteps">Reset ticks</button></div>
+<p class="xl-sub">What you are building (sheet <b>Report</b>):</p>
+<div class="xl-layout" aria-label="Dashboard layout">
+ <div class="xl-wide">Income &amp; Expenditure Dashboard · INCOME · EXPENSE · NET SAVINGS</div>
+ <div>Slicers: Year, Month</div><div>① Income by category</div><div>② Expense by category + % of total</div>
+ <div>③ Expense by subcategory + %</div><div>④ Income by month</div><div>⑤ Expense by month · ⑥ Net savings by month</div>
+</div>
+<div id="steps"></div>
+</section>
+
+<section id="tab-exam" hidden>
+<div class="xl-part">
+<h2>What the teacher said about the final</h2>
+<div class="xl-step"><ul>
+ <li>The final asks you to build this dashboard, especially the Expense table with <b>% of Total</b>.</li>
+ <li>The data may be <b>accounting data</b> (e.g. from adjusting entries). Use the same steps but think about what the report is about: if it asks for <b>Asset</b>, filter and label <b>Asset</b> instead of Income.</li>
+ <li>A PivotTable is built from the <b>column headers</b>. Each header becomes a field. Keep the data as an active Excel table (do not use <i>Convert to Range</i>).</li>
+ <li>Make it look professional: tables lined up, a clear title, and headline numbers. "Your manager wants to read this report."</li>
+</ul></div>
+</div>
+<div class="xl-part">
+<h2>Common mistakes and fixes</h2>
+<div class="xl-step"><ul>
+ <li><b>New rows do not show in the report</b>: paste them directly under the table so the table grows, then <b>Data → Refresh All</b>.</li>
+ <li><b>Slicer changes only one table</b>: right-click the slicer → <b>Report Connections</b> → tick the other PivotTables.</li>
+ <li><b>Negative bars are red or point the wrong way</b>: Manage Rules → Edit Rule → <b>Negative Value and Axis</b> → fill colour pink, then set <b>Bar Direction: Right-to-Left</b>.</li>
+ <li><b>Rule colours only part of the table</b>: in Edit Rule choose <b>All cells showing "Sum of …" values for "Subcategory"</b> (or "Category"), not <i>Selected cells</i>.</li>
+ <li><b>Group selects the wrong units</b>: in the Group box hold <kbd>Ctrl</kbd> (<kbd>⌘</kbd> on Mac) while clicking, so you can untick Days and keep Months + Years.</li>
+ <li><b>Group is greyed out</b>: some Date cells are text or blank. Fix them to real dates, then refresh.</li>
+ <li><b>Month names show in Thai</b>: Excel takes group names from the computer's region format. Set the region format to English (Windows: Settings → Time &amp; language → Region; Mac: System Settings → General → Language &amp; Region), reopen Excel and group again.</li>
+ <li><b>Columns jump in width after refresh</b>: PivotTable Options → untick <b>Autofit column widths on update</b>.</li>
+ <li><b><code>;;;</code> made the numbers vanish</b>: that is intended for the bar column. The values are still there (formula bar shows them).</li>
+</ul></div>
+</div>
+<div class="xl-part">
+<h2>Shortcuts used</h2>
+<div class="xl-step"><ul>
+ <li><kbd>Ctrl</kbd>+<kbd>T</kbd> make a table · <kbd>Ctrl</kbd>+<kbd>1</kbd> Format Cells · <kbd>F3</kbd> paste a defined name</li>
+ <li><kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd> copy a whole PivotTable to make the next one · <kbd>Ctrl</kbd>+<kbd>X</kbd> move a PivotTable</li>
+</ul></div>
+</div>
+</section>
+
+<section id="tab-quiz" hidden>
+<p class="xl-score" id="score"></p>
+<div id="quiz"></div>
+<button class="xl-btn" type="button" id="resetQuiz">Clear my answers</button>
+</section>
+</main>
+<script>
+(function(){
+'use strict';
+const KEY='studyos.excel.v1';
+const $=id=>document.getElementById(id);
+const PARTS=[
+ {t:'Part A · Prepare the data',d:'Two sheets: Categories (your list) and Transactions (bank data).',steps:[
+  {id:'a1',t:'Categories sheet as a table',b:`<ol><li>List each <b>Subcategory</b> (Groceries, Rent, Salary…), its larger <b>Category</b> (Living Expenses, Fixed…) and its <b>Category Type</b> (Income or Expense).</li><li>Click inside the list → <kbd>Ctrl</kbd>+<kbd>T</kbd> → My table has headers → OK.</li><li>Table Design → Table Name: <code>Categories</code>. Pick a light grey style.</li></ol>`},
+  {id:'a2',t:'Name the Subcategory list',b:`<ol><li>Select the Subcategory cells (no header).</li><li>Formulas → <b>Define Name</b> → e.g. <code>SubcategoryList</code> → OK.</li></ol><div class="xl-tip">Because it points into the table, new subcategories join the dropdown automatically.</div>`},
+  {id:'a3',t:'Transactions table',b:`<ol><li>Paste bank data with headers: <b>Account</b>, <b>Date</b>, <b>Description</b>, <b>Debit (Spend)</b>, <b>Credit (Income)</b>.</li><li><kbd>Ctrl</kbd>+<kbd>T</kbd>, name it <code>Transactions</code>.</li><li>Add a column <b>Income/(Expense)</b>: <code>=[@[Credit (Income)]]-[@[Debit (Spend)]]</code> (income positive, spending negative).</li></ol>`},
+  {id:'a4',t:'Subcategory dropdown',b:`<ol><li>Add a column <b>Subcategory</b>. Select its cells.</li><li>Data → <b>Data Validation</b> → Allow: <b>List</b> → Source: <code>=SubcategoryList</code> (press <kbd>F3</kbd> to pick the name).</li><li>Choose a subcategory for every transaction.</li></ol>`},
+  {id:'a5',t:'Look up Category and Type',b:`<p>Add columns <b>Category</b> and <b>Category Type</b>:</p><p><code>=XLOOKUP([@Subcategory],Categories[Subcategory],Categories[Category])</code></p><p><code>=XLOOKUP([@Subcategory],Categories[Subcategory],Categories[Category Type])</code></p><div class="xl-tip">No XLOOKUP? <code>=VLOOKUP([@Subcategory],Categories,2,FALSE)</code> works when Subcategory is the first column of Categories (use 3 for Type).</div>`}
+ ]},
+ {t:'Part B · Six PivotTables',d:'Make the first one carefully, then copy it to make the others.',steps:[
+  {id:'b1',t:'① Income by category',b:`<ol><li>Click in Transactions → Insert → <b>PivotTable</b> → Existing Worksheet → a cell on sheet <b>Report</b> (e.g. B4).</li></ol><div class="xl-fields"><div><b>Filters</b>Category Type = Income</div><div><b>Rows</b>Category, then Subcategory</div><div><b>Values</b>Sum of Income/(Expense) ×2</div></div><ol start="2"><li>Right-click a number → Sort → <b>Largest to Smallest</b>.</li><li>Select the second value column → Home → Conditional Formatting → <b>Data Bars</b> → Solid Fill.</li><li>Conditional Formatting → <b>Manage Rules</b> → Edit Rule → <b>All cells showing "Sum of Income/(Expense)2" values for "Subcategory"</b> → bar colour <b>green</b> → OK.</li><li>Select that column → <kbd>Ctrl</kbd>+<kbd>1</kbd> → Custom → type <code>;;;</code> → OK. The numbers hide; only the bars stay.</li><li>Click the first value header and type <b>Income</b>.</li><li>Right-click → PivotTable Options → untick <b>Autofit column widths on update</b>.</li></ol>`},
+  {id:'b2',t:'② Expense by category with % of Total',b:`<ol><li>Select the whole Income PivotTable → <kbd>Ctrl</kbd>+<kbd>C</kbd> → click an empty cell (e.g. F4) → <kbd>Ctrl</kbd>+<kbd>V</kbd>.</li><li>Filter arrow → <b>Expense</b>. Remove <b>Subcategory</b> from Rows.</li><li>Sort <b>Smallest to Largest</b> (expenses are negative, so the biggest spend comes first).</li><li>Add Income/(Expense) to Values again and drag it between the two; rename it <b>% of Total</b> → right-click → Show Values As → <b>% of Grand Total</b>.</li><li>On the bar column: Data Bars → Manage Rules → Edit Rule → "for Category" → <b>Negative Value and Axis</b> → fill <b>pink</b> → OK → Bar Direction <b>Right-to-Left</b>.</li><li>Rename the first header <b>Expense</b>. PivotTable Design → choose a pink style.</li></ol>`},
+  {id:'b3',t:'③ Expense by subcategory',b:`<ol><li>Copy ② to a new spot (e.g. K4).</li><li>Rows: <b>Category</b>, then <b>Subcategory</b>.</li><li>Conditional Formatting → Clear Rules → <b>This PivotTable</b>, then add Data Bars on the <b>% of Total</b> column again: pink negative fill, Right-to-Left.</li><li>Sort Smallest to Largest.</li></ol>`},
+  {id:'b4',t:'④ Income by month',b:`<ol><li>Copy ① to the row below (e.g. B20).</li><li>Untick Category and Subcategory; tick <b>Date</b> (Rows). Keep Category Type = Income.</li><li>Right-click a date → <b>Group</b> → hold <kbd>Ctrl</kbd> and select <b>Months</b> and <b>Years</b> (untick Days) → OK.</li><li>Data Bars → Edit Rule → <b>green</b>.</li></ol>`},
+  {id:'b5',t:'⑤ Expense by month',b:`<ol><li>Copy ④ beside it. Filter → <b>Expense</b>.</li><li>Edit the bar rule: Negative Value and Axis → <b>pink</b>, Bar Direction <b>Right-to-Left</b>.</li><li>Header: <b>Expense</b>.</li></ol>`},
+  {id:'b6',t:'⑥ Net savings by month',b:`<ol><li>Copy ④ again. Filter arrow → tick <b>Select Multiple Items</b> → tick <b>Income</b> and <b>Expense</b> → OK. The filter shows "(Multiple Items)".</li><li>Header: <b>Net Savings</b>. Edit the bar rule → Bar Direction <b>Left-to-Right</b>.</li><li>Line the six tables up neatly (<kbd>Ctrl</kbd>+<kbd>X</kbd> to move, insert rows/columns if needed).</li></ol>`}
+ ]},
+ {t:'Part C · Make it interactive',d:'Slicers filter several PivotTables at once.',steps:[
+  {id:'c1',t:'Insert Year and Month slicers',b:`<ol><li>Click a PivotTable → Insert → <b>Slicer</b> → tick <b>Years</b> and <b>Months</b> (from the Date group) → OK.</li><li>Right-click each slicer → <b>Slicer Settings</b> → set the caption (Year / Month) → tick <b>Hide items with no data</b>.</li><li>Slicer tab → Columns <b>2</b>; resize the buttons to fit the top-left area.</li></ol>`},
+  {id:'c2',t:'Connect the slicers (Report Connections)',b:`<ol><li>Right-click the <b>Year</b> slicer → <b>Report Connections</b> → tick <b>all six</b> PivotTables.</li><li>Right-click the <b>Month</b> slicer → Report Connections → tick the category tables ①②③.</li><li>Not sure which is which? Click a PivotTable → PivotTable Analyze → <b>PivotTable Name</b>.</li></ol><div class="xl-tip">Test it: click Jan, then Feb. Every connected table should change.</div>`}
+ ]},
+ {t:'Part D · Title and headline numbers',d:'',steps:[
+  {id:'d1',t:'Title bar',b:`<ol><li>Make row 2 taller. Select across the dashboard width → fill <b>green</b> → <b>Merge &amp; Center</b>.</li><li>Type <b>Income &amp; Expenditure Dashboard</b>, size about 22.</li></ol>`},
+  {id:'d2',t:'Big numbers with GETPIVOTDATA',b:`<ol><li>In a cell on the title bar type <kbd>=</kbd> and click the <b>Grand Total</b> of ①. Excel writes <code>=GETPIVOTDATA(…)</code>. That is Income.</li><li>Next cell: <kbd>=</kbd> and click the Grand Total of ② (Expense, negative).</li><li>Net Savings: <code>=Income cell + Expense cell</code> (plus, because expense is already negative).</li><li>Format as Currency, 0 decimals. Make Expense red. Make the numbers big.</li></ol>`},
+  {id:'d3',t:'Labels with text boxes',b:`<ol><li>Insert → <b>Text Box</b> → draw above each number → type <b>INCOME</b>, <b>EXPENSE</b>, <b>NET SAVINGS</b>.</li><li>Copy the first text box for the others so they match; centre them.</li></ol>`}
+ ]},
+ {t:'Part E · Update each month',d:'',steps:[
+  {id:'e1',t:'Add new transactions and refresh',b:`<ol><li>Paste the new month's rows on the first empty row <b>right under</b> the Transactions table. The table grows and the formulas fill down.</li><li>Pick a Subcategory for each new row.</li><li>Data → <b>Refresh All</b>. All six tables, slicers and headline numbers update.</li></ol>`}
+ ]}
+];
+const QUIZ=[
+ {q:'Why convert the data to an Excel table (Ctrl+T) before making PivotTables?',o:['It makes the numbers bold','New rows pasted under it join the table, so the PivotTable picks them up on refresh','It stops anyone editing the data','It is the only way to use SUM'],a:1,e:'A table grows when you paste rows right under it. PivotTables and formulas that point at it then include the new rows after Refresh All.'},
+ {q:'Which feature makes the Subcategory column a dropdown list?',o:['Conditional Formatting','Data Validation → List','Flash Fill','Remove Duplicates'],a:1,e:'Data → Data Validation → Allow: List, with Source set to the defined name (F3 pastes it).'},
+ {q:'Expense is negative in Income/(Expense). How do you compute Net Savings from the two headline cells?',o:['Income − Expense','Income + Expense','Expense − Income','Income × Expense'],a:1,e:'Expense values are already negative, so adding them subtracts the spending.'},
+ {q:'What does the custom number format ;;; do?',o:['Deletes the values','Rounds to zero decimals','Hides the displayed value but keeps it, so only the data bar shows','Shows values in red'],a:2,e:'The three empty sections (positive;negative;zero) display nothing. The value stays in the cell.'},
+ {q:'In the Expense table, which setting makes pink bars grow from right to left?',o:['Sort Largest to Smallest','Negative Value and Axis fill + Bar Direction Right-to-Left','PivotTable Options → Autofit','Show Values As → % of Row'],a:1,e:'Edit Rule → Negative Value and Axis sets the colour for negative values; Bar Direction sets the side they grow from.'},
+ {q:'How do you show each expense category as a share of the total?',o:['Show Values As → % of Grand Total','Summarize Values By → Count','Insert a slicer','Group by Months'],a:0,e:'Add the value field again, then right-click → Show Values As → % of Grand Total, and rename it % of Total.'},
+ {q:'You want monthly totals from daily dates. What do you do?',o:['Type the month names by hand','Right-click a date → Group → Months and Years','Insert → Timeline only','Sort Oldest to Newest'],a:1,e:'Group by Months and Years (hold Ctrl to select both and untick Days).'},
+ {q:'The Year slicer changes only one PivotTable. What is missing?',o:['Refresh All','Report Connections to the other PivotTables','A defined name','Data Validation'],a:1,e:'Right-click the slicer → Report Connections → tick every PivotTable it should control.'},
+ {q:'Net savings by month needs both income and expense rows. How do you set the Category Type filter?',o:['Choose Income only','Select Multiple Items → tick Income and Expense','Remove the Date field','Use a slicer for Category Type only'],a:1,e:'Tick Select Multiple Items in the filter and choose both types; the filter shows (Multiple Items).'},
+ {q:'Typing = and clicking a PivotTable Grand Total creates which function?',o:['VLOOKUP','SUMIF','GETPIVOTDATA','INDEX'],a:2,e:'GETPIVOTDATA keeps pointing at the Grand Total even when the PivotTable changes size, which suits headline numbers.'},
+ {q:'A final exam asks for an Asset report from an accounting table instead of Income. What changes?',o:['You need a different Excel feature','Same steps; filter and label by Asset (the field values come from the column headers and data)','PivotTables cannot use accounting data','Use only formulas, no PivotTables'],a:1,e:'The method is the same. Pick the field and filter value that match what the report is about.'},
+ {q:'New rows were pasted under the table but the report did not change. What is the next step?',o:['Data → Refresh All','Save and close','Ctrl+T again','Delete the PivotTables'],a:0,e:'PivotTables keep a cache; Refresh All rebuilds them (and the slicers and GETPIVOTDATA numbers).'}
+];
+let st={done:{},ans:{}};
+try{const o=JSON.parse(localStorage.getItem(KEY)||'null');if(o&&typeof o==='object'){if(o.done&&typeof o.done==='object')st.done=o.done;if(o.ans&&typeof o.ans==='object')st.ans=o.ans;}}catch{}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch{}}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ALL=PARTS.flatMap(p=>p.steps.map(s=>s.id));
+function renderSteps(){
+ $('steps').innerHTML=PARTS.map(p=>'<div class="xl-part"><h2>'+esc(p.t)+'</h2>'+(p.d?'<p>'+esc(p.d)+'</p>':'')+p.steps.map(s=>'<article class="xl-step'+(st.done[s.id]?' done':'')+'" id="step-'+s.id+'"><h3><label><input type="checkbox" data-step="'+s.id+'"'+(st.done[s.id]?' checked':'')+'><span>'+esc(s.t)+'</span></label></h3>'+s.b+'</article>').join('')+'</div>').join('');
+ progress();
+}
+function progress(){const n=ALL.filter(id=>st.done[id]).length;$('doneTxt').textContent=n+' of '+ALL.length+' steps done';$('doneBar').style.width=Math.round(n/ALL.length*100)+'%';}
+document.addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.step;if(!id)return;if(e.target.checked)st.done[id]=true;else delete st.done[id];save();e.target.closest('.xl-step').classList.toggle('done',e.target.checked);progress();});
+$('resetSteps').onclick=()=>{if(!confirm('Untick all steps?'))return;st.done={};save();renderSteps();};
+function renderQuiz(){
+ let ok=0,ansN=0;
+ $('quiz').innerHTML=QUIZ.map((x,i)=>{const id='x'+(i+1),a=st.ans[id],has=Number.isInteger(a);if(has){ansN++;if(a===x.a)ok++;}
+  return '<div class="xl-q"><p>'+(i+1)+'. '+esc(x.q)+'</p><div class="xl-opts">'+x.o.map((o,j)=>'<button type="button" class="xl-opt'+(has&&j===x.a?' right':'')+(has&&j===a&&a!==x.a?' wrong':'')+'" data-q="'+id+'" data-o="'+j+'"'+(has?' aria-pressed="'+(j===a)+'"':'')+'>'+String.fromCharCode(97+j)+'. '+esc(o)+'</button>').join('')+'</div>'+(has?'<p class="xl-exp">'+(a===x.a?'Correct. ':'Not quite. ')+esc(x.e)+'</p>':'')+'</div>';}).join('');
+ $('score').textContent=ansN?ok+' / '+ansN+' correct ('+QUIZ.length+' questions)':QUIZ.length+' questions';
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.xl-opt');if(b){if(Number.isInteger(st.ans[b.dataset.q]))return;st.ans[b.dataset.q]=+b.dataset.o;save();renderQuiz();return;}
+ const t=e.target.closest&&e.target.closest('[data-tab]');if(t){for(const x of document.querySelectorAll('[data-tab]'))x.setAttribute('aria-pressed',String(x===t));for(const k of ['steps','exam','quiz'])$('tab-'+k).hidden=k!==t.dataset.tab;try{sessionStorage.setItem('studyos.excel.tab',t.dataset.tab);}catch{}}});
+$('resetQuiz').onclick=()=>{st.ans={};save();renderQuiz();};
+renderSteps();renderQuiz();
+let tab=new URLSearchParams(location.search).get('tab');if(!tab)try{tab=sessionStorage.getItem('studyos.excel.tab');}catch{}
+if(['exam','quiz'].includes(tab))document.querySelector('[data-tab="'+tab+'"]').click();
+})();
+</script>
+<script src="scripts/study-nav.js?v=6"></script>
+</body>
+</html>

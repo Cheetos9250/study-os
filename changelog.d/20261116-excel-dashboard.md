@@ -1,0 +1,1 @@
+- New Excel subject page (`excel.html`): step-by-step basic dashboard (tables, data validation, XLOOKUP, six PivotTables, data bars, slicers, GETPIVOTDATA headline), exam tips and a 12-question quiz. Linked from Lessons and Practice; progress key `studyos.excel.v1` is backed up and validated on restore.
