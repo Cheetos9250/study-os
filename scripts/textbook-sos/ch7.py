@@ -350,6 +350,7 @@ def p_sales_cash(id,co,mon,sales,collect,cashsales,other):
     lines+='\n'+'\n'.join(f'- **{mon} {d}** Collected {c}\'s ${f(a)} invoice'+(f' less {p}% discount.' if p else ' (no discount).') for d,c,a,p in collect)
     lines+='\n'+'\n'.join(f'- **{mon} {d}** Cash sales ${f(a)}; cost ${f(k)}.' for d,a,k in cashsales)
     lines+='\n'+'\n'.join(f'- **{mon} {d}** Received ${f(a)} — {acct}.' for d,acct,a in other)
+    chk(id,('Cash receipts journal — Cash Dr total',tc),('Schedule of accounts receivable total',sum(bal.values())))
     add(id,'Special journals, subsidiary ledgers and schedule of accounts receivable',f"""
 {co} sells on terms 2/10, n/30 and uses a perpetual system. Its {mon} transactions are listed by date within each type:
 {lines}
@@ -394,6 +395,7 @@ def p_purch_pay(id,co,mon,purch,pays,cashpays):
     lines='\n'.join(f'- **{mon} {d}** Bought {names[a]} on credit from {s}, ${f(x)}'+(' (terms 2/10, n/30).' if a=='inv' else ' (n/30).') for d,s,a,x in purch)
     lines+='\n'+'\n'.join(f'- **{mon} {d}** Paid {s} ${f(x)}'+(f' less {p}% discount.' if p else ' (discount period missed).') for d,s,x,p in pays)
     lines+='\n'+'\n'.join(f'- **{mon} {d}** Paid ${f(x)} — {a}.' for d,a,x in cashpays)
+    chk(id,('Cash payments journal — Cash Cr total',tc),('Schedule of accounts payable total',sum(bal.values())))
     add(id,'Special journals, subsidiary ledgers and schedule of accounts payable',f"""
 {co} uses a perpetual system. Its {mon} transactions:
 {lines}
@@ -426,6 +428,7 @@ def p_all(id,co,inv0,vendor,pamt,cust1,s1amt,c1,ret,rentamt,csamt,c2,cust2,s2amt
     tdr=round(cash+s2amt+inv+sdisc+cos+rentamt+salamt,2); tcr=inv0+sales
     check(tdr,tcr,id)
     d=days
+    chk(id,('Month-end Cash',cash),('Month-end Merchandise Inventory',inv),('Trial balance totals',tdr))
     add(id,'Special journals, subsidiary ledgers and trial balance',f"""
 {co} uses all five journals (perpetual; terms 2/10, n/30). Its first month:
 - **Day {d[0]}** Owner invested ${f(inv0)} cash.
@@ -460,5 +463,19 @@ p_all('P-7-3B','Prism Outfitters',15000,'Pike Traders',5000,'Rae Quinn',2600,156
 order=[i['id'] for i in json.load(open(os.path.join(os.path.dirname(__file__),'..','..','data','accounting-textbook-index.json')))['items'] if i['chapter']=='7' and not i['id'].startswith('SEC')]
 ITEMS.sort(key=lambda x:order.index(x['id']))
 assert [i['id'] for i in ITEMS]==order,(set(order)-{i['id'] for i in ITEMS})
+# ---------- key answers for the self-check boxes ----------
+chk('QS-7-4',('Correct controlling account balance',8300))
+chk('QS-7-6',('Sales journal total (AR Dr / Sales Cr)',3255),('Cost of sales column total',1950))
+chk('QS-7-7',('Cash Dr column total',10447))
+chk('QS-7-8',('Accounts Payable Cr total',4635))
+chk('E-7-1',('Sales journal total',6835),('Cost of sales column total',4095))
+chk('QS-7-13',('Days\' payable outstanding, this year',30.0,0.1),('Days\' payable outstanding, last year',27.4,0.1))
+chk('E-7-3',('Cash Dr column total',13966.80))
+chk('E-7-6',('Accounts Payable Cr total',7775))
+chk('E-7-7',('Cash Cr column total',9496.40))
+chk('E-7-12',('Schedule of accounts receivable total',1885))
+chk('E-7-13',('Atlas days\' payable outstanding',30.0,0.1),('Borealis days\' payable outstanding',20.0,0.1))
+
+attach_checks()
 json.dump(ITEMS,open(os.path.join(os.path.dirname(__file__),'..','..','data','textbook-sos','ch7.json'),'w'),ensure_ascii=False,separators=(',',':'))
 print(len(ITEMS))

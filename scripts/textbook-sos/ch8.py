@@ -228,7 +228,8 @@ The $1,870 deposit is assumed to be a collection on account. The bank error need
 """)
 
 def simple_rec(id,co,mon,bank,book,dit,oc,bank_extra,book_items,entries,note=''):
-    t,_=bankrec(bank,book,[('Deposits in transit',dit),('Outstanding checks',-oc)]+bank_extra,book_items)
+    t,adj=bankrec(bank,book,[('Deposits in transit',dit),('Outstanding checks',-oc)]+bank_extra,book_items)
+    chk(id,('Adjusted cash balance',adj))
     add(id,'Bank reconciliation',f"""
 Prepare {co}'s {mon} bank reconciliation.
 - Bank statement balance ${f(bank)}; book balance ${f(book)}.
@@ -291,6 +292,7 @@ def p_petty(id,co,fund,cash1,r1,cash2,r2,newfund,adjust):
         if extra<0: rows.append(('','Petty Cash','',-extra))
         rows.append(('','Cash','',amt+extra))
         return JE(*rows)
+    chk(id,('Mar 15 cash paid to reimburse',re1),('Mar 31 cash paid (incl. fund change)',re2+newfund-fund))
     add(id,'Establishing, reimbursing and '+('increasing' if newfund>fund else 'adjusting')+' petty cash',f"""
 {co}:
 - **Mar 1** Established a petty cash fund of ${f(fund)}.
@@ -314,6 +316,7 @@ p_petty('P-8-3B','Iris Florist',350,51,[('Delivery Expense',138),('Office Suppli
 
 def p_rec(id,co,mon,bank,book,bank_items,book_items,entries,extra=''):
     t,adj=bankrec(bank,book,bank_items,book_items)
+    chk(id,('Adjusted cash balance',adj))
     add(id,'Preparing a bank reconciliation and recording adjustments',f"""
 {co} — {mon}.
 - Cash per bank statement: ${f(bank)}. Cash per books: ${f(book)}.
@@ -375,8 +378,22 @@ For each item, say whether it is added to or deducted from the bank balance or t
 | 8 | Bank | Add | No |
 """)
 
+# ---------- key answers for the self-check boxes ----------
+chk('QS-8-3',('Cash and cash equivalents',18140))
+chk('QS-8-5',('Cash Over and Short (debit)',8))
+chk('QS-8-6',('Cash paid to replenish',213),('Cash Over and Short (debit)',2))
+chk('QS-8-7',('Adjusted cash balance',13655))
+chk('QS-8-35',('Year 2 days\' sales uncollected',30.1,0.1),('Year 1 days\' sales uncollected',28.2,0.1))
+chk('E-8-5',('Cash and cash equivalents',47050))
+chk('E-8-8',('Cash paid to reimburse',254),('Cash Over and Short (debit)',6))
+chk('E-8-9',('Total cash paid',325),('Cash Over and Short (credit)',2))
+chk('E-8-11',('Adjusted cash balance',21825))
+chk('E-8-13',('Cash debited for the note collection',1845))
+chk('E-8-15',('Orca days\' sales uncollected',30.0,0.1),('Puffin days\' sales uncollected',24.0,0.1))
+
 order=[i['id'] for i in json.load(open(os.path.join(os.path.dirname(__file__),'..','..','data','accounting-textbook-index.json')))['items'] if i['chapter']=='8' and not i['id'].startswith('SEC')]
 ITEMS.sort(key=lambda x:order.index(x['id']))
 assert [i['id'] for i in ITEMS]==order,(set(order)-{i['id'] for i in ITEMS})
+attach_checks()
 json.dump(ITEMS,open(os.path.join(os.path.dirname(__file__),'..','..','data','textbook-sos','ch8.json'),'w'),ensure_ascii=False,separators=(',',':'))
 print(len(ITEMS))

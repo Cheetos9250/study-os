@@ -552,6 +552,7 @@ def prob_adj(id,co,d):
     inv_book,inv_count,sup_bal,sup_on,prepaid_bal,prepaid_exp,sales,sret,sdisc,cos,sell,adm=d
     shrink=inv_book-inv_count; supused=sup_bal-sup_on
     netsales=sales-sret-sdisc; cos2=cos+shrink; gp=netsales-cos2; sell2=sell+supused; adm2=adm+prepaid_exp; ni=gp-sell2-adm2
+    chk(id,('Net sales',netsales),('Gross profit',gp),('Net income',ni))
     add(id,'Preparing adjusting entries and income statements',f"""
 Unadjusted Dec 31 balances for {co} (perpetual):
 {T(['Account','Balance'],['Merchandise inventory','$'+f(inv_book)],['Store supplies','$'+f(sup_bal)],['Prepaid insurance','$'+f(prepaid_bal)],['Sales','$'+f(sales)],['Sales returns and allowances','$'+f(sret)],['Sales discounts','$'+f(sdisc)],['Cost of sales','$'+f(cos)],['Selling expenses (excl. supplies)','$'+f(sell)],['General & admin expenses (excl. insurance)','$'+f(adm)])}
@@ -581,6 +582,7 @@ def prob_amounts(id,rows):
         cogs=bi+pur-pr-pd+fi-ei; gp=ns-cogs
         q.append([name,f(bi),f(pur),f(pr),f(pd),f(fi),f(ei),f(ns)])
         a.append([name,f(pur-pr-pd+fi),f(bi+pur-pr-pd+fi),f(cogs),f(gp)])
+    chk(id,*[(r[0]+' cost of goods sold',float(r[3].replace(',',''))) for r in a],*[(r[0]+' gross profit',float(r[4].replace(',',''))) for r in a])
     add(id,'Computing merchandising amounts and formatting income statements',f"""
 Periodic data for two stores. For each, compute net cost of purchases, cost of goods available for sale, cost of goods sold and gross profit.
 {T(['Store','Beg. inventory','Purchases','Purch. returns','Purch. discounts','Freight-in','End. inventory','Net sales'],*q)}
@@ -595,6 +597,7 @@ prob_amounts('P-5-5B',[('Store 1',(22600,104500,4100,2000,2700,19900,156300)),('
 def prob_close(id,co,d):
     sales,sret,sdisc,cos,expenses,draw=d
     tot=sret+sdisc+cos+sum(v for _,v in expenses); ni=sales-tot
+    chk(id,('Net income',ni),('Change in owner\'s capital',ni-draw))
     add(id,'Preparing closing entries and interpreting information',f"""
 Adjusted balances for {co} at Dec 31:
 {T(['Account','Balance'],['Sales','$'+f(sales)],['Sales returns and allowances','$'+f(sret)],['Sales discounts','$'+f(sdisc)],['Cost of sales','$'+f(cos)],*[[n,'$'+f(v)] for n,v in expenses],['Owner, Withdrawals','$'+f(draw)])}
@@ -629,5 +632,33 @@ How many units should be in Haze's ending inventory?
 - Add consigned-out goods (Haze is the consignor).
 """)
 
+# ---------- key answers for the self-check boxes ----------
+chk('QS-5-1',('Cash paid on Mar 13',3430))
+chk('QS-5-4',('Inventory cost',7320))
+chk('QS-5-5',('Shop A net income',11200),('Shop B net sales',100000))
+chk('QS-5-6',('Invoice A paid',2548),('Invoice B paid',9166.50),('Invoice C paid',772.20))
+chk('QS-5-7',('Cash paid on Jun 9',5488))
+chk('QS-5-9',('Cash received on Apr 11',2548))
+chk('QS-5-21',('North gross margin ratio (%)',28.0,0.1),('South gross margin ratio (%)',36.0,0.1))
+chk('QS-5-23',('Net income',19000))
+chk('QS-5-24',('Net sales',203000),('Gross profit',82000),('Net income',18500))
+chk('QS-5-25',('Total current assets',48000))
+chk('QS-5-26',('Acid-test ratio',0.90,0.005))
+chk('QS-5-42C',('Discounts lost',70))
+chk('QS-5-44C',('Interest revenue (discount forfeited)',52))
+chk('E-5-5',('Cash paid on May 11',7350))
+chk('E-5-1',('Cash paid on Oct 10',3201))
+chk('E-5-23',('Net income',24690))
+chk('E-5-9',('Ending Merchandise Inventory',7300),('Cost of Sales',27800))
+chk('E-5-21',('Net sales',350000),('Net income',33300))
+chk('E-5-22',('Net sales',120350),('Gross profit',46950))
+chk('E-5-25',('Correct Year 1 net income',49200),('Correct Year 2 net income',50300))
+chk('E-5-26',('Alpha current ratio',2.05,0.005),('Beta current ratio',2.00,0.005),('Alpha acid-test ratio',0.45,0.005),('Beta acid-test ratio',1.42,0.006))
+chk('E-5-27',('Total assets',97000))
+chk('E-5-42B',('Sales Refund Payable',5400),('Inventory Returns Estimated',3240))
+chk('E-5-41',('Cash paid on Nov 12',6534))
+chk('QS-5-34',('Units in ending inventory',1510))
+
+attach_checks()
 json.dump(ITEMS,open(__import__('os').path.join(__import__('os').path.dirname(__file__),'..','..','data','textbook-sos','ch5.json'),'w'),ensure_ascii=False,separators=(',',':'))
 print(len(ITEMS))
