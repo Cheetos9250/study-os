@@ -558,8 +558,10 @@ function tbSave(id,text){ try{ const raw=localStorage.getItem(TBP_KEY); const p=
       QS.push({id,cat:'c'+ch,q:it.title||it.id,opts:['I got it','I missed it'],order:[0,1],right:0,exp:'',open:true,src:it.id,prompt:it.prompt,solution:it.solution||'',tb:it.id.replace('-',' ')+' · written'}); added++; } }catch(e){} }
   if(added){ const cur=deck[qpos]&&deck[qpos].id; buildDeck(); if(cur&&!qJump){ const i=deck.findIndex(x=>x.id===cur); if(i>=0) qpos=i; } renderQ(); }
 })();
+let qtype=(()=>{try{const u=new URLSearchParams(location.search);const v=u.get('type')||(u.get('q')?'all':sessionStorage.getItem('studyos.acc.qtype'));return v==='mcq'||v==='written'?v:'all';}catch(e){return 'all';}})();
+const typeOk=q=>qtype==='all'||(qtype==='written'?!!q.open:!q.open);
 let qcats=new Set(), missedOnly=false, unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
-function buildDeck(){ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!reviewOnly||dueSet.has(String(q.id)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(){ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>typeOk(q)&&(!reviewOnly||dueSet.has(String(q.id)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; } }
 function renderQ(){
@@ -567,7 +569,7 @@ function renderQ(){
     [['all','All'],...CATS].forEach(([id,l])=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip';
       b.setAttribute('aria-pressed', id==='all'?!qcats.size:qcats.has(id));
-      b.innerHTML=esc(l)+'<span class="n">'+(id==='all'?QS.length:QS.filter(q=>q.cat===id).length)+'</span>';
+      b.innerHTML=esc(l)+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'||q.cat===id)).length+'</span>';
       b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qJump=null; buildDeck();renderQ(); };
       box.appendChild(b); });
   })($('#qCats'));
@@ -575,6 +577,7 @@ function renderQ(){
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
+  h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
   h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button><button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
@@ -608,6 +611,7 @@ function renderQ(){
   wireQ();
 }
 function wireQ(){
+  document.querySelectorAll('#qBody .qtype').forEach(b=>b.onclick=()=>{ qtype=b.dataset.qtype; try{sessionStorage.setItem('studyos.acc.qtype',qtype);}catch(e){} qJump=null; buildDeck(); renderQ(); });
   const rb=$('#revBtn'); if(rb) rb.onclick=()=>{reviewOnly=!reviewOnly;qJump=null;reviewStart=Date.now();qpos=0;buildDeck();renderQ()};
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;qJump=null;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;qJump=null;buildDeck();renderQ()};
