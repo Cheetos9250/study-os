@@ -7,9 +7,11 @@
  * Requires a new SQLite-backed Durable Object namespace and a NEW independent
  * secret. Merely committing this file must NEVER activate or deploy it.
  */
-const SUBJECTS=['acc','eco','math','eng','zh','today'];
+const SUBJECTS=['acc','eco','math','eng','zh','today','home'];
 const SUBJECT_SET=new Set(SUBJECTS);
 const MAX_BYTES=350_000;
+// 'home' carries the Today cover, icon and card images (data URLs), so it gets more room.
+const MAX_HOME_BYTES=1_900_000;
 const PROD_HOST='vocabloom-progress-cas-prod.kasidit09022550.workers.dev';
 const ORIGIN='https://cheetos9250.github.io';
 const PROTOCOL='vocabloom-cas-prod-candidate-v1';
@@ -22,6 +24,9 @@ const record=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const initialCourse=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
 // 'today' holds the Study OS planner settings (studyos.today.v1: exams, plan ticks, timetable).
 const initialToday=()=>({today:{}});
+// 'home' holds studyos.home.v1 (tasks, cover, icon, card images) and studyos.grades.v1.
+const initialHome=()=>({home:{},grades:{}});
+const homeValidator=x=>record(x)&&record(x.home)&&record(x.grades)&&Object.keys(x).every(k=>k==='home'||k==='grades');
 const todayValidator=x=>record(x)&&record(x.today)&&Object.keys(x).every(k=>k==='today');
 const courseValidator=x=>record(x)&&record(x.study)&&record(x.study.ans)&&
  record(x.study.ats)&&(x.study.known===undefined||Array.isArray(x.study.known))&&
@@ -47,8 +52,10 @@ function safeEqual(a,b){
 export class ProductionProgressDO {
  constructor(ctx){this.ctx=ctx;}
  async fetch(request){
-  const isToday=request.headers.get('X-Progress-Subject')==='today';
-  const initial=isToday?initialToday:initialCourse,validator=isToday?todayValidator:courseValidator;
+  const kind=request.headers.get('X-Progress-Subject');
+  const initial=kind==='today'?initialToday:kind==='home'?initialHome:initialCourse;
+  const validator=kind==='today'?todayValidator:kind==='home'?homeValidator:courseValidator;
+  const max=kind==='home'?MAX_HOME_BYTES:MAX_BYTES;
   if(request.method==='GET'){
    const stored=this.ctx.storage.kv.get('record')??{revision:0,value:initial()};
    return json(stored.value,200,stored.revision);
@@ -61,10 +68,10 @@ export class ProductionProgressDO {
   if(!/^application\/json(?:\s*;|$)/i.test(type))
    return json({error:'JSON content type required'},415);
   const declared=Number(request.headers.get('Content-Length'));
-  if(Number.isFinite(declared)&&declared>MAX_BYTES)
+  if(Number.isFinite(declared)&&declared>max)
    return json({error:'Payload too large'},413);
   const raw=await request.text();
-  if(new TextEncoder().encode(raw).byteLength>MAX_BYTES)
+  if(new TextEncoder().encode(raw).byteLength>max)
    return json({error:'Payload too large'},413);
   let submitted;
   try{submitted=JSON.parse(raw)}catch{return json({error:'Invalid JSON'},400)}
@@ -127,7 +134,7 @@ export default {
   const id=env.PROD_PROGRESS_DO.idFromName('vocabloom:production-progress:v1:'+m[1]);
   const stub=env.PROD_PROGRESS_DO.get(id);
   // Tell the object which schema applies; the client cannot choose it (it follows the URL subject).
-  const inner=new Request(request);inner.headers.set('X-Progress-Subject',m[1]==='today'?'today':'course');
+  const inner=new Request(request);inner.headers.set('X-Progress-Subject',m[1]==='today'||m[1]==='home'?m[1]:'course');
   return cors(await stub.fetch(inner));
  }
 };

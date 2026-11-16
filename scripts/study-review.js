@@ -4,7 +4,8 @@
    A wrong answer comes back tomorrow; each correct answer moves the question to a longer gap. */
 (function (root) {
   var DAY = 86400000, TZ = 7 * 3600000;               // days start at midnight Bangkok, like the flashcards
-  var GAPS = [1, 3, 7, 14, 30];                        // days until the next review, per box
+  var GAPS = [1, 3, 7, 14, 30, 90];                    // days until the next review, per box
+  var RETIRE = 4;                                      // 4 correct in a row: retired (30, then 90 days away)
   function sod(t) { return Math.floor((t + TZ) / DAY) * DAY - TZ; }
   function valid(e) { return Array.isArray(e) && e.length === 2 && isFinite(e[0]) && isFinite(e[1]); }
   /* box and due time after answering; `prev` is the current [box, due] or undefined */
@@ -33,6 +34,16 @@
     var e = store.rv && store.rv[id];
     return valid(e) && store.ans && store.ans[id] !== undefined && e[1] <= now;
   }
+  /* retired: answered correctly enough times in a row; hidden from the normal deck until its next (rare) review is due */
+  function isRetired(store, id, now) {
+    var e = store.rv && store.rv[id];
+    return valid(e) && e[0] >= RETIRE && e[1] > now && store.ans && store.ans[id] !== undefined;
+  }
+  function retiredRaw(raw, now) {
+    try { var s = JSON.parse(raw || 'null'); if (!s || typeof s !== 'object') return 0;
+      return Object.keys(s.rv || {}).filter(function (id) { return isRetired(s, id, now); }).length; }
+    catch (e) { return 0; }
+  }
   function dueIds(store, now) {
     return Object.keys((store && store.rv) || {}).filter(function (id) { return isDue(store, id, now); });
   }
@@ -41,7 +52,7 @@
     try { var s = JSON.parse(raw || 'null'); return s && typeof s === 'object' ? dueIds(s, now).length : 0; }
     catch (e) { return 0; }
   }
-  var api = { GAPS: GAPS, sod: sod, next: next, record: record, seed: seed, isDue: isDue, dueIds: dueIds, countRaw: countRaw };
+  var api = { GAPS: GAPS, RETIRE: RETIRE, isRetired: isRetired, retiredRaw: retiredRaw, sod: sod, next: next, record: record, seed: seed, isDue: isDue, dueIds: dueIds, countRaw: countRaw };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.StudyReview = api;
 })(typeof window !== 'undefined' ? window : this);

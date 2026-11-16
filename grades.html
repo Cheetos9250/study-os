@@ -159,6 +159,8 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 </main>
 </div>
 <script src="scripts/study-grades.js?v=1"></script>
+<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-cloud.js?v=3"></script>
 <script src="scripts/study-nav.js?v=4"></script>
 <script>
 (function(){
@@ -167,8 +169,9 @@ const G=window.StudyGrades,$=s=>document.querySelector(s),KEY=G.KEY;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function read(){try{return localStorage.getItem(KEY);}catch{return null;}}
 let st=G.load(read());
-function save(){try{localStorage.setItem(KEY,JSON.stringify(st));$('#gStatus').textContent='';return true;}catch{$('#gStatus').textContent='Could not save (storage full).';return false;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));$('#gStatus').textContent='';window.StudyCloud&&StudyCloud.dirty();return true;}catch{$('#gStatus').textContent='Could not save (storage full).';return false;}}
 const fmt=n=>Number.isFinite(n)?(Math.round(n*100)/100).toString():'–';
+addEventListener('studycloud:applied',()=>{st=G.load(read());render();});
 function render(){
  $('#courses').innerHTML=st.courses.length?st.courses.map(c=>{
   return '<section class="course" data-id="'+esc(c.id)+'"><div class="course-head"><h3>'+esc(c.name)+'</h3><span class="hint">'+c.credits+' credits</span>'
