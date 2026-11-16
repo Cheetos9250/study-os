@@ -10,7 +10,8 @@
 (function (root) {
   'use strict';
   var PROGRESS_LSK = 'study-sync-progress-key-v1', AUTOK = 'study-sync-auto-v1',
-      BASEK = 'study-sync-today-base-v1', LASTK = 'study-sync-last-v1', TODAYK = 'studyos.today.v1';
+      BASEK = 'study-sync-today-base-v1', LASTK = 'study-sync-last-v1', TODAYK = 'studyos.today.v1', NOTESK = 'studyos.notes.v1',
+      MAXB = 340000;
   var J = function (v) { return JSON.stringify(v === undefined ? null : v); };
   var obj = function (v) { return !!v && typeof v === 'object' && !Array.isArray(v); };
 
@@ -53,6 +54,16 @@
     });
     return out;
   }
+  /* notes ({key: {text, updated}}): three-way per note; if both devices edited the same note, the newer edit wins */
+  function mergeNotes(base, local, remote) {
+    var out = merge3map(base, local, remote);
+    Object.keys(out).forEach(function (k) {
+      var l = local[k], r = remote[k], b = base && base[k];
+      if (l && r && J(l) !== J(r) && (!b || (J(l) !== J(b) && J(r) !== J(b))))
+        out[k] = String(r.updated || '') > String(l.updated || '') ? r : l;
+    });
+    return out;
+  }
   function byId(list) { var m = {}; (list || []).forEach(function (x) { if (x && x.id) m[x.id] = x; }); return m; }
   function values(m) { return Object.keys(m).map(function (k) { return m[k]; }); }
   /* planner settings: exams and timetable merge per entry id; plan ticks per day; reminders per key */
@@ -69,7 +80,7 @@
   }
 
   /* ---------- browser part ---------- */
-  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map }; return; }
+  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map, mergeNotes: mergeNotes }; return; }
   var T = root.StudyToday;
   var ls = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -89,7 +100,7 @@
     try { var e = JSON.parse(ls.get(PROGRESS_LSK) || 'null'); return e && e.endpoint === api && typeof e.key === 'string' ? e.key.trim() : ''; }
     catch (e) { return ''; }
   }
-  var autoOn = function () { return ls.get(AUTOK) === '1'; };
+  var autoOn = function () { var v = ls.get(AUTOK); if (v === null && key()) { ls.set(AUTOK, '1'); return true; } return v === '1'; };
   function last() { try { return JSON.parse(ls.get(LASTK) || 'null'); } catch (e) { return null; } }
   function note(ok, msg) { status = { t: Date.now(), ok: ok, msg: msg || '' }; ls.set(LASTK, J(status)); listeners.forEach(function (f) { try { f(status); } catch (e) {} }); }
   function subjects() {
@@ -123,11 +134,22 @@
           if (!obj(remote)) throw Error('server data is invalid');
           var cur, body, after;
           if (s.id === 'today') {
-            var raw = ls.get(TODAYK), local = T.loadSettings(raw), base = null;
+            var raw = ls.get(TODAYK), local = T.loadSettings(raw), base = null, nraw = ls.get(NOTESK), lnotes = {};
             try { base = JSON.parse(ls.get(BASEK) || 'null'); } catch (e) {}
-            var merged = mergeToday(base, local, obj(remote.today) ? remote.today : {});
-            body = { today: merged };
-            after = function () { if (ls.get(TODAYK) !== raw) return 'retry'; if (J(local) !== J(merged)) ls.set(TODAYK, J(merged)); ls.set(BASEK, J(merged)); return J(local) !== J(merged); };
+            try { var pn = JSON.parse(nraw || '{}'); if (obj(pn)) lnotes = pn; } catch (e) {}
+            var rt = obj(remote.today) ? remote.today : {};
+            var merged = mergeToday(base, local, rt);
+            var notes = mergeNotes(base && obj(base.notes) ? base.notes : null, lnotes, obj(rt.notes) ? rt.notes : {});
+            body = { today: Object.assign({}, merged, { notes: notes }) };
+            if (new TextEncoder().encode(J(body)).length > MAXB) throw Error('planner and notes are over 340 KB, too large to sync');
+            after = function () {
+              if (ls.get(TODAYK) !== raw || ls.get(NOTESK) !== nraw) return 'retry';
+              var ch = false;
+              if (J(local) !== J(merged)) { ls.set(TODAYK, J(merged)); ch = true; }
+              if (J(lnotes) !== J(notes)) { ls.set(NOTESK, J(notes)); ch = true; }
+              ls.set(BASEK, J(body.today));
+              return ch;
+            };
           } else {
             cur = readCourse(s);
             var m2 = mergeCourse(cur.value, remote);
@@ -204,7 +226,7 @@
         var has = !!(api && key());
         d.innerHTML = '<h2 id="cloudTitle" style="margin:0 0 6px;font:700 22px var(--num,serif)">Cloud sync</h2>'
           + '<p id="cloudMsg" role="status" style="margin:0 0 12px;color:var(--muted,#555)">' + label().replace(/</g, '&lt;') + '</p>'
-          + (api ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Quiz answers, review schedule, flashcards, exams, plan ticks and the timetable sync automatically: when a page opens, after changes and every few minutes.</p>' : '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">The sync server has not been switched on for this site yet.</p>')
+          + (api ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Quiz answers, review schedule, flashcards, notes, exams, plan ticks and the timetable sync automatically: when a page opens, after changes and every few minutes.</p>' : '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">The sync server has not been switched on for this site yet.</p>')
           + '<div style="display:flex;flex-wrap:wrap;gap:8px">'
           + (api ? (has ? '<button type="button" data-a="now" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sync now</button><button type="button" data-a="auto" aria-pressed="' + autoOn() + '" style="' + btn + '">Auto sync: ' + (autoOn() ? 'on' : 'off') + '</button><button type="button" data-a="key" style="' + btn + '">Change key</button>' : '<button type="button" data-a="key" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Set sync key</button>') : '')
           + '<button type="button" data-a="close" style="' + btn + '">Close</button></div>';
@@ -212,7 +234,7 @@
           b.onclick = function () {
             var a = b.getAttribute('data-a');
             if (a === 'close') return d.close();
-            if (a === 'auto') { if (autoOn()) { try { localStorage.removeItem(AUTOK); } catch (e) {} } else ls.set(AUTOK, '1'); return paint(); }
+            if (a === 'auto') { ls.set(AUTOK, autoOn() ? '0' : '1'); return paint(); }
             var p = a === 'key' ? setKey() : syncAll('manual');
             paint(); p.then(paint);
           };

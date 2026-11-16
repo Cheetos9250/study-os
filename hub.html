@@ -111,7 +111,7 @@ button.danger{color:var(--red)}
 </main>
 </div>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-cloud.js?v=1"></script>
+<script src="scripts/study-cloud.js?v=2"></script>
 <script src="scripts/study-nav.js?v=4"></script>
 <script>
 (function(){
@@ -164,7 +164,7 @@ function noteBox(k){if(openNote!==k)return '';const n=notes[k];return '<div clas
 let noteTimer=null;
 function saveNote(k,text){try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}
  if(text.trim())notes[k]={text:text.slice(0,20000),updated:new Date().toISOString()};else delete notes[k];
- let ok=true;try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch{ok=false;}
+ let ok=true;try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));window.StudyCloud&&StudyCloud.dirty();}catch{ok=false;}
  const m=document.querySelector('[data-note-meta="'+CSS.escape(k)+'"]');if(m)m.textContent=ok?(text.trim()?'Saved':'Empty note removed'):'Could not save (storage full)';}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-note]');if(!b)return;openNote=openNote===b.dataset.note?null:b.dataset.note;render();const t=document.querySelector('[data-note-text="'+CSS.escape(b.dataset.note)+'"]');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}});
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.noteText;if(!k)return;clearTimeout(noteTimer);const v=e.target.value;noteTimer=setTimeout(()=>saveNote(k,v),400);});
@@ -176,7 +176,7 @@ function render(){
 }
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
-addEventListener('studycloud:applied',()=>render());
+addEventListener('studycloud:applied',()=>{if(noteTimer)return;try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}render();});
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();})
  .then(html=>{data[c.key]=T.parseCourseData(html);}).catch(()=>{errors.push(c.key);}))).then(render);
