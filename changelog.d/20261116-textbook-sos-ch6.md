@@ -1,0 +1,1 @@
+- Textbook Exercises: chapter 6 Study OS versions (56 exercises incl. Problems A and B) with worked solutions — cost flows (FIFO, LIFO, weighted average, periodic and perpetual), specific identification, LCNRV, inventory errors, ratios, gross profit and retail methods. Calculations come from `scripts/textbook-sos/costflow.py`.
