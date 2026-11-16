@@ -102,8 +102,13 @@ node tests/auto-sync-browser.cjs
 
 - Notion is retired (owner, 15 Nov 2026). Do not re-add Notion loading. New cards/questions would be edited in `data/*.json` or a future in-site editor.
 
-- Syllabi received so far: Accounting (3 credits; final Thu 26 Nov 09:00–12:00 covers Ch5–9; weights 10/10/10/10/30/30) and EC1 (no final exam; group presentation in week 16, about Wed 18 Nov).
-- Still needed: syllabi for Math, Excel ("Using Spreadsheet Software for Accounting"), Global Citizenship and Economics. They give credits, Economics/Math final scope and grade weights. Grade data goes to the owner as an import link, never committed.
+- Syllabi received (all six courses, 16 Nov 2026). Grade data goes to the owner as an import link, never committed.
+  - Accounting: 3 credits; final Thu 26 Nov 09:00–12:00 covers Ch5–9; weights 10/10/10/10/30/30.
+  - EC1: no final exam; group presentation in week 16 (about Wed 18 Nov).
+  - Economics (1202221): 3 credits; 15 + 35 mid + 15 + 35 final; A≥80 … D≥50. Final (27 Nov) covers weeks 10–16: GDP/GNP, business cycle & unemployment, money & inflation, AD–AS, fiscal and monetary policy, growth & development. The eco page has no fiscal/monetary chapters yet.
+  - Math for Life (11061001): 3 credits; quizzes/HW/mid/final 25 each; final 1 Dec 09:00–12:00; grading by distribution (no fixed scale). Final scope not stated (default assumes Ch5–7).
+  - Excel (1201118): 1 credit; assignments 10, case study 20, mid 35, final 35; A≥79.5 … D≥49.5; final review 19 Nov, final date not given.
+  - Global Citizenship (16011001): online; goal quizzes 50%, SDG videos 10%, group video 40%; group video link due 20 Nov 2026 (default calendar entry `gc-video-20261120`).
 - UI is English everywhere a user normally goes. Thai remains only in study content (cards, summaries) and in admin/staging tools under `vocabloom/`.
 - Planned features: Google Classroom import (needs an OAuth client the owner would create), AI tutor (costs money).
 - PR #68 (79 worked textbook answers, 50 PDF-reviewed) is waiting for the owner to decide whether to release the reviewed answers.

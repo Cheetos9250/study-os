@@ -13,7 +13,7 @@ test('real course pages expose parseable data with the expected progress keys',(
   assert.equal(d.markKey,c.mark);assert.ok(d.cards.length>0&&d.quiz.length>0);
   for(const q of d.quiz)assert.ok(Number.isInteger(q[3]),'quiz answer index');
  }
- for(const e of T.DEFAULT_EXAMS){const d=T.parseCourseData(fs.readFileSync(path.join(root,T.COURSES.find(c=>c.key===e.course).page),'utf8'));
+ for(const e of T.DEFAULT_EXAMS){if(e.course==='other'){assert.equal(e.cats.length,0);continue;}const d=T.parseCourseData(fs.readFileSync(path.join(root,T.COURSES.find(c=>c.key===e.course).page),'utf8'));
   for(const id of e.cats)assert.ok(d.cats.some(x=>x[0]===id),e.id+' scope '+id);}
 });
 test('Monday quiz defaults to cost flow (ch6) and bank reconciliation (ch8)',()=>{
@@ -62,7 +62,7 @@ test('later exams add at most one chapter and only within two weeks',()=>{
  assert.equal(close.filter(x=>x.examId==='b').length,0,'imminent exam gets full focus');
 });
 test('settings normalisation rejects unknown courses and invalid dates',()=>{
- const s=T.loadSettings(JSON.stringify({exams:[{id:'x',course:'zz',date:'2026-11-20'},{id:'y',course:'acc',date:'bad'},{id:'z',course:'eco',date:'2026-11-27',title:'<b>',cats:['g',3]}]}));
+ const s=T.loadSettings(JSON.stringify({exams:[{id:'x',course:'zz',date:'2026-11-20'},{id:'y',course:'acc',date:'bad'},{id:'z',course:'eco',date:'2026-11-27',title:'<b>',cats:['g',3]}],seenDefaults:T.DEFAULT_EXAMS.map(e=>e.id)}));
  assert.deepEqual(s.exams.map(e=>e.id),['z']);assert.deepEqual(s.exams[0].cats,['g']);
  assert.equal(T.loadSettings(null).exams.length,T.DEFAULT_EXAMS.length);
 });
