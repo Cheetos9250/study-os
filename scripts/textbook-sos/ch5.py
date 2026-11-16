@@ -629,5 +629,5 @@ How many units should be in Haze's ending inventory?
 - Add consigned-out goods (Haze is the consignor).
 """)
 
-json.dump(ITEMS,open(__import__('os').path.join(__import__('os').path.dirname(__file__),'..','..','data','textbook-sos','ch5.json'),'w'),ensure_ascii=False,indent=0)
+json.dump(ITEMS,open(__import__('os').path.join(__import__('os').path.dirname(__file__),'..','..','data','textbook-sos','ch5.json'),'w'),ensure_ascii=False,separators=(',',':'))
 print(len(ITEMS))
