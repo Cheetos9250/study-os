@@ -30,11 +30,12 @@ function legacyResolver(file,obj){
  vm.runInNewContext("let api='',progressKeyName=LSK;\n"+src.slice(first,last)+'\nthis.cfg=cfg;',ctx,{timeout:1000});
  return ctx.cfg;
 }
-test('Live data/config.json remains unchanged: original Notion + progress API is still selected',async()=>{
- assert.deepEqual(config,{api:originalApi});
- assert.equal(await vocabloomResolver(config)(),originalApi);
+const prodProgressApi='https://vocabloom-progress-cas-prod.kasidit09022550.workers.dev';
+test('Live data/config.json: original api kept, progress goes to the approved CAS Worker on every client',async()=>{
+ assert.deepEqual(config,{api:originalApi,progress_api:prodProgressApi});
+ assert.equal(await vocabloomResolver(config)(),prodProgressApi);
  for(const path of subjects)
-  assert.equal(await legacyResolver(path,config)(),originalApi,path);
+  assert.equal(await legacyResolver(path,config)(),prodProgressApi,path);
 });
 test('Opt-in progress_api can be selected independently of Notion API for all six clients',async()=>{
  const future={...config,progress_api:futureApi+'/'};
@@ -61,7 +62,7 @@ test('Quiz/card loaders read only the saved data/ snapshot (Notion retired), nev
  }
 });
 test('No Production/Notion endpoints, secrets or Cloudflare bindings are switched in config',()=>{
- assert.doesNotMatch(text('data/config.json'),/progress_api|staging|SYNC_KEY|token/i);
+ assert.doesNotMatch(text('data/config.json'),/staging|SYNC_KEY|token|key/i);
  assert.equal(text('data/config.json'),JSON.stringify(config)+'\n');
  assert.match(text('vocabloom/unified-progress.js'),/const url=String\(j\.progress_api\|\|original\)/);
 });
