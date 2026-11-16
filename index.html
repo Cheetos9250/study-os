@@ -229,7 +229,8 @@ a.sb:hover{background:var(--dots),var(--panel)}
 </div>
 <script src="scripts/study-review.js?v=1"></script>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-nav.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=1"></script>
+<script src="scripts/study-nav.js?v=4"></script>
 <script>
 (function(){
 'use strict';
@@ -240,7 +241,7 @@ function load(){try{const v=JSON.parse(read(KEY)||'{}');return v&&typeof v==='ob
 let st=load();st.tasks=Array.isArray(st.tasks)?st.tasks:[];st.covers=st.covers&&typeof st.covers==='object'&&!Array.isArray(st.covers)?st.covers:{};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));return true;}catch{alert('Could not save (storage full). Try a smaller image.');return false;}}
 let settings=T.loadSettings(read(T.SETTINGS_KEY));
-function saveSettings(){try{localStorage.setItem(T.SETTINGS_KEY,JSON.stringify(settings));return true;}catch{alert('Could not save.');return false;}}
+function saveSettings(){try{localStorage.setItem(T.SETTINGS_KEY,JSON.stringify(settings));window.StudyCloud&&StudyCloud.dirty();return true;}catch{alert('Could not save.');return false;}}
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const parts=iso=>{const [y,m,d]=iso.split('-').map(Number);return {y,m:m-1,d};};
 function dowOf(iso){const p=parts(iso);return new Date(Date.UTC(p.y,p.m,p.d)).getUTCDay();}
@@ -406,6 +407,7 @@ renderAll();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
 Promise.all(T.LANGS.map(l=>fetch(l.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){compute();renderAll();}});
+addEventListener('studycloud:applied',()=>{compute();renderAll();});
 paintImages();
 })();
 </script>

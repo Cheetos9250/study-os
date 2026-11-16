@@ -37,3 +37,7 @@ The GitHub Actions workflow `.github/workflows/prod-progress-cas-tests.yml` **on
 Cloudflare's current [SQLite Durable Object storage API](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/) supports synchronous `ctx.storage.kv.get/put` for the critical CAS section. New class configuration should follow the current [Wrangler docs](https://developers.cloudflare.com/workers/wrangler/configuration/); the newer declarative `exports` and legacy `migrations` approaches must not be mixed. If/when an authorized release is planned, verify documentation again before generating any production Wrangler config.
 
 **Status: DESIGN/TEST CANDIDATE ONLY — PRODUCTION RELEASE BLOCKED.**
+
+## Release path (owner-approved 15 Nov 2026)
+
+The owner approved going live with a **fresh** namespace instead of migrating the legacy KV: each device merges its own local progress on first sync, and the legacy `study-api` KV stays untouched for rollback. The deploy config lives in `workers/progress/wrangler.jsonc` and is applied only by the manual workflow `.github/workflows/deploy-progress-worker.yml` (typed `DEPLOY` confirmation, secrets from GitHub). `data/config.json` gets `progress_api` only after that workflow's smoke test passes.

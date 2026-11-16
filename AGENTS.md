@@ -87,11 +87,12 @@ node tests/auto-sync-browser.cjs
 ## Sync status (cross-device)
 
 - Not live yet. Today the owner moves data with Back up / Restore.
+- Client ready (16 Nov 2026): `scripts/study-cloud.js` (`window.StudyCloud`) on Today, Calendar, Practice, Flashcards and Lessons syncs all five courses plus the `today` subject (`studyos.today.v1`) through `progress_api` only, with CAS and per-item merges; the nav's **Cloud sync** opens its dialog. It is inactive until `progress_api` is in `data/config.json`. Sync caches `study-sync-today-base-v1` / `study-sync-last-v1` are not backed up. The Worker accepts the extra subject `today` with its own schema.
 - Live `study-api` Worker:
   - serves Notion quiz/cards (no longer read by the site — Notion retired 15 Nov 2026; pages use only `data/quiz.json` / `data/cards.json`) plus legacy progress, with unconditional writes;
   - must not be replaced;
   - is used through `data/config.json` → `api`.
-- `workers/progress/wrangler.jsonc` and `.github/workflows/deploy-progress-worker.yml` (PR #102, may still be open) deploy `vocabloom-progress-cas-prod`, a compare-and-set progress Worker built from `experiments/prod-progress-cas/worker.mjs`.
+- `workers/progress/wrangler.jsonc` and `.github/workflows/deploy-progress-worker.yml` (from PR #102, now on `main`) deploy `vocabloom-progress-cas-prod`, a compare-and-set progress Worker built from `experiments/prod-progress-cas/worker.mjs`.
 - That deploy needs the owner to add the GitHub secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `PROGRESS_SYNC_KEY`, then run the workflow and type `DEPLOY`. The owner postponed this.
 - After the smoke test passes, add `progress_api` to `data/config.json`. Course pages and WordNest already support it, including auto sync.
 - Owner request (15 Nov 2026, after losing quiz answers when the iPad cleared site data): when cloud sync goes live it must also sync `studyos.today.v1` (timetable, exams, plan ticks), not only course progress. Until then the owner chose device-side protection: `navigator.storage.persist()` on every page and the Today backup reminder.

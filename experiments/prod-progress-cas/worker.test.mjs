@@ -105,7 +105,7 @@ test('Production identity marker requires credentials and is read-only by defaul
  const body=await r.json();
  assert.deepEqual(body,{
   productionCandidate:true,protocol:'vocabloom-cas-prod-candidate-v1',
-  state:'read-only',subjects:['acc','eco','math','eng','zh']
+  state:'read-only',subjects:['acc','eco','math','eng','zh','today']
  });
  assert.equal(f.objects.size,0);
  assert.equal((await f.req('GET','/__prod/health',{headers:{'X-Sync-Key':''}})).status,401);
