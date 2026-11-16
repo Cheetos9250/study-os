@@ -1,0 +1,1 @@
+- Accounting practice now includes the 214 written textbook exercises (Ch5–9) next to the multiple-choice questions: full problem with tables, a working box (shared with Textbook Exercises), **Show solution**, then **I got it / I missed it** so scores, Missed and Review due work for them too. Renderer moved to `scripts/textbook-sos-render.js`, shared by both pages.

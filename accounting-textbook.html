@@ -97,6 +97,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;fl
 <details class="settings"><summary>Backup progress · About this textbook</summary><div class="settings-body"><button class="btn" id="export" type="button">Export answers</button><button class="btn" id="import" type="button">Import answers</button><input id="progressFile" type="file" accept=".json,application/json"><button class="btn" id="forgetPdf" type="button">Remove stored PDF</button></div><p class="privacy">The PDF is imported into this browser and is not uploaded to Study OS, GitHub or another server. The reader loads the PDF.js rendering library from a third-party CDN. Book contents stay on your device. Your answers use the same local progress storage as the previous textbook index; they do not sync across devices. Use Export answers before clearing Safari data.</p><p class="privacy">Source: Wild &amp; Shaw, <em>Fundamental Accounting Principles</em>, 24th ed. Some automatically identified question boundaries may include neighboring material; use “Show full page” when needed.</p></details><p class="error" id="error" role="alert" hidden></p><div class="jump-bar" role="group" aria-label="เลื่อนไปยังโจทย์หรือช่องตอบ"><button class="btn" id="jumpQ" type="button">↑ โจทย์</button><button class="btn primary" id="jumpA" type="button">↓ ช่องตอบ</button></div></main></div><footer>Study OS · Personal textbook practice · Built for iPad</footer></div>
 <script src="scripts/accounting-answer-check.js?v=20261113-money"></script>
 <script src="scripts/acc-textbook-mcq.js?v=1"></script>
+<script src="scripts/textbook-sos-render.js?v=1"></script>
 <script>
 'use strict';
 const PROGRESS_KEY='studyos.accounting.textbook.progress.v1', LAST_KEY='studyos.accounting.textbook.last.v1', IDB='studyos-accounting-pdf-v1', STORE='book', MAX_LIST=180;
@@ -122,18 +123,7 @@ function renderList(){const list=$('questionList');list.replaceChildren();const 
 for(const q of all.slice(0,MAX_LIST)){const b=document.createElement('button');b.type='button';b.className='q-item';b.setAttribute('aria-current',q.id===current?.id?'true':'false');const name=document.createElement('b');name.textContent=q.id+(statusOf(q.id)==='done'?' · Done':'');if(statusOf(q.id)==='done')name.className='finished';const title=document.createElement('small');title.textContent=($('search').value.trim()?'Ch. '+q.chapter+' · ':'')+q.title.replace(/\s+[A-Z][!"#$%&'()]+$/,'');b.append(name,title);b.onclick=()=>{openQuestion(q.id);if(window.innerWidth<=850){$('sidebar').classList.remove('expanded');$('toggleList').textContent='Show question list';$('toggleList').setAttribute('aria-expanded','false');$('workspace').scrollIntoView({behavior:'smooth',block:'start'});}};list.append(b);}}
 /* ---------- Study OS rewritten exercises (data/textbook-sos/chN.json) ---------- */
 const SOS=new Map();
-function sosEsc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function sosInline(t){return sosEsc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*?)\*/g,'$1<i>$2</i>');}
-function sosCell(c,tag){const v=c.trim(),num=/^[-−(]?\$?[\d,]+(\.\d+)?%?\)?$/.test(v)||v==='—';return '<'+tag+(num?' class="n"':'')+'>'+sosInline(v)+'</'+tag+'>';}
-function sosMd(text){const lines=String(text||'').split('\n');let h='',i=0;const row=l=>l.trim().replace(/^\||\|$/g,'').split('|');
- while(i<lines.length){const l=lines[i];
-  if(/^\s*\|/.test(l)){const rows=[];while(i<lines.length&&/^\s*\|/.test(lines[i]))rows.push(lines[i++]);let head=null;if(rows.length>1&&/^\s*\|?\s*:?-{2,}/.test(rows[1])){head=rows[0];rows.splice(0,2);}
-   h+='<div class="sos-tbl"><table>'+(head?'<thead><tr>'+row(head).map(c=>sosCell(c,'th')).join('')+'</tr></thead>':'')+'<tbody>'+rows.map(r=>'<tr>'+row(r).map(c=>sosCell(c,'td')).join('')+'</tr>').join('')+'</tbody></table></div>';continue;}
-  if(/^#{1,4} /.test(l)){h+='<h4>'+sosInline(l.replace(/^#+ /,''))+'</h4>';i++;continue;}
-  if(/^\s*([-•]|\d+[.)]|[a-z][.)]) /.test(l)){const ol=/^\s*(\d+|[a-z])[.)] /.test(l);let items='';while(i<lines.length&&/^\s*([-•]|\d+[.)]|[a-z][.)]) /.test(lines[i])){const m=lines[i].match(/^\s*(?:[-•]|(\d+|[a-z])[.)]) (.*)$/);items+='<li'+(m[1]&&ol?' value="'+(isNaN(m[1])?m[1].charCodeAt(0)-96:m[1])+'"':'')+(m[1]&&isNaN(m[1])?' style="list-style-type:lower-alpha"':'')+'>'+sosInline(m[2])+'</li>';i++;}h+=ol?'<ol>'+items+'</ol>':'<ul>'+items+'</ul>';continue;}
-  if(!l.trim()){i++;continue;}
-  let para=[];while(i<lines.length&&lines[i].trim()&&!/^\s*\|/.test(lines[i])&&!/^#{1,4} /.test(lines[i])&&!/^\s*([-•]|\d+[.)]|[a-z][.)]) /.test(lines[i]))para.push(sosInline(lines[i++]));h+='<p>'+para.join('<br>')+'</p>';}
- return h;}
+const sosMd=window.StudySosMd;
 function sosActive(){return !!(current&&SOS.has(current.id));}
 function applySos(q){const it=q&&SOS.get(q.id),on=!!it;$('sosView').hidden=!on;document.querySelector('#paneQ .viewer:not(#sosView)').hidden=on;$('sosSolBox').hidden=!on;$('origCheck').hidden=on;$('surrounding').hidden=on;if(on){renderVersion++;$('extraPage').hidden=true;$('sosBody').innerHTML=sosMd(it.prompt);$('sosSol').innerHTML=sosMd(it.solution);$('sosSol').hidden=true;$('sosShow').textContent='Show solution';}return on;}
 $('sosShow').addEventListener('click',()=>{const s=$('sosSol');s.hidden=!s.hidden;$('sosShow').textContent=s.hidden?'Show solution':'Hide solution';});
