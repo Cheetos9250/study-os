@@ -115,6 +115,18 @@
   function paintFold(){var on=!!(T&&T.collapsed&&T.collapsed());fb.innerHTML=svg(on?'unfold':'fold')+'<span>'+(on?'Expand sidebar':'Collapse sidebar')+'</span>';fb.setAttribute('aria-pressed',String(on));fb.title=on?'Expand sidebar':'Collapse sidebar';}
   if(!T||!T.setCollapsed)fb.hidden=true;else{fb.onclick=function(){T.setCollapsed(!T.collapsed());paintFold();};paintFold();}
  }
+ /* running Pomodoro from Today (state read through StudyTheme.pomo): a small countdown on every other page */
+ function pomo(){
+  var P=window.StudyTheme&&window.StudyTheme.pomo;if(active==='today'||!document.body||!P||!P())return;
+  var a=document.createElement('a');a.id='snPomo';a.href='index.html';a.setAttribute('aria-label','Pomodoro timer, open Today');
+  a.style.cssText='position:fixed;top:max(10px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:70;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border:2.5px solid var(--ink,#111);border-radius:999px;background:var(--panel,#fff);color:var(--text,#111);font:700 15px/1 var(--num,ui-monospace,monospace);text-decoration:none;font-variant-numeric:tabular-nums';
+  document.body.appendChild(a);
+  var done=false,t=setInterval(paint,500);paint();
+  function paint(){var s=P();if(!s){clearInterval(t);a.remove();return;}var l=Math.ceil((s.endAt-Date.now())/1000);
+   if(l<=0){if(!done){done=true;a.textContent='Time\u2019s up';try{navigator.vibrate&&navigator.vibrate(300);}catch(e){}setTimeout(function(){clearInterval(t);a.remove();},60000);}return;}
+   a.textContent='\u23F1 '+String(Math.floor(l/60)).padStart(2,'0')+':'+String(l%60).padStart(2,'0');}
+ }
  window.StudyNav={TABS:TABS,active:active};
+ if(document.body)pomo();else document.addEventListener('DOMContentLoaded',pomo);
  if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
 })();

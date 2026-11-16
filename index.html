@@ -182,7 +182,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 }
 @media(max-width:420px){.sb{padding:12px 14px 14px;min-height:110px}}
 </style>
-<script src="scripts/study-theme.js?v=4"></script>
+<script src="scripts/study-theme.js?v=5"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
@@ -232,7 +232,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=3"></script>
-<script src="scripts/study-nav.js?v=5"></script>
+<script src="scripts/study-nav.js?v=6"></script>
 <script>
 (function(){
 'use strict';
@@ -299,16 +299,28 @@ document.addEventListener('click',e=>{if(!menu.hidden&&!menu.contains(e.target)&
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
 fileIn.onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f||!target)return;const k=target,S=slot(k);pickImage(f,S.w,S.q,d=>put(k,d),S.alpha);};
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-img]');if(!b)return;e.stopPropagation();openMenu(b.dataset.img,b);});
-/* ---------- pomodoro ---------- */
+/* ---------- pomodoro ----------
+   The timer keeps running when you leave Today: its end time is kept in studyos.pomo.v1 (a screen setting, not study data,
+   not backed up), and the nav shows a small countdown on every other page. */
+const POMO_KEY='studyos.pomo.v1';
 let mins=25,left=25*60,endAt=0,tick=null;
 const clock=$('#clock'),fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function savePomo(){try{localStorage.setItem(POMO_KEY,JSON.stringify(endAt?{mins,endAt}:{mins,left}));}catch{}}
 function showClock(){clock.textContent=fmt(Math.max(0,left));document.title=(endAt?fmt(Math.max(0,left))+' · ':'')+'Today — Study OS';}
 function stop(){clearInterval(tick);tick=null;endAt=0;$('#pStart').textContent='start';}
-function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){left=0;stop();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}return;}showClock();}
-$('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();showClock();$('#pStart').textContent='resume';return;}
- if(left<=0)left=mins*60;endAt=Date.now()+left*1000;tick=setInterval(step,500);$('#pStart').textContent='pause';step();};
-function setMode(m){stop();mins=m;left=m*60;showClock();document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.m===m)));}
+function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}return;}showClock();}
+function run(){tick=setInterval(step,500);$('#pStart').textContent='pause';step();}
+$('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();savePomo();showClock();$('#pStart').textContent='resume';return;}
+ if(left<=0)left=mins*60;endAt=Date.now()+left*1000;savePomo();run();};
+function setMode(m){stop();mins=m;left=m*60;savePomo();showClock();paintTabs();}
+function paintTabs(){document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.m===mins)));}
 $('#pReset').onclick=()=>setMode(mins);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setMode(+b.dataset.m));
+/* pick the timer up where it was */
+(function(){let s=null;try{s=JSON.parse(localStorage.getItem(POMO_KEY)||'null');}catch{}
+ if(!s||![5,15,25].includes(s.mins))return;mins=s.mins;paintTabs();
+ if(s.endAt&&s.endAt>Date.now()){endAt=s.endAt;run();}
+ else if(s.endAt){left=0;showClock();savePomo();}
+ else if(Number.isFinite(s.left)&&s.left>=0&&s.left<=mins*60){left=s.left;showClock();if(left&&left<mins*60)$('#pStart').textContent='resume';}})();
 /* ---------- data ---------- */
 let data={},summaries={},langData={},langSum={},loadFailed=0,now=Date.now(),today=T.dayKey(now);
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');

@@ -1,0 +1,1 @@
+- Pomodoro keeps counting when you leave Today: its end time is kept in `studyos.pomo.v1` (a screen setting, not backed up), Today resumes it on return, and every other page shows a small countdown pill (top right) that links back to Today and says "Time's up" at the end.

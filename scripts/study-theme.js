@@ -20,7 +20,9 @@
  function cycle(){mode=NEXT[mode];apply(mode);try{if(mode==='auto')localStorage.removeItem(KEY);else localStorage.setItem(KEY,mode);}catch(e){}return mode;}
  /* Ask the browser to keep this site's data instead of clearing it under storage pressure (iPadOS honours this best for home-screen apps). */
  try{if(navigator.storage&&navigator.storage.persisted&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist();}).catch(function(){});}catch(e){}
- window.StudyTheme={mode:function(){return mode;},cycle:cycle,ICON:ICON,LABEL:LABEL,collapsed:function(){return collapsed;},setCollapsed:setCollapsed,focus:function(){return focus;},setFocus:setFocus};
+ /* read-only view of Today's running Pomodoro (studyos.pomo.v1 is written only by index.html) */
+ function pomo(){try{var s=JSON.parse(localStorage.getItem('studyos.pomo.v1')||'null');return s&&s.endAt?s:null;}catch(e){return null;}}
+ window.StudyTheme={pomo:pomo,mode:function(){return mode;},cycle:cycle,ICON:ICON,LABEL:LABEL,collapsed:function(){return collapsed;},setCollapsed:setCollapsed,focus:function(){return focus;},setFocus:setFocus};
  function mount(){
   if(document.getElementById('studyThemeBtn')||document.getElementById('studyNav')||document.querySelector('script[src*="study-nav.js"]'))return;
   var b=document.createElement('button');b.id='studyThemeBtn';b.type='button';
