@@ -1,0 +1,1 @@
+- Practice: a large ruled notebook under the quizzes, one page per subject (General, ACC, ECO, MATH), up to 100,000 characters each, autosaved, with a Full screen mode (Esc or Done to close). Notes are stored in `studyos.notes.v1` as `practice:<subject>`, so they are already in Back up / Restore; notes written on the Lessons page are kept.

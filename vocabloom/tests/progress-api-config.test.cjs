@@ -49,13 +49,13 @@ test('Missing or empty progress_api falls back to existing api with no migration
   for(const path of subjects)assert.equal(await legacyResolver(path,c)(),originalApi);
  }
 });
-test('All five legacy Notion quiz/card loaders still read j.api, not progress_api',()=>{
+test('Quiz/card loaders read only the saved data/ snapshot (Notion retired), never progress_api',()=>{
  for(const path of subjects){
   const src=text(path);
   const idx=src.indexOf('async function cfg(){');
   assert.ok(idx>=0);
   const preceding=src.slice(0,idx);
-  assert.match(preceding,/if\(c\.ok\) api=String\(\(await c\.json\(\)\)\.api\|\|''\)/);
+  assert.match(preceding,/fetch\('data\/'\+name\+'\.json'/);assert.doesNotMatch(preceding,/fetch\(api\+'\/'\+name\)|window\.claude\.use\("mcp"\)/);
   assert.doesNotMatch(preceding,/progress_api/);
   assert.match(src.slice(idx,idx+380),/j\.progress_api\|\|original/);
  }

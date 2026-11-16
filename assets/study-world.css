@@ -1,0 +1,190 @@
+/* Study OS visual system: "Ink manga".
+   Black-and-white manga line art: heavy ink panel frames, pen hatching and halftone for what is "now",
+   speech bubbles for the next action. One accent colour follows the owner's Today cover image
+   (scripts/study-accent.js sets --ah/--as/--al/--ad; defaults below are an ink red).
+   Loaded after each core page's own <style>, so these rules win at equal specificity.
+   Used by: index, flashcards, practice, hub, calendar, grades. Course pages keep study-unify.css. */
+/* Fonts are linked from each page's <head> (preconnect + stylesheet) so they load in parallel, not after this file. */
+
+:root{
+ --ah:4;--as:76%;--al:50%;--ad:68%;
+ color-scheme:light;
+ --ui:'Zen Maru Gothic','Mali','Sukhumvit Set',system-ui,-apple-system,sans-serif;
+ --num:'Kaisei Decol','Zen Maru Gothic','Mali',serif;
+ --mono:var(--ui);
+ --bg:#f4f4f2;--panel:#ffffff;--panel-2:#f0f0ee;--text:#111111;--muted:#505050;--line:#111111;--line-soft:#dcdcda;--line-strong:#111111;
+ --ink:#111111;--paper:#ffffff;
+ --acc:hsl(var(--ah) var(--as) var(--al));--acc-ink:var(--acc-ink-l,#ffffff);--acc-soft:hsl(var(--ah) var(--as) 94%);--acc-tone:hsl(var(--ah) var(--as) var(--al) / .32);
+ --halftone:#b9b9b9;
+ --accent:var(--ink);--accent-ink:#ffffff;--acc-t:var(--acc-text,var(--acc));--link:var(--acc-t);--focus:var(--ink);
+ --red:#c21f2f;--orange:#a8500c;--green:#1f7448;
+ --hi:#ffdcdc;--hi-t:#8a1622;--med:#fff0b3;--med-t:#5c4500;--low:#d9efe0;--low-t:#1b5131;--blue-soft:#ececec;
+ --t-acc:#8fb2f4;--t-eco:#f4ad7f;--t-math:#b49bf0;--t-eng:#f2909f;--t-zh:#f2cf55;
+ --bw:3px;--r:2px;--r-s:6px;
+ /* hub.html legacy names */
+ --purple:var(--acc);--deep:var(--acc);--greenbg:var(--low);--lav:var(--acc-soft);--white:var(--panel);--redbg:var(--hi);--orangebg:var(--med);--shadow:none;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ color-scheme:dark;
+ --bg:#0e0e0f;--panel:#171718;--panel-2:#1f1f21;--text:#f0f0ee;--muted:#a9a9a6;--line:#f0f0ee;--line-soft:#333335;--line-strong:#f0f0ee;
+ --ink:#f0f0ee;--paper:#0e0e0f;
+ --acc:hsl(var(--ah) var(--as) var(--ad));--acc-ink:#0e0e0f;--acc-soft:hsl(var(--ah) calc(var(--as) * .5) 16%);--acc-tone:hsl(var(--ah) var(--as) var(--ad) / .34);
+ --halftone:#4a4a4c;
+ --accent:var(--ink);--accent-ink:#0e0e0f;--focus:var(--ink);--acc-t:var(--acc);--link:var(--acc);
+ --red:#ff7b85;--orange:#f2a25c;--green:#6fd29c;
+ --hi:#4a1a20;--hi-t:#ffbcc2;--med:#433710;--med-t:#f4d87a;--low:#173523;--low-t:#a9ddb9;--blue-soft:#262628;
+ --t-acc:#7fa3e8;--t-eco:#e39a6c;--t-math:#a38ae0;--t-eng:#e07f8f;--t-zh:#e0bd45;
+}}
+:root[data-theme="dark"]{
+ color-scheme:dark;
+ --bg:#0e0e0f;--panel:#171718;--panel-2:#1f1f21;--text:#f0f0ee;--muted:#a9a9a6;--line:#f0f0ee;--line-soft:#333335;--line-strong:#f0f0ee;
+ --ink:#f0f0ee;--paper:#0e0e0f;
+ --acc:hsl(var(--ah) var(--as) var(--ad));--acc-ink:#0e0e0f;--acc-soft:hsl(var(--ah) calc(var(--as) * .5) 16%);--acc-tone:hsl(var(--ah) var(--as) var(--ad) / .34);
+ --halftone:#4a4a4c;
+ --accent:var(--ink);--accent-ink:#0e0e0f;--focus:var(--ink);--acc-t:var(--acc);--link:var(--acc);
+ --red:#ff7b85;--orange:#f2a25c;--green:#6fd29c;
+ --hi:#4a1a20;--hi-t:#ffbcc2;--med:#433710;--med-t:#f4d87a;--low:#173523;--low-t:#a9ddb9;--blue-soft:#262628;
+ --t-acc:#7fa3e8;--t-eco:#e39a6c;--t-math:#a38ae0;--t-eng:#e07f8f;--t-zh:#e0bd45;
+}
+
+/* ---------- line-art textures ---------- */
+:root{
+ --hatch:repeating-linear-gradient(-45deg,var(--acc) 0 1.5px,transparent 1.5px 8px);
+ --hatch-ink:repeating-linear-gradient(-45deg,var(--halftone) 0 1.5px,transparent 1.5px 8px);
+ --dots:radial-gradient(circle,var(--halftone) 1.2px,transparent 1.6px) 0 0/7px 7px;
+}
+.now-tone{background:var(--hatch),var(--panel)}
+
+/* ---------- base ---------- */
+html{background:var(--bg);scrollbar-color:var(--ink) var(--bg)}
+.ko{background:var(--panel);padding:0 4px;border-radius:2px}
+body{font-family:var(--ui);background:var(--bg);color:var(--text);line-height:1.6;font-size:16px}
+h1,h2,h3,.mono{font-family:var(--ui)}
+::selection{background:var(--acc);color:var(--acc-ink)}
+input,select,textarea,button{font-family:var(--ui)}
+input,textarea{caret-color:var(--acc)}
+a{text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px;box-shadow:0 0 0 6px var(--acc-soft)}
+input[type=checkbox]{accent-color:var(--acc)}
+.page{max-width:1080px}
+.page,.container{padding-bottom:96px}
+
+/* page heads: one rhythm on every core page */
+h1{font:700 clamp(36px,5vw,50px)/1.1 var(--num);letter-spacing:0;margin:0}
+.page>h1,.hero h1{margin-top:8px}
+.hero{padding-top:max(24px,env(safe-area-inset-top))!important;padding-bottom:0!important}
+.container{padding-top:0!important}
+h2{font:700 20px/1.3 var(--num);margin:40px 0 12px;display:flex;align-items:center;gap:12px;letter-spacing:0}
+h2::before{content:none!important}
+h2::after{content:"";flex:1;height:var(--bw);background:var(--ink);order:1}
+h2 .sec-link,h2 small,h2 a{order:2}
+.sec-link{margin-left:0;font:900 14px var(--ui);color:var(--link)}
+.date,.lead{color:var(--muted);font-size:15px;font-weight:500}
+
+/* ---------- panels (manga frames) ---------- */
+.box,.card,.pc,.course,.subj,.exam,.wd{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);box-shadow:none}
+.box,.card{padding:16px 18px}
+.empty{color:var(--muted)}
+.row{border-bottom:2px solid var(--line-soft)}
+.row .t{font-family:var(--ui);font-weight:700}
+.plan li{border-bottom:2px solid var(--line-soft)}
+
+/* lead panel: the next action on each page, spoken from a bubble */
+.lead-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;margin:18px 0 0;padding:18px 20px 26px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--hatch),var(--panel)}
+.lead-panel .bub{max-width:460px;padding:18px 34px 20px}
+.lead-panel .bub b{display:block;font:700 clamp(20px,2.6vw,26px)/1.25 var(--num)}
+.lead-panel .bub span{display:block;color:var(--muted);font-weight:700;font-size:14px}
+.lead-panel .go{font:900 15px var(--ui);min-height:46px;padding:0 22px;border-radius:var(--r-s);background:var(--acc);color:var(--acc-ink);border:var(--bw) solid var(--ink);display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}
+@media(max-width:560px){.lead-panel{grid-template-columns:1fr}.lead-panel .go{justify-self:start}}
+
+/* inner pages: one wide "now" panel, the rest narrower (manga page rhythm) */
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px}
+/* text stays on clean paper; the hatch fills the right third of the wide panel */
+.grid>.wide,.grid3>.wide{grid-column:span 2;background:linear-gradient(90deg,var(--panel) 0 60%,var(--ink) 60% calc(60% + 3px),transparent calc(60% + 3px)),var(--hatch),var(--panel)}
+.grid>.wide>*,.grid3>.wide>*{max-width:56%}
+.grid>.strip,.grid3>.strip{grid-column:span 2}
+.grid[aria-label="More practice"]{align-items:start}
+.grid3{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+@media(max-width:700px){.grid,.grid3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:480px){.grid,.grid3{grid-template-columns:1fr!important}.grid>.wide,.grid3>.wide,.grid>.strip,.grid3>.strip{grid-column:auto}}
+
+/* ---------- controls ---------- */
+.acts a,.btns button,.add,.mini,.toolbar select,.toolbar input,.toolbar button,.cal-head button,button.notebtn{border-radius:var(--r-s);border:2.5px solid var(--ink);background:var(--panel);color:var(--text);font-family:var(--ui);font-weight:700}
+.toolbar input,.toolbar select,.edit input[type=text],.edit input[type=date],.edit select,.items input{border-radius:var(--r-s);border:2px solid var(--ink);background:var(--panel)}
+.acts a{font-size:14px;min-height:42px;padding:0 16px}
+.plan .acts a{min-height:40px}
+.acts a:hover,.btns button:hover,.add:hover,.mini:hover,.cal-head button:hover{background:var(--panel-2)}
+.acts a.main,.toolbar .primary,.btns .primary,button.primary{background:var(--ink);border-color:var(--ink);color:var(--accent-ink)}
+.acts a.main:hover,.toolbar .primary:hover,.btns .primary:hover,button.primary:hover{background:var(--acc);border-color:var(--ink);color:var(--acc-ink)}
+.btns .danger,.mini.danger,button.danger{color:var(--red)}
+.toolbar ::placeholder,.edit ::placeholder{color:var(--muted)}
+.cal-head button{min-height:44px;min-width:44px;padding:0 14px;font-size:15px}
+.cal-head button svg{width:20px;height:20px;display:block}
+
+.chip{border-radius:var(--r);background:var(--panel);border:var(--bw) solid var(--ink)}
+.chip b{font:700 28px/1 var(--num)}
+.left{font:700 12px var(--ui);background:var(--blue-soft);color:var(--text);border:1.5px solid var(--ink);border-radius:4px}
+.left.late{background:var(--hi);color:var(--hi-t)}.left.today{background:var(--med);color:var(--med-t)}
+.pri{font:700 12px var(--ui);border:1.5px solid var(--ink);border-radius:4px}
+.badge{font:700 12px var(--ui);background:var(--hi);color:var(--hi-t);border:1.5px solid var(--ink);border-radius:4px}
+
+/* ---------- course tones ---------- */
+.t-acc{--team:var(--t-acc)}.t-eco{--team:var(--t-eco)}.t-math{--team:var(--t-math)}.t-eng,.t-voc{--team:var(--t-eng)}.t-zh{--team:var(--t-zh)}
+.tag{display:inline-block;font:900 11px/1.6 var(--ui);padding:0 8px;border-radius:4px;border:2px solid var(--ink);background:var(--team,var(--blue-soft));color:#111;margin-right:8px;vertical-align:1px}
+.jersey{flex:none;display:inline-grid;place-items:center;min-width:46px;height:38px;padding:0 8px;border-radius:4px;border:2.5px solid var(--ink);background:var(--team,var(--acc-soft));color:#111;font:700 14px/1 var(--num)}
+.jersey.sm{min-width:42px;height:30px;font-size:12px;padding:0 7px}
+h3 .jersey{margin-right:10px;vertical-align:middle}
+.pc h3,.card h3{display:flex;align-items:center;gap:0;font-weight:900}
+.kind{display:inline-block;font:900 11px/1.6 var(--ui);padding:0 7px;border-radius:4px;border:1.5px solid var(--ink);margin-right:8px;background:var(--blue-soft);color:var(--text)}
+.kind.k-e{background:var(--hi);color:var(--hi-t)}.kind.k-c{background:var(--acc-soft)}
+.nums b{font-family:var(--num)!important;font-weight:700!important}
+.nums .due b{color:var(--red)}.nums div:not(.due) b{color:var(--text)}
+.bar{height:10px;border-radius:2px;border:2px solid var(--ink);background:var(--panel)}
+.bar i{background:var(--ink)}
+
+/* ---------- speech bubble (solid ink tail) ---------- */
+/* tail: an ink wedge behind the bubble, a paper wedge on top that opens the outline, so the stroke runs into the tail */
+.bub{position:relative;isolation:isolate;display:block;background:var(--panel);border:var(--bw) solid var(--ink);border-radius:50%;padding:14px 30px 16px;text-align:center}
+.bub::before{content:"";position:absolute;z-index:-1;left:16%;bottom:-24px;width:30px;height:40px;background:var(--ink);clip-path:polygon(0 0,100% 0,6% 100%)}
+.bub::after{content:"";position:absolute;z-index:1;left:calc(16% + 4.5px);bottom:-16.5px;width:20px;height:30px;background:var(--panel);clip-path:polygon(0 0,100% 0,6% 100%)}
+
+/* ---------- cover (owner image; default = ink speed lines on halftone) ---------- */
+.cover{background:
+ repeating-conic-gradient(from 0deg at 78% 55%,var(--ink) 0 1.4deg,transparent 1.4deg 7deg),
+ radial-gradient(circle at 78% 55%,var(--panel) 0 16%,transparent 34%),
+ var(--dots),var(--panel);border-bottom:var(--bw) solid var(--ink)}
+.cover[style*="background-image: url"]{background-size:cover;background-position:center;background-repeat:no-repeat}
+.cover-tools button{font:900 13px var(--ui);border-radius:var(--r-s);background:var(--paper);color:var(--text);border:2.5px solid var(--ink);min-height:40px;opacity:1}
+.avatar{border:var(--bw) solid var(--ink)!important;box-shadow:0 0 0 4px var(--bg);background-color:var(--panel)}
+.avatar.img{border:0!important;box-shadow:none}
+
+/* ---------- exams ---------- */
+.exam.soon,.exam.urgent{border-left-color:var(--ink)}
+.exam .n{font:700 38px/1 var(--num);color:var(--text)}
+.exam .n small{font:700 13px var(--ui);color:var(--muted)}
+.exam.soon .n{color:var(--orange)}.exam.urgent .n{color:var(--acc-t)}
+/* urgent exam: a hatched band down the left edge; the text stays on clean paper */
+.exam.urgent{background:var(--hatch) left top/14px 100% no-repeat,var(--panel);padding-left:28px}
+
+/* ---------- calendar ---------- */
+.day{border-radius:var(--r);background:var(--panel);border:2px solid var(--ink);font:700 15px var(--num)}
+.day.out{opacity:.35}
+.day.today{background:var(--hatch),var(--panel);box-shadow:none;border-width:3px}
+.day[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.dots i{background:var(--ink)}.dots i.e{background:var(--acc)}
+.day[aria-pressed=true] .dots i{background:var(--paper)}
+.dow{font:900 12px var(--ui);letter-spacing:.04em;text-transform:uppercase}
+.wd{border-width:2px}
+.wd.today{background:var(--hatch),var(--panel);box-shadow:none;border-width:3px}
+.wd h4{font:900 12px var(--ui);letter-spacing:.04em;text-transform:uppercase}
+.cl{background:var(--team,var(--panel-2));color:#111;border:2px solid var(--ink);border-radius:4px}
+.cl b{font:700 13px var(--num)}
+
+/* ---------- grades ---------- */
+.course .big,.pc .big,.big{font-family:var(--num);font-weight:700}
+.letter{font:700 20px var(--num);background:var(--acc);color:var(--acc-ink);border:2.5px solid var(--ink);border-radius:4px}
+.items th{font:900 12px var(--ui);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--ink)}
+.items td{border-bottom:2px solid var(--line-soft)}
+.need span{font:700 12px var(--ui);background:var(--panel);border:2px solid var(--ink);border-radius:4px}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

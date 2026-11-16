@@ -99,7 +99,7 @@ test('Missing new progress key refuses Auto Sync enablement even with old conten
  assert.equal(storage.get(CONSENT),undefined);
  assert.equal(f.calls.confirm,0);
  assert.equal(f.calls.sync.length,0);
- assert.match(f.calls.notices[0].text,/Progress Worker ใหม่/);
+ assert.match(f.calls.notices[0].text,/new Progress Worker/);
 });
 test('Cancelled explicit consent cannot enable progress Auto Sync',async()=>{
  const storage=new Map(Object.entries({...BASE,[KEY]:'0'}));
@@ -119,7 +119,7 @@ test('Storage failure to persist endpoint consent or auto preference fails close
   assert.equal(f.CLOUD.enabled,false);
   assert.equal(storage.get(KEY),'0');
   assert.equal(f.calls.sync.length,0);
-  assert.match(f.calls.notices.at(-1).text,/ไม่สามารถบันทึก/);
+  assert.match(f.calls.notices.at(-1).text,/Could not save/);
  }
 });
 test('Turning off explicitly enabled Auto Sync disables and preserves the endpoint binding',async()=>{

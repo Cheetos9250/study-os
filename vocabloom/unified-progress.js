@@ -30,7 +30,7 @@ function cInitLocal(){
  if(!cSafeGet(CLOUD_AUTOSYNC_MIGRATION)){
   if(cSafeGet(CLOUD_AUTO)==='1'){
    cSafeSet(CLOUD_AUTO,'0');
-   CLOUD.message='Auto Sync เดิมถูกปิดเพื่อความปลอดภัย กรุณาเปิดอีกครั้งด้วยตนเองหากต้องการ';
+   CLOUD.message='The previous Auto Sync was turned off for safety; turn it on again yourself if you want it';
   }
   cSafeSet(CLOUD_AUTOSYNC_MIGRATION,'1');
  }
@@ -206,7 +206,7 @@ async function cApiUrl(){
   CLOUD.enabled=false;
   if(cSafeGet(CLOUD_AUTO)==='1')cSafeSet(CLOUD_AUTO,'0');
  }
- return url}catch(e){throw Error('ไม่พบ Cloudflare API ที่ตั้งค่าไว้')}
+ return url}catch(e){throw Error('No Cloudflare API configured')}
 }
 function cCloudStorageKey(){return CLOUD.progressSplit?CLOUD_PROGRESS_KEY:CLOUD_KEY;}
 function cCloudKey(){
@@ -231,23 +231,23 @@ function cCloudRevision(response){
 }
 async function cCloudSync(manual=false){
  if(CLOUD.busy||(!manual&&!CLOUD.enabled)||!USTATE.ready)return;
- CLOUD.busy=true;CLOUD.mode='unknown';cCloudNotice('กำลังตรวจเวอร์ชันและซิงก์ข้อมูล...');let count=0,legacyConsent=false;
+ CLOUD.busy=true;CLOUD.mode='unknown';cCloudNotice('Checking revisions and syncing…');let count=0,legacyConsent=false;
  try{
   const api=await cApiUrl(),key=cCloudKey();
   // Resolving progress_api can deactivate inherited Auto Sync. Recheck after
   // the await, before issuing any network requests with a progress credential.
-  if(!manual&&!CLOUD.enabled)throw Error('Auto Sync ปิดอยู่หรือเพิ่งปิดหลังเปลี่ยนปลายทาง Progress — ยังไม่ได้เขียนข้อมูล');
-  if(!key)throw Error('ปลายทาง Progress ยังไม่มีรหัสเฉพาะ กรุณาตั้งรหัสใหม่ก่อนซิงก์');
+  if(!manual&&!CLOUD.enabled)throw Error('Auto Sync is off or was turned off after the Progress endpoint changed — nothing was written');
+  if(!key)throw Error('The Progress endpoint has no key of its own yet; set one before syncing');
   const hds={'X-Sync-Key':key,'Content-Type':'application/json'};
   for(const d of USTATE.decks){
    const url=api+'/progress/'+encodeURIComponent(d.key);
    let complete=false;
    for(let attempt=1;attempt<=CLOUD_MAX_RETRIES;attempt++){
     // Do not continue an in-flight background sync after the user turns it off.
-    if(!manual&&!CLOUD.enabled)throw Error('Auto Sync ถูกปิดระหว่างดำเนินการ — หยุดก่อนส่งคำขอถัดไป');
+    if(!manual&&!CLOUD.enabled)throw Error('Auto Sync was turned off mid-run — stopped before the next request');
     const resp=await fetch(url,{headers:hds,cache:'no-store'});
-    if(resp.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง — ตั้งรหัสใหม่ได้ใน Settings');
-    if(resp.status===404||resp.status===405)throw Error('Worker ไม่รองรับเส้นทางซิงก์ '+d.key);
+    if(resp.status===401)throw Error('Wrong SYNC_KEY — set it again in Settings');
+    if(resp.status===404||resp.status===405)throw Error('Worker does not support the sync route '+d.key);
     if(!resp.ok)throw Error('Cloudflare GET '+d.key+' HTTP '+resp.status);
     const revision=cCloudRevision(resp);
     const customRev=resp.headers?.get?.('X-Sync-Revision');
@@ -255,53 +255,53 @@ async function cCloudSync(manual=false){
     // An advertised but broken revision, or a weak HTTP validator, is NOT
     // equivalent to an unversioned legacy backend; refuse even manual PUT.
     if(!revision&&(customRev!==null&&customRev!==undefined||/^W\//.test(httpTag)))
-     throw Error('Worker ส่งหมายเลขเวอร์ชันที่ไม่ปลอดภัย (Weak ETag หรือ X-Sync-Revision ผิดรูปแบบ) จึงไม่เขียนข้อมูล');
+     throw Error('Worker sent an unsafe revision (weak ETag or malformed X-Sync-Revision), so nothing was written');
     if(revision&&CLOUD.mode!=='legacy')CLOUD.mode='cas';
     if(!revision){
      CLOUD.mode='legacy';
      if(!manual){
       CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');
-      throw Error('Worker ยังไม่รองรับ Safe Sync (ไม่มี ETag) จึงปิด Auto Sync เพื่อป้องกันคะแนนถูกเขียนทับ · คะแนนในเครื่องไม่ถูกแก้ไข');
+      throw Error('Worker does not support Safe Sync (no ETag), so Auto Sync was turned off to protect your scores · local scores unchanged');
      }
      if(!legacyConsent){
-      if(!window.confirm('Worker ปัจจุบันยังไม่รองรับ ETag / If-Match จึงป้องกันการเขียนทับคะแนนจากหลายอุปกรณ์ไม่ได้\n\nซิงก์แบบเดิมนี้จะอ่านและเขียนข้อมูลจริงทั้ง 5 วิชา กรุณาสำรอง Full backup ก่อน และห้ามเปิดซิงก์พร้อมกันสองเครื่อง\n\nต้องการดำเนินการแบบ Legacy Sync ด้วยตนเองหรือไม่?'))
-       throw Error('ยกเลิก Legacy Sync — ยังไม่ได้เขียนข้อมูลไปยัง Worker');
+      if(!window.confirm('The current Worker does not support ETag / If-Match, so it cannot stop devices from overwriting each other’s scores.\n\nThis older sync reads and writes real data for all 5 subjects. Make a Full backup first and never sync two devices at once.\n\nRun Legacy Sync manually?'))
+       throw Error('Legacy Sync cancelled — nothing was written to the Worker');
       legacyConsent=true;
      }
     }
     const remote=await resp.json();
     if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error||(Object.keys(remote).length>0&&!remote.study&&!remote.srs)))
-     throw Error('รูปแบบข้อมูล Worker ไม่ถูกต้อง');
+     throw Error('Invalid Worker data format');
     const local=cLocalSubject(d);
     const baseline=JSON.stringify(local);
     if(d.key==='eng')cShadowFromLocal(local.srs.s);
     const joined=cMergeState(local,remote||{});
     const body=JSON.stringify(joined);
-    if(new TextEncoder().encode(body).byteLength>350000)throw Error('ข้อมูลซิงก์มากเกินขนาดที่ปลอดภัย กรุณาส่งออก Backup ก่อน');
+    if(new TextEncoder().encode(body).byteLength>350000)throw Error('Sync data is larger than the safe limit; export a backup first');
     // GET may have completed after Auto Sync was disabled. No new write.
-    if(!manual&&!CLOUD.enabled)throw Error('Auto Sync ถูกปิดระหว่างตรวจข้อมูล — ไม่ส่งคำขอเขียนคะแนน');
+    if(!manual&&!CLOUD.enabled)throw Error('Auto Sync was turned off while checking — no write was sent');
     const headers=revision?{...hds,'If-Match':revision}:hds;
     const saved=await fetch(url,{method:'PUT',headers,body});
-    if(saved.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง');
+    if(saved.status===401)throw Error('Wrong SYNC_KEY');
     if(revision&&(saved.status===409||saved.status===412))continue;
-    if(saved.status===428)throw Error('Worker ต้องการ If-Match แต่ไม่ส่ง ETag กลับมา — ยังไม่ได้เปลี่ยนคะแนนในเครื่อง');
+    if(saved.status===428)throw Error('Worker requires If-Match but sent no ETag — local scores unchanged');
     if(!saved.ok)throw Error('Cloudflare PUT '+d.key+' HTTP '+saved.status);
     // A user might answer another card while the PUT is in flight.
     // Never overwrite those newer local answers with the older merged snapshot.
     if(JSON.stringify(cLocalSubject(d))!==baseline){
      if(revision)continue;
-     throw Error('คะแนนในเครื่องเปลี่ยนระหว่าง Legacy Sync: ยกเลิกการนำเข้าข้อมูลเก่า กรุณาซิงก์ใหม่');
+     throw Error('Local scores changed during Legacy Sync: cancelled importing old data; sync again');
     }
     cApplySubject(d,joined);count++;complete=true;break;
    }
-   if(!complete)throw Error('เวอร์ชันข้อมูล '+d.key+' เปลี่ยนพร้อมกันหลายครั้งเกินกำหนด ('+CLOUD_MAX_RETRIES+' รอบ) เก็บข้อมูลในเครื่องไว้ครบ');
+   if(!complete)throw Error('Data revision '+d.key+' changed concurrently too many times ('+CLOUD_MAX_RETRIES+' tries); local data kept');
   }
   CLOUD.last=Date.now();cSafeSet(CLOUD_LAST,String(CLOUD.last));CLOUD.remoteStatus='saved';
-  cCloudNotice('ซิงก์สำเร็จทั้ง '+count+' วิชา · '+new Date(CLOUD.last).toLocaleTimeString('th-TH'));
+  cCloudNotice('Synced all '+count+' subjects · '+new Date(CLOUD.last).toLocaleTimeString('th-TH'));
   if(['home','studymerge','review','progress','settings'].includes(ui.page))render();
  }catch(e){
   CLOUD.remoteStatus='error';
-  cCloudNotice('ซิงก์ยังไม่ครบ ('+count+'/'+USTATE.decks.length+' วิชา): '+String(e.message||e),true);
+  cCloudNotice('Sync incomplete ('+count+'/'+USTATE.decks.length+' subjects): '+String(e.message||e),true);
  }finally{
   CLOUD.busy=false;
   if(ui.page==='settings')render();
@@ -312,15 +312,15 @@ function cCloudDebounce(){if(!cCloudKey()||!CLOUD.enabled)return;if(CLOUD.busy){
 async function cSetKey(){
  try{await cApiUrl();}catch(e){cCloudNotice(String(e.message||e),true);return;}
  const promptText=CLOUD.progressSplit?
-  'ใส่รหัสของ Progress Worker นี้เท่านั้น\n\nรหัสจะใช้ได้เฉพาะ URL ที่เลือกอยู่ ห้ามใช้รหัส Worker เดิมหรือ Staging กรุณาสำรอง Full backup ก่อนซิงก์ครั้งแรก':
-  'ใส่ SYNC_KEY ของ Cloudflare Worker study-api (รหัสเดียวกับ Study OS เดิม)\n\nเมื่อใส่รหัส ระบบจะซิงก์ทันที 1 รอบ: อ่านและเขียนข้อมูลทั้ง 5 วิชาขึ้น Worker โปรดทำ Full backup ก่อน และอย่าใช้งานสองเครื่องพร้อมกันจนกว่าระบบจะผ่าน QA';
+  'Enter the key for this Progress Worker only.\n\nThe key works only for the selected URL. Do not reuse the original or staging Worker key. Make a Full backup before the first sync.':
+  'Enter the SYNC_KEY of the study-api Cloudflare Worker (same key as Study OS).\n\nAfter you enter it, one sync runs right away: it reads and writes data for all 5 subjects on the Worker. Make a Full backup first and do not use two devices at once until QA is done.';
  const k=window.prompt(promptText,cCloudKey()?'':'');
  if(k===null)return;
- if(!k.trim()){cCloudNotice('ยังไม่ได้ตั้งรหัสซิงก์');return}
+ if(!k.trim()){cCloudNotice('No sync key set');return}
  const stored=CLOUD.progressSplit
   ?JSON.stringify({endpoint:CLOUD.api,key:k.trim()}):k.trim();
  if(!cSafeSet(cCloudStorageKey(),stored)){
-  cCloudNotice('ไม่สามารถเก็บรหัสซิงก์ในเครื่อง จึงยกเลิกการซิงก์',true);
+  cCloudNotice('Could not store the sync key on this device, so the sync was cancelled',true);
   return;
  }
  // One manual sync is requested by entering the key. Auto Sync remains opt-in.
@@ -329,14 +329,14 @@ async function cSetKey(){
 
 async function cFullRestore(file){
  if(!file)return;
- if(CLOUD.busy){cCloudNotice('กรุณารอให้ซิงก์เสร็จก่อนนำเข้าข้อมูล',true);return;}
+ if(CLOUD.busy){cCloudNotice('Wait for the sync to finish before importing',true);return;}
  let saved=null,oldData=null,oldDays=null,oldStudyDays=null;
  try{
-  if(Number(file.size)>8*1024*1024)throw Error('ไฟล์ใหญ่เกิน 8 MB');
+  if(Number(file.size)>8*1024*1024)throw Error('File is larger than 8 MB');
   const payload=JSON.parse(await file.text());
-  if(payload?.type!=='vocabloom-unified-study-backup'||payload.version!==1)throw Error('ไม่ใช่ไฟล์ Full backup ของ VocaBloom');
+  if(payload?.type!=='vocabloom-unified-study-backup'||payload.version!==1)throw Error('Not a WordNest Full backup file');
   const v=payload.vocabloom,subs=payload.subjects;
-  if(!v||!v.progress||!v.days||!Array.isArray(v.custom)||!v.settings||!subs||typeof subs!=='object')throw Error('โครงสร้างข้อมูลสำรองไม่ครบ');
+  if(!v||!v.progress||!v.days||!Array.isArray(v.custom)||!v.settings||!subs||typeof subs!=='object')throw Error('Backup structure incomplete');
   const writes={};
   for(const d of USTATE.decks){
    const k1='study-'+d.key,k2=d.markKey+'-srs',a=subs[k1],b=subs[k2];
@@ -346,7 +346,7 @@ async function cFullRestore(file){
       (a.ans!==undefined&&!record(a.ans))||(a.ats!==undefined&&!record(a.ats))||
       (b.s!==undefined&&!record(b.s))||(b.m!==undefined&&!record(b.m))||
       (Object.keys(b).length>0&&(b.s===undefined||b.m===undefined)))
-     throw Error('ไม่มีข้อมูลวิชา '+d.key);
+     throw Error('No subject data '+d.key);
    writes[k1]=JSON.stringify(a);writes[k2]=JSON.stringify(b);
   }
   writes[STORAGE_KEY]=JSON.stringify(v);
@@ -355,13 +355,13 @@ async function cFullRestore(file){
   const importedStudyDays=!otherDevice&&payload.studyDays&&typeof payload.studyDays==='object'?payload.studyDays:{};
   writes[CLOUD_LOCAL_DAYS]=JSON.stringify(importedDays);
   writes[CLOUD_STUDY_DAYS]=JSON.stringify(importedStudyDays);
-  if(!window.confirm('นำเข้า Full backup แล้วเขียนทับคะแนนในเบราว์เซอร์นี้ทั้ง 5 วิชาใช่หรือไม่? ควรดาวน์โหลด Full backup ปัจจุบันก่อน'))return;
+  if(!window.confirm('Import this Full backup and overwrite scores for all 5 subjects in this browser? Download a current Full backup first.'))return;
   saved=Object.fromEntries(Object.keys(writes).map(key=>[key,cSafeGet(key)]));
   oldData=structuredClone(data);oldDays=structuredClone(CLOCAL.days);oldStudyDays=structuredClone(CLOCAL.studyDays);
-  for(const [key,value] of Object.entries(writes))if(!cSafeSet(key,value))throw Error('พื้นที่เก็บข้อมูลไม่เพียงพอ');
+  for(const [key,value] of Object.entries(writes))if(!cSafeSet(key,value))throw Error('Not enough storage');
   data=structuredClone(v);CLOCAL.days=structuredClone(importedDays);CLOCAL.studyDays=structuredClone(importedStudyDays);
   CLOUD.studyMergedDays=null;CLOUD.remoteStatus='restored locally';
-  cCloudNotice('กู้คืนข้อมูลครบ 5 วิชาบนเครื่องนี้แล้ว · ยังไม่ได้ส่งข้อมูลขึ้น Cloudflare');
+  cCloudNotice('Restored all 5 subjects on this device · nothing sent to Cloudflare');
   render();
  }catch(e){
   if(saved){
@@ -372,45 +372,45 @@ async function cFullRestore(file){
    if(oldDays)CLOCAL.days=oldDays;
    if(oldStudyDays)CLOCAL.studyDays=oldStudyDays;
   }
-  cCloudNotice('นำเข้าไม่สำเร็จ: '+String(e.message||e),true);
+  cCloudNotice('Import failed: '+String(e.message||e),true);
  }
 }
 
 async function cForgetKey(){
  try{await cApiUrl();}catch(e){cCloudNotice(String(e.message||e),true);return;}
- if(CLOUD.busy){cCloudNotice('กำลังซิงก์อยู่ รอให้การทำงานเสร็จก่อนลบรหัส',true);return;}
+ if(CLOUD.busy){cCloudNotice('Sync in progress; wait for it to finish before removing the key',true);return;}
  if(!cCloudKey())return;
- if(!window.confirm('ลบรหัส SYNC_KEY ออกจากเบราว์เซอร์นี้ใช่หรือไม่? จะไม่ลบคะแนนการเรียนที่บันทึกไว้'))return;
+ if(!window.confirm('Remove the SYNC_KEY from this browser? Your saved study scores are not deleted.'))return;
  try{localStorage.removeItem(cCloudStorageKey());}catch{}
  CLOUD.enabled=false;cSafeSet(CLOUD_AUTO,'0');clearTimeout(CLOUD.timer);
- CLOUD.remoteStatus='disconnected';cCloudNotice('ลบรหัสซิงก์จากเบราว์เซอร์นี้แล้ว');
+ CLOUD.remoteStatus='disconnected';cCloudNotice('Sync key removed from this browser');
  render();
 }
 function cPanel(){
- const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'ยังไม่เคยยืนยันการซิงก์';
- const engine=CLOUD.mode==='cas'?'Safe Sync (ETag / If-Match)':CLOUD.mode==='legacy'?'Legacy Worker (ไม่มี ETag)':'ยังไม่ได้ตรวจความสามารถ Worker';
- return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>บันทึกแฟลชการ์ดทุกวิชา ข้อสอบ และประวัติเกมศัพท์ ผ่าน Worker เดิม (ไม่ส่งข้อมูลไปยัง Notion)</p><p style="color:#ae6741;font-weight:700">Cloud Sync ยังอยู่ระหว่าง QA: Worker จริงยังไม่ได้รับการยืนยันว่ารองรับการเขียนข้อมูลพร้อมกันอย่างปลอดภัย · Auto Sync จะปิดตัวเองหากไม่พบ ETag · การซิงก์แบบเดิมต้องยืนยันความเสี่ยงทุกครั้ง โปรดทำ Full backup ก่อนใช้งาน</p><p>โหมดเซิร์ฟเวอร์: <strong>'+h(engine)+'</strong></p><p><strong>'+(active?'มีรหัสซิงก์':'ยังไม่มีรหัสซิงก์')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'เปลี่ยนรหัส':'ตั้งรหัสซิงก์')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'ปิด Auto Sync':'เปิด Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Local backup</button><button class="btn btn-outline" data-action="cloud-remote-backup" '+(!active||CLOUD.busy?'disabled':'')+'>↓ Cloud snapshot (read-only)</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>ลบรหัสจากเครื่องนี้</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'ข้อมูลเก็บบนเครื่องจนกว่าจะตั้ง SYNC_KEY และซิงก์สำเร็จ')+'</p><p class="footnote">ระบบเก็บ SYNC_KEY ใน localStorage ของเบราว์เซอร์ ไม่ฝังคีย์ลงเว็บไซต์ · Auto Sync ปิดโดยค่าเริ่มต้น · ถ้าใช้คอมพิวเตอร์สาธารณะให้ใช้โหมดส่วนตัวและลบรหัสออกก่อนเลิกใช้ · โปรดทำ Full backup ก่อนซิงก์ครั้งแรก · Cloud snapshot ใช้แค่ GET ไม่เปลี่ยนข้อมูลบน Worker หรือคะแนนในเครื่อง และไฟล์มีข้อมูลการเรียนส่วนตัว · Full restore เขียนทับคะแนนในเบราว์เซอร์นี้และต้องยืนยันก่อนเสมอ</p></div>';
+ const active=!!cCloudKey(),time=CLOUD.last?new Date(CLOUD.last).toLocaleString('th-TH'):'No sync confirmed yet';
+ const engine=CLOUD.mode==='cas'?'Safe Sync (ETag / If-Match)':CLOUD.mode==='legacy'?'Legacy Worker (no ETag)':'Worker capabilities not checked yet';
+ return '<div class="panel mt20"><span class="section-kicker">CROSS-DEVICE PROGRESS</span><h3 class="mt10">☁ Unified Learning Sync</h3><p>Saves flashcards for every subject, quiz answers and word-game history through the existing Worker</p><p style="color:#ae6741;font-weight:700">Cloud Sync is still in QA: the live Worker is not confirmed safe for concurrent writes · Auto Sync turns itself off without an ETag · The older sync asks you to confirm the risk every time; make a Full backup first</p><p>Server mode: <strong>'+h(engine)+'</strong></p><p><strong>'+(active?'Sync key set':'No sync key')+'</strong> · '+h(time)+'</p><div class="pill-row"><button class="btn btn-primary" data-action="cloud-sync" '+(!active||CLOUD.busy?'disabled':'')+'>↻ Sync now</button><button class="btn btn-outline" data-action="cloud-config">⚙ '+(active?'Change key':'Set sync key')+'</button><button class="btn btn-outline" data-action="cloud-auto">'+(CLOUD.enabled?'Turn off Auto Sync':'Turn on Auto Sync')+'</button><button class="btn btn-outline" data-action="cloud-backup">↓ Local backup</button><button class="btn btn-outline" data-action="cloud-remote-backup" '+(!active||CLOUD.busy?'disabled':'')+'>↓ Cloud snapshot (read-only)</button><button class="btn btn-outline" data-action="cloud-restore">↑ Full restore</button><button class="btn btn-outline" data-action="cloud-forget" '+(!active?'disabled':'')+'>Remove key from this device</button></div><input type="file" id="fullRestoreInput" accept=".json,application/json" hidden><p class="footnote mt20" id="cloudSyncState" role="status">'+h(CLOUD.message||'Data stays on this device until a SYNC_KEY is set and a sync succeeds')+'</p><p class="footnote">SYNC_KEY is kept in this browser’s localStorage, never in the site · Auto Sync is off by default · On a shared computer use private mode and remove the key afterwards · Make a Full backup before the first sync · Cloud snapshot only reads (GET) and changes nothing; the file contains private study data · Full restore overwrites scores in this browser and always asks first</p></div>';
 }
 
 /* Read-only remote snapshot for migration planning. Never POST/PUT or mutate local progress. */
 async function cRemoteSnapshot(){
- if(CLOUD.busy){cCloudNotice('มีการซิงก์อื่นทำงานอยู่ กรุณาลองใหม่หลังจบ',true);return;}
+ if(CLOUD.busy){cCloudNotice('Another sync is running; try again when it finishes',true);return;}
  try{await cApiUrl();}catch(e){cCloudNotice(String(e.message||e),true);return;}
- if(!cCloudKey()||!USTATE.ready){cCloudNotice('ยังไม่มีรหัสซิงก์หรือข้อมูลวิชาไม่พร้อม',true);return;}
- if(!window.confirm('สำรองคะแนนจาก Cloudflare แบบอ่านอย่างเดียวทั้ง 5 วิชาใช่หรือไม่?\n\nไฟล์ JSON นี้มีรายละเอียดคะแนนการเรียนและควรเก็บเป็นส่วนตัว ถ้าใช้คอมพิวเตอร์สาธารณะควรย้ายไฟล์ไปพื้นที่ส่วนตัวแล้วลบไฟล์ที่ดาวน์โหลดออกจากเครื่อง'))return;
- CLOUD.busy=true;cCloudNotice('กำลังอ่านข้อมูล Cloudflare เพื่อสำรอง (ไม่ส่งคำสั่ง PUT)...');
+ if(!cCloudKey()||!USTATE.ready){cCloudNotice('No sync key yet, or subject data not ready',true);return;}
+ if(!window.confirm('Back up scores for all 5 subjects from Cloudflare (read-only)?\n\nThis JSON file contains your study details and should stay private. On a shared computer, move it somewhere private and delete the download.'))return;
+ CLOUD.busy=true;cCloudNotice('Reading Cloudflare data for a backup (no PUT)…');
  try{
   const api=await cApiUrl();
   const headers={'X-Sync-Key':cCloudKey()};
   const subjects={},revisions={};
   for(const d of USTATE.decks){
    const response=await fetch(api+'/progress/'+encodeURIComponent(d.key),{headers,cache:'no-store'});
-   if(response.status===401)throw Error('รหัส SYNC_KEY ไม่ถูกต้อง');
-   if(!response.ok)throw Error('อ่านข้อมูลวิชา '+d.key+' ไม่สำเร็จ HTTP '+response.status);
+   if(response.status===401)throw Error('Wrong SYNC_KEY');
+   if(!response.ok)throw Error('Read subject data '+d.key+' failed HTTP '+response.status);
    const body=await response.text();
-   if(new TextEncoder().encode(body).byteLength>500000)throw Error('ข้อมูลวิชา '+d.key+' ใหญ่เกินขนาดปลอดภัย');
+   if(new TextEncoder().encode(body).byteLength>500000)throw Error('Subject data '+d.key+' is larger than the safe limit');
    const value=JSON.parse(body);
-   if(!value||typeof value!=='object'||Array.isArray(value)||value.error)throw Error('ข้อมูลวิชา '+d.key+' มีรูปแบบผิดปกติ');
+   if(!value||typeof value!=='object'||Array.isArray(value)||value.error)throw Error('Subject data '+d.key+' has an unexpected format');
    subjects[d.key]=value;
    revisions[d.key]=cCloudRevision(response)||null;
   }
@@ -421,16 +421,16 @@ async function cRemoteSnapshot(){
   };
   const payload=JSON.stringify(snapshot,null,2);
   // Never serialize SYNC_KEY, request headers or Cloudflare API credentials into downloaded data.
-  if(payload.includes(cCloudKey()))throw Error('ไม่สามารถสร้างไฟล์สำรองได้อย่างปลอดภัย');
+  if(payload.includes(cCloudKey()))throw Error('Could not create the backup file safely');
   const blob=new Blob([payload],{type:'application/json;charset=utf-8'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download='vocabloom-cloud-snapshot-'+cDate()+'.json';
   document.body.append(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),1500);
-  cCloudNotice('อ่านและดาวน์โหลดสำรองข้อมูล Cloudflare ครบ 5 วิชาแล้ว · 5 GET / 0 PUT');
+  cCloudNotice('Read and downloaded the Cloudflare backup for all 5 subjects · 5 GET / 0 PUT');
  }catch(e){
-  cCloudNotice('ดาวน์โหลดสำรองข้อมูล Cloudflare ไม่สำเร็จ: '+String(e.message||e),true);
+  cCloudNotice('Cloudflare backup download failed: '+String(e.message||e),true);
  }finally{
   CLOUD.busy=false;
   if(ui.page==='settings')render();
@@ -446,7 +446,7 @@ function cFullBackup(){
  const payload={version:1,type:'vocabloom-unified-study-backup',createdAt:new Date().toISOString(),deviceId:CLOCAL.device,vocabloom:structuredClone(data),deviceDays:CLOCAL.days,studyDays:CLOCAL.studyDays,subjects:subjectStorage};
  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vocabloom-full-backup-'+cDate()+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
- cCloudNotice('ส่งออกสำรองทั้ง 5 วิชาแล้ว (ไม่รวม SYNC_KEY)');
+ cCloudNotice('Exported a backup of all 5 subjects (without SYNC_KEY)');
 }
 
 async function cToggleAuto(){
@@ -465,15 +465,15 @@ async function cToggleAuto(){
   }
   if(CLOUD.progressSplit){
    if(!cCloudKey()){
-    cCloudNotice('ต้องตั้งรหัสของ Progress Worker ใหม่ก่อนเปิด Auto Sync',true);
+    cCloudNotice('Set the key for the new Progress Worker before turning on Auto Sync',true);
     return;
    }
-   if(!window.confirm('คุณกำลังเปิด Auto Sync สำหรับ Progress Worker ใหม่แยกจาก Worker เดิม\n\nตรวจ Full backup และผลทดสอบการย้ายข้อมูลแล้วหรือยัง? การเปิดจะเขียนคะแนนทั้ง 5 วิชาไปยังปลายทางใหม่นี้\n\nอนุญาตให้เปิด Auto Sync สำหรับปลายทางนี้เท่านั้นหรือไม่?'))return;
+   if(!window.confirm('You are turning on Auto Sync for the new Progress Worker, separate from the original Worker.\n\nHave you checked your Full backup and the migration test? Turning it on writes scores for all 5 subjects to this new endpoint.\n\nAllow Auto Sync for this endpoint only?'))return;
    if(!cSafeSet(CLOUD_AUTO_ENDPOINT,CLOUD.api))
-    throw Error('ไม่สามารถบันทึกการยืนยันปลายทาง Auto Sync บนเครื่องนี้');
+    throw Error('Could not save the Auto Sync endpoint confirmation on this device');
   }
   if(!cSafeSet(CLOUD_AUTO,'1'))
-   throw Error('ไม่สามารถบันทึกการเปิด Auto Sync บนเครื่องนี้');
+   throw Error('Could not save the Auto Sync setting on this device');
   CLOUD.enabled=true;
   render();
   cCloudSync(false);
@@ -501,7 +501,7 @@ function cDashboardExtra(){
  const counts=USTATE.decks.map(d=>({name:d.name,...uStats(d)}));
  const total=counts.reduce((a,x)=>a+x.total,0),seen=counts.reduce((a,x)=>a+x.seen,0),due=counts.reduce((a,x)=>a+x.due,0);
  const d=CLOUD.studyMergedDays?.[cDate()]||CLOCAL.studyDays[cDate()]||{answered:0};
- return '<div class="panel mt20"><div class="panel-header"><h3>Unified Study Progress</h3><span class="badge">ALL SUBJECTS</span></div><div class="progress-tiles mt20"><div class="mini-metric"><strong>'+total+'</strong><small>Flashcards</small></div><div class="mini-metric"><strong>'+seen+'</strong><small>Cards reviewed</small></div><div class="mini-metric"><strong>'+due+'</strong><small>Cards due</small></div><div class="mini-metric"><strong>'+(Number(d.answered)||0)+'</strong><small>Other subject reviews today</small></div></div><p class="footnote mt20">การ์ดภาษาอังกฤษและเกมศัพท์ใช้สถานะร่วมกันเมื่อเป็นคำเดียวกัน ส่วนวิชาอื่นเก็บรอบทบทวนด้วยคีย์เดิม</p></div>';
+ return '<div class="panel mt20"><div class="panel-header"><h3>Unified Study Progress</h3><span class="badge">ALL SUBJECTS</span></div><div class="progress-tiles mt20"><div class="mini-metric"><strong>'+total+'</strong><small>Flashcards</small></div><div class="mini-metric"><strong>'+seen+'</strong><small>Cards reviewed</small></div><div class="mini-metric"><strong>'+due+'</strong><small>Cards due</small></div><div class="mini-metric"><strong>'+(Number(d.answered)||0)+'</strong><small>Other subject reviews today</small></div></div><p class="footnote mt20">English cards and word games share status for the same word; other subjects keep their own review keys</p></div>';
 }
 let ORIGINAL_VOCA_RECORD=null;
 function cInstall(){

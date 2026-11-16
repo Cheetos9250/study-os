@@ -2,6 +2,12 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
 <title>ศัพท์จีน บท 1–10</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -120,7 +126,7 @@ td:first-child{font-weight:500;min-width:7.5em}
 .cell.cur{outline:2px solid var(--ink);outline-offset:1px}
 @media (prefers-reduced-motion:reduce){.card,.qbar i{transition:none}}
 </style>
-<script src="scripts/study-theme.js?v=2"></script>
+<script src="scripts/study-theme.js?v=3"></script>
 <div class="wrap">
   <header><h1 class="course-title course-zh">ศัพท์จีน บท 1–10</h1><span>ภาษาจีน · 279 คำ · แฟลชการ์ดแบบ Anki</span></header>
   <nav class="tabs" role="tablist">
@@ -236,7 +242,7 @@ function renderCard(){
   const q=queues(fcat); cur=q.L[0]||q.R[0]||q.N[0]||null; shown=false;
   $('#srsCounts').innerHTML='<span class="n"><b>'+q.N.length+'</b>new</span><span class="l"><b>'+q.L.length+'</b>learning</span><span class="d"><b>'+q.R.length+'</b>due</span>';
   const total=CARDS.filter(inScope).length, seen=CARDS.filter(c=>inScope(c)&&srs[c.mid]).length;
-  $('#count').textContent='Started '+seen+'/'+total+(extN?' · Notion '+extN:'');
+  $('#count').textContent='Started '+seen+'/'+total+(extN?' · extra '+extN:'');
   const st=$('#stage'), show=$('#showBtn'), rt=$('#rate4');
   if(!cur){
     const waits=CARDS.filter(c=>inScope(c)&&srs[c.mid]).map(c=>srs[c.mid].due).filter(d=>d>Date.now());
@@ -361,14 +367,14 @@ function renderSync(){
 }
 function errText(e,writing){
   switch(e&&e.code){
-    case "server_not_connected": return "ยังไม่ได้เชื่อม Notion: เพิ่ม Notion ใน claude.ai Settings → Connectors แล้วลองใหม่";
-    case "needs_reauth": return "การเชื่อม Notion หมดอายุ: เชื่อมใหม่ใน claude.ai Settings → Connectors";
-    case "selection_required": return "มีบัญชี Notion มากกว่าหนึ่งบัญชี เลือกบัญชีที่หน้าต่างของ claude.ai แล้วกดอีกครั้ง";
-    case "approval_required": case "not_in_manifest": case "consent_required": return "หน้านี้ยังไม่ได้รับอนุญาตให้ใช้ Notion กดปุ่มอีกครั้งแล้วเลือกอนุญาต";
-    case "blocked_by_policy": return "องค์กรของคุณไม่อนุญาตให้ใช้ Notion จากหน้านี้";
-    case "tool_error": return "Notion ปฏิเสธการบันทึก: "+(e.message||"").slice(0,160);
-    case "server_unavailable": case "upstream_error": return writing?"Notion ไม่ตอบกลับ อาจบันทึกไปแล้ว เปิดหน้าบทใน Notion เพื่อตรวจก่อนกดอีกครั้ง":"ติดต่อ Notion ไม่ได้ชั่วคราว ลองกดอีกครั้งในอีกสักครู่";
-    default: return "บันทึกไม่สำเร็จ ("+((e&&e.code)||"unknown")+")";
+    case "server_not_connected": return "Notion is not connected: add Notion in claude.ai Settings → Connectors, then try again";
+    case "needs_reauth": return "Notion connection expired: reconnect in claude.ai Settings → Connectors";
+    case "selection_required": return "More than one Notion account: choose one in the claude.ai window, then try again";
+    case "approval_required": case "not_in_manifest": case "consent_required": return "This page is not yet allowed to use Notion; tap again and choose Allow";
+    case "blocked_by_policy": return "Your organization does not allow Notion from this page";
+    case "tool_error": return "Notion refused the save: "+(e.message||"").slice(0,160);
+    case "server_unavailable": case "upstream_error": return writing?"Notion did not reply; it may have saved. Check the chapter page in Notion before trying again.":"Notion is temporarily unreachable; try again shortly";
+    default: return "Save failed ("+((e&&e.code)||"unknown")+")";
   }
 }
 async function syncViaApi(){
@@ -381,11 +387,11 @@ async function syncViaApi(){
     if(!X.reviewReady())throw Error('Original Notion Worker credential is missing');
     const r=await fetch(reviewApi+'/review',{method:'POST',headers:X.reviewHdr(),body:JSON.stringify({page,pass})});
     const j=await r.json().catch(()=>({}));
-    if(r.status===401){ msg.className='err'; msg.textContent='รหัสซิงก์ไม่ถูกต้อง กดปุ่ม ☁ มุมขวาล่างเพื่อตั้งรหัสใหม่'; }
-    else if(!r.ok||!j.ok){ msg.className='err'; msg.textContent='บันทึกไม่สำเร็จ ('+(j.error||r.status)+')'; }
-    else if(j.already){ msg.className='ok'; msg.textContent='วันนี้บันทึกไปแล้ว · Review Step = '+j.step; done=true; $('#syncBtn').textContent='Saved ✓'; }
+    if(r.status===401){ msg.className='err'; msg.textContent='Wrong sync key; use the ☁ button to set it again'; }
+    else if(!r.ok||!j.ok){ msg.className='err'; msg.textContent='Save failed ('+(j.error||r.status)+')'; }
+    else if(j.already){ msg.className='ok'; msg.textContent='Already saved today · Review Step = '+j.step; done=true; $('#syncBtn').textContent='Saved ✓'; }
     else{ msg.className='ok'; msg.textContent='Saved · '+catLabel(fcat)+': Last review '+j.today+' · Review Step '+j.step+' → '+j.next+' · next review in '+STEPS[Math.min(j.next,STEPS.length-1)]+' days'; done=true; $('#syncBtn').textContent='Saved ✓'; }
-  }catch(e){ msg.className='err'; msg.textContent='ติดต่อเซิร์ฟเวอร์ซิงก์ไม่ได้ ลองใหม่อีกครั้ง'; }
+  }catch(e){ msg.className='err'; msg.textContent='Could not reach the sync server; try again'; }
   syncing=false; if(!done) $('#syncBtn').disabled=false;
 }
 async function syncNotion(){
@@ -393,7 +399,7 @@ async function syncNotion(){
   const page=(D.pages||{})[fcat]; if(!mcp||!page||syncing) return;
   const t=scopeT(), pass=t.g/t.n>=PASS;
   syncing=true; $('#syncBtn').disabled=true;
-  const msg=$('#syncMsg'); msg.className=''; msg.textContent='กำลังอ่าน Review Step ปัจจุบันจาก Notion…';
+  const msg=$('#syncMsg'); msg.className=''; msg.textContent='Reading the current Review Step from Notion…';
   let step=0;
   try{
     const r=await mcp.callTool(NOTION,"notion-fetch",{id:page},{cache:false});
@@ -410,10 +416,8 @@ async function syncNotion(){
   syncing=false;
 }
 $('#syncBtn').onclick=syncNotion;
-if(window.claude&&window.claude.use){
-  window.claude.use("user").then(u=>u?u.isOwner():false).then(v=>{owner=!!v;renderSync();}).catch(()=>{});
-  window.claude.use("mcp").then(m=>{mcp=m;renderSync();loadExt();loadExtQ();}).catch(()=>{loadStatic();});
-}else{ loadStatic(); }
+// Notion is no longer used (owner decision, 15 Nov 2026): cards and questions come only from the saved snapshot.
+loadStatic();
 
 /* ---------- extra cards from the Notion "Flashcards" table ---------- */
 const SUBJ={acc:'Accounting',math:'Math for Life',eco:'Economics',eng:'English Vocab',zh:'Chinese'}[D.key];
@@ -471,8 +475,8 @@ const EMBQ=[];
 try{ const _c=JSON.parse(localStorage.getItem(QKEY)||'[]'); const _m=new Map(); EMBQ.forEach(r=>_m.set(r.url,r)); _c.forEach(r=>_m.set(r.url,r)); setExtQ([..._m.values()]); buildDeck(); }catch(e){}
 async function loadExtQ(){
   if(!SUBJ) return;
-  if(!mcp){ qStat='ไม่ได้เชื่อม Notion — ใช้ข้อสอบที่ฝังไว้ (ข้อมูล ณ 10 พ.ย. 2026)'; qStatErr=false; renderQ(); loadStatic(); return; }
-  qStat='กำลังโหลดข้อสอบจาก Notion…'; qStatErr=false; renderQ();
+  if(!mcp){ qStat='Notion not connected — using built-in questions (as of 10 Nov 2026)'; qStatErr=false; renderQ(); loadStatic(); return; }
+  qStat='Loading questions from Notion…'; qStatErr=false; renderQ();
   let lastErr=null;
   for(let a=0;a<3;a++){
     try{
@@ -480,7 +484,7 @@ async function loadExtQ(){
       try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
       setExtQ(rows);
       const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
-      qStat='โหลดจาก Notion สำเร็จ · เพิ่ม '+n+' ข้อ'; qStatErr=false;
+      qStat='Loaded from Notion · added '+n+' ข้อ'; qStatErr=false;
       if(qpos>=QS.length) qpos=0; buildDeck(); renderQ(); return;
     }catch(e){ lastErr=e; await new Promise(r=>setTimeout(r,2500*(a+1))); }
   }
@@ -492,10 +496,8 @@ async function loadStatic(){
   await 0;
   if(!SUBJ) return;
   try{
-    let api='';
-    try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok) api=String((await c.json()).api||'').replace(/\/+$/,''); }catch(e){}
     const getJ=async(name)=>{
-      if(api){ try{ const r=await fetch(api+'/'+name); if(r.ok){ const j=await r.json(); if(j&&Array.isArray(j.rows)) return j; } }catch(e){} }
+      // Notion is no longer used (owner decision, 15 Nov 2026): read only the saved snapshot in data/.
       const r=await fetch('data/'+name+'.json',{cache:'no-store'}); if(!r.ok) throw new Error(name+' '+r.status); return r.json();
     };
     const [q,c]=await Promise.all([getJ('quiz'), getJ('cards').catch(()=>null)]);
@@ -503,7 +505,7 @@ async function loadStatic(){
     setExtQ(rows); try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
     if(c&&c.rows){ const cr=c.rows.filter(x=>x.Subject===SUBJ); setExt(cr); try{ localStorage.setItem(EXT_KEY,JSON.stringify(cr)); }catch(e){} cardsRow(); if(!shown) renderCard(); }
     const n=QS.filter(x=>String(x.id).startsWith('n-')).length;
-    qStat=(q.live?'โหลดสดจาก Notion สำเร็จ':'โหลดจากไฟล์ข้อมูลสำเร็จ')+' · เพิ่ม '+n+' ข้อ · อัปเดต '+(q.updated||'-'); qStatErr=false;
+    qStat='Saved questions · added '+n+' questions · updated '+(q.updated||'-'); qStatErr=false;
     if(qpos>=QS.length) qpos=0; buildDeck(); renderQ();
   }catch(e){}
 }
@@ -563,51 +565,51 @@ window.__xs=(()=>{
     // Deliberate manual click only; never run on page load, visibility or rating.
     if(!manual||busy) return;
     const base=await cfg();
-    if(!base){ say('ยังไม่ได้ตั้งค่า api ใน data/config.json'); return; }
+    if(!base){ say('api is not set in data/config.json'); return; }
     if(!key()){ if(!auto)askKey(); return; }
-    if(auto&&progressKeyName===LSK){ say('ซิงก์อัตโนมัติใช้ได้เฉพาะกับ Progress Worker แยกต่างหาก'); return; }
-    if(!auto&&!window.confirm('การซิงก์จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Cloudflare Worker\n\nหาก Worker ยังไม่รองรับ ETag/If-Match การซิงก์แบบเดิมอาจเขียนทับคะแนนเมื่อใช้อีกอุปกรณ์พร้อมกัน กรุณาสำรองคะแนนและหลีกเลี่ยงการซิงก์สองเครื่องพร้อมกัน\n\nต้องการซิงก์ด้วยตนเองตอนนี้หรือไม่?')) return;
-    busy=true;say('กำลังตรวจเวอร์ชันและซิงก์…',true);
+    if(auto&&progressKeyName===LSK){ say('Auto sync works only with the separate Progress Worker'); return; }
+    if(!auto&&!window.confirm('Sync will read and write the scores for '+D.key+' to the Cloudflare Worker.\n\nIf the Worker does not support ETag/If-Match, this older sync can overwrite scores when another device syncs at the same time. Back up first and avoid syncing two devices at once.\n\nSync manually now?')) return;
+    busy=true;say('Checking revision and syncing…',true);
     try{
       const url=base+'/progress/'+D.key;
       let done=false;
       for(let attempt=1;attempt<=6;attempt++){
         const r=await fetch(url,{headers:hdr(),cache:'no-store'});
         if(r.status===401){
-          say('รหัสซิงก์ไม่ถูกต้อง กดปุ่มเพื่อตั้งใหม่');
+          say('Wrong sync key; tap the button to set it again');
           try{localStorage.removeItem(progressKeyName);}catch(e){}
           busy=false;paint();return;
         }
         if(!r.ok)throw Error('GET HTTP '+r.status);
         const etag=(r.headers?.get?.('X-Sync-Revision')??r.headers?.get?.('ETag'))||'';
         const revision=/^"[0-9]+"$/.test(etag)?etag:'';
-        if(auto&&!revision)throw Error('Worker ไม่ส่งหมายเลขเวอร์ชัน (ETag) จึงไม่ซิงก์อัตโนมัติ ใช้ปุ่มซิงก์ด้วยตนเองแทน');
+        if(auto&&!revision)throw Error('Worker sent no revision (ETag), so auto sync is off; use manual sync instead');
         const originalTag=r.headers?.get?.('ETag')||'';
         const customRev=r.headers?.get?.('X-Sync-Revision');
         // A weak tag or malformed application version indicates broken CAS.
         // Never treat it as a safe legacy manual-sync fallback.
         if(!revision&&(customRev!==null&&customRev!==undefined||/^W\//.test(originalTag)))
-          throw Error('Worker ส่งหมายเลขเวอร์ชันที่ไม่ปลอดภัย หยุดซิงก์เพื่อป้องกันข้อมูลสูญหาย');
+          throw Error('Worker sent an unsafe revision number; sync stopped to protect your data');
         const remote=await r.json();
         if(remote!==null&&(typeof remote!=='object'||Array.isArray(remote)||remote.error))
-          throw Error('ข้อมูล Worker ไม่ถูกต้อง');
+          throw Error('Invalid Worker data');
         const snapshot=local(),baseline=JSON.stringify(snapshot);
         const joined=merge(snapshot,remote||{});
         const headers=revision?{...hdr(),'If-Match':revision}:hdr();
         const p=await fetch(url,{method:'PUT',headers,body:JSON.stringify(joined)});
         if(revision&&(p.status===409||p.status===412))continue;
-        if(p.status===428)throw Error('Worker ต้องการ If-Match แต่ไม่ส่ง ETag กลับมา');
+        if(p.status===428)throw Error('Worker requires If-Match but sent no ETag');
         if(!p.ok)throw Error('PUT HTTP '+p.status);
         if(JSON.stringify(local())!==baseline){
           if(revision)continue;
-          throw Error('คะแนนเปลี่ยนระหว่างซิงก์แบบเดิม ยังไม่เขียนทับคะแนนในเครื่อง');
+          throw Error('Scores changed during the older sync; local scores were not overwritten');
         }
         apply(joined);
         done=true;break;
       }
-      if(!done)throw Error('ข้อมูลเปลี่ยนพร้อมกันเกิน 6 รอบ คะแนนบนเครื่องยังอยู่');
-      dirtyFlag=false;say('ซิงก์แล้ว '+hhmm(),true);
-    }catch(e){say('ซิงก์ไม่สำเร็จ: '+String(e.message||e));}
+      if(!done)throw Error('Data changed concurrently more than 6 times; local scores are kept');
+      dirtyFlag=false;say('Synced '+hhmm(),true);
+    }catch(e){say('Sync failed: '+String(e.message||e));}
     busy=false;paint();
   }
   /* Opt-in automatic sync: only with the separate Progress Worker (progress_api) and a CAS revision header. */
@@ -616,23 +618,23 @@ window.__xs=(()=>{
   const autoOn=()=>{try{return localStorage.getItem(AUTOK)==='1'}catch(e){return false}};
   const autoReady=()=>!!(api&&key()&&progressKeyName!==LSK);
   function schedule(ms){ clearTimeout(autoTimer); autoTimer=setTimeout(()=>{ if(autoOn()&&autoReady()&&!document.hidden||dirtyFlag&&autoOn()&&autoReady()) sync(true,true); },ms); }
-  function setAuto(on){ try{ if(on)localStorage.setItem(AUTOK,'1'); else localStorage.removeItem(AUTOK); }catch(e){ say('บันทึกการตั้งค่าซิงก์อัตโนมัติไม่ได้'); return; } if(on){arm();schedule(500);} else clearTimeout(autoTimer); say(on?'ซิงก์อัตโนมัติเปิดอยู่':'ซิงก์อัตโนมัติปิดอยู่',true); paint(); }
+  function setAuto(on){ try{ if(on)localStorage.setItem(AUTOK,'1'); else localStorage.removeItem(AUTOK); }catch(e){ say('Could not save the auto sync setting'); return; } if(on){arm();schedule(500);} else clearTimeout(autoTimer); say(on?'Auto sync is on':'Auto sync is off',true); paint(); }
   let armed=false;
   function arm(){ if(armed)return; armed=true;
     setInterval(()=>{ if(!document.hidden&&autoOn()&&autoReady()) sync(true,true); },300000);
     document.addEventListener('visibilitychange',()=>{ if(!autoOn()||!autoReady())return; if(document.hidden){ if(dirtyFlag) sync(true,true); } else schedule(800); }); }
   function askKey(){
     let k=''; try{ k=window.prompt(progressKeyName===LSK?
-     'ใส่รหัส SYNC_KEY สำหรับ Cloudflare Worker เดิม\n\nหน้า Study OS รุ่นเก่าไม่ซิงก์อัตโนมัติอีกต่อไป การใส่รหัสจะขอยืนยันก่อนซิงก์เอง 1 ครั้ง':
-     'ใส่รหัสใหม่สำหรับ Progress Worker แยกต่างหาก\n\nห้ามใช้รหัส Worker เดิมหรือ Staging รหัสนี้ใช้เฉพาะปลายทาง Progress ใหม่เท่านั้น')||''; }catch(e){}
+     'Enter the SYNC_KEY for the original Cloudflare Worker.\n\nThis older page no longer syncs automatically; you will be asked to confirm one manual sync.':
+     'Enter the key for the separate Progress Worker.\n\nDo not reuse the original or staging Worker key; this key is only for the new Progress endpoint.')||''; }catch(e){}
     k=k.trim(); if(!k) return;
     try{
      const scoped=progressKeyName===LSK?k:JSON.stringify({endpoint:api,key:k});
      localStorage.setItem(progressKeyName,scoped);
-    }catch(e){say('บันทึกรหัสในเครื่องไม่ได้ จึงไม่ซิงก์');return}
+    }catch(e){say('Could not save the key on this device, so nothing was synced');return}
     paint(); try{ renderSync(); }catch(e){} sync(true);
   }
-  function paint(){ if(btnEl) btnEl.textContent=key()?'☁ ซิงก์ด้วยตนเอง':'☁ ตั้งรหัสซิงก์'; if(autoBtn){ const can=progressKeyName!==LSK&&!!key(); autoBtn.hidden=!can; autoBtn.textContent=autoOn()?'⟳ อัตโนมัติ: เปิด':'⟳ อัตโนมัติ: ปิด'; autoBtn.setAttribute('aria-pressed',autoOn()); } }
+  function paint(){ if(btnEl) btnEl.textContent=key()?'☁ Sync manually':'☁ Set sync key'; if(autoBtn){ const can=progressKeyName!==LSK&&!!key(); autoBtn.hidden=!can; autoBtn.textContent=autoOn()?'⟳ Auto: on':'⟳ Auto: off'; autoBtn.setAttribute('aria-pressed',autoOn()); } }
   function mount(){
     box=document.createElement('div');
     box.className='cloud-sync-bar';
@@ -641,11 +643,11 @@ window.__xs=(()=>{
     btnEl=document.createElement('button'); btnEl.type='button'; btnEl.style.cssText='border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;font-weight:600;padding:2px 4px';
     btnEl.onclick=async()=>{ await cfg(); if(!key()) askKey(); else sync(true); };
     autoBtn=document.createElement('button'); autoBtn.type='button'; autoBtn.hidden=true; autoBtn.style.cssText=btnEl.style.cssText;
-    autoBtn.onclick=()=>{ if(autoOn()){ setAuto(false); return; } if(window.confirm('เปิดซิงก์อัตโนมัติ?\n\nเมื่อเปิด หน้านี้จะอ่านและเขียนคะแนนวิชา '+D.key+' ไปยัง Progress Worker ของคุณเองเป็นระยะ (ตอนเปิดหน้า หลังตอบ และทุกไม่กี่นาที) โดยรวมข้อมูลทีละรายการและไม่เขียนทับกัน\n\nต้องใช้รหัสเดียวกันทุกเครื่อง ปิดได้ทุกเมื่อด้วยปุ่มเดิม')) setAuto(true); };
+    autoBtn.onclick=()=>{ if(autoOn()){ setAuto(false); return; } if(window.confirm('Turn on auto sync?\n\nThis page will read and write the scores for '+D.key+' with your own Progress Worker from time to time (on open, after answering and every few minutes), merging item by item without overwriting.\n\nUse the same key on every device. Turn it off any time with the same button.')) setAuto(true); };
     box.append(msgEl,btnEl,autoBtn); document.body.appendChild(box); paint();
   }
   mount();
-  say(autoOn()?'ซิงก์อัตโนมัติเปิดอยู่':'Cloud Sync ปิดอัตโนมัติ',true);
+  say(autoOn()?'Auto sync is on':'Cloud Sync: auto off',true);
   cfg().then(()=>{ try{ renderSync(); }catch(e){} paint(); if(autoOn()&&autoReady()){arm();schedule(1500);} });
   // LocalStorage writes still happen immediately in save() and saveS().
   // Do not dispatch background GET/PUT even if the browser already has a SYNC_KEY.
@@ -659,5 +661,5 @@ window.__xs=(()=>{
 </script>
 
 <script src="scripts/study-course-mode.js?v=1"></script>
-<script src="scripts/study-nav.js?v=1"></script>
+<script src="scripts/study-nav.js?v=3"></script>
 </html>

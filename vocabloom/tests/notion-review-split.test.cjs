@@ -66,7 +66,7 @@ test('Missing original Notion credential blocks all /review requests, regardless
  for(const file of SUBJECTS){
   const {calls,panel}=await simulateReview(file,{reviewReady:false});
   assert.equal(calls.length,0,file);
-  assert.match(panel.textContent,/ติดต่อเซิร์ฟเวอร์ซิงก์ไม่ได้/);
+  assert.match(panel.textContent,/Could not reach the sync server/);
  }
 });
 test('Original review API still has a separate host and credential after future split',()=>{

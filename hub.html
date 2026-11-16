@@ -3,16 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — subjects and chapters">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
 <title>Hub — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
-:root{color-scheme:light;--bg:#fff;--white:#f9f8f6;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--purple:#2383e2;--deep:#1a6fc4;--lav:#e4f0fb;--green:#2f8f5b;--greenbg:#d9ead9;--orange:#d9730d;--orangebg:#f5e6b0;--red:#d6453d;--redbg:#fadddb;--shadow:none}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--white:#212121;--text:#ececec;--muted:#a8a5a0;--line:#333;--purple:#5aa9f0;--deep:#8cc4f5;--lav:#1e3445;--green:#6fcf9b;--greenbg:#26422a;--orange:#f0a050;--orangebg:#4d4115;--red:#ff8a80;--redbg:#5a2a27;--shadow:none}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--white:#212121;--text:#ececec;--muted:#a8a5a0;--line:#333;--purple:#5aa9f0;--deep:#8cc4f5;--lav:#1e3445;--green:#6fcf9b;--greenbg:#26422a;--orange:#f0a050;--orangebg:#4d4115;--red:#ff8a80;--redbg:#5a2a27;--shadow:none}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55}
 .container{max-width:1040px;margin:auto;padding:clamp(18px,4vw,40px) max(18px,env(safe-area-inset-right)) 60px max(18px,env(safe-area-inset-left))}
@@ -82,8 +87,15 @@ button.danger{color:var(--red)}
 .chap .meta b{color:var(--text)}.chap .meta .due b{color:var(--red)}
 .tagx{font-size:12px;font-weight:700;color:var(--orange);background:var(--orangebg);border-radius:6px;padding:1px 8px}
 .list{display:grid;gap:12px;margin-top:14px}
+.notebtn{font:500 13px 'IBM Plex Mono',monospace;font-family:inherit;border:1px dashed var(--line);background:var(--bg);color:var(--muted);border-radius:10px;padding:0 14px;min-height:44px;cursor:pointer}
+.notebtn.has{border-style:solid;color:var(--text)}
+.notebox textarea{width:100%;min-height:180px;resize:vertical;font:15px/1.6 inherit;font-family:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+.notebox textarea:focus{outline:2px solid var(--purple);outline-offset:1px}
+.notemeta{font-size:12px;color:var(--muted);margin:4px 0 0;min-height:16px}
 </style>
-<script src="scripts/study-theme.js?v=2"></script>
+<link rel="stylesheet" href="assets/study-world.css?v=8">
+<script src="scripts/study-theme.js?v=3"></script>
+<script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
 <div class="container">
@@ -93,11 +105,13 @@ button.danger{color:var(--red)}
 <p class="lead" id="lead" hidden></p>
 </section>
 <nav class="crumb" id="crumb" aria-label="Breadcrumb" hidden><a href="#">← Lessons</a></nav>
+<section class="lead-panel" id="nextStep" aria-label="Next step" hidden></section>
+<h2 id="secTitle">Subjects</h2>
 <div id="view" class="list"><p class="status">Loading…</p></div>
 </main>
 </div>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-nav.js?v=1"></script>
+<script src="scripts/study-nav.js?v=3"></script>
 <script>
 (function(){
 'use strict';
@@ -112,30 +126,48 @@ function examFor(courseKey,catId,now){
  return settings.exams.filter(e=>e.course===courseKey&&e.cats.includes(catId)).map(e=>({...e,days:T.daysUntil(e.date,now)})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days)[0]||null;
 }
 function subjects(now){
- $('#title').textContent='Lessons';$('#crumb').hidden=true;
+ $('#title').textContent='Lessons';$('#crumb').hidden=true;$('#secTitle').hidden=false;
+ const wideKey=(settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d)[0]||{}).course||'';
+ {const ne=settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d)[0],c=ne&&T.COURSES.find(x=>x.key===ne.course),box=$('#nextStep');
+  if(c){const sc=(ne.cats||[]).length?' · scope: '+ne.cats.map(x=>x.replace(/^c/,'Ch')).join(', '):'';box.hidden=false;const chs=(ne.cats||[]).map(x=>x.replace(/^c/,'Ch'));box.innerHTML='<div class="bub"><b>'+(chs.length?'Read '+esc(chs.slice(0,3).join(' + '))+(chs.length>3?' …':''):'Read '+esc(c.name))+'</b><span>'+esc(ne.title)+(ne.d===0?' today':' in '+ne.d+(ne.d===1?' day':' days'))+'</span></div><a class="go" href="#'+c.key+'">Open '+esc(c.name)+'</a>';}else box.hidden=true;}
  const cards=T.COURSES.map(c=>{
   const s=summaries[c.key];
   if(!s)return '<div class="card subj"><h3>'+esc(c.name)+'</h3><p class="full">'+esc(c.full)+'</p><p class="empty">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p></div>';
   const pct=s.total?Math.round(s.seen/s.total*100):0,chapters=Object.keys(s.per).length;
-  return '<a class="card subj" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="due"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Lessons →</span></a>';
+  return '<a class="card subj t-'+c.key+(c.key===wideKey?' wide':'')+'" href="#'+c.key+'" aria-label="Open '+esc(c.name)+'"><h3><span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>'+esc(c.name)+'</h3><p class="full">'+chapters+' chapters</p><div class="nums"><div class="'+(s.reviewNow?'due':'')+'"><b>'+s.reviewNow+'</b>due</div><div class="new"><b>'+pct+'%</b>seen</div></div><div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><span class="go">Lessons →</span></a>';
  });
- cards.push('<a class="card subj" href="vocabloom/index.html?lang=en"><h3>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
- cards.push('<a class="card subj" href="vocabloom/index.html?lang=zh"><h3>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj strip t-eng" href="vocabloom/index.html?lang=en"><h3><span class="jersey sm" aria-hidden="true">EN</span>English</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
+ cards.push('<a class="card subj strip t-zh" href="vocabloom/index.html?lang=zh"><h3><span class="jersey sm" aria-hidden="true">ZH</span>Chinese</h3><p class="full">WordNest</p><span class="go">Open →</span></a>');
  $('#view').className='grid3';$('#view').innerHTML=cards.join('');
 }
 function chapters(c,now){
  const D=data[c.key],s=summaries[c.key];
- $('#title').textContent=c.name;$('#crumb').hidden=false;
+ $('#title').textContent=c.name;$('#crumb').hidden=false;$('#secTitle').hidden=true;$('#nextStep').hidden=true;
  if(!D||!s){$('#view').className='list';$('#view').innerHTML='<p class="status'+(errors.includes(c.key)?' err':'')+'">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p>';return;}
  const rows=D.cats.map(([id,label])=>{
   const p=s.per[id],ex=examFor(c.key,id,now),acc=T.accuracy(p);
   const book=c.key==='acc'&&/^c\d+$/.test(id)?'<a href="accounting-textbook.html?ch='+id.slice(1)+'">Textbook</a>':'';
   return '<div class="card chap"><h3>'+esc(label)+(ex?' <span class="tagx">'+esc(ex.title)+' · '+(ex.days===0?'today':ex.days+'d')+'</span>':'')+'</h3>'
    +'<div class="meta"><span class="due">Due <b>'+p.due+'</b></span><span>Cards <b>'+p.seen+'/'+p.cards+'</b></span><span>Quiz <b>'+(p.quiz?(p.answered?Math.round(acc*100)+'%':'–'):'–')+'</b></span></div>'
-   +'<div class="acts"><a class="main" href="'+link(c,'sum',id)+'">Lesson</a><a href="'+link(c,'cards',id)+'">Cards</a><a href="'+link(c,'prac',id)+'">Practice</a>'+book+'</div></div>';
+   +'<div class="acts"><a class="main" href="'+link(c,'sum',id)+'">Lesson</a><a href="'+link(c,'cards',id)+'">Cards</a><a href="'+link(c,'prac',id)+'">Practice</a>'+book+noteBtn(c.key+':'+id)+'</div>'+noteBox(c.key+':'+id)+'</div>';
  });
+ rows.unshift('<div class="card chap"><h3>General notes</h3><div class="acts">'+noteBtn(c.key+':general')+'</div>'+noteBox(c.key+':general')+'</div>');
  $('#view').className='list';$('#view').innerHTML=rows.join('');
 }
+/* ---------- notes (this browser; backed up) ---------- */
+const NOTES_KEY='studyos.notes.v1';let notes={},openNote=null;
+try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}
+const noteText=k=>notes[k]&&typeof notes[k].text==='string'?notes[k].text:'';
+function noteBtn(k){const has=noteText(k).trim();return '<button type="button" class="notebtn'+(has?' has':'')+'" data-note="'+esc(k)+'" aria-expanded="'+(openNote===k)+'">'+(has?'Edit notes':'+ Notes')+'</button>';}
+function noteBox(k){if(openNote!==k)return '';const n=notes[k];return '<div class="notebox"><textarea data-note-text="'+esc(k)+'" maxlength="20000" placeholder="Write notes for this chapter…" aria-label="Notes">'+esc(noteText(k))+'</textarea><p class="notemeta" data-note-meta="'+esc(k)+'">'+(n&&n.updated?'Saved '+new Date(n.updated).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</p></div>';}
+let noteTimer=null;
+function saveNote(k,text){try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}
+ if(text.trim())notes[k]={text:text.slice(0,20000),updated:new Date().toISOString()};else delete notes[k];
+ let ok=true;try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch{ok=false;}
+ const m=document.querySelector('[data-note-meta="'+CSS.escape(k)+'"]');if(m)m.textContent=ok?(text.trim()?'Saved':'Empty note removed'):'Could not save (storage full)';}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-note]');if(!b)return;openNote=openNote===b.dataset.note?null:b.dataset.note;render();const t=document.querySelector('[data-note-text="'+CSS.escape(b.dataset.note)+'"]');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}});
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.noteText;if(!k)return;clearTimeout(noteTimer);const v=e.target.value;noteTimer=setTimeout(()=>saveNote(k,v),400);});
+document.addEventListener('focusout',e=>{const k=e.target.dataset&&e.target.dataset.noteText;if(k){clearTimeout(noteTimer);saveNote(k,e.target.value);}});
 function render(){
  const now=compute(),key=(location.hash||'').slice(1),c=T.COURSES.find(x=>x.key===key);
  document.title=(c?c.name+' — ':'')+'Lessons — Study OS';

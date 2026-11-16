@@ -3,16 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — practice and review">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
 <title>Practice — Study OS</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
-:root{color-scheme:light;--bg:#fff;--text:#2b2b2b;--muted:#6f6d69;--line:#e9e7e3;--panel:#f9f8f6;--accent:#2383e2;--red:#d6453d;--orange:#d9730d;--green:#2f8f5b;--hi:#fadddb;--hi-t:#8a2c27;--med:#f5e6b0;--med-t:#6b5300;--low:#d9ead9;--low-t:#2d5a2d;--blue-soft:#e4f0fb;--mono:'Outfit','DM Sans','IBM Plex Sans Thai',system-ui,sans-serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#191919;--text:#ececec;--muted:#a8a5a0;--line:#333;--panel:#212121;--accent:#5aa9f0;--red:#ff8a80;--orange:#f0a050;--green:#6fcf9b;--hi:#5a2a27;--hi-t:#ffb4ae;--med:#4d4115;--med-t:#f1d776;--low:#26422a;--low-t:#a8d9a8;--blue-soft:#1e3445}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans','IBM Plex Sans Thai',system-ui,-apple-system,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
@@ -32,7 +37,6 @@ h1{font-size:clamp(28px,5vw,38px);margin:0;letter-spacing:-.5px;line-height:1.1}
 .chip b{font:700 24px var(--mono)}.chip span{font-size:14px;color:var(--muted)}
 .chip.warn b{color:var(--red)}.chip.soon b{color:var(--orange)}
 h2{font-size:clamp(19px,3vw,24px);margin:40px 0 14px;display:flex;align-items:center;gap:8px}
-h2::before{content:"✦";font-size:.75em;color:var(--accent)}
 .sec-link{margin-left:auto;font:500 13px var(--mono);color:var(--accent);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
 .top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
 .box{border-radius:16px;padding:16px 18px;background:var(--panel)}
@@ -103,25 +107,60 @@ h1{margin:8px 0 0}
 .small{font-size:12px;color:var(--muted);margin:8px 0 0}
 
 </style>
-<script src="scripts/study-theme.js?v=2"></script>
+<link rel="stylesheet" href="assets/study-world.css?v=8">
+<style>
+/* Practice notebook: one big ruled page per subject, saved in studyos.notes.v1 (backed up) */
+.nb{border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel)}
+.nb-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border-bottom:var(--bw) solid var(--ink)}
+.nb-tabs{display:inline-flex;border:2.5px solid var(--ink);border-radius:6px;overflow:hidden}
+.nb-tabs button{border:0;background:var(--panel);color:var(--text);font:900 14px var(--ui);min-height:40px;padding:0 14px;cursor:pointer}
+.nb-tabs button+button{border-left:2px solid var(--ink)}
+.nb-tabs button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.nb-status{font:700 14px var(--ui);color:var(--muted);margin-left:auto}
+.nb-status.err{color:var(--red)}
+.nb-bar .nb-btn{border:2.5px solid var(--ink);border-radius:6px;background:var(--panel);color:var(--text);font:900 14px var(--ui);min-height:40px;padding:0 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.nb-bar .nb-btn svg{width:18px;height:18px}
+.nb-text{display:block;width:100%;min-height:max(420px,58vh);resize:vertical;border:0;margin:0;padding:6px 22px 32px 22px;font:500 16px/34px var(--ui);color:var(--text);background:repeating-linear-gradient(to bottom,transparent 0 33px,var(--line-soft) 33px 34px) 0 6px/100% 34px local,var(--panel);caret-color:var(--acc)}
+.nb-text:focus{outline:none}
+.nb:focus-within{box-shadow:0 0 0 4px var(--acc-soft)}
+.nb-text::placeholder{color:var(--muted)}
+/* focus mode: the notebook takes the whole screen */
+.nb.full{position:fixed;inset:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));z-index:95;display:flex;flex-direction:column}
+.nb.full .nb-text{flex:1;min-height:0;resize:none}
+html.nb-lock,html.nb-lock body{overflow:hidden}
+@media(max-width:520px){.nb-status{width:100%;order:3;margin-left:0}.nb-text{padding:6px 14px 28px;font-size:16px}}
+</style>
+<script src="scripts/study-theme.js?v=3"></script>
+<script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
 <div class="page">
 <h1>Practice</h1>
+<section class="lead-panel" id="lead" aria-label="Next step" hidden></section>
 <main>
 <h2>Quizzes</h2>
 <section class="grid" id="courses" aria-label="Quizzes by subject"></section>
+<h2>Notes</h2>
+<section class="nb" id="nb" aria-label="Practice notes">
+ <div class="nb-bar">
+  <div class="nb-tabs" role="group" aria-label="Notebook"><button type="button" data-nb="general" aria-pressed="true">General</button><button type="button" data-nb="acc" aria-pressed="false">ACC</button><button type="button" data-nb="eco" aria-pressed="false">ECO</button><button type="button" data-nb="math" aria-pressed="false">MATH</button></div>
+  <span class="nb-status" id="nbStatus" role="status">Saved on this device</span>
+  <button type="button" class="nb-btn" id="nbFull" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
+ </div>
+ <textarea class="nb-text" id="nbText" maxlength="100000" spellcheck="true" placeholder="Write anything: formulas, mistakes to remember, worked steps…" aria-label="Notes"></textarea>
+</section>
 <h2>Weak chapters</h2>
 <section class="box" id="weak" aria-label="Weak chapters"><p class="empty">Loading…</p></section>
 <h2>More practice</h2>
 <section class="grid" aria-label="More practice">
- <div class="pc"><h3>🎮 English games · WordNest</h3><div class="acts"><a class="main" href="vocabloom/?lang=en">Play</a></div></div>
- <div class="pc"><h3>📚 Accounting Textbook Exercises</h3><p class="small">403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</p><div class="acts"><a class="main" href="accounting-textbook.html">Open</a></div></div>
+ <div class="pc strip"><h3><span class="jersey sm t-eng" aria-hidden="true">EN</span>English games · WordNest</h3><div class="acts"><a class="main" href="vocabloom/?lang=en">Play</a></div></div>
+ <div class="pc strip"><h3><span class="jersey sm t-acc" aria-hidden="true">ACC</span>Accounting Textbook Exercises</h3><p class="small">403 indexed exercises · Chapters 1–9 (through Receivables) · Quick Study, Exercises &amp; Problems</p><div class="acts"><a class="main" href="accounting-textbook.html">Open</a></div></div>
 </section>
 </main>
 </div>
+<script src="scripts/study-review.js?v=1"></script>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-nav.js?v=1"></script>
+<script src="scripts/study-nav.js?v=3"></script>
 <script>
 (function(){
 'use strict';
@@ -129,16 +168,27 @@ const T=window.StudyToday,$=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function read(k){try{return localStorage.getItem(k);}catch{return null;}}
 const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):'');
-const EMOJI={acc:'📒',eco:'📈',math:'🧮'};
-let data={},langData={},failed=[];const FLAG={eng:'🇬🇧',zh:'🇨🇳'};
+const ICON={acc:'<span class="jersey sm t-acc" aria-hidden="true">ACC</span>',eco:'<span class="jersey sm t-eco" aria-hidden="true">ECO</span>',math:'<span class="jersey sm t-math" aria-hidden="true">MATH</span>'};
+let data={},langData={},failed=[];
+function nextExam(now){const st=T.loadSettings(read(T.SETTINGS_KEY));return st.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d||a.date.localeCompare(b.date))[0]||null;}
+const inDays=d=>d===0?'today':d===1?'in 1 day':'in '+d+' days';
+function lead(say,sub,href,label){const el=$('#lead');if(!say){el.hidden=true;return;}el.hidden=false;el.innerHTML='<div class="bub"><b>'+say+'</b>'+(sub?'<span>'+sub+'</span>':'')+'</div><a class="go" href="'+href+'">'+esc(label)+'</a>';}
 function render(){
  const now=Date.now(),sum={};
  for(const c of T.COURSES)if(data[c.key])sum[c.key]=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);
+ const ne0=nextExam(now),wideKey=ne0?ne0.course:'';
+ const due={};for(const c of T.COURSES)due[c.key]=window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0;
  $('#courses').innerHTML=T.COURSES.map(c=>{const s=sum[c.key];let q=0,a=0,r=0;if(s)for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}
-  return '<div class="pc"><h3>'+EMOJI[c.key]+' '+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small> <span style="color:var(--text)">'+(a?Math.round(r/a*100)+'%':'–')+'</span><small>correct</small></div>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
-   +'<div class="acts"><a class="main" href="'+link(c,'prac')+'">Start quiz</a></div></div>';}).join('');
+  return '<div class="pc'+(c.key===wideKey?' wide':'')+'"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
+   +'<div class="acts">'+(due[c.key]?'<a class="main" href="'+link(c,'prac')+'&review=1">Review '+due[c.key]+'</a><a href="'+link(c,'prac')+'">Quiz</a>':'<a class="main" href="'+link(c,'prac')+'">Start quiz</a>')+'</div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;
+ const ne=nextExam(now),nc=ne&&T.COURSES.find(x=>x.key===ne.course),wk=(nc&&weak.find(w=>w.course===nc.key))||weak[0];
+ const rvc=T.COURSES.slice().sort((a,b)=>due[b.key]-due[a.key])[0];
+ if(rvc&&due[rvc.key]){lead('Review '+due[rvc.key]+' '+esc(rvc.name)+' question'+(due[rvc.key]>1?'s':''),'Missed or due again today · spaced repetition',link(rvc,'prac')+'&review=1','Start review');}
+ else if(wk&&(!nc||wk.course===nc.key)){const c=T.COURSES.find(x=>x.key===wk.course);lead('Fix '+esc(wk.label),Math.round(wk.acc*100)+'% correct so far'+(ne&&nc&&nc.key===c.key?' · '+esc(ne.title)+' '+inDays(ne.d):''),link(c,'prac',wk.cat),'Practise '+c.name);}
+ else if(nc)lead('Warm up: '+esc(nc.name)+' quiz',esc(ne.title)+' '+inDays(ne.d),link(nc,'prac'),'Start '+nc.name+' quiz');
+ else lead('Take a '+esc(T.COURSES[0].name)+' quiz','Pick up where you left off',link(T.COURSES[0],'prac'),'Start quiz');
  $('#weak').innerHTML=weak.length?'<ul class="weak">'+weak.map(w=>{const c=T.COURSES.find(x=>x.key===w.course),D=data[w.course],cat=[w.cat];
   return '<li><span><b>'+esc(w.courseName)+'</b> · '+esc(w.label)+' <span class="badge">'+Math.round(w.acc*100)+'%</span></span><span class="acts"><a class="main" href="'+link(c,'prac',cat?cat[0]:'')+'">Practice</a></span></li>';}).join('')+'</ul>'
   :'<p class="empty">No weak chapters yet.</p>';
@@ -146,6 +196,30 @@ function render(){
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+})();
+
+/* ---------- practice notebook (studyos.notes.v1, keys practice:<book>; backed up) ---------- */
+(function(){
+'use strict';
+const KEY='studyos.notes.v1',$=s=>document.querySelector(s),box=$('#nb'),ta=$('#nbText'),st=$('#nbStatus'),full=$('#nbFull');
+let book='general',timer=null;
+function all(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch{return {};}}
+const count=t=>t.length.toLocaleString('en-US')+' characters';
+function load(){const n=all()['practice:'+book];ta.value=n&&typeof n.text==='string'?n.text:'';st.classList.remove('err');st.textContent=ta.value?'Saved · '+count(ta.value):'Saved on this device';}
+/* re-read before every write so notes written on the Lessons page (or another tab) are kept */
+function save(){clearTimeout(timer);timer=null;const notes=all(),k='practice:'+book,text=ta.value.slice(0,100000);
+ if(text.trim())notes[k]={text,updated:new Date().toISOString()};else delete notes[k];
+ try{localStorage.setItem(KEY,JSON.stringify(notes));st.classList.remove('err');st.textContent='Saved · '+count(text);}
+ catch{st.classList.add('err');st.textContent='Not saved: storage is full';}}
+ta.addEventListener('input',()=>{st.classList.remove('err');st.textContent='Saving…';clearTimeout(timer);timer=setTimeout(save,500);});
+ta.addEventListener('blur',()=>{if(timer)save();});
+window.addEventListener('pagehide',()=>{if(timer)save();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&timer)save();else if(!document.hidden&&!timer&&document.activeElement!==ta)load();});
+box.querySelectorAll('[data-nb]').forEach(b=>b.onclick=()=>{if(timer)save();book=b.dataset.nb;box.querySelectorAll('[data-nb]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));load();ta.focus();});
+function setFull(on){box.classList.toggle('full',on);document.documentElement.classList.toggle('nb-lock',on);full.setAttribute('aria-pressed',String(on));full.querySelector('span').textContent=on?'Done':'Full screen';if(on)ta.focus();}
+full.onclick=()=>setFull(!box.classList.contains('full'));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&box.classList.contains('full'))setFull(false);});
+load();
 })();
 </script>
 </body>

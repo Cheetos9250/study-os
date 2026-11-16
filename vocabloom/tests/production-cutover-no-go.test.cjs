@@ -41,10 +41,10 @@ test('Staging worker hard-fails on wrong flag, hostname and origin',()=>{
  assert.match(worker,/if\(!env\.SYNC_KEY\|\|request\.headers\.get\('X-Sync-Key'\)!==env\.SYNC_KEY\)/);
  assert.doesNotMatch(worker,/https:\/\/study-api\.kasidit09022550\.workers\.dev/);
 });
-test('Production Notion quiz/cards loading is separate from optional progress routing',()=>{
+test('Quiz/cards load from the saved snapshot only (Notion retired), separate from optional progress routing',()=>{
  for(const subject of SUBJECTS){
   const src=read(subject+'.html'),before=src.slice(0,src.indexOf('async function cfg(){'));
-  assert.match(before,/if\(c\.ok\) api=String\(\(await c\.json\(\)\)\.api\|\|''\)/);
+  assert.match(before,/fetch\('data\/'\+name\+'\.json'/);assert.doesNotMatch(before,/fetch\(api\+'\/'\+name\)/);
   assert.doesNotMatch(before,/progress_api/);
   const block=src.slice(src.indexOf('async function cfg(){'),src.indexOf('  const say=',src.indexOf('async function cfg(){')));
   assert.match(block,/j\.progress_api\|\|original/);

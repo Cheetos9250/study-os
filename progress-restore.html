@@ -7,6 +7,12 @@
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;family=Outfit:wght@400;500;600;700;800&amp;family=IBM+Plex+Sans+Thai:wght@400;500;700&amp;family=Noto+Sans+Thai:wght@400;500;700&amp;display=swap" rel="stylesheet">
@@ -36,7 +42,7 @@
     button:disabled{opacity:.5;cursor:not-allowed}
     #preview{padding-left:22px;font-size:14px;overflow-wrap:anywhere}
 </style>
-<script src="scripts/study-theme.js?v=2"></script>
+<script src="scripts/study-theme.js?v=3"></script>
 </head>
 <body>
 <main>
@@ -76,6 +82,9 @@
     if (key === "vocabloom_mvp_v1") return "VocaBloom learning history";
     if (key === "studyos.accounting.textbook.progress.v1") return "Accounting textbook answers";
     if (key === "studyos.home.v1") return "Home dashboard tasks and checklists";
+    if (key === "studyos.today.v1") return "Exam schedule, plan ticks and timetable";
+    if (key === "studyos.grades.v1") return "Grades and GPA";
+    if (key === "studyos.notes.v1") return "Lesson notes";
     var courses = {acc:"Accounting",eco:"Economics",math:"Mathematics",eng:"English",zh:"Chinese"};
     if (key.startsWith("study-")) return courses[key.slice(6)] + " quiz history";
     var prefix = key.replace(/-(srs|typ)$/, "");
@@ -131,6 +140,6 @@
   });
 })();
 </script>
-<script src="scripts/study-nav.js?v=1"></script>
+<script src="scripts/study-nav.js?v=3"></script>
 </body>
 </html>

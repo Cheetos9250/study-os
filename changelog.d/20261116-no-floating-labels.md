@@ -1,0 +1,1 @@
+- Today: removed the loose knockout patches behind text on hatched panels. The urgent exam card now has a hatched band down its left edge with text on clean paper; the Tasks scoreboard panel is plain; the next-exam date sits in a framed caption box.
