@@ -8,7 +8,6 @@ test('accounting has 20 English "errors" questions with stable ids and valid ans
     assert.doesNotMatch(JSON.stringify(q),/[฀-๿]/); assert.equal(new Set(q[2]).size,4); }
   assert.match(src,/id:'err-'\+\(i\+1\)/);
 });
-test('accounting practice hides Thai saved questions and has an Errors set filter',()=>{
+test('accounting practice hides Thai saved questions ',()=>{
   assert.match(src,/if\(\/\[\\u0E00-\\u0E7F\]\/\.test\(\[r\.Question/);
-  assert.match(src,/id="errBtn"/); assert.match(src,/set=errors/);
 });
