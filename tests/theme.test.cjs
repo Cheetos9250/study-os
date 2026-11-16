@@ -11,7 +11,9 @@ for(const f of pages)test(f+'.html supports manual light/dark and loads the them
 });
 test('theme script writes only its own keys and they are not part of backups',()=>{
  const s=fs.readFileSync(path.join(root,'scripts/study-theme.js'),'utf8');
- assert.deepEqual([...s.matchAll(/setItem\(([^,]+),/g)].map(m=>m[1]).sort(),['KEY','NAV_KEY']);
+ assert.deepEqual([...s.matchAll(/setItem\(([^,]+),/g)].map(m=>m[1]).sort(),['FOCUS_KEY','KEY','NAV_KEY']);
+ assert.match(s,/FOCUS_KEY='studyos\.focus\.v1'/);
+ assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.focus.v1'));
  assert.match(s,/NAV_KEY='studyos\.nav\.v1'/);
  assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.nav.v1'));
  assert.match(s,/KEY='studyos\.theme\.v1'/);
