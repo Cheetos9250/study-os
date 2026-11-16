@@ -94,6 +94,11 @@
         for (var part of [set.ans, set.key])
           for (var qn of Object.keys(part))
             if (!/^\d{1,3}$/.test(qn) || !/^[a-e]$/.test(String(part[qn]))) throw new Error("Invalid PDF practice answers");
+        if (set.notes !== undefined) {
+          if (!object(set.notes)) throw new Error("Invalid PDF practice answers");
+          for (var pn of Object.keys(set.notes))
+            if (!/^\d{1,5}$/.test(pn) || typeof set.notes[pn] !== "string") throw new Error("Invalid PDF practice answers");
+        }
       }
     } else if (key === "studyos.grades.v1") {
       if (!Array.isArray(value.courses)) throw new Error("Invalid grades data");
