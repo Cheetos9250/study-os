@@ -1,0 +1,1 @@
+- Cloud sync switched on: `data/config.json` now has `progress_api` (the owner deployed `vocabloom-progress-cas-prod`; its smoke test passed). Each device sets the sync key once from the nav's **Cloud sync**; after that quiz answers, review schedule, flashcards, exams, plan ticks and the timetable sync automatically.

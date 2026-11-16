@@ -98,6 +98,7 @@ test('Read-only tools and published landing pages retain zero mutating fetch sig
  ]){
   assert.deepEqual(signatures(read(path)),{direct:0,conditional:0},path);
  }
+ // Owner-approved cutover (16 Nov 2026): progress_api is the separate CAS Worker; api stays the original.
  assert.deepEqual(JSON.parse(read('data/config.json')),
-  {api:'https://study-api.kasidit09022550.workers.dev'});
+  {api:'https://study-api.kasidit09022550.workers.dev',progress_api:'https://vocabloom-progress-cas-prod.kasidit09022550.workers.dev'});
 });

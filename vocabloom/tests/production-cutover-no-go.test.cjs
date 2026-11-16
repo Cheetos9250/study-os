@@ -13,11 +13,14 @@ const read=path=>readFileSync(join(ROOT,path),'utf8');
 const ORIGINAL='https://study-api.kasidit09022550.workers.dev';
 const STAGING='https://study-api-cas-staging-only.kasidit09022550.workers.dev';
 const SUBJECTS=['acc','eco','math','eng','zh'];
-test('Production config is intentionally unchanged; no unapproved progress cutover',()=>{
+/* Owner-approved Production cutover (16 Nov 2026): the owner deployed vocabloom-progress-cas-prod with the manual
+   workflow (smoke test passed). progress_api must be exactly that Worker; api stays the original; never Staging. */
+const PROD_PROGRESS='https://vocabloom-progress-cas-prod.kasidit09022550.workers.dev';
+test('Production config is exactly the approved cutover: original api + separate CAS progress Worker',()=>{
  const config=JSON.parse(read('data/config.json'));
- assert.deepEqual(config,{api:ORIGINAL});
+ assert.deepEqual(config,{api:ORIGINAL,progress_api:PROD_PROGRESS});
  assert.equal(read('data/config.json'),JSON.stringify(config)+'\n');
- assert.ok(!('progress_api' in config));
+ assert.notEqual(config.progress_api,ORIGINAL);
  assert.ok(!Object.values(config).includes(STAGING));
 });
 test('Isolated staging Wrangler config cannot accidentally rename staging to Production',()=>{

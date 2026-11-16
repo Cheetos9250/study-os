@@ -18,6 +18,9 @@ test('deploy workflow is manual, typed confirmation, never prints the key',()=>{
  assert.doesNotMatch(y,/echo "?\$PROGRESS_SYNC_KEY/);assert.doesNotMatch(y,/set -x/);
  assert.match(y,/test "\$noauth" = 401/);
 });
-test('public config is not switched by this change',()=>{
- assert.deepEqual(Object.keys(JSON.parse(read('data/config.json'))),['api']);
+test('public config: legacy api unchanged, progress_api points only at the separate CAS Worker',()=>{
+ const c=JSON.parse(read('data/config.json'));
+ assert.deepEqual(Object.keys(c),['api','progress_api']);
+ assert.equal(c.api,'https://study-api.kasidit09022550.workers.dev');
+ assert.equal(c.progress_api,'https://vocabloom-progress-cas-prod.kasidit09022550.workers.dev');
 });
