@@ -154,7 +154,8 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 </main>
 </div>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-nav.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=1"></script>
+<script src="scripts/study-nav.js?v=4"></script>
 <script>
 (function(){
 'use strict';
@@ -163,7 +164,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function read(k){try{return localStorage.getItem(k);}catch{return null;}}
 function homeTasks(){try{const v=JSON.parse(read(HOME)||'{}');return v&&Array.isArray(v.tasks)?v.tasks:[];}catch{return [];}}
 let settings=T.loadSettings(read(T.SETTINGS_KEY)),data={};
-function save(){try{localStorage.setItem(T.SETTINGS_KEY,JSON.stringify(settings));$('#saveStatus').textContent='';return true;}catch{$('#saveStatus').textContent='Could not save (storage full).';return false;}}
+function save(){try{localStorage.setItem(T.SETTINGS_KEY,JSON.stringify(settings));window.StudyCloud&&StudyCloud.dirty();$('#saveStatus').textContent='';return true;}catch{$('#saveStatus').textContent='Could not save (storage full).';return false;}}
 const MO=['January','February','March','April','May','June','July','August','September','October','November','December'],DOW=['Su','Mo','Tu','We','Th','Fr','Sa'];
 const parts=iso=>{const [y,m,d]=iso.split('-').map(Number);return {y,m:m-1,d};};
 const isoUTC=d=>d.toISOString().slice(0,10),shortDay=iso=>{const p=parts(iso);return p.d+' '+MO[p.m].slice(0,3);};
@@ -261,6 +262,7 @@ function render(){renderLead();const open=[...document.querySelectorAll('details
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){settings=T.loadSettings(read(T.SETTINGS_KEY));render();}});
+addEventListener('studycloud:applied',()=>{settings=T.loadSettings(read(T.SETTINGS_KEY));render();});
 })();
 </script>
 </body>

@@ -7,7 +7,7 @@
  * Requires a new SQLite-backed Durable Object namespace and a NEW independent
  * secret. Merely committing this file must NEVER activate or deploy it.
  */
-const SUBJECTS=['acc','eco','math','eng','zh'];
+const SUBJECTS=['acc','eco','math','eng','zh','today'];
 const SUBJECT_SET=new Set(SUBJECTS);
 const MAX_BYTES=350_000;
 const PROD_HOST='vocabloom-progress-cas-prod.kasidit09022550.workers.dev';
@@ -19,8 +19,11 @@ const JSON_HEADERS={
  'X-Content-Type-Options':'nosniff'
 };
 const record=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
-const initial=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
-const validator=x=>record(x)&&record(x.study)&&record(x.study.ans)&&
+const initialCourse=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
+// 'today' holds the Study OS planner settings (studyos.today.v1: exams, plan ticks, timetable).
+const initialToday=()=>({today:{}});
+const todayValidator=x=>record(x)&&record(x.today)&&Object.keys(x).every(k=>k==='today');
+const courseValidator=x=>record(x)&&record(x.study)&&record(x.study.ans)&&
  record(x.study.ats)&&(x.study.known===undefined||Array.isArray(x.study.known))&&
  (x.study.rst===undefined||Number.isFinite(x.study.rst))&&
  record(x.srs)&&record(x.srs.s)&&record(x.srs.m);
@@ -44,6 +47,8 @@ function safeEqual(a,b){
 export class ProductionProgressDO {
  constructor(ctx){this.ctx=ctx;}
  async fetch(request){
+  const isToday=request.headers.get('X-Progress-Subject')==='today';
+  const initial=isToday?initialToday:initialCourse,validator=isToday?todayValidator:courseValidator;
   if(request.method==='GET'){
    const stored=this.ctx.storage.kv.get('record')??{revision:0,value:initial()};
    return json(stored.value,200,stored.revision);
@@ -121,6 +126,8 @@ export default {
    return cors(json({error:'Dedicated production Durable Object binding missing'},503));
   const id=env.PROD_PROGRESS_DO.idFromName('vocabloom:production-progress:v1:'+m[1]);
   const stub=env.PROD_PROGRESS_DO.get(id);
-  return cors(await stub.fetch(request));
+  // Tell the object which schema applies; the client cannot choose it (it follows the URL subject).
+  const inner=new Request(request);inner.headers.set('X-Progress-Subject',m[1]==='today'?'today':'course');
+  return cors(await stub.fetch(inner));
  }
 };

@@ -111,7 +111,8 @@ button.danger{color:var(--red)}
 </main>
 </div>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-nav.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=1"></script>
+<script src="scripts/study-nav.js?v=4"></script>
 <script>
 (function(){
 'use strict';
@@ -175,6 +176,7 @@ function render(){
 }
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+addEventListener('studycloud:applied',()=>render());
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();})
  .then(html=>{data[c.key]=T.parseCourseData(html);}).catch(()=>{errors.push(c.key);}))).then(render);

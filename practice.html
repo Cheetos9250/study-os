@@ -160,7 +160,8 @@ html.nb-lock,html.nb-lock body{overflow:hidden}
 </div>
 <script src="scripts/study-review.js?v=1"></script>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-nav.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=1"></script>
+<script src="scripts/study-nav.js?v=4"></script>
 <script>
 (function(){
 'use strict';
@@ -196,6 +197,7 @@ function render(){
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+addEventListener('studycloud:applied',()=>render());
 })();
 
 /* ---------- practice notebook (studyos.notes.v1, keys practice:<book>; backed up) ---------- */
