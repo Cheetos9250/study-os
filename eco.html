@@ -170,6 +170,7 @@ td:first-child{font-weight:500;min-width:7.5em}
     <div id="qBody"></div>
   </section>
 </div>
+<script src="scripts/study-review.js?v=1"></script>
 <script src="scripts/study-progress-backup.js?v=20261113-compare"></script>
 <script src="scripts/study-course-storage.js?v=20261114-cross-tab"></script>
 <script>
@@ -315,8 +316,12 @@ const QS = D.quiz.map((q,i)=>{ const o={id:i,cat:q[0],q:q[1],opts:q[2],exp:q[4]|
   let s=(i+1)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
   const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   o.order=idx; o.right=q[3]; return o; });
+/* quiz review (spaced repetition) */
+let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set();
+const reviewFresh=x=>reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart;
+const revChip=()=>'<button class="chip" id="revBtn" aria-pressed="'+reviewOnly+'" type="button">Review due<span class="n">'+(window.StudyReview?QS.filter(q=>StudyReview.isDue(store,q.id,Date.now())).length:0)+'</span></button>';
 let qcats=new Set(), missedOnly=false, unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
-function buildDeck(){ const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(){ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!reviewOnly||dueSet.has(String(q.id)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; }
 function renderQ(){
@@ -332,9 +337,9 @@ function renderQ(){
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+='<div class="row" style="margin-bottom:12px"><button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button><button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
-  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+((missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
-  const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined;
+  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button><button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
+  const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
   h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
   q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
@@ -342,18 +347,19 @@ function renderQ(){
   h+='</div>';
   if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+'</div>'; }
   h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
-  h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
+  h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined||reviewFresh(x)?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
   box.innerHTML=h;
-  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); save(); renderQ(); });
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); window.StudyReview&&StudyReview.record(store,q.id,store.ans[q.id]===q.right,Date.now()); save(); renderQ(); });
   box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
   const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};
   wireQ();
 }
 function wireQ(){
+  const rb=$('#revBtn'); if(rb) rb.onclick=()=>{reviewOnly=!reviewOnly;reviewStart=Date.now();qpos=0;buildDeck();renderQ()};
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;buildDeck();renderQ()};
   const sh=$('#shufBtn'); if(sh) sh.onclick=()=>{shuffleOn=!shuffleOn;buildDeck();renderQ()};
-  const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
+  const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rv={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
 
 /* ---------- tabs ---------- */
@@ -542,7 +548,7 @@ window.__xs=(()=>{
   async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); const original=String(j.api||'').replace(/\/+$/,''); const next=String(j.progress_api||original).replace(/\/+$/,''); contentApi=original; api=next; progressKeyName=next&&next!==original?PROGRESS_LSK:LSK; } }catch(e){} return api; }
   const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'var(--ok,#1d7a4a)':'var(--bad,#b3261e)'; } };
   const hhmm=()=>new Intl.DateTimeFormat('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date());
-  function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[]}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
+  function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[],rv:store.rv||{}}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
   function merge(a,b){
     const A=a.study||{}, B=b.study||{}, out={study:{ans:{},ats:{},rst:0,known:[]},srs:{s:{},m:{day:0,newDone:0}}};
     const rst=Math.max(A.rst||0,B.rst||0); out.study.rst=rst;
@@ -553,6 +559,7 @@ window.__xs=(()=>{
       const useA=ha&&(!hb||ta>=tb), v=useA?A.ans[id]:B.ans[id], t=useA?ta:tb;
       if(!(ha||hb)) return; if(rst&&t<rst) return;
       out.study.ans[id]=v; out.study.ats[id]=t;
+      const rvx=useA?(A.rv||{})[id]:(B.rv||{})[id]; if(rvx)(out.study.rv=out.study.rv||{})[id]=rvx;
     });
     out.study.known=[...new Set([...(A.known||[]),...(B.known||[])])];
     const SA=(a.srs||{}).s||{}, SB=(b.srs||{}).s||{};
@@ -567,7 +574,7 @@ window.__xs=(()=>{
   function apply(m){
     applying=true;
     try{
-      store.ans=m.study.ans; store.ats=m.study.ats; store.rst=m.study.rst; store.known=m.study.known; save();
+      store.ans=m.study.ans; store.ats=m.study.ats; store.rst=m.study.rst; store.known=m.study.known; store.rv=m.study.rv||{}; window.StudyReview&&StudyReview.seed(store,QS,Date.now()); save();
       srs=m.srs.s; meta=m.srs.m; saveS();
       try{ buildDeck(); renderQ(); cardsRow(); if(!shown) renderCard(); }catch(e){}
     } finally { applying=false; }

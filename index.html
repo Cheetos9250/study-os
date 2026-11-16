@@ -227,6 +227,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <section class="subjects" id="subjects" aria-label="Subjects"></section>
 </main>
 </div>
+<script src="scripts/study-review.js?v=1"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-nav.js?v=3"></script>
 <script>
@@ -316,7 +317,9 @@ function renderChips(){
  const open=st.tasks.filter(t=>!t.done),late=open.filter(t=>t.date<today).length,ne=upcoming()[0];
  const top=T.COURSES.slice().sort((a,b)=>((summaries[b.key]||{}).reviewNow||0)-((summaries[a.key]||{}).reviewNow||0))[0];
  const topN=top&&summaries[top.key]?summaries[top.key].reviewNow:0;
- const cells=['<a class="sb" href="'+(dueTotal?link(top,'cards'):'flashcards.html')+'"><span class="n">'+dueTotal+'</span><span class="l">Cards due</span><span class="s">'+(dueTotal?esc(top.name)+' has '+topN:'All caught up')+'</span></a>',
+ /* quiz review (spaced repetition) comes first: the owner mostly studies with quizzes */
+ const qd=T.COURSES.map(c=>({c,n:window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0})).sort((a,b)=>b.n-a.n),quizDue=qd.reduce((n,x)=>n+x.n,0),qTop=qd[0];
+ const cells=['<a class="sb" href="'+(quizDue?link(qTop.c,'prac')+'&review=1':dueTotal?link(top,'cards'):'practice.html')+'"><span class="n">'+quizDue+'</span><span class="l">Quiz review</span><span class="s">'+(quizDue?esc(qTop.c.name)+' has '+qTop.n+(dueTotal?' · '+dueTotal+' cards due':''):dueTotal?dueTotal+' cards due':'All caught up')+'</span></a>',
   '<a class="sb'+(late?' alert':'')+'" href="#tasks"><span class="n">'+open.length+'</span><span class="l">Tasks</span><span class="s">'+(late?late+' late':open.length?'Open':'Nothing open')+'</span></a>'];
  if(ne){const c=course(ne.course);cells.push('<a class="sb next'+(ne.d<=3?' alert':'')+'" href="#exams" aria-label="Next exam: '+esc(ne.title)+'"><span class="bub"><span class="fx">'+esc(ne.title)+(ne.d===0?'':' in')+'</span><span class="n">'+(ne.d===0?'Today!':ne.d+'<small>'+(ne.d===1?'day':'days')+'</small>'+(ne.d<=3?'!':''))+'</span></span><span class="s">'+esc(shortDay(ne.date))+(c?' · '+esc(c.name):'')+'</span></a>');}
  else cells.push('<a class="sb next" href="calendar.html"><span class="bub"><span class="fx">No exams coming up</span></span><span class="s">Add one in Calendar</span></a>');
