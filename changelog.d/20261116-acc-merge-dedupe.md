@@ -1,0 +1,1 @@
+- Accounting practice: removed the separate Errors / Bank rec errors / Bank rec cases filters — all questions are one pool by chapter. 95 near-duplicate questions hidden (at most 6 similar per concept, one exact duplicate); answers already saved are kept. Selection script: `scripts/acc-quiz-dedupe.py`.
