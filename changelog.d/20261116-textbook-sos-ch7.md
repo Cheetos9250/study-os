@@ -1,0 +1,1 @@
+- Textbook Exercises: chapter 7 Study OS versions (30 exercises incl. Problems A and B) with worked solutions — AIS components and principles, controlling accounts, sales/purchases/cash receipts/cash payments journals, subsidiary ledger schedules, days' payable outstanding.
