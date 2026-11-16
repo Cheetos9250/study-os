@@ -1,0 +1,1 @@
+- Textbook Exercises: chapter 5 now shows a **Study OS version** of every exercise (55, incl. Problems A and B) — same task and method, new numbers and wording, with tables — instead of the PDF image, plus a **Show solution** button with a worked solution. Exercises without a rewrite still show the PDF. Data: `data/textbook-sos/ch5.json` (generator in `scripts/textbook-sos/`).
