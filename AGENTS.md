@@ -43,6 +43,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 | `grades.html` | Weighted course items, letter per course scale, "needed on the rest", estimated GPA. |
 | `acc/eco/math/eng/zh.html` | Course pages. Data is embedded as `const D={...}` (one huge line; never rewrite it with regex). Each page shows one mode via `?tab=cards|sum|prac` (`scripts/study-course-mode.js`) and has its own sync engine. |
 | `accounting-textbook.html` | Index of 403 textbook exercises, Ch1–9. |
+| `excel.html` | **Excel** subject (not in `COURSES`, no cloud sync): basic dashboard step-by-step from the class, exam tips, quiz. Linked from Lessons and Practice. |
 | `progress-backup.html` / `progress-restore.html` | Local JSON backup and validated restore. |
 | `today.html` | Redirects to `calendar.html` (old links). |
 | `vocabloom/` | **WordNest** (formerly VocaBloom). `?lang=en` gives English games + English cards, `?lang=zh` gives Chinese cards. The folder name and storage keys stay `vocabloom` so progress is kept. `vocabloom/wordnest.js` is the language layer. |
@@ -68,6 +69,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). |
 | `studyos.accounting.textbook.progress.v1` | Textbook answers. |
 | `vocabloom_mvp_v1` | WordNest English data. |
+| `studyos.excel.v1` | Excel page: ticked steps (`done`) and quiz answers (`ans`, `x<n>` → option index). |
 | `studyos.pdfsets.v1` | **My PDF sets** (`pdf-sets.html`): per uploaded PDF its name, subject, detected question count, my answers, answer key and per-page working notes (`notes`). PDFs over 60 pages are books (no question detection, lazy page rendering). The 1,210-page textbook is set `ptextbook` and its file lives in the Textbook page's IDB `studyos-accounting-pdf-v1` (shared, added once). The PDFs themselves are in IndexedDB `studyos-pdf-sets-v1` on the device only (not backed up, never uploaded). |
 
 Not backed up: `studyos.theme.v1`, `studyos.nav.v1` (collapsed sidebar), `studyos.focus.v1` (focus mode, default on: hides summaries and flashcards; all three written only by `scripts/study-theme.js`), `studyos.pomo.v1` (running Pomodoro end time, written only by `index.html`, read by `StudyTheme.pomo()` for the nav countdown), `studyos.backup-meta.v1` (time **Back up now** was last tapped on Today, written only by `index.html`; drives the Today backup reminder. `progress-backup.html` must stay read-only, CI checks it), sync keys (`study-sync-*`), caches.
