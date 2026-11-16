@@ -2,6 +2,10 @@ import sys,os,json; sys.path.insert(0,os.path.dirname(__file__))
 from sos_lib import *
 from costflow import *
 
+def wt(r):
+    """Tolerance for periodic weighted-average answers when the unit cost is not a whole number of cents."""
+    return 0.01 if abs(r['WA']['avg']*100-round(r['WA']['avg']*100))<1e-9 else 2.0
+
 # ---------- ownership and costs ----------
 add('QS-6-1','Inventory ownership',"""
 Ridge Outfitters counted 2,150 units in its store at Dec 31. Decide how many units belong in ending inventory:
@@ -422,6 +426,7 @@ def p_alt(id,co,beg,ev,price,expenses,suffix):
     units_sold=sum(e[2] for e in ev if e[0]=='sell'); sales=units_sold*price
     rows=''.join('| %s | %s | %s | %s |\n'%(e[1],'Purchase' if e[0]=='buy' else 'Sale',f(e[2]),money(e[3]) if e[0]=='buy' else money(price)+' selling price') for e in ev)
     ni=lambda c: round(sales-c-expenses,2)
+    chk(id,('FIFO cost of goods sold',rf['cogs']),('FIFO ending inventory',rf['end']),('LIFO cost of goods sold',rl['cogs']),('LIFO ending inventory',rl['end']),('Weighted average cost of goods sold',ra['cogs']),('Weighted average ending inventory',ra['end']),('FIFO net income',ni(rf['cogs'])))
     add(id,'Perpetual: alternative cost flows',f"""
 {co} uses a **perpetual** system. Data for the quarter:
 | Date | Activity | Units | Unit cost / price |
@@ -441,6 +446,8 @@ Operating expenses were {money(expenses)}.
 **Weighted average**
 {perp_table(ra)}
 
+{T(['Method','Cost of goods sold','Ending inventory'],['FIFO',money(rf['cogs']),money(rf['end'])],['LIFO',money(rl['cogs']),money(rl['end'])],['Weighted average',money(ra['cogs']),money(ra['end'])])}
+
 2. Sales = {f(units_sold)} × {money(price)} = {money(sales)}.
 {T(['','FIFO','LIFO','Weighted avg'],['Sales',f(sales),f(sales),f(sales)],['Cost of goods sold',f(rf['cogs']),f(rl['cogs']),f(ra['cogs'])],['Gross profit',f(round(sales-rf['cogs'],2)),f(round(sales-rl['cogs'],2)),f(round(sales-ra['cogs'],2))],['Operating expenses',f(expenses),f(expenses),f(expenses)],['**Net income**','**'+f(ni(rf['cogs']))+'**','**'+f(ni(rl['cogs']))+'**','**'+f(ni(ra['cogs']))+'**'])}
 
@@ -453,6 +460,7 @@ p_alt('P-6-9B','Violet Shoes',(90,60.00),[('buy','Nov 3',140,63.00),('sell','Nov
 
 def p_periodic(id,co,beg,buys,sold,price,exp):
     r=periodic(beg,buys,sold); sales=sold*price
+    chk(id,('FIFO ending inventory',r['FIFO']['end']),('FIFO cost of goods sold',r['FIFO']['cogs']),('LIFO ending inventory',r['LIFO']['end']),('LIFO cost of goods sold',r['LIFO']['cogs']),('Weighted average ending inventory',r['WA']['end'],wt(r)),('Weighted average cost of goods sold',r['WA']['cogs'],wt(r)))
     add(id,'Periodic: alternative cost flows',f"""
 {co} uses a **periodic** system.
 {avail_table(r['layers'])}
@@ -477,6 +485,7 @@ def p_err(id,co,rep,err_y1,err_y2):
     (c1,c2,c3),(n1,n2,n3)=rep
     cc=[c1-err_y1,c2+err_y1-err_y2,c3+err_y2]; nn=[n1+err_y1,n2-err_y1+err_y2,n3-err_y2]
     d=lambda e,w: ('understated' if e>0 else 'overstated')+' by '+money(abs(e))
+    chk(id,('Correct Year 1 net income',nn[0]),('Correct Year 2 net income',nn[1]),('Correct Year 3 net income',nn[2]))
     add(id,'Analysis of inventory errors',f"""
 {co} reported:
 {T(['','Year 1','Year 2','Year 3'],['Cost of goods sold',money(c1),money(c2),money(c3)],['Net income',money(n1),money(n2),money(n3)])}
@@ -497,6 +506,7 @@ def p_lcnrv(id,co,items):
     rows=[];tc=tn=tl=0
     for n,u,c,v in items:
         a=u*c;b=u*v;l=min(a,b);tc+=a;tn+=b;tl+=l;rows.append([n,f(u),money(c),money(v),f(a),f(b),f(l)])
+    chk(id,('Inventory, item by item',tl),('Inventory, whole inventory',min(tc,tn)),('Write-down (item by item)',tc-tl))
     add(id,'Lower of cost and NRV',f"""
 {co} inventory at year-end:
 {T(['Item','Units','Unit cost','Unit NRV'],*[[r[0],r[1],r[2],r[3]] for r in rows])}
@@ -521,6 +531,7 @@ def p_income(id,co,beg,buys,sold,price,exp,tax):
     def col(m):
         c=r[m]['cogs']; gp=round(sales-c,2); pre=round(gp-exp,2); t=round(pre*tax,2); return [f(c),f(gp),f(pre),f(t),f(round(pre-t,2))]
     cols={m:col(m) for m in ['FIFO','LIFO','WA']}
+    chk(id,*[(n+' net income',float(cols[m][4].replace(',','')))+((wt(r),) if m=='WA' else ()) for m,n in [('FIFO','FIFO'),('LIFO','LIFO'),('WA','Weighted average')]])
     add(id,'Periodic: income comparisons and cost flows',f"""
 {co} (periodic):
 {avail_table(r['layers'])}
@@ -538,6 +549,7 @@ p_income('P-6-6B','Indigo Electronics',(120,95.00),[('Feb 8',220,99.00),('Jun 4'
 
 def p_retail(id,co,bc,br,pc,pr,ns,count_r):
     gc=bc+pc; gr=br+pr; ratio=gc/gr; er=gr-ns; ec=round(er*ratio,2); cc=round(count_r*ratio,2)
+    chk(id,('Estimated ending inventory at cost',ec),('Physical count at cost',cc),('Shrinkage at cost',round(ec-cc,2)))
     add(id,'Retail inventory method',f"""
 {co} uses the retail method.
 {T(['','At cost','At retail'],['Beginning inventory',money(bc),money(br)],['Net purchases',money(pc),money(pr)],['Net sales','',money(ns)])}
@@ -554,6 +566,7 @@ p_retail('P-6-7B','Poppy Mart',29700,54000,151800,276000,262500,64800)
 
 def p_gp(id,co,beg,pur,pret,fi,sales,sret,gpr,salv):
     ga=beg+pur-pret+fi; ns=sales-sret; cogs=round(ns*(1-gpr),2); end=round(ga-cogs,2)
+    chk(id,('Estimated cost of goods sold',cogs),('Estimated inventory on the fire date',end),('Inventory destroyed',round(end-salv,2)))
     add(id,'Gross profit method',f"""
 A fire destroyed {co}'s inventory on Sep 30. From the records:
 {T(['Item','Amount'],['Beginning inventory, Jan 1',money(beg)],['Purchases',money(pur)],['Purchase returns',money(pret)],['Freight-in',money(fi)],['Sales',money(sales)],['Sales returns',money(sret)])}
@@ -569,8 +582,41 @@ Estimate the cost of inventory destroyed.
 p_gp('P-6-18A','Sorrel Books',62000,248000,5000,4000,380000,12000,0.35,9500)
 p_gp('P-6-18B','Fennel Books',48500,193000,3500,2900,295000,9000,0.32,7200)
 
+# ---------- key answers for the self-check boxes ----------
+chk('QS-6-1',('Units in ending inventory',1985))
+chk('QS-6-2',('Inventory cost',18280))
+chk('E-6-2',('Inventory cost',44270))
+chk('QS-6-9',('Units available',A['units']),('Cost of goods available',A['total']),('Units in ending inventory',A['end_units']))
+for qid,m in [('QS-6-5A','FIFO'),('QS-6-6A','LIFO'),('QS-6-7A','WA')]: chk(qid,('Ending inventory',A[m]['end'],wt(A) if m=='WA' else 0.01),('Cost of goods sold',A[m]['cogs'],wt(A) if m=='WA' else 0.01))
+chk('QS-6-15A',('Ending inventory',3900),('Cost of goods sold',A['total']-3900))
+chk('QS-6-14A',('Ending inventory',B['LIFO']['end']),('Cost of goods sold',B['LIFO']['cogs']))
+chk('QS-6-13A',('Ending inventory',B['WA']['end'],wt(B)),('Cost of goods sold',B['WA']['cogs'],wt(B)))
+for qid,m in [('QS-6-18','FIFO'),('QS-6-4','LIFO'),('QS-6-3','AVG')]:
+    r=perpetual(C_beg,C_ev,m); chk(qid,('Cost of goods sold',r['cogs']),('Ending inventory',r['end']))
+chk('QS-6-19',('Cost of goods sold',4110),('Ending inventory',tot_C-4110))
+for qid,m in [('QS-6-11','LIFO'),('QS-6-12','AVG')]:
+    r=perpetual((60,5.00),[('buy','Mar 2',90,5.40),('sell','Mar 9',100),('buy','Mar 15',70,5.80),('sell','Mar 22',50)],m); chk(qid,('Cost of goods sold',r['cogs']),('Ending inventory',r['end']))
+chk('QS-6-17',('Inventory at lower of cost and NRV',6740),('Write-down',400))
+chk('QS-6-21',('Arden inventory turnover',7.3,0.06),('Belmont inventory turnover',4.56,0.06),('Arden days\' sales in inventory',54.4,0.1),('Belmont days\' sales in inventory',73.3,0.1))
+chk('QS-6-22B',('Estimated inventory lost',32500))
+chk('E-6-3A',('FIFO net income',12600-B['FIFO']['cogs']-3200),('LIFO net income',12600-B['LIFO']['cogs']-3200),('Weighted average net income',round(12600-B['WA']['cogs']-3200,2),wt(B)))
+chk('E-6-4A',('FIFO cost of goods sold',D['FIFO']['cogs']),('LIFO cost of goods sold',D['LIFO']['cogs']),('Weighted average cost of goods sold',D['WA']['cogs'],wt(D)))
+chk('E-6-5',('FIFO cost of goods sold',rF['cogs']),('FIFO ending inventory',rF['end']),('LIFO cost of goods sold',rL['cogs']),('LIFO ending inventory',rL['end']))
+chk('E-6-9',('Cost of goods sold',rA['cogs']),('Ending inventory',rA['end']))
+chk('E-6-6',('Cost of goods sold',6965),('Ending inventory',1095))
+chk('E-6-11',('FIFO net income',9900-D['FIFO']['cogs']-1600),('LIFO net income',9900-D['LIFO']['cogs']-1600))
+chk('E-6-12',('Correct Year 1 net income',40500),('Correct Year 2 net income',28900),('Correct Year 3 net income',38900))
+chk('E-6-18',('Inventory at lower of cost and NRV',6345),('Write-down',345))
+chk('E-6-19',('Year 2 inventory turnover',7.86,0.06),('Year 2 days\' sales in inventory',45.0,0.1),('Year 1 days\' sales in inventory',52.3,0.1))
+chk('E-6-7A',('FIFO ending inventory',A['FIFO']['end']),('LIFO ending inventory',A['LIFO']['end']),('Weighted average ending inventory',A['WA']['end'],wt(A)))
+chk('E-6-13B',('Estimated ending inventory at cost',23400))
+chk('E-6-15B',('Estimated ending inventory',59000))
+chk('E-6-16',('FIFO cost of goods sold',rF2['cogs']),('LIFO cost of goods sold',rL2['cogs']),('Weighted average cost of goods sold',rA2['cogs']))
+chk('E-6-17A',('FIFO ending inventory',G['FIFO']['end']),('LIFO ending inventory',G['LIFO']['end']),('Weighted average ending inventory',G['WA']['end'],wt(G)))
+
 order=[i['id'] for i in json.load(open(os.path.join(os.path.dirname(__file__),'..','..','data','accounting-textbook-index.json')))['items'] if i['chapter']=='6' and not i['id'].startswith('SEC')]
 ITEMS.sort(key=lambda x:order.index(x['id']))
 assert [i['id'] for i in ITEMS]==order,(set(order)-{i['id'] for i in ITEMS},{i['id'] for i in ITEMS}-set(order))
+attach_checks()
 json.dump(ITEMS,open(os.path.join(os.path.dirname(__file__),'..','..','data','textbook-sos','ch6.json'),'w'),ensure_ascii=False,separators=(',',':'))
 print(len(ITEMS))

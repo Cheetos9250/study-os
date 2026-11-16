@@ -126,6 +126,7 @@ td:first-child{font-weight:500;min-width:7.5em}
 .cell.cur{outline:2px solid var(--ink);outline-offset:1px}
 @media (prefers-reduced-motion:reduce){.card,.qbar i{transition:none}}
 .sos-body{line-height:1.6;overflow-wrap:anywhere}.sos-body p{margin:0 0 8px}.sos-body ul,.sos-body ol{margin:0 0 8px;padding-left:22px}.sos-body h4{margin:10px 0 6px}.sos-tbl{overflow-x:auto;margin:6px 0 10px;-webkit-overflow-scrolling:touch}.sos-tbl table{border-collapse:collapse;font-size:14px}.sos-tbl th,.sos-tbl td{border:1px solid rgba(127,127,127,.35);padding:5px 8px;text-align:left;vertical-align:top}.sos-tbl th{background:rgba(127,127,127,.1);white-space:nowrap}.sos-tbl td.n,.sos-tbl th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.tb-ans{width:100%;min-height:140px;box-sizing:border-box;margin:6px 0 10px;padding:10px;border-radius:10px;border:1px solid rgba(127,127,127,.4);background:transparent;color:inherit;font:inherit;font-size:15px}.tb-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.sos-checks{border:1px dashed rgba(127,127,127,.5);border-radius:10px;padding:10px 12px;margin:10px 0}.sos-checks-h{font-weight:700;margin-bottom:6px}.sos-chk{display:grid;grid-template-columns:1fr minmax(110px,150px) auto;gap:8px;align-items:center;margin:6px 0;font-size:14px}.sos-chk input{width:100%;box-sizing:border-box;padding:7px 9px;border-radius:8px;border:1px solid rgba(127,127,127,.45);background:transparent;color:inherit;font:inherit;font-variant-numeric:tabular-nums;text-align:right}.sos-res{font-style:normal;font-size:13px;min-width:70px}.sos-res.ok{color:#1a7f37}.sos-res.no{color:#c4321c}.sos-chk-bar{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}.sos-sum{font-size:13px;opacity:.8}@media (max-width:520px){.sos-chk{grid-template-columns:1fr auto}.sos-chk span{grid-column:1/-1}}
 </style>
 <script src="scripts/study-theme.js?v=3"></script>
 <div class="wrap">
@@ -555,7 +556,7 @@ function tbSave(id,text){ try{ const raw=localStorage.getItem(TBP_KEY); const p=
 (async()=>{ let added=0;
   for(const ch of [5,6,7,8,9]){ try{ const r=await fetch('data/textbook-sos/ch'+ch+'.json',{cache:'no-cache'}); if(!r.ok) continue; const list=await r.json();
     for(const it of (Array.isArray(list)?list:[])){ if(!it||typeof it.id!=='string'||!it.prompt) continue; const id='tbw-'+it.id; if(QS.some(q=>q.id===id)) continue;
-      QS.push({id,cat:'c'+ch,q:it.title||it.id,opts:['I got it','I missed it'],order:[0,1],right:0,exp:'',open:true,src:it.id,prompt:it.prompt,solution:it.solution||'',tb:it.id.replace('-',' ')+' · written'}); added++; } }catch(e){} }
+      QS.push({id,cat:'c'+ch,q:it.title||it.id,opts:['I got it','I missed it'],order:[0,1],right:0,exp:'',open:true,src:it.id,prompt:it.prompt,solution:it.solution||'',checks:Array.isArray(it.checks)?it.checks:[],tb:it.id.replace('-',' ')+' · written'}); added++; } }catch(e){} }
   if(added){ const cur=deck[qpos]&&deck[qpos].id; buildDeck(); if(cur&&!qJump){ const i=deck.findIndex(x=>x.id===cur); if(i>=0) qpos=i; } renderQ(); }
 })();
 let qtype=(()=>{try{const u=new URLSearchParams(location.search);const v=u.get('type')||(u.get('q')?'all':sessionStorage.getItem('studyos.acc.qtype'));return v==='mcq'||v==='written'?v:'all';}catch(e){return 'all';}})();
@@ -587,6 +588,7 @@ function renderQ(){
   if(q.open){ const shown=done||tbReveal.has(q.id);
     h+='<p class="qtext"><b>'+esc(q.q)+'</b></p><div class="qcase sos-body" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:10px 12px;margin:8px 0 10px;font-size:15px">'+StudySosMd(q.prompt)+'</div>';
     h+='<textarea id="tbAns" class="tb-ans" maxlength="15000" placeholder="Work it out here. Saved on this device (shared with Textbook Exercises)." aria-label="Your working"></textarea>';
+    if(!done&&q.checks.length) h+='<div id="tbChecks">'+StudySosChecks.html(q.checks)+'<div class="tb-row" id="tbQuick" hidden><span class="count">All correct.</span><button class="btn primary" id="tbGotQuick" type="button">Mark as got it</button></div></div>';
     if(!shown) h+='<div class="tb-row"><button class="btn primary" id="tbShow" type="button">Show solution</button></div>';
     else { h+='<div class="explain"><b class="v">Solution</b><div class="sos-body">'+StudySosMd(q.solution)+'</div></div>';
       h+= done ? '<div class="count" style="margin-top:8px">'+(ch===q.right?'Marked: got it':'Marked: missed · it will come back in Review due')+'</div>' : '<div class="tb-row"><span class="count">How did you do?</span><button class="btn" id="tbGot" type="button">I got it</button><button class="btn" id="tbMiss" type="button">I missed it</button></div>'; }
@@ -605,6 +607,8 @@ function renderQ(){
     const flush=()=>{ if(ta){ clearTimeout(tbTimer); tbSave(q.src,ta.value); } };
     const sb=$('#tbShow'); if(sb) sb.onclick=()=>{ flush(); tbReveal.add(q.id); renderQ(); };
     const mark=v=>{ flush(); store.ans[q.id]=v; (store.ats=store.ats||{})[q.id]=Date.now(); window.StudyReview&&StudyReview.record(store,q.id,v===q.right,Date.now()); save(); renderQ(); };
+    StudySosChecks.wire($('#tbChecks'),q.checks,(ok,filled,total)=>{ const qk=$('#tbQuick'); if(qk) qk.hidden=!(ok===total); });
+    const gq=$('#tbGotQuick'); if(gq) gq.onclick=()=>mark(0);
     const g=$('#tbGot'); if(g) g.onclick=()=>mark(0); const m=$('#tbMiss'); if(m) m.onclick=()=>mark(1); }
   box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
   const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};

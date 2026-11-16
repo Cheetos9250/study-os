@@ -337,15 +337,16 @@ p_card('P-9-2A','Sable Sports',8400,3,5600,60,2400,1.5)
 p_card('P-9-2B','Tulip Sports',7200,2.5,4800,55,3200,2)
 
 def p_bad(id,co,y1,y2):
-    out_p=[];out_s=[]
+    out_p=[];out_s=[];EXPS=[]
     allow=0
     for yr,(sales,wo,rec,ar,pct) in enumerate([y1,y2],1):
         before=allow-wo+rec
-        need=round(ar*pct/100,2); exp=round(need-before,2); allow=need
+        need=round(ar*pct/100,2); exp=round(need-before,2); allow=need; EXPS.append(exp)
         out_p.append(f"- **Year {yr}:** credit sales ${f(sales)}; accounts written off ${f(wo)}; recoveries ${f(rec)}; Dec 31 accounts receivable ${f(ar)}; estimated uncollectible {pct}% of receivables.")
         out_s.append(f"""**Year {yr}**: allowance before adjustment = {('credit '+f(before)) if before>=0 else ('debit '+f(-before))}. Required = {f(ar)} × {pct}% = {f(need)}. Bad debts expense = **{f(exp)}**.
 {JE(('Dec 31','Bad Debts Expense',exp,''),('','Allowance for Doubtful Accounts','',exp))}
 Balance sheet: receivables {f(ar)} − allowance {f(need)} = **{f(round(ar-need,2))}**.""")
+    chk(id,*[(f'Year {k+1} bad debts expense',float(x)) for k,x in enumerate(EXPS)])
     add(id,'Estimating and reporting bad debts',f"""
 {co} began operations in Year 1 and uses the allowance method based on a percent of receivables.
 """+'\n'.join(out_p)+"""
@@ -358,6 +359,7 @@ p_bad('P-9-3B','Raven Co.',(540000,3600,0,74000,5),(598000,4200,450,81200,5))
 def p_aging(id,co,buckets,rates,before_credit,wo):
     est=[round(a*r/100,2) for a,r in zip(buckets,rates)]; total=sum(est); exp=round(total-before_credit,2)
     names=['Not yet due','1–30 days past due','31–60 days past due','61–90 days past due','Over 90 days past due']
+    chk(id,('Required allowance',round(total,2)),('Bad debts expense',exp))
     add(id,'Aging accounts receivable and accounting for bad debts',f"""
 {co} ages its receivables at Dec 31:
 {T(['Age','Balance','Estimated % uncollectible'],*[[n,'$'+f(a),f(r)+'%'] for n,a,r in zip(names,buckets,rates)])}
@@ -427,5 +429,31 @@ p_notes('P-9-5B','Willow Co.',[('Feb 5','D. Knox',7500,0.08,90,'May 6','honored'
 order=[i['id'] for i in json.load(open(os.path.join(os.path.dirname(__file__),'..','..','data','accounting-textbook-index.json')))['items'] if i['chapter']=='9' and not i['id'].startswith('SEC')]
 ITEMS.sort(key=lambda x:order.index(x['id']))
 assert [i['id'] for i in ITEMS]==order,(set(order)-{i['id'] for i in ITEMS})
+# ---------- key answers for the self-check boxes ----------
+chk('QS-9-2',('Cash received',3510))
+chk('QS-9-1',('Required allowance',3079),('Bad debts expense',2119))
+chk('QS-9-7',('Accounts receivable, net',55250))
+chk('QS-9-8',('Bad debts expense (credit balance case)',1640),('Bad debts expense (debit balance case)',3340))
+chk('QS-9-9',('Bad debts expense',3075))
+chk('QS-9-22',('Interest',120),('Maturity value',4620))
+chk('QS-9-24',('Accrued interest at Dec 31',90),('Cash received at maturity',7380))
+chk('QS-9-25',('Cash received',23280))
+chk('QS-9-26',('Net income',38530))
+chk('QS-9-27',('Total current assets',110340))
+chk('E-9-2',('Schedule of accounts receivable total',5450))
+chk('E-9-3',('Cash received on Jun 4',5096),('Receivable from card company',2716))
+chk('E-9-4',('Cash collected on Aug 10',1827))
+chk('QS-9-28',('Year 2 turnover',12.0,0.05),('Year 1 turnover',12.0,0.05))
+chk('E-9-1',('Bad debts expense',1970),('Net realizable value',138450))
+chk('E-9-55',('Bad debts expense, % of sales',7800),('Bad debts expense, % of receivables',4880))
+chk('E-9-56',('Required allowance',1792),('Bad debts expense',1382))
+chk('E-9-24',('Accrued interest at Dec 31',60),('Cash received on Jan 30',9120))
+chk('E-9-25',('Cash received at maturity',5467.50))
+chk('E-9-26',('Accounts receivable recorded on dishonor',5467.50))
+chk('E-9-27',('Cash from factoring',29400))
+chk('E-9-28',('Lyra turnover',12.0,0.05),('Mako turnover',9.2,0.05))
+chk('P-9-5A',('Ending accounts receivable',59650),('Bad debts expense',479))
+
+attach_checks()
 json.dump(ITEMS,open(os.path.join(os.path.dirname(__file__),'..','..','data','textbook-sos','ch9.json'),'w'),ensure_ascii=False,separators=(',',':'))
 print(len(ITEMS))

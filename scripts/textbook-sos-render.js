@@ -13,4 +13,14 @@ function md(text){const lines=String(text||'').split('\n');let h='',i=0;const ro
   let para=[];while(i<lines.length&&lines[i].trim()&&!/^\s*\|/.test(lines[i])&&!/^#{1,4} /.test(lines[i])&&!/^\s*([-•]|\d+[.)]|[a-z][.)]) /.test(lines[i]))para.push(sosInline(lines[i++]));h+='<p>'+para.join('<br>')+'</p>';}
  return h;}
 root.StudySosMd=md;
+
+/* Self-check boxes for key numeric answers: checks = [[label, value, tolerance?], ...]. Correct values are never shown before the solution. */
+function parseNum(t){ let s=String(t==null?'':t).trim().replace(/[$,\s฿]/g,'').replace(/−/g,'-').replace(/%$/,''); const m=s.match(/^\((.*)\)$/); if(m) s='-'+m[1]; return /^-?(\d+\.?\d*|\.\d+)$/.test(s)?parseFloat(s):null; }
+function checksHtml(checks){ if(!Array.isArray(checks)||!checks.length) return '';
+  return '<div class="sos-checks"><div class="sos-checks-h">Check your numbers</div>'+checks.map((c,i)=>'<label class="sos-chk"><span>'+sosEsc(c[0])+'</span><input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" data-ci="'+i+'" aria-label="'+sosEsc(c[0])+'"><i class="sos-res" data-ri="'+i+'" aria-live="polite"></i></label>').join('')+'<div class="sos-chk-bar"><button type="button" class="btn sos-chkbtn">Check</button><span class="sos-sum" role="status"></span></div></div>'; }
+function wireChecks(root,checks,onDone){ if(!root||!Array.isArray(checks)||!checks.length) return; const btn=root.querySelector('.sos-chkbtn'); if(!btn) return;
+  const run=()=>{ let ok=0,filled=0; checks.forEach((c,i)=>{ const inp=root.querySelector('[data-ci="'+i+'"]'),out=root.querySelector('[data-ri="'+i+'"]'); const v=parseNum(inp&&inp.value); if(v===null){ out.textContent=''; out.className='sos-res'; return; } filled++; const good=Math.abs(v-c[1])<=(typeof c[2]==='number'?c[2]:0.01)+1e-9; if(good) ok++; out.textContent=good?'✓ correct':'✗ try again'; out.className='sos-res '+(good?'ok':'no'); });
+    root.querySelector('.sos-sum').textContent=filled?ok+' of '+checks.length+' correct':'Type at least one answer first'; if(onDone) onDone(ok,filled,checks.length); };
+  btn.onclick=run; root.querySelectorAll('input[data-ci]').forEach(i=>i.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); run(); } })); }
+root.StudySosChecks={parse:parseNum,html:checksHtml,wire:wireChecks};
 })(typeof window!=='undefined'?window:globalThis);
