@@ -22,6 +22,8 @@ test('Today lists what cloud sync does not cover, using the backup labels',()=>{
  const B=require('../scripts/study-progress-backup.js');
  for(const k of ['studyos.accounting.textbook.progress.v1','vocabloom_mvp_v1','studyos.excel.v1','studyos.pdfsets.v1']){
   assert.ok(B.keys.includes(k));assert.doesNotMatch(B.labelForKey(k),/Unknown/);
-  assert.ok(!cloud.includes("'"+k+"'"),k+' is not in cloud sync, so Today lists it');
  }
+ assert.ok(!cloud.includes("'vocabloom_mvp_v1'"),'WordNest history is not in cloud sync, so Today lists it');
+ // Excel, PDF sets and textbook answers count as synced only after the extra subject has synced once (Worker redeployed)
+ assert.match(s,/extra=!!read\('study-sync-extra-base-v1'\)/);
 });

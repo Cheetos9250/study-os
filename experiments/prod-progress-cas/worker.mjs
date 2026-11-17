@@ -7,7 +7,7 @@
  * Requires a new SQLite-backed Durable Object namespace and a NEW independent
  * secret. Merely committing this file must NEVER activate or deploy it.
  */
-const SUBJECTS=['acc','eco','math','eng','zh','today','home'];
+const SUBJECTS=['acc','eco','math','eng','zh','today','home','extra'];
 const SUBJECT_SET=new Set(SUBJECTS);
 const MAX_BYTES=350_000;
 // 'home' carries the Today cover, icon and card images (data URLs), so it gets more room.
@@ -26,6 +26,10 @@ const initialCourse=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:
 const initialToday=()=>({today:{}});
 // 'home' holds studyos.home.v1 (tasks, cover, icon, card images) and studyos.grades.v1.
 const initialHome=()=>({home:{},grades:{}});
+// 'extra' holds studyos.excel.v1, studyos.pdfsets.v1 (answers and notes only; PDF files never leave the device)
+// and studyos.accounting.textbook.progress.v1 (textbook answers, journal and statement rows).
+const initialExtra=()=>({excel:{},pdfsets:{},textbook:{}});
+const extraValidator=x=>record(x)&&record(x.excel)&&record(x.pdfsets)&&record(x.textbook)&&Object.keys(x).every(k=>k==='excel'||k==='pdfsets'||k==='textbook');
 const homeValidator=x=>record(x)&&record(x.home)&&record(x.grades)&&Object.keys(x).every(k=>k==='home'||k==='grades');
 const todayValidator=x=>record(x)&&record(x.today)&&Object.keys(x).every(k=>k==='today');
 const courseValidator=x=>record(x)&&record(x.study)&&record(x.study.ans)&&
@@ -53,9 +57,9 @@ export class ProductionProgressDO {
  constructor(ctx){this.ctx=ctx;}
  async fetch(request){
   const kind=request.headers.get('X-Progress-Subject');
-  const initial=kind==='today'?initialToday:kind==='home'?initialHome:initialCourse;
-  const validator=kind==='today'?todayValidator:kind==='home'?homeValidator:courseValidator;
-  const max=kind==='home'?MAX_HOME_BYTES:MAX_BYTES;
+  const initial=kind==='today'?initialToday:kind==='home'?initialHome:kind==='extra'?initialExtra:initialCourse;
+  const validator=kind==='today'?todayValidator:kind==='home'?homeValidator:kind==='extra'?extraValidator:courseValidator;
+  const max=kind==='home'||kind==='extra'?MAX_HOME_BYTES:MAX_BYTES;
   if(request.method==='GET'){
    const stored=this.ctx.storage.kv.get('record')??{revision:0,value:initial()};
    return json(stored.value,200,stored.revision);
@@ -134,7 +138,7 @@ export default {
   const id=env.PROD_PROGRESS_DO.idFromName('vocabloom:production-progress:v1:'+m[1]);
   const stub=env.PROD_PROGRESS_DO.get(id);
   // Tell the object which schema applies; the client cannot choose it (it follows the URL subject).
-  const inner=new Request(request);inner.headers.set('X-Progress-Subject',m[1]==='today'||m[1]==='home'?m[1]:'course');
+  const inner=new Request(request);inner.headers.set('X-Progress-Subject',m[1]==='today'||m[1]==='home'||m[1]==='extra'?m[1]:'course');
   return cors(await stub.fetch(inner));
  }
 };

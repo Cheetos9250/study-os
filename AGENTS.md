@@ -48,7 +48,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 | `grades.html` | Weighted course items, letter per course scale, "needed on the rest", estimated GPA. |
 | `acc/eco/math/eng/zh.html` | Course pages. Data is embedded as `const D={...}` (one huge line; never rewrite it with regex). Each page shows one mode via `?tab=cards|sum|prac` (`scripts/study-course-mode.js`) and has its own sync engine. |
 | `accounting-textbook.html` | Index of 403 textbook exercises, Ch1–9. |
-| `excel.html` | **Excel** subject (not in `COURSES`, no cloud sync): basic dashboard step-by-step from the class, exam tips, quiz. Linked from Lessons and Practice. |
+| `excel.html` | **Excel** subject (not in `COURSES`; synced through the `extra` subject once the Worker is redeployed): basic dashboard step-by-step from the class, exam tips, quiz. Linked from Lessons and Practice. |
 | `progress-backup.html` / `progress-restore.html` | Local JSON backup and validated restore. |
 | `today.html` | Redirects to `calendar.html` (old links). |
 | `vocabloom/` | **WordNest** (formerly VocaBloom). `?lang=en` gives English games + English cards, `?lang=zh` gives Chinese cards. The folder name and storage keys stay `vocabloom` so progress is kept. `vocabloom/wordnest.js` is the language layer. |
@@ -98,6 +98,7 @@ node tests/auto-sync-browser.cjs
 
 - **Live since 16 Nov 2026.** The owner deployed `vocabloom-progress-cas-prod` (smoke test passed) and `data/config.json` has `progress_api`. Each device needs the sync key once (nav → Cloud sync → Set sync key). Back up / Restore still works as before.
 - Client ready (16 Nov 2026): `scripts/study-cloud.js` (`window.StudyCloud`) on Today, Calendar, Practice, Flashcards and Lessons syncs all five courses plus the `today` subject (`studyos.today.v1` and `studyos.notes.v1` as `today.notes`, 340 KB guard), and a `home` subject (`studyos.home.v1` tasks/cover/icon/card images + `studyos.grades.v1`, 1.85 MB guard; needs the Worker redeployed, skipped while the server answers 404). Also loaded on Grades and the acc/eco/math quiz pages through `progress_api` only, with CAS and per-item merges; the nav's **Cloud sync** opens its dialog. Sync caches `study-sync-today-base-v1` / `study-sync-home-base-v1` / `study-sync-last-v1` are not backed up. The Worker accepts the extra subject `today` with its own schema.
+- `extra` subject (code ready 17 Nov 2026, **needs the Worker redeployed — ask the owner first**): `studyos.excel.v1`, `studyos.pdfsets.v1` (JSON only) and `studyos.accounting.textbook.progress.v1` in one document `{excel, pdfsets, textbook}` (1.9 MB limit). Merges: Excel per step/answer, PDF sets per set then per answer/key/note, textbook per exercise (newer `updated` wins). Base cache `study-sync-extra-base-v1` (not backed up). Skipped while the server answers 404.
 - Live `study-api` Worker:
   - serves Notion quiz/cards (no longer read by the site — Notion retired 15 Nov 2026; pages use only `data/quiz.json` / `data/cards.json`) plus legacy progress, with unconditional writes;
   - must not be replaced;

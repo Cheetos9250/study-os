@@ -1,0 +1,1 @@
+- Cloud sync (ready, needs the Worker redeployed): a new `extra` subject syncs Excel lesson progress, My PDF sets answers/notes (never the PDF files) and Accounting textbook answers (including journal and statement tables). Until the Worker is redeployed it is skipped; nothing else changes.

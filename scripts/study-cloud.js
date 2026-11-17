@@ -11,7 +11,8 @@
   'use strict';
   var PROGRESS_LSK = 'study-sync-progress-key-v1', AUTOK = 'study-sync-auto-v1',
       BASEK = 'study-sync-today-base-v1', LASTK = 'study-sync-last-v1', TODAYK = 'studyos.today.v1', NOTESK = 'studyos.notes.v1',
-      MAXB = 340000, HOMEK = 'studyos.home.v1', GRADESK = 'studyos.grades.v1', HBASEK = 'study-sync-home-base-v1', MAXH = 1850000;
+      MAXB = 340000, HOMEK = 'studyos.home.v1', GRADESK = 'studyos.grades.v1', HBASEK = 'study-sync-home-base-v1', MAXH = 1850000,
+      EXCELK = 'studyos.excel.v1', PDFK = 'studyos.pdfsets.v1', TBK = 'studyos.accounting.textbook.progress.v1', EBASEK = 'study-sync-extra-base-v1';
   var J = function (v) { return JSON.stringify(v === undefined ? null : v); };
   var obj = function (v) { return !!v && typeof v === 'object' && !Array.isArray(v); };
 
@@ -64,6 +65,32 @@
     });
     return out;
   }
+  /* Excel lesson ({done, ans}): three-way per step and per answer */
+  function mergeExcel(base, local, remote) {
+    var b = obj(base) ? base : {}, out = Object.assign({}, remote, local);
+    ['done', 'ans'].forEach(function (k) {
+      if (obj(local[k]) || obj(remote[k])) out[k] = merge3map(obj(b[k]) ? b[k] : null, obj(local[k]) ? local[k] : {}, obj(remote[k]) ? remote[k] : {});
+    });
+    return out;
+  }
+  /* PDF sets ({sets: {id: {name, n, ans, key, notes, …}}}): per set, then per answer, key entry and page note */
+  function mergePdfSets(base, local, remote) {
+    var bs = obj(base) && obj(base.sets) ? base.sets : null, ls0 = obj(local.sets) ? local.sets : {}, rs = obj(remote.sets) ? remote.sets : {};
+    var sets = merge3map(bs, ls0, rs);
+    Object.keys(sets).forEach(function (id) {
+      var l = ls0[id], r = rs[id], b = bs && bs[id];
+      if (!obj(l) || !obj(r)) return;
+      var rest = function (o) { var x = {}; Object.keys(o || {}).forEach(function (k) { if (k !== 'ans' && k !== 'key' && k !== 'notes') x[k] = o[k]; }); return x; };
+      var s = merge3map(obj(b) ? rest(b) : null, rest(l), rest(r));
+      ['ans', 'key', 'notes'].forEach(function (k) {
+        if (obj(l[k]) || obj(r[k])) s[k] = merge3map(obj(b) && obj(b[k]) ? b[k] : null, obj(l[k]) ? l[k] : {}, obj(r[k]) ? r[k] : {});
+      });
+      sets[id] = s;
+    });
+    return Object.assign({}, remote, local, { sets: sets });
+  }
+  /* Textbook answers ({id: {status, notes, updated, je, fs}}): per exercise; if both devices edited it, the newer edit wins */
+  function mergeTextbook(base, local, remote) { return mergeNotes(base, local, remote); }
   function byId(list) { var m = {}; (list || []).forEach(function (x) { if (x && x.id) m[x.id] = x; }); return m; }
   function values(m) { return Object.keys(m).map(function (k) { return m[k]; }); }
   /* planner settings: exams and timetable merge per entry id; plan ticks per day; reminders per key */
@@ -97,7 +124,7 @@
   }
 
   /* ---------- browser part ---------- */
-  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map, mergeNotes: mergeNotes, mergeHome: mergeHome, mergeGrades: mergeGrades }; return; }
+  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map, mergeNotes: mergeNotes, mergeHome: mergeHome, mergeGrades: mergeGrades, mergeExcel: mergeExcel, mergePdfSets: mergePdfSets, mergeTextbook: mergeTextbook }; return; }
   var T = root.StudyToday;
   var ls = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -124,6 +151,7 @@
     var list = [{ id: 'today' }];
     (T ? T.COURSES.concat(T.LANGS) : []).forEach(function (c) { if (c.key && c.mark) list.push({ id: c.key, mark: c.mark }); });
     list.push({ id: 'home' });                                                // last: a server without it (404) is skipped
+    list.push({ id: 'extra' });                                               // Excel, PDF sets, textbook answers (404 until the Worker is redeployed)
     return list;
   }
   function readCourse(s) {
@@ -145,14 +173,32 @@
       if (++attempt > 6) throw Error('data kept changing; try again');
       return fetch(url, { headers: hdr, cache: 'no-store' }).then(function (r) {
         if (r.status === 401) { var e = Error('wrong sync key'); e.auth = true; throw e; }
-        if (r.status === 404 && s.id === 'home') return false;                 // Worker not updated yet: skip images/tasks/grades
+        if (r.status === 404 && (s.id === 'home' || s.id === 'extra')) return false; // Worker not updated yet: skip this subject
         if (!r.ok) throw Error('read failed (HTTP ' + r.status + ')');
         var rev = r.headers.get('X-Sync-Revision') || '';
         if (!/^"[0-9]+"$/.test(rev)) throw Error('server sent no revision; nothing was written');
         return r.json().then(function (remote) {
           if (!obj(remote)) throw Error('server data is invalid');
           var cur, body, after;
-          if (s.id === 'home') {
+          if (s.id === 'extra') {
+            var raws = [EXCELK, PDFK, TBK].map(function (k) { return ls.get(k); }), lv = raws.map(function (x) { try { var p = JSON.parse(x || '{}'); return obj(p) ? p : {}; } catch (e) { return {}; } }), eb = null;
+            try { eb = JSON.parse(ls.get(EBASEK) || 'null'); } catch (e) {}
+            eb = obj(eb) ? eb : {};
+            var mx = mergeExcel(eb.excel, lv[0], obj(remote.excel) ? remote.excel : {});
+            var mp = mergePdfSets(eb.pdfsets, lv[1], obj(remote.pdfsets) ? remote.pdfsets : {});
+            var mt = mergeTextbook(obj(eb.textbook) ? eb.textbook : null, lv[2], obj(remote.textbook) ? remote.textbook : {});
+            body = { excel: mx, pdfsets: mp, textbook: mt };
+            if (new TextEncoder().encode(J(body)).length > MAXH) throw Error('Excel, PDF set and textbook answers are over 1.8 MB, too large to sync');
+            after = function () {
+              if ([EXCELK, PDFK, TBK].some(function (k, i) { return ls.get(k) !== raws[i]; })) return 'retry';
+              var ch = false;
+              [[EXCELK, mx, 0], [PDFK, mp, 1], [TBK, mt, 2]].forEach(function (x) {
+                if (J(lv[x[2]]) !== J(x[1]) && (raws[x[2]] || Object.keys(x[1]).length)) { ls.set(x[0], J(x[1])); ch = true; }
+              });
+              ls.set(EBASEK, J(body));
+              return ch;
+            };
+          } else if (s.id === 'home') {
             var hraw = ls.get(HOMEK), graw = ls.get(GRADESK), lh = {}, lg = {}, hb = null;
             try { var ph = JSON.parse(hraw || '{}'); if (obj(ph)) lh = ph; } catch (e) {}
             try { var pg = JSON.parse(graw || '{}'); if (obj(pg)) lg = pg; } catch (e) {}
