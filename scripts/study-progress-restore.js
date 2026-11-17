@@ -40,7 +40,9 @@
         if (!id || ["__proto__", "constructor", "prototype"].includes(id) || !object(record) ||
             (record.status !== undefined && !["new", "doing", "done"].includes(record.status)) ||
             (record.notes !== undefined && typeof record.notes !== "string") ||
-            (record.updated !== undefined && typeof record.updated !== "string"))
+            (record.updated !== undefined && typeof record.updated !== "string") ||
+            (record.je !== undefined && (!Array.isArray(record.je) || record.je.length > 40 ||
+              !record.je.every(function (r) { return Array.isArray(r) && r.length <= 4 && r.every(function (c) { return typeof c === "string"; }); }))))
           throw new Error("Invalid accounting textbook answer data");
       }
     } else if (key === "studyos.home.v1") {
