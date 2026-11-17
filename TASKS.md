@@ -71,7 +71,7 @@ Today already has a backup reminder (`studyos.backup-meta.v1`). Make it stronger
 
 ### 6. Sync Excel and PDF sets across devices (Thai: ซิงก์หน้า Excel และ My PDF sets)
 
-Status: needs owner (code ready in #157; run the deploy workflow to finish)
+Status: done (#157; Worker redeployed by the owner on 17 Nov 2026)
 
 Add `studyos.excel.v1` and `studyos.pdfsets.v1` to cloud sync, using the `home` subject or a new subject with size guards. PDF files stay on the device; sync only the JSON. This needs a Worker change:
 1. Prepare the code and tests.
