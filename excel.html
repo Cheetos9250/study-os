@@ -172,7 +172,10 @@ const QUIZ=[
 ];
 let st={done:{},ans:{}};
 try{const o=JSON.parse(localStorage.getItem(KEY)||'null');if(o&&typeof o==='object'){if(o.done&&typeof o.done==='object')st.done=o.done;if(o.ans&&typeof o.ans==='object')st.ans=o.ans;}}catch{}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch{}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));window.StudyCloud&&StudyCloud.dirty();}catch{}}
+/* Cloud sync: tell it about changes; when another device's Excel/PDF/textbook data arrives, reload to show it (not while typing). */
+addEventListener('studycloud:applied',e=>{const d=e.detail||{};if(!(d.subjects||[]).includes('extra'))return;const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;location.reload();});
+
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ALL=PARTS.flatMap(p=>p.steps.map(s=>s.id));
 function renderSteps(){
@@ -196,6 +199,8 @@ let tab=new URLSearchParams(location.search).get('tab');if(!tab)try{tab=sessionS
 if(['exam','quiz'].includes(tab))document.querySelector('[data-tab="'+tab+'"]').click();
 })();
 </script>
+<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-cloud.js?v=4"></script>
 <script src="scripts/study-nav.js?v=8"></script>
 </body>
 </html>

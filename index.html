@@ -244,7 +244,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=2"></script>
-<script src="scripts/study-cloud.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=4"></script>
 <script src="scripts/study-nav.js?v=8"></script>
 <script>
 (function(){
@@ -429,13 +429,14 @@ function renderClasses(){
 const BK_META='studyos.backup-meta.v1',BK=window.StudyProgressBackup;
 /* What cloud sync covers on this device: courses + planner + notes once a sync has worked; tasks/grades once the home subject synced. */
 function cloudState(){
- let on=false,home=!!read('study-sync-home-base-v1');
+ let on=false,home=!!read('study-sync-home-base-v1'),extra=!!read('study-sync-extra-base-v1');
  try{const k=JSON.parse(read('study-sync-progress-key-v1')||'null'),l=JSON.parse(read('study-sync-last-v1')||'null');on=!!(k&&k.key&&l&&l.ok);}catch{}
- return {on,home:on&&home};
+ return {on,home:on&&home,extra:on&&extra};
 }
 function inCloud(k,c){
  if(!c.on)return false;
  if(/^study-(acc|eco|math|eng|zh)$/.test(k)||/-srs$/.test(k)||k==='studyos.today.v1'||k==='studyos.notes.v1')return true;
+ if(c.extra&&(k==='studyos.excel.v1'||k==='studyos.pdfsets.v1'||k==='studyos.accounting.textbook.progress.v1'))return true;
  return c.home&&(k==='studyos.home.v1'||k==='studyos.grades.v1');
 }
 function notInCloud(c){return BK?BK.keys.filter(k=>!/-typ$/.test(k)&&read(k)!==null&&!inCloud(k,c)).map(k=>BK.labelForKey(k)):[];}

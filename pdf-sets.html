@@ -106,7 +106,10 @@ const KEY='studyos.pdfsets.v1', DB='studyos-pdf-sets-v1', STORE='files';
 const $=id=>document.getElementById(id);
 let data={sets:{}}, cur=null, mode='ans', wrongOnly=false;
 try{ const raw=localStorage.getItem(KEY); const v=raw?JSON.parse(raw):null; if(v&&typeof v==='object'&&v.sets&&typeof v.sets==='object') data=v; }catch(e){}
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){ $('err').textContent='Could not save (storage full).'; } }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); window.StudyCloud&&StudyCloud.dirty(); }catch(e){ $('err').textContent='Could not save (storage full).'; } }
+/* Cloud sync: tell it about changes; when another device's Excel/PDF/textbook data arrives, reload to show it (not while typing). */
+addEventListener('studycloud:applied',e=>{const d=e.detail||{};if(!(d.subjects||[]).includes('extra'))return;const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;location.reload();});
+
 function db(){ return new Promise((res,rej)=>{ if(!('indexedDB' in window)) return rej(new Error('This browser cannot store files.')); const r=indexedDB.open(DB,1); r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(STORE)) r.result.createObjectStore(STORE); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
 async function idb(op,key,val){ const d=await db(); return new Promise((res,rej)=>{ const tx=d.transaction(STORE,op==='get'?'readonly':'readwrite'); const st=tx.objectStore(STORE); const rq=op==='get'?st.get(key):op==='put'?st.put(val,key):st.delete(key); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); tx.oncomplete=()=>d.close(); }); }
 const COURSE={eco:'Economics',math:'Mathematics',acc:'Accounting',other:'Other'};
@@ -207,6 +210,8 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
 (async()=>{ try{ if(!data.sets[BOOK_ID]&&await bookIdb('get')){ data.sets[BOOK_ID]={name:'Accounting textbook (24e)',course:'acc',n:0,pages:1210,page:{},opts:{},ans:{},key:{},notes:{},added:Date.now()}; save(); } }catch(e){}
   renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
+<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-cloud.js?v=4"></script>
 <script src="scripts/study-nav.js?v=8"></script>
 </body>
 </html>
