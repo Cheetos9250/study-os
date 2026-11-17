@@ -31,6 +31,10 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 6. **Verify before claiming success.** Run the tests. For UI work, check screenshots at 1180×820 (iPad landscape), 820×1180 and 390×844, in both dark and light mode. Check that there is no horizontal overflow and no page errors.
 7. Commit trailer used so far: `Co-Authored-By: <model> <noreply@anthropic.com>`. PR bodies end with a generated-by line.
 
+## Work queue
+
+`TASKS.md` lists numbered tasks the owner hands to agents ("ทำข้อ 3 ใน TASKS.md" = do task 3). Follow its "How to work a task" section and change only your own task's status line.
+
 ## Structure
 
 | Page | Purpose |
