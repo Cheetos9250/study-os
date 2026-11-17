@@ -1,0 +1,1 @@
+- Grades: each course now shows the **final exam score needed for each letter** (as points out of the final's maximum; other open items are assumed at your rate so far) and a link to its **weakest practice chapter** (Accounting, Economics, Math).

@@ -142,6 +142,8 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 .mini.danger{color:var(--red)}
 .x{border:0;background:none;color:var(--muted);font-size:16px;min-width:40px;min-height:40px;cursor:pointer}
 .hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.fin{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}.fin>b{font-size:14px;margin-right:8px}
+.weakl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:10px 0 0;font-size:14px}.weakl .go-prac{display:inline-flex;align-items:center;text-decoration:none;min-height:40px}
 </style>
 <link rel="stylesheet" href="assets/study-world.css?v=8">
 <script src="scripts/study-theme.js?v=5"></script>
@@ -158,7 +160,7 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 <p class="status" id="gStatus" role="status"></p>
 </main>
 </div>
-<script src="scripts/study-grades.js?v=1"></script>
+<script src="scripts/study-grades.js?v=2"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=3"></script>
 <script src="scripts/study-nav.js?v=6"></script>
@@ -198,7 +200,36 @@ function paint(){
  for(const c of st.courses){const el=document.querySelector('.course[data-id="'+CSS.escape(c.id)+'"]');if(!el)continue;const r=G.result(c);
   el.querySelector('.res-score').innerHTML='<span class="big">'+fmt(r.earned)+'<small style="font-size:13px;color:var(--muted)"> / '+fmt(r.doneWeight)+' pts</small></span> '+(r.letter?'<span class="letter">'+r.letter+'</span>':'');
   el.querySelector('.res-more').innerHTML=(r.weightTotal!==100?'<p class="hint" style="color:var(--red)">Weights add up to '+fmt(r.weightTotal)+'%, not 100%.</p>':'')
-   +(r.remaining>0?'<div class="need">'+r.needs.map(n=>'<span class="'+(n.need>100?'no':n.need<=0?'ok':'')+'">'+n.letter+': '+(n.need<=0?'secured':n.need>100?'out of reach':'need '+fmt(n.need)+'% on the rest')+'</span>').join('')+'</div>':'');}
+   +(r.remaining>0?'<div class="need">'+r.needs.map(n=>'<span class="'+(n.need>100?'no':n.need<=0?'ok':'')+'">'+n.letter+': '+(n.need<=0?'secured':n.need>100?'out of reach':'need '+fmt(n.need)+'% on the rest')+'</span>').join('')+'</div>':'')
+   +finalHtml(c)+weakHtml(c);}
+}
+/* ---------- final exam targets ---------- */
+function finalHtml(c){
+ const f=G.finalNeeds(c);if(!f)return '';
+ const mx=f.item.max,show=n=>n.pct<=0?'secured':n.pct>100?'out of reach':'need '+fmt(Math.ceil(n.score*10-1e-6)/10)+' / '+fmt(mx);
+ return '<div class="fin"><b>'+esc(f.item.name)+' ('+fmt(f.item.weight)+'%)</b>'+(f.assumedPct!=null?'<span class="hint">other open items assumed at your '+fmt(Math.round(f.assumedPct))+'% so far</span>':'')
+  +'<div class="need">'+f.needs.map(n=>'<span class="'+(n.pct>100?'no':n.pct<=0?'ok':'')+'">'+n.letter+': '+show(n)+'</span>').join('')+'</div></div>';
+}
+/* ---------- weakest chapter on the practice pages (course data loaded only for matching courses) ---------- */
+const T=window.StudyToday,WEAK={},LOADING={};
+function courseKey(name){const n=String(name).toLowerCase();return /account|บัญชี/.test(n)?'acc':/econ|เศรษฐ/.test(n)?'eco':/math|คณิต/.test(n)?'math':'';}
+function weakest(key){
+ const C=T&&T.COURSES.find(x=>x.key===key);if(!C)return null;
+ if(WEAK[key]!==undefined)return WEAK[key];
+ if(!LOADING[key]){LOADING[key]=fetch(C.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{
+   const D=T.parseCourseData(h),s=T.summarize(D,localStorage.getItem(C.mark+'-srs'),localStorage.getItem('study-'+key),Date.now());
+   const per=Object.values(s.per).filter(p=>p.quiz>0),tried=per.filter(p=>p.answered>=2).sort((a,b)=>a.correct/a.answered-b.correct/b.answered||b.answered-a.answered);
+   WEAK[key]={C,p:tried[0]||per.sort((a,b)=>(b.quiz-b.answered)-(a.quiz-a.answered))[0]||null,tried:!!tried[0]};
+  }).catch(()=>{WEAK[key]=null;}).then(paint);}
+ return undefined;
+}
+function weakHtml(c){
+ const key=courseKey(c.name);if(!key)return '';
+ const w=weakest(key);if(w===undefined)return '<p class="weakl hint">Checking your practice…</p>';
+ if(!w||!w.p)return '';
+ const href=w.C.page+'?tab=prac&cat='+encodeURIComponent(w.p.id);
+ return '<p class="weakl">'+(w.tried?'Weakest chapter: <b>'+esc(w.p.label)+'</b> · '+Math.round(w.p.correct/w.p.answered*100)+'% correct':'Not practised yet: <b>'+esc(w.p.label)+'</b>')
+  +' <a class="mini go-prac" href="'+esc(href)+'">Practise →</a></p>';
 }
 function course(el){const id=el.closest('[data-id]').dataset.id;return st.courses.find(c=>c.id===id);}
 document.addEventListener('change',e=>{const f=e.target.dataset&&e.target.dataset.f;if(!f)return;const c=course(e.target),it=c&&c.items.find(x=>x.id===e.target.closest('[data-item]').dataset.item);if(!it)return;

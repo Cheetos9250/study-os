@@ -121,7 +121,7 @@ Use only data that already exists (quiz `ans`/`ats`, review `rv`, plan ticks). I
 
 ### 11. Grades linked to practice (Thai: เกรดกับคะแนนฝึก)
 
-Status: todo
+Status: done (#152)
 
 On `grades.html`, next to each course, show:
 - the final score needed for each target letter (the maths exists in `scripts/study-grades.js`);

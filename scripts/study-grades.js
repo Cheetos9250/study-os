@@ -26,6 +26,17 @@
   const needs=scale.filter(x=>x[1]!=='F').map(([min,l])=>({letter:l,need:remaining>0?(min-earned)/remaining*100:NaN}));
   return {weightTotal,doneWeight,earned,remaining,pctSoFar,letter,needs,final:remaining===0&&done.length>0};
  }
+ /* Score needed on the final for each letter. The final is the ungraded item named "final" (or the only ungraded item);
+    other ungraded items are assumed at your rate so far. Returns null when there is no such item or no rate to assume. */
+ function finalNeeds(c){
+  const r=result(c),open=c.items.filter(x=>x.got==null&&x.weight>0);if(!open.length)return null;
+  const fin=open.find(x=>/final/i.test(x.name))||(open.length===1?open[0]:null);if(!fin)return null;
+  const others=open.filter(x=>x!==fin),rate=r.pctSoFar==null?null:r.pctSoFar/100;
+  if(others.length&&rate==null)return null;
+  const otherPts=others.reduce((n,x)=>n+x.weight*rate,0);
+  return {item:fin,assumedPct:others.length?rate*100:null,needs:normScale(c.scale).filter(x=>x[1]!=='F').map(([min,l])=>{
+   const pct=(min-r.earned-otherPts)/fin.weight*100;return {letter:l,pct,score:pct/100*fin.max};})};
+ }
  function gpa(courses){let pts=0,credits=0;for(const c of courses){const r=result(c);if(!r.letter)continue;pts+=POINTS[r.letter]*c.credits;credits+=c.credits;}return {gpa:credits?pts/credits:0,credits};}
- return {KEY,DEFAULT_SCALE,POINTS,num,load,result,gpa,letterFor};
+ return {KEY,DEFAULT_SCALE,POINTS,num,load,result,gpa,letterFor,finalNeeds};
 });
