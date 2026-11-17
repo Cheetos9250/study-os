@@ -1,0 +1,1 @@
+- Journal entry table: account suggestions are now in chart-of-accounts order (Assets → Liabilities → Equity → Revenue → Expenses) with the category shown next to each name; customer/creditor accounts sit right after their control account.

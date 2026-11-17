@@ -29,10 +29,17 @@ test('every textbook solution with a journal table parses and balances',()=>{
  }
  assert.ok(n>=80,'journal questions found: '+n);
 });
-test('suggestion list mixes answer accounts into a common sorted list',()=>{
- const list=JE.accounts(JE.parse(SOL));
- assert.ok(list.includes('Credit Card Expense')&&list.includes('Rent Expense'));
- assert.deepEqual(list,[...list].sort((x,y)=>x.localeCompare(y)));
+test('suggestion list is in chart-of-accounts order (assets, liabilities, equity, revenue, expenses)',()=>{
+ const list=JE.accounts(JE.parse(SOL)),names=list.map(a=>a.name),cats=list.map(a=>a.cat);
+ assert.ok(names.includes('Credit Card Expense')&&names.includes('Rent Expense'));
+ const order=['Asset','Liability','Equity','Revenue','Expense','Other'];
+ for(let i=1;i<cats.length;i++)assert.ok(order.indexOf(cats[i-1])<=order.indexOf(cats[i]),cats[i-1]+' before '+cats[i]);
+ assert.equal(names[0],'Cash');
+ assert.ok(names.indexOf('Accounts Receivable')<names.indexOf('Allowance for Doubtful Accounts'));
+ const sub=JE.accounts([{acct:'Accounts Receivable — A. Hale',dr:1,cr:0},{acct:'R. Vale, Capital',dr:0,cr:1}]);
+ const pos=n=>sub.findIndex(a=>a.name===n);
+ assert.equal(pos('Accounts Receivable — A. Hale'),pos('Accounts Receivable')+1,'subsidiary right after its control account');
+ assert.equal(sub[pos('R. Vale, Capital')].cat,'Equity');
 });
 test('acc.html uses the grid for journal questions and stores rows in the textbook record (validated on restore)',()=>{
  const s=fs.readFileSync(path.join(root,'acc.html'),'utf8');
