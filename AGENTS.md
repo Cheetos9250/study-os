@@ -71,7 +71,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | `studyos.today.v1` | Exams, plan ticks, timetable. `markChapter` must keep the other fields. |
 | `studyos.grades.v1` | Grades. |
 | `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). |
-| `studyos.accounting.textbook.progress.v1` | Textbook answers. |
+| `studyos.accounting.textbook.progress.v1` | Textbook answers (`notes`, `status`, `updated`, and `je`: journal-entry grid rows `[date, account, debit, credit]` from `scripts/je-grid.js` on acc.html written practice). |
 | `vocabloom_mvp_v1` | WordNest English data. |
 | `studyos.excel.v1` | Excel page: ticked steps (`done`) and quiz answers (`ans`, `x<n>` → option index). |
 | `studyos.pdfsets.v1` | **My PDF sets** (`pdf-sets.html`): per uploaded PDF its name, subject, detected question count, my answers, answer key and per-page working notes (`notes`). PDFs over 60 pages are books (no question detection, lazy page rendering). The 1,210-page textbook is set `ptextbook` and its file lives in the Textbook page's IDB `studyos-accounting-pdf-v1` (shared, added once). The PDFs themselves are in IndexedDB `studyos-pdf-sets-v1` on the device only (not backed up, never uploaded). |
