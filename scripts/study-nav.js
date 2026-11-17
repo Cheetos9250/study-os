@@ -87,7 +87,33 @@
  +' #studyNav.sn-open .sn-foot{display:grid;gap:2px}'
  +' #studyNav .sn-foot a,#studyNav .sn-foot button{padding:0 12px;font-size:15px;width:100%;text-align:left;color:var(--sn-fg)}'
  +'}'
+ /* Pomodoro "time's up" popup: red panel, ink frame, same in light and dark */
+ +'#snAlert{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.45);font-family:"Zen Maru Gothic","Mali",system-ui,-apple-system,sans-serif}'
+ +'#snAlert .sa-box{background:#c21f2f;color:#fff;border:3px solid #111;border-radius:6px;box-shadow:6px 6px 0 #111;padding:22px 22px 18px;width:min(380px,100%);box-sizing:border-box;text-align:center;animation:snPop .28s cubic-bezier(.2,1.4,.4,1)}'
+ +'#snAlert h2{font:700 34px/1.1 "Kaisei Decol",serif;margin:0 0 8px;color:#fff}'
+ +'#snAlert h2::before,#snAlert h2::after{display:none}'
+ +'#snAlert p{margin:0 0 18px;font-size:16px;line-height:1.5;font-weight:700}'
+ +'#snAlert .sa-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}'
+ +'#snAlert button,#snAlert a{font:inherit;font-weight:900;min-height:44px;padding:0 22px;border-radius:6px;border:2.5px solid #111;background:#fff;color:#111;cursor:pointer;display:inline-flex;align-items:center;text-decoration:none}'
+ +'#snAlert a{background:#111;color:#fff}'
+ +'#snAlert button:focus-visible,#snAlert a:focus-visible{outline:3px solid #fff;outline-offset:2px}'
+ +'@keyframes snPop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}'
+ +'@media(prefers-reduced-motion:reduce){#snAlert .sa-box{animation:none}}'
  +'@media print{#studyNav{display:none}html.sn-on body{padding:0!important}}';
+ /* Red popup when a Pomodoro ends (Today calls it, other pages call it from the nav countdown). */
+ function timesUp(mins){
+  if(!document.body)return;
+  if(!document.getElementById('studyNavCss')){var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);}
+  var old=document.getElementById('snAlert');if(old)old.remove();
+  var brk=mins===5||mins===15,prev=document.activeElement;
+  var d=document.createElement('div');d.id='snAlert';d.setAttribute('role','alertdialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-labelledby','snAlertT');d.setAttribute('aria-describedby','snAlertM');
+  d.innerHTML='<div class="sa-box"><h2 id="snAlertT">Time\u2019s up!</h2><p id="snAlertM">'+(brk?'Break is over. Back to study.':'Pomodoro done. Take a break.')+'</p>'
+   +'<div class="sa-row">'+(active==='today'?'':'<a href="index.html">Open Today</a>')+'<button type="button">OK</button></div></div>';
+  function close(){d.remove();document.removeEventListener('keydown',key);if(prev&&prev.focus)try{prev.focus();}catch(e){}}
+  function key(e){if(e.key==='Escape')close();}
+  d.querySelector('button').onclick=close;d.addEventListener('click',function(e){if(e.target===d)close();});document.addEventListener('keydown',key);
+  document.body.appendChild(d);d.querySelector('button').focus();
+ }
  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
  function mount(){
   if(document.getElementById('studyNav'))return;
@@ -121,12 +147,15 @@
   var a=document.createElement('a');a.id='snPomo';a.href='index.html';a.setAttribute('aria-label','Pomodoro timer, open Today');
   a.style.cssText='position:fixed;top:max(10px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:70;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border:2.5px solid var(--ink,#111);border-radius:999px;background:var(--panel,#fff);color:var(--text,#111);font:700 15px/1 var(--num,ui-monospace,monospace);text-decoration:none;font-variant-numeric:tabular-nums';
   document.body.appendChild(a);
-  var done=false,t=setInterval(paint,500);paint();
+  var done=false,seen=false,t=setInterval(paint,500);paint();
   function paint(){var s=P();if(!s){clearInterval(t);a.remove();return;}var l=Math.ceil((s.endAt-Date.now())/1000);
-   if(l<=0){if(!done){done=true;a.textContent='Time\u2019s up';try{navigator.vibrate&&navigator.vibrate(300);}catch(e){}setTimeout(function(){clearInterval(t);a.remove();},60000);}return;}
+   if(l<=0){if(!done){done=true;a.textContent='Time\u2019s up';try{navigator.vibrate&&navigator.vibrate(300);}catch(e){}
+     // Popup only when it ends while this page is open, not when a page opens after it already ended.
+     if(seen)timesUp(s.mins);setTimeout(function(){clearInterval(t);a.remove();},60000);}return;}
+   seen=true;
    a.textContent='\u23F1 '+String(Math.floor(l/60)).padStart(2,'0')+':'+String(l%60).padStart(2,'0');}
  }
- window.StudyNav={TABS:TABS,active:active};
+ window.StudyNav={TABS:TABS,active:active,timesUp:timesUp};
  if(document.body)pomo();else document.addEventListener('DOMContentLoaded',pomo);
  if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
 })();

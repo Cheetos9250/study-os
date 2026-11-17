@@ -1,0 +1,1 @@
+- Pomodoro: a red "Time's up!" popup when the timer ends, on Today and on any other page while the timer runs (Escape or OK closes; it does not repeat on the next page).
