@@ -245,7 +245,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=3"></script>
-<script src="scripts/study-nav.js?v=6"></script>
+<script src="scripts/study-nav.js?v=7"></script>
 <script>
 (function(){
 'use strict';
@@ -321,7 +321,10 @@ const clock=$('#clock'),fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+Stri
 function savePomo(){try{localStorage.setItem(POMO_KEY,JSON.stringify(endAt?{mins,endAt}:{mins,left}));}catch{}}
 function showClock(){clock.textContent=fmt(Math.max(0,left));document.title=(endAt?fmt(Math.max(0,left))+' · ':'')+'Today — Study OS';}
 function stop(){clearInterval(tick);tick=null;endAt=0;$('#pStart').textContent='start';}
-function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){const m=mins;left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}window.StudyNav&&StudyNav.timesUp&&StudyNav.timesUp(m);return;}showClock();}
+/* Pomodoro history for Stats: minutes of finished 25-minute sessions per day (studyos.pomolog.v1, backed up). lastEnd stops double counting. */
+const POMOLOG='studyos.pomolog.v1';
+function logPomo(end,m){if(m!==25||!end)return;try{const o=JSON.parse(read(POMOLOG)||'{}')||{};if(o.lastEnd===end)return;const d=T.dayKey(end);o.days=o.days&&typeof o.days==='object'?o.days:{};o.days[d]=(+o.days[d]||0)+m;o.lastEnd=end;localStorage.setItem(POMOLOG,JSON.stringify(o));}catch{}}
+function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){const m=mins;logPomo(endAt,m);left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}window.StudyNav&&StudyNav.timesUp&&StudyNav.timesUp(m);return;}showClock();}
 function run(){tick=setInterval(step,500);$('#pStart').textContent='pause';step();}
 $('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();savePomo();showClock();$('#pStart').textContent='resume';return;}
  if(left<=0)left=mins*60;endAt=Date.now()+left*1000;savePomo();run();};
@@ -332,7 +335,7 @@ $('#pReset').onclick=()=>setMode(mins);document.querySelectorAll('.tab').forEach
 (function(){let s=null;try{s=JSON.parse(localStorage.getItem(POMO_KEY)||'null');}catch{}
  if(!s||![5,15,25].includes(s.mins))return;mins=s.mins;paintTabs();
  if(s.endAt&&s.endAt>Date.now()){endAt=s.endAt;run();}
- else if(s.endAt){left=0;showClock();savePomo();}
+ else if(s.endAt){logPomo(s.endAt,mins);left=0;showClock();savePomo();}
  else if(Number.isFinite(s.left)&&s.left>=0&&s.left<=mins*60){left=s.left;showClock();if(left&&left<mins*60)$('#pStart').textContent='resume';}})();
 /* ---------- data ---------- */
 let data={},summaries={},langData={},langSum={},loadFailed=0,now=Date.now(),today=T.dayKey(now);

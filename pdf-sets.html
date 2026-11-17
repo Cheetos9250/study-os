@@ -207,6 +207,6 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
 (async()=>{ try{ if(!data.sets[BOOK_ID]&&await bookIdb('get')){ data.sets[BOOK_ID]={name:'Accounting textbook (24e)',course:'acc',n:0,pages:1210,page:{},opts:{},ans:{},key:{},notes:{},added:Date.now()}; save(); } }catch(e){}
   renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
-<script src="scripts/study-nav.js?v=6"></script>
+<script src="scripts/study-nav.js?v=7"></script>
 </body>
 </html>

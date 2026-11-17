@@ -104,6 +104,12 @@
             if (!/^\d{1,5}$/.test(pn) || typeof set.notes[pn] !== "string") throw new Error("Invalid PDF practice answers");
         }
       }
+    } else if (key === "studyos.pomolog.v1") {
+      if (!object(value.days) || (value.lastEnd !== undefined && !Number.isFinite(value.lastEnd)))
+        throw new Error("Invalid Pomodoro history");
+      for (var pd of Object.keys(value.days))
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(pd) || !Number.isFinite(value.days[pd]) || value.days[pd] < 0 || value.days[pd] > 1440)
+          throw new Error("Invalid Pomodoro history");
     } else if (key === "studyos.excel.v1") {
       if ((value.done !== undefined && !object(value.done)) || (value.ans !== undefined && !object(value.ans)))
         throw new Error("Invalid Excel lesson progress");

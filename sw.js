@@ -9,7 +9,7 @@
 const VERSION = 'studyos-v1';
 const CACHE = VERSION + '-files';
 const CORE = [
-  './', 'index.html', 'flashcards.html', 'practice.html', 'hub.html', 'calendar.html', 'grades.html',
+  './', 'index.html', 'flashcards.html', 'practice.html', 'hub.html', 'calendar.html', 'grades.html', 'stats.html',
   'acc.html', 'eco.html', 'math.html', 'eng.html', 'zh.html', 'accounting-textbook.html', 'excel.html',
   'pdf-sets.html', 'progress-backup.html', 'progress-restore.html', 'vocabloom/index.html',
   'manifest.webmanifest', 'data/quiz.json', 'data/cards.json', 'data/accounting-textbook-index.json',

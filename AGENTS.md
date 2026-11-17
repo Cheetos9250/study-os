@@ -44,6 +44,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 | `practice.html` | Quizzes per subject, weak chapters, WordNest English games, the accounting textbook. |
 | `hub.html` | **Lessons**: subject → chapters → Lesson / Cards / Practice / Notes. |
 | `calendar.html` | Month view, weekly **timetable** (edit + import), **exam schedule** editor. |
+| `stats.html` | **Stats** (nav footer): streak, 30-day answers and Pomodoro charts, accuracy per subject/chapter. Read-only; helpers in `scripts/study-stats.js`. |
 | `grades.html` | Weighted course items, letter per course scale, "needed on the rest", estimated GPA. |
 | `acc/eco/math/eng/zh.html` | Course pages. Data is embedded as `const D={...}` (one huge line; never rewrite it with regex). Each page shows one mode via `?tab=cards|sum|prac` (`scripts/study-course-mode.js`) and has its own sync engine. |
 | `accounting-textbook.html` | Index of 403 textbook exercises, Ch1–9. |
@@ -73,6 +74,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). |
 | `studyos.accounting.textbook.progress.v1` | Textbook answers (`notes`, `status`, `updated`, `je`: journal-entry grid rows `[date, account, debit, credit]` from `scripts/je-grid.js`, and `fs`: statement-table rows `[line item, amount, total]` from `scripts/fs-grid.js`, both on acc.html written practice). |
 | `vocabloom_mvp_v1` | WordNest English data. |
+| `studyos.pomolog.v1` | Pomodoro history for Stats: `days` (`YYYY-MM-DD` → minutes of finished 25-minute sessions) and `lastEnd` (end time of the last counted session, so one session counts once). Written only by `index.html`. |
 | `studyos.excel.v1` | Excel page: ticked steps (`done`) and quiz answers (`ans`, `x<n>` → option index). |
 | `studyos.pdfsets.v1` | **My PDF sets** (`pdf-sets.html`): per uploaded PDF its name, subject, detected question count, my answers, answer key and per-page working notes (`notes`). PDFs over 60 pages are books (no question detection, lazy page rendering). The 1,210-page textbook is set `ptextbook` and its file lives in the Textbook page's IDB `studyos-accounting-pdf-v1` (shared, added once). The PDFs themselves are in IndexedDB `studyos-pdf-sets-v1` on the device only (not backed up, never uploaded). |
 

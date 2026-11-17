@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — study stats">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Stats — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=8">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:1040px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 96px max(18px,env(safe-area-inset-left))}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 6px}
+.tile{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:12px 16px 14px;min-height:112px;display:flex;flex-direction:column;gap:2px}
+.tile .n{font:700 40px/1.05 var(--num);font-variant-numeric:tabular-nums}.tile .n small{font-size:16px;margin-left:4px}
+.tile .l{font-weight:900;font-size:14px}.tile .s{font-size:13px;color:var(--muted)}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:14px 16px 12px;margin:12px 0}
+.panel h3{margin:0 0 2px;font-size:16px}.panel .sub{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.chart{position:relative}.chart svg{display:block;width:100%;height:auto;overflow:visible}.chart{min-height:150px}
+.chart .bar{fill:var(--ink);pointer-events:none}.chart .bar.today{fill:var(--acc-t,var(--ink))}.chart .hit{fill:transparent;cursor:default}
+.chart .hit:hover+.bar,.chart .hit:focus+.bar{opacity:.7}
+.chart .axis{stroke:var(--ink);stroke-width:2}.chart .grid{stroke:var(--line-soft);stroke-width:1}
+.chart text{fill:var(--muted);font:600 11px var(--ui);font-variant-numeric:tabular-nums}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font-size:13px;font-weight:700;padding:5px 9px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-100%);margin-top:-8px}
+details.tbl{margin-top:6px;font-size:13px}details.tbl summary{cursor:pointer;min-height:36px;display:flex;align-items:center;font-weight:700}
+details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tbl td,details.tbl th{border-bottom:1px solid var(--line-soft);padding:3px 6px;text-align:left}details.tbl td.n{text-align:right;font-variant-numeric:tabular-nums}
+.subj{margin:0;padding:0;list-style:none}.subj>li{border-top:2px solid var(--ink);padding:10px 0}.subj>li:first-child{border-top:0}
+.subj .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.subj .hd b{font-size:16px;flex:1}.subj .hd span{font-variant-numeric:tabular-nums;font-weight:700}
+.ch{display:grid;grid-template-columns:minmax(0,1fr) 110px 76px;gap:10px;align-items:center;font-size:14px;padding:4px 0}
+.ch a{color:inherit;text-decoration:none;min-height:32px;display:flex;align-items:center}.ch a:hover{text-decoration:underline}
+.meter{height:8px;border-radius:4px;background:var(--line-soft);overflow:hidden}.meter i{display:block;height:100%;background:var(--ink);border-radius:4px}
+.ch .pc{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+@media(max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.ch{grid-template-columns:minmax(0,1fr) 70px 62px}.tile .n{font-size:34px}}
+</style>
+<script src="scripts/study-theme.js?v=5"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+</head>
+<body>
+<div class="page">
+<h1>Stats</h1>
+<div class="tiles" id="tiles" aria-label="Summary"></div>
+<main>
+<section class="panel" aria-labelledby="qh"><h3 id="qh">Questions answered</h3><p class="sub">Last 30 days · each question counts on the day you last answered it</p><div class="chart" id="qChart"></div></section>
+<section class="panel" aria-labelledby="ph"><h3 id="ph">Pomodoro minutes</h3><p class="sub">Last 30 days · finished 25-minute sessions</p><div class="chart" id="pChart"></div></section>
+<h2>By subject and chapter</h2>
+<section class="panel"><ul class="subj" id="subj"><li class="note">Loading…</li></ul></section>
+</main>
+</div>
+<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-stats.js?v=1"></script>
+<script src="scripts/study-nav.js?v=7"></script>
+<script>
+(function(){
+'use strict';
+const T=window.StudyToday,S=window.StudyStats,$=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function read(k){try{return localStorage.getItem(k);}catch{return null;}}
+const now=Date.now(),days=S.lastDays(now,30);
+const ALL=T.COURSES.concat(T.LANGS);
+const answered=S.answersPerDay(ALL.map(c=>read('study-'+c.key)));
+const pomo=S.pomoPerDay(read('studyos.pomolog.v1'));
+const ticks=S.tickDays(read('studyos.today.v1'));
+const streak=S.streak(now,[answered,pomo,ticks]);
+const sum=(map,list)=>list.reduce((n,d)=>n+(map[d]||0),0);
+const fmtDay=d=>new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}).format(new Date(d+'T00:00:00Z'));
+function tiles(pct){
+ const a30=sum(answered,days),p7=sum(pomo,days.slice(-7)),today=days[days.length-1];
+ $('#tiles').innerHTML=[
+  [streak,streak===1?'day':'days','Streak',streak?'Answered, timed or ticked something each day':'Study today to start one'],
+  [a30,'','Answered','Last 30 days'+(answered[today]?' · '+answered[today]+' today':'')],
+  [pct==null?'–':pct,pct==null?'':'%','Correct','All practice so far'],
+  [p7,'min','Pomodoro','Last 7 days'+(pomo[today]?' · '+pomo[today]+' today':'')]
+ ].map(([n,u,l,s])=>'<div class="tile"><span class="n">'+n+(u?'<small>'+u+'</small>':'')+'</span><span class="l">'+l+'</span><span class="s">'+esc(s)+'</span></div>').join('');
+}
+/* Single-series bar chart: one ink colour (today in the accent), 4px rounded tops, 2px gaps, hover/focus tooltip, table view. */
+function chart(el,map,unit){
+ const W=Math.max(280,Math.round(el.clientWidth||600)),H=150,P={l:30,r:4,t:10,b:20},n=days.length,slot=(W-P.l-P.r)/n,bw=Math.max(2,slot-2);
+ const vals=days.map(d=>map[d]||0),max=Math.max(1,...vals),top=S.niceMax(max),y=v=>P.t+(H-P.t-P.b)*(1-v/top),base=H-P.b;
+ const bar=(x,v)=>{if(!v)return '';const h=base-y(v),r=Math.min(4,bw/2,h),yy=y(v);return 'M'+x+','+base+'V'+(yy+r)+'Q'+x+','+yy+' '+(x+r)+','+yy+'H'+(x+bw-r)+'Q'+(x+bw)+','+yy+' '+(x+bw)+','+(yy+r)+'V'+base+'Z';};
+ let g='<line class="grid" x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+y(top)+'" y2="'+y(top)+'"/><line class="grid" x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+y(top/2)+'" y2="'+y(top/2)+'"/>'
+  +'<text x="'+(P.l-6)+'" y="'+(y(top)+4)+'" text-anchor="end">'+top+'</text><text x="'+(P.l-6)+'" y="'+(y(top/2)+4)+'" text-anchor="end">'+top/2+'</text><text x="'+(P.l-6)+'" y="'+(base+4)+'" text-anchor="end">0</text>';
+ days.forEach((d,i)=>{const x=P.l+i*slot+1,v=vals[i],lab=fmtDay(d)+': '+v+' '+unit;
+  g+='<rect class="hit" x="'+(P.l+i*slot)+'" y="'+P.t+'" width="'+slot+'" height="'+(base-P.t)+'" tabindex="0" data-tip="'+esc(lab)+'" aria-label="'+esc(lab)+'"></rect>'
+   +'<path class="bar'+(i===n-1?' today':'')+'" d="'+bar(x,v)+'"/>';});
+ g+='<line class="axis" x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+base+'" y2="'+base+'"/>';
+ [0,14,n-1].forEach(i=>{g+='<text x="'+(P.l+i*slot+slot/2)+'" y="'+(H-4)+'" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+(i===n-1?'Today':fmtDay(days[i]))+'</text>';});
+ el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(unit)+' per day, last 30 days, highest '+max+'">'+g+'</svg><div class="tip" hidden></div>'
+  +'<details class="tbl"><summary>Show as table</summary><table><thead><tr><th>Day</th><th>'+esc(unit[0].toUpperCase()+unit.slice(1))+'</th></tr></thead><tbody>'
+  +days.slice().reverse().map((d,i)=>'<tr><td>'+fmtDay(d)+'</td><td class="n">'+(map[d]||0)+'</td></tr>').join('')+'</tbody></table></details>';
+ const tip=el.querySelector('.tip'),svg=el.querySelector('svg');
+ const show=t=>{const r=t.getBoundingClientRect(),b=el.getBoundingClientRect();tip.textContent=t.dataset.tip;tip.hidden=false;
+  tip.style.left=Math.min(Math.max(r.left-b.left+r.width/2,60),b.width-60)+'px';tip.style.top=(r.top-b.top+8)+'px';};
+ svg.addEventListener('pointerover',e=>{if(e.target.dataset.tip)show(e.target);});svg.addEventListener('focusin',e=>{if(e.target.dataset.tip)show(e.target);});
+ svg.addEventListener('pointerleave',()=>{tip.hidden=true;});svg.addEventListener('focusout',()=>{tip.hidden=true;});
+}
+function charts(){chart($('#qChart'),answered,'questions');chart($('#pChart'),pomo,'minutes');}
+tiles(null);charts();
+/* drawn at the real width so axis text keeps its size on a phone */
+let rw=innerWidth,rt=null;addEventListener('resize',()=>{if(innerWidth===rw)return;rw=innerWidth;clearTimeout(rt);rt=setTimeout(charts,150);});
+/* subject and chapter accuracy: course data loaded like Practice does */
+const data={};
+Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{
+ let A=0,C=0;
+ const rows=T.COURSES.filter(c=>data[c.key]).map(c=>{
+  const s=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now),per=Object.values(s.per).filter(p=>p.quiz>0);
+  const a=per.reduce((n,p)=>n+p.answered,0),r=per.reduce((n,p)=>n+p.correct,0),q=per.reduce((n,p)=>n+p.quiz,0);A+=a;C+=r;
+  return '<li><div class="hd"><b>'+esc(c.name)+'</b><span>'+a+' / '+q+' answered'+(a?' · '+Math.round(r/a*100)+'% correct':'')+'</span></div>'
+   +per.map(p=>{const pc=p.answered?Math.round(p.correct/p.answered*100):null;
+    return '<div class="ch"><a href="'+esc(c.page+'?tab=prac&cat='+encodeURIComponent(p.id))+'">'+esc(p.label)+'</a><span class="meter" role="img" aria-label="'+(pc==null?'not practised':pc+'% correct')+'"><i style="width:'+(pc||0)+'%"></i></span><span class="pc">'+(pc==null?'–':pc+'%')+' · '+p.answered+'/'+p.quiz+'</span></div>';}).join('')+'</li>';});
+ $('#subj').innerHTML=rows.join('')||'<li class="note">Could not load the course data. Check your connection and reload.</li>';
+ tiles(A?Math.round(C/A*100):null);
+});
+})();
+</script>
+</body>
+</html>
