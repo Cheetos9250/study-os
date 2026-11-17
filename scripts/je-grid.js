@@ -17,7 +17,7 @@
   return /^-?(\d+\.?\d*|\.\d+)$/.test(s)?parseFloat(s):null;
  }
  const ALIAS=[[/^a ?r$/,'accounts receivable'],[/^a ?p$/,'accounts payable'],[/^ar /,'accounts receivable '],
-  [/^cost of goods sold$/,'cost of sales'],[/^cogs$/,'cost of sales'],[/^inventory$/,'merchandise inventory'],
+  [/^cost of sales$/,'cost of goods sold'],[/^cogs$/,'cost of goods sold'],[/^inventory$/,'merchandise inventory'],
   [/^allowance for uncollectible accounts$/,'allowance for doubtful accounts'],[/^bad debt expense$/,'bad debts expense'],
   [/^uncollectible accounts expense$/,'bad debts expense'],[/^n ?r$/,'notes receivable'],[/^n ?p$/,'notes payable']];
  function norm(s){
@@ -51,7 +51,7 @@
   ['Liability',['Accounts Payable','Notes Payable','Interest Payable','Salaries Payable','Sales Refund Payable','Unearned Revenue']],
   ['Equity',['Owner Capital','Owner Withdrawals','Income Summary']],
   ['Revenue',['Sales','Sales Discounts','Sales Returns and Allowances','Service Revenue','Interest Revenue']],
-  ['Expense',['Cost of Sales','Purchases','Purchases Discounts','Purchases Returns and Allowances','Transportation-In','Discounts Lost','Bad Debts Expense',
+  ['Expense',['Cost of Goods Sold','Purchases','Purchases Discounts','Purchases Returns and Allowances','Transportation-In','Discounts Lost','Bad Debts Expense',
    'Credit Card Expense','Factoring Fee Expense','Bank Service Charge Expense','Cash Over and Short','Delivery Expense','Depreciation Expense','Insurance Expense',
    'Rent Expense','Salaries Expense','Utilities Expense','Store Supplies Expense','Postage Expense','Repairs Expense','Travel Expense','Entertainment Expense',
    'Miscellaneous Expense','Selling Expenses','Administrative Expenses','General Expenses','Interest Expense']]];

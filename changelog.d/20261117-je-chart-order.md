@@ -1,1 +1,2 @@
 - Journal entry table: account suggestions are now in chart-of-accounts order (Assets → Liabilities → Equity → Revenue → Expenses) with the category shown next to each name; customer/creditor accounts sit right after their control account.
+- Textbook-style written exercises now say **Cost of Goods Sold** (the textbook's name) instead of Cost of Sales; answers typed as Cost of Sales or COGS still count as correct.

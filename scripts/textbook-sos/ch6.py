@@ -191,7 +191,7 @@ Apply the lower of cost and net realizable value item by item.
 | Jackets | 3,500 | 3,300 | 3,300 |
 | **Total** | **7,140** | **7,100** | **6,740** |
 
-Inventory is reported at **$6,740**; write-down 7,140 − 6,740 = **$400** (debit Cost of Sales, credit Merchandise Inventory).
+Inventory is reported at **$6,740**; write-down 7,140 − 6,740 = **$400** (debit Cost of Goods Sold, credit Merchandise Inventory).
 """)
 
 # ---------- ratios / estimates ----------
@@ -334,7 +334,7 @@ Apply the lower of cost and NRV item by item and compute the write-down.
 | Mixers | 1,800 | 1,875 | 1,800 |
 | **Total** | **6,690** | **6,540** | **6,345** |
 
-Write-down = 6,690 − 6,345 = **$345**: Dr Cost of Sales 345, Cr Merchandise Inventory 345.
+Write-down = 6,690 − 6,345 = **$345**: Dr Cost of Goods Sold 345, Cr Merchandise Inventory 345.
 """)
 
 add('E-6-19','Inventory turnover and days’ sales in inventory',"""
@@ -521,7 +521,7 @@ Item by item: **{money(tl)}**.
 2. Whole inventory: lower of {money(tc)} and {money(tn)} = **{money(min(tc,tn))}**.
 
 3. Write-down {money(tc-tl)}:
-{JE(('Dec 31','Cost of Sales',tc-tl,''),('','Merchandise Inventory','',tc-tl))}
+{JE(('Dec 31','Cost of Goods Sold',tc-tl,''),('','Merchandise Inventory','',tc-tl))}
 """)
 p_lcnrv('P-6-4A','Bramble Sports',[('Tents',20,210,185),('Sleeping bags',45,80,92),('Stoves',30,64,58),('Lanterns',70,18,21),('Backpacks',25,96,90)])
 p_lcnrv('P-6-4B','Heather Sports',[('Rackets',35,88,79),('Shoes',50,62,70),('Bags',40,45,41),('Balls (cases)',90,12,13),('Nets',12,150,138)])

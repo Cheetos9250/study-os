@@ -82,18 +82,18 @@ add('QS-7-6','Sales journal',f"""
 {JOURNALS}
 Wilder Books made these credit sales in March (terms n/30):
 {T(['Date','Customer','Invoice','Sale','Cost'],['Mar 3','Ivy Moss','#311','$720','$430'],['Mar 9','Joel Tan','#312','$1,150','$690'],['Mar 18','Ivy Moss','#313','$480','$290'],['Mar 27','Kai Lund','#314','$905','$540'])}
-1. Record them in a sales journal with the columns Accounts Receivable Dr / Sales Cr and Cost of Sales Dr / Inventory Cr.
+1. Record them in a sales journal with the columns Accounts Receivable Dr / Sales Cr and Cost of Goods Sold Dr / Inventory Cr.
 2. What is posted at month-end?
 """,f"""
 1.
-{T(['Date','Account debited','Invoice','PR','AR Dr / Sales Cr','Cost of Sales Dr / Inventory Cr'],['Mar 3','Ivy Moss','311','✓','720','430'],['Mar 9','Joel Tan','312','✓','1,150','690'],['Mar 18','Ivy Moss','313','✓','480','290'],['Mar 27','Kai Lund','314','✓','905','540'],['**Totals**','','','','**3,255**','**1,950**'])}
+{T(['Date','Account debited','Invoice','PR','AR Dr / Sales Cr','Cost of Goods Sold Dr / Inventory Cr'],['Mar 3','Ivy Moss','311','✓','720','430'],['Mar 9','Joel Tan','312','✓','1,150','690'],['Mar 18','Ivy Moss','313','✓','480','290'],['Mar 27','Kai Lund','314','✓','905','540'],['**Totals**','','','','**3,255**','**1,950**'])}
 
-2. Each amount is posted daily to the customer's subsidiary account (✓). At month-end: Dr Accounts Receivable 3,255, Cr Sales 3,255; Dr Cost of Sales 1,950, Cr Merchandise Inventory 1,950.
+2. Each amount is posted daily to the customer's subsidiary account (✓). At month-end: Dr Accounts Receivable 3,255, Cr Sales 3,255; Dr Cost of Goods Sold 1,950, Cr Merchandise Inventory 1,950.
 """)
 
 add('QS-7-7','Cash receipts journal',f"""
 {JOURNALS}
-Record these April receipts for Wilder Books in a cash receipts journal with columns Cash Dr, Sales Discounts Dr, Accounts Receivable Cr, Sales Cr, Other Accounts Cr, Cost of Sales Dr / Inventory Cr.
+Record these April receipts for Wilder Books in a cash receipts journal with columns Cash Dr, Sales Discounts Dr, Accounts Receivable Cr, Sales Cr, Other Accounts Cr, Cost of Goods Sold Dr / Inventory Cr.
 - **Apr 4** Cash sales $1,320 (cost $790).
 - **Apr 8** Collected Joel Tan's $1,150 invoice less a 2% discount.
 - **Apr 15** Owner invested $5,000 cash.
@@ -153,7 +153,7 @@ Halo Gifts records these in the general journal. Prepare the entries, showing po
 - **Jun 18** Nell Rao returned $240 of goods (cost $145) bought on credit.
 - **Jun 24** Halo returned $300 of merchandise to Ink House, a supplier, for credit.
 """,f"""
-{JE(('Jun 18','Sales Returns and Allowances',240,''),('','Accounts Receivable — Nell Rao','',240),('Jun 18','Merchandise Inventory',145,''),('','Cost of Sales','',145),('Jun 24','Accounts Payable — Ink House',300,''),('','Merchandise Inventory','',300))}
+{JE(('Jun 18','Sales Returns and Allowances',240,''),('','Accounts Receivable — Nell Rao','',240),('Jun 18','Merchandise Inventory',145,''),('','Cost of Goods Sold','',145),('Jun 24','Accounts Payable — Ink House',300,''),('','Merchandise Inventory','',300))}
 
 The receivable and payable credits/debits are posted twice: to the controlling account and to the customer's or supplier's subsidiary account (PR shows e.g. 106/✓).
 """)
@@ -171,7 +171,7 @@ add('QS-7-13','Days’ payable outstanding',"""
 | | This year | Last year |
 |---|---|---|
 | Accounts payable | $38,400 | $31,500 |
-| Cost of sales | $467,200 | $420,000 |
+| Cost of goods sold | $467,200 | $420,000 |
 
 Compute days' payable outstanding for both years (365 days). Is the company paying suppliers faster or slower?
 ""","""
@@ -275,11 +275,11 @@ Ridgeway Co. uses the special journals above. For each transaction, name the jou
 4. Paid the $1,200 less 1%.
 5. Customer returned $150 of goods (cost $90).
 ""","""
-1. S — Dr Accounts Receivable 900, Cr Sales 900; Dr Cost of Sales 540, Cr Inventory 540.
+1. S — Dr Accounts Receivable 900, Cr Sales 900; Dr Cost of Goods Sold 540, Cr Inventory 540.
 2. R — Dr Cash 882, Dr Sales Discounts 18, Cr Accounts Receivable 900.
 3. P — Dr Merchandise Inventory 1,200, Cr Accounts Payable 1,200.
 4. D — Dr Accounts Payable 1,200, Cr Merchandise Inventory 12, Cr Cash 1,188.
-5. G — Dr Sales Returns and Allowances 150, Cr Accounts Receivable 150; Dr Inventory 90, Cr Cost of Sales 90.
+5. G — Dr Sales Returns and Allowances 150, Cr Accounts Receivable 150; Dr Inventory 90, Cr Cost of Goods Sold 90.
 """)
 
 add('E-7-12','Posting to subsidiary ledger',f"""
@@ -319,7 +319,7 @@ Two companies report:
 | | Atlas | Borealis |
 |---|---|---|
 | Accounts payable | $54,000 | $27,600 |
-| Cost of sales | $657,000 | $503,700 |
+| Cost of goods sold | $657,000 | $503,700 |
 
 Compute days' payable outstanding (365 days). Which pays suppliers sooner?
 ""","""
@@ -455,7 +455,7 @@ def p_all(id,co,inv0,vendor,pamt,cust1,s1amt,c1,ret,rentamt,csamt,c2,cust2,s2amt
 - Accounts Payable = {f(pamt)} − {f(ret)} − {f(pamt-ret)} = **0**
 
 3.
-{T(['Account','Debit','Credit'],['Cash',f(cash),''],['Accounts Receivable',f(s2amt),''],['Merchandise Inventory',f(inv),''],['Owner, Capital','',f(inv0)],['Sales','',f(sales)],['Sales Discounts',f(sdisc),''],['Cost of Sales',f(cos),''],['Rent Expense',f(rentamt),''],['Salaries Expense',f(salamt),''],['**Totals**','**'+f(tdr)+'**','**'+f(tcr)+'**'])}
+{T(['Account','Debit','Credit'],['Cash',f(cash),''],['Accounts Receivable',f(s2amt),''],['Merchandise Inventory',f(inv),''],['Owner, Capital','',f(inv0)],['Sales','',f(sales)],['Sales Discounts',f(sdisc),''],['Cost of Goods Sold',f(cos),''],['Rent Expense',f(rentamt),''],['Salaries Expense',f(salamt),''],['**Totals**','**'+f(tdr)+'**','**'+f(tcr)+'**'])}
 """)
 p_all('P-7-3A','Lumen Outfitters',20000,'Vale Supply',6000,'Kim Ross',3500,2100,400,1200,2800,1680,'Lou Sato',1900,1140,1600,(1,2,4,6,8,11,13,18,24,28))
 p_all('P-7-3B','Prism Outfitters',15000,'Pike Traders',5000,'Rae Quinn',2600,1560,500,1000,2200,1320,'Sol Vega',1500,900,1400,(1,3,5,7,9,12,14,19,25,29))
@@ -465,10 +465,10 @@ ITEMS.sort(key=lambda x:order.index(x['id']))
 assert [i['id'] for i in ITEMS]==order,(set(order)-{i['id'] for i in ITEMS})
 # ---------- key answers for the self-check boxes ----------
 chk('QS-7-4',('Correct controlling account balance',8300))
-chk('QS-7-6',('Sales journal total (AR Dr / Sales Cr)',3255),('Cost of sales column total',1950))
+chk('QS-7-6',('Sales journal total (AR Dr / Sales Cr)',3255),('Cost of goods sold column total',1950))
 chk('QS-7-7',('Cash Dr column total',10447))
 chk('QS-7-8',('Accounts Payable Cr total',4635))
-chk('E-7-1',('Sales journal total',6835),('Cost of sales column total',4095))
+chk('E-7-1',('Sales journal total',6835),('Cost of goods sold column total',4095))
 chk('QS-7-13',('Days\' payable outstanding, this year',30.0,0.1),('Days\' payable outstanding, last year',27.4,0.1))
 chk('E-7-3',('Cash Dr column total',13966.80))
 chk('E-7-6',('Accounts Payable Cr total',7775))
