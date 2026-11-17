@@ -133,7 +133,7 @@ On `grades.html`, next to each course, show:
 
 ### 12. Audit speed, accessibility and tests (Thai: ตรวจความเร็วและโค้ด)
 
-Status: todo
+Status: done (#158; report in docs/audit-2026-11-17.md, accessibility fixed; course-engine refactor suggested)
 
 Audit the repo:
 - load time on iPad (`acc.html` embeds very large data);
@@ -145,7 +145,7 @@ Fix one topic per PR. Never change storage formats.
 
 ### 13. Close stale PRs (Thai: เก็บกวาด PR)
 
-Status: needs owner
+Status: needs owner (#102 closed 17 Nov 2026 at the owner's request; #68 still waits for the owner)
 
 - PR #102 (progress Worker deploy workflow) is already on `main`. Close it after confirming with the owner.
 - PR #68 (79 worked textbook answers) is waiting for the owner to decide whether to release or close it.
