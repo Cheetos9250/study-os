@@ -104,7 +104,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .bk{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:18px 0 0;padding:12px 14px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel)}
 .bk svg{width:22px;height:22px;flex:none}
 .bk p{margin:0;flex:1;min-width:220px;font-size:14px;line-height:1.45}.bk p b{display:block;font-size:15px}
-.bk .acts{margin:0}
+.bk .acts{margin:0;flex-basis:100%;padding-left:36px}.bk .bk-miss{display:block;margin-top:2px;font-weight:700}.bk .bk-msg{flex-basis:100%;margin:0;padding-left:36px;font-size:14px;font-weight:700;color:var(--green,#1f7448)}.bk .bk-msg.bad{color:var(--red,#c21f2f)}.bk .acts a[aria-disabled=true]{opacity:.5;pointer-events:none}
 /* wide screens: the reminder sits in the empty space beside the title */
 @media(min-width:760px){.headrow{display:flex;align-items:flex-end;gap:24px}.headrow .head{flex:none}.headrow .bk{flex:1 1 380px;max-width:560px;margin:18px 0 4px auto}.headrow .bk p{min-width:0}}
 /* Today: ink manga panels, speech bubble, hatched timer (after study-world.css) */
@@ -230,6 +230,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 </main>
 </div>
 <script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=3"></script>
 <script src="scripts/study-nav.js?v=6"></script>
@@ -407,23 +408,75 @@ function renderClasses(){
   return '<a class="cls'+(hm>=x.start&&hm<x.end?' now':hm>=x.end?' done':'')+(c?' t-'+c.key:'')+'" href="'+href+'">'+(c?'<span class="jersey sm" aria-hidden="true">'+esc(c.full||c.key.toUpperCase())+'</span>':'')+'<b>'+x.start+'–'+x.end+'</b>'+esc(x.name)+(x.code?'<span>'+esc(x.code)+'</span>':'')+'</a>';}).join('')
   :'<span class="cls"><span>No classes today</span></span>';
 }
-/* ---------- backup reminder: iPadOS can clear website data (in-app browsers, 7 days unused in Safari) ---------- */
-const BK_META='studyos.backup-meta.v1';
+/* ---------- weekly backup: iPadOS can clear website data (in-app browsers, 7 days unused in Safari) ----------
+   One tap makes the same JSON file as progress-backup.html (which stays read-only) and opens the iPad share sheet
+   (save to Files / iCloud Drive), or downloads it on a computer. Today records the time in studyos.backup-meta.v1. */
+const BK_META='studyos.backup-meta.v1',BK=window.StudyProgressBackup;
+/* What cloud sync covers on this device: courses + planner + notes once a sync has worked; tasks/grades once the home subject synced. */
+function cloudState(){
+ let on=false,home=!!read('study-sync-home-base-v1');
+ try{const k=JSON.parse(read('study-sync-progress-key-v1')||'null'),l=JSON.parse(read('study-sync-last-v1')||'null');on=!!(k&&k.key&&l&&l.ok);}catch{}
+ return {on,home:on&&home};
+}
+function inCloud(k,c){
+ if(!c.on)return false;
+ if(/^study-(acc|eco|math|eng|zh)$/.test(k)||/-srs$/.test(k)||k==='studyos.today.v1'||k==='studyos.notes.v1')return true;
+ return c.home&&(k==='studyos.home.v1'||k==='studyos.grades.v1');
+}
+function notInCloud(c){return BK?BK.keys.filter(k=>!/-typ$/.test(k)&&read(k)!==null&&!inCloud(k,c)).map(k=>BK.labelForKey(k)):[];}
+function lastBackup(){try{const m=JSON.parse(read(BK_META)||'null');const t=m&&typeof m.last==='string'?Date.parse(m.last):NaN;return Number.isFinite(t)?t:null;}catch{return null;}}
+const bkDate=t=>new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',timeZone:'Asia/Bangkok'}).format(new Date(t));
 function renderBackupNudge(){
  const el=$('#backupNudge');if(!el)return;
  let snooze='';try{snooze=sessionStorage.getItem('studyos.backup-snooze')||'';}catch{}
  const has=T.COURSES.concat(T.LANGS).some(c=>read(c.mark+'-srs')||read('study-'+c.key))||st.tasks.length||settings.timetable.length;
- let last=null;try{const m=JSON.parse(read(BK_META)||'null');if(m&&typeof m.last==='string')last=Date.parse(m.last);}catch{}
- const days=last?Math.floor((Date.now()-last)/864e5):null;
- if(!has||snooze===today||(days!==null&&days<3)){el.hidden=true;return;}
+ const last=lastBackup(),days=last?Math.floor((Date.now()-last)/864e5):null,c=cloudState();
+ /* weekly when cloud sync already protects the courses and planner; sooner when everything lives only here */
+ const every=c.on?7:3;
+ if(!has||snooze===today||(days!==null&&days<every)){el.hidden=true;return;}
  const app=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+ const miss=notInCloud(c);
  el.hidden=false;
  el.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/></svg>'
-  +'<p><b>'+(days===null?'Your progress has no backup yet':'Last backup '+days+' days ago')+'</b>Answers live only in this browser, which can clear them'+(app?'.':' (in-app browsers, or 7 days unused). The Home Screen app keeps them safer.')+'</p>'
-  +'<div class="acts"><a class="main" href="progress-backup.html">Back up now</a><a href="#" id="bkLater">Later</a></div>';
- /* the backup page stays read-only (CI guard), so Today notes the time when Back up now is tapped */
- el.querySelector('a.main').onclick=()=>{try{localStorage.setItem(BK_META,JSON.stringify({last:new Date().toISOString(),from:'today'}));}catch{}};
+  +'<p><b>'+(days===null?'No backup yet':'Last backup '+esc(bkDate(last))+' · '+days+' day'+(days===1?'':'s')+' ago')+'</b>'
+  +(c.on?(miss.length?'Cloud sync keeps your courses and planner. <span class="bk-miss">Only on this device: '+esc(miss.join(', '))+'.</span>':'Cloud sync covers your data. A weekly file is extra safety.')
+   :'Cloud sync is off here, so everything lives only in this browser'+(app?'.':', which can clear it (in-app browsers, or 7 days unused).'))
+  +'</p><div class="acts"><a class="main" href="progress-backup.html" id="bkNow">Back up now</a><a href="progress-backup.html" id="bkCheck">Backup page</a><a href="#" id="bkLater">Later</a></div>'
+  +'<p class="bk-msg" role="status" hidden></p>';
+ $('#bkNow').onclick=quickBackup;
+ /* the backup page stays read-only (CI guard), so Today notes the time when it is opened from here, as before */
+ $('#bkCheck').onclick=()=>bkMark('today');
  $('#bkLater').onclick=e=>{e.preventDefault();try{sessionStorage.setItem('studyos.backup-snooze',today);}catch{}el.hidden=true;};
+}
+function bkMark(from){try{localStorage.setItem(BK_META,JSON.stringify({last:new Date().toISOString(),from}));}catch{}}
+function bkSay(t,ok){const m=document.querySelector('#backupNudge .bk-msg');if(!m)return;m.hidden=false;m.textContent=t;m.classList.toggle('bad',!ok);}
+function bkDone(how){
+ bkMark('today-'+how);
+ bkSay(how==='share'?'Backed up. Keep the file in Files or iCloud Drive.':'Backed up. The file is in your Downloads.',true);
+ const el=$('#backupNudge');el.querySelectorAll('.acts a').forEach(a=>a.setAttribute('aria-disabled','true'));
+ setTimeout(()=>{el.hidden=true;},8000);
+}
+function quickBackup(e){
+ if(!BK)return; /* no backup script: the link opens the backup page */
+ e.preventDefault();
+ let json;try{json=BK.createSnapshot(localStorage,location.origin,new Date());}catch(err){bkSay(String(err&&err.message||err),false);return;}
+ const name='study-os-progress-'+new Date().toISOString().slice(0,10)+'.json';
+ /* iPad/iPhone: share sheet (Save to Files). Must start inside the tap, so nothing async before share(). */
+ const touch=(navigator.maxTouchPoints||0)>0;
+ try{
+  const f=typeof File==='function'?new File([json],name,{type:'application/json'}):null;
+  if(touch&&f&&navigator.canShare&&navigator.canShare({files:[f]})){
+   navigator.share({files:[f],title:'Study OS backup'}).then(()=>bkDone('share'),err=>{
+    if(err&&err.name==='AbortError')bkSay('Cancelled. No backup was saved.',false);else download(json,name);});
+   return;
+  }
+ }catch(err){}
+ download(json,name);
+}
+function download(json,name){
+ try{const url=URL.createObjectURL(new Blob([json],{type:'application/json;charset=utf-8'})),a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);bkDone('download');}
+ catch(err){bkSay('Could not save the file here. Open the Backup page instead.',false);}
 }
 function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
 renderAll();
