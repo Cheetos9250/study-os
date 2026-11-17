@@ -1,0 +1,1 @@
+- My PDF sets, Multiple choice: if no quiz is found near the chapter ends, the whole book is searched; headings such as "Multiple Choice Questions" are accepted. If a quiz still cannot be read, the pages that mention "multiple choice" are listed so you can open them.

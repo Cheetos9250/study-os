@@ -16,7 +16,7 @@
   }
   return [...rows.keys()].sort((a,b)=>b-a).map(y=>({p,t:rows.get(y).sort((a,b)=>a.transform[4]-b.transform[4]).map(i=>i.str).join(' ').replace(/\s+/g,' ').trim()})).filter(l=>l.t);
  }
- const QUIZ=/multiple[\s-]*choice\s+quiz/i, ANSWERS=/answers?\s+to\s+multiple[\s-]*choice\s+quiz/i;
+ const QUIZ=/multiple[\s-]*choice\s+(quiz|questions?|test)\b/i, ANSWERS=/answers?\s+to\s+multiple[\s-]*choice\s+quiz/i;
  const STOP=/^(quick\s+study|discussion\s+questions|exercises?\b|problem\s+set|key\s+terms|summary)/i;
  /* highest option letter written on a line: "a." or "(a)" or "a)" */
  function optsIn(t){let best=0;for(const m of t.matchAll(/(?:^|\s|\()([a-e])\s*[.)]\s*\S/g)){const k='abcde'.indexOf(m[1])+1;if(k>best)best=k;}return best;}
@@ -45,5 +45,7 @@
   }
   return out;
  }
- return {pageLines,findQuiz,optsIn};
+ /* any mention, for a whole-book search when the quiz is not near the chapter end */
+ const MENTION=/multiple[\s-]*choice/i;
+ return {pageLines,findQuiz,optsIn,MENTION};
 });
