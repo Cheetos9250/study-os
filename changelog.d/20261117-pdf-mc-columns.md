@@ -1,0 +1,1 @@
+- My PDF sets, Multiple choice: reads the textbook's two-column quiz layout (questions and printed answers in left and right columns), so each chapter's Multiple Choice Quiz becomes its own answer sheet with the key filled in.
