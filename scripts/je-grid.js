@@ -119,12 +119,18 @@
  +'@media (max-width:560px){.je-row,.je-tot{grid-template-columns:64px minmax(0,1fr) minmax(0,1fr) 34px;grid-template-areas:"acct acct acct x" "date dr cr ."}'
  +'.je-row .d{grid-area:date}.je-row .a{grid-area:acct}.je-row .dr{grid-area:dr}.je-row .c{grid-area:cr}.je-row .je-x{grid-area:x}'
  +'.je-row{padding-bottom:6px;border-bottom:1px dashed rgba(127,127,127,.35)}.je-head{display:none}'
+ +'.je-tot{grid-template-areas:"lab dr cr ."}.je-tot .lab{grid-area:lab}.je-tot .t1{grid-area:dr}.je-tot .t2{grid-area:cr}.je-why{grid-column:1/-1}}'
+ /* the same narrow layout when the table sits in a narrow panel (My PDF sets side panel) */
+ +'.je{container-type:inline-size}@container (max-width:560px){.je-row,.je-tot{grid-template-columns:64px minmax(0,1fr) minmax(0,1fr) 34px;grid-template-areas:"acct acct acct x" "date dr cr ."}'
+ +'.je-row .d{grid-area:date}.je-row .a{grid-area:acct}.je-row .dr{grid-area:dr}.je-row .c{grid-area:cr}.je-row .je-x{grid-area:x}'
+ +'.je-row{padding-bottom:6px;border-bottom:1px dashed rgba(127,127,127,.35)}.je-head{display:none}'
  +'.je-tot{grid-template-areas:"lab dr cr ."}.je-tot .lab{grid-area:lab}.je-tot .t1{grid-area:dr}.je-tot .t2{grid-area:cr}.je-why{grid-column:1/-1}}';
  function ensureCss(doc){if(doc.getElementById('jeCss'))return;const s=doc.createElement('style');s.id='jeCss';s.textContent=CSS;doc.head.appendChild(s);}
  function html(){return '<div class="je" id="jeBox" role="group" aria-label="Journal entry"></div>';}
  /* Mount the grid in box. opts: {answer, rows, save(rows), onAllCorrect()} */
  function mount(box,opts){
   if(!box)return null;ensureCss(box.ownerDocument);
+  const B=opts.btnClass||'btn'; /* noCheck: a free table with live totals only (no answer to compare with) */
   const answer=opts.answer||[],list='jeAcc'+Math.random().toString(36).slice(2,7);
   let rows=clean(opts.rows);while(rows.length<3)rows.push(['','','','']);
   let result=null,timer=null;
@@ -143,9 +149,9 @@
      +(rr?'<div class="je-why '+(rr.ok?'ok':'no')+'">'+(rr.ok?'✓ correct':'✗ '+esc(rr.why))+'</div>':'')+'</div>';});
    h+='<div class="je-tot"><span class="lab">Total</span><span class="n t1">'+fmt(t.dr)+'</span><span class="n t2">'+fmt(t.cr)+'</span></div>';
    if(any)h+='<p class="je-bal '+(t.dr===t.cr?'ok':'no')+'" aria-live="polite">'+(t.dr===t.cr?'Debits = Credits ✓':'Not balanced · difference '+fmt(Math.abs(t.dr-t.cr)))+'</p>';
-   h+='<div class="je-bar"><button type="button" class="btn" data-add>+ Add line</button><button type="button" class="btn primary" data-check>Check entry</button>'
+   h+='<div class="je-bar"><button type="button" class="'+B+'" data-add>+ Add line</button>'+(opts.noCheck?'':'<button type="button" class="'+B+' primary" data-check>Check entry</button>')+''
     +'<span class="je-sum'+(result&&result.all?' ok':'')+'" aria-live="polite">'+(result?result.all?'All lines correct.':result.ok+' of '+result.total+' lines correct'+(result.missing&&result.entered<result.total?' · '+(result.total-result.entered)+' line'+(result.total-result.entered>1?'s':'')+' missing':''):'')+'</span>'
-    +(result&&result.all&&opts.onAllCorrect?'<button type="button" class="btn primary" data-got>Mark as got it</button>':'')+'</div>'
+    +(result&&result.all&&opts.onAllCorrect?'<button type="button" class="'+B+' primary" data-got>Mark as got it</button>':'')+'</div>'
     +'<datalist id="'+list+'">'+accounts(answer).map(a=>'<option value="'+esc(a.name)+'" label="'+esc(a.cat)+'">').join('')+'</datalist>';
    box.innerHTML=h;
    if(focus){const el=box.querySelector('[data-r="'+focus[0]+'"] [data-c="'+focus[1]+'"]');if(el)el.focus();}

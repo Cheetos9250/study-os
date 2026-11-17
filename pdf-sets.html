@@ -41,6 +41,7 @@ h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px)}
 .ps-viewer canvas{display:block;width:100%;height:auto;margin:0 0 8px;border-radius:6px;background:#fff}
 .ps-sheet{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
 @media (max-width:900px){.ps-sheet{position:static;max-height:none}}
+.ps-ex{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 14px}.ps-ex #exTitle{flex:1;min-width:160px}.ps-ex a.ps-btn{text-decoration:none}
 .ps-mc{display:grid;gap:8px;margin:0 0 14px}.ps-mc .ps-set{min-height:44px}.ps-mc small,.ps-mcnote{font-size:13px;opacity:.75}
 .ps-jump{display:none}@media (max-width:900px){.ps-jump{display:inline-flex}}
 .ps-sheet h2{font-size:16px;margin:0 0 6px}
@@ -85,7 +86,19 @@ input[type=file]{display:none}
     <div class="ps-bar"><b id="pageNow">Page 1</b><input id="pageInput" type="number" min="1" inputmode="numeric" aria-label="Go to page" style="width:90px"><button class="ps-btn" id="pageGo" type="button">Go</button></div>
     <div id="exBar" hidden>
      <div class="ps-bar" role="group" aria-label="Exercise type"><button class="ps-btn" id="exW" type="button" aria-pressed="true">Written</button><button class="ps-btn" id="exM" type="button" aria-pressed="false">Multiple choice</button></div>
-     <div class="ps-bar" id="exWBox"><select id="exSel" class="ps-btn" aria-label="Go to a written exercise" style="max-width:100%"></select></div>
+     <div id="exWBox">
+      <div class="ps-bar"><select id="exSel" class="ps-btn" aria-label="Go to a written exercise" style="max-width:100%"></select></div>
+      <section class="ps-ex" id="exPanel" hidden aria-labelledby="exTitle">
+       <div class="ps-bar"><b id="exTitle"></b><select id="exStatus" class="ps-btn" aria-label="Status"><option value="new">New</option><option value="doing">Doing</option><option value="done">Done</option></select></div>
+       <p class="ps-mcnote" id="exHint"></p>
+       <div class="je" id="pjeBox" hidden></div>
+       <div class="fs" id="pfsBox" hidden></div>
+       <div class="ps-bar"><button class="ps-btn" type="button" id="exAddJe">+ Journal table</button><button class="ps-btn" type="button" id="exAddFs">+ Statement table</button></div>
+       <label class="ps-note" for="exAnswer">My answer / working for this exercise</label>
+       <textarea id="exAnswer" class="ps-notes" maxlength="15000" placeholder="Calculations, explanations, true/false answers…"></textarea>
+       <div class="ps-bar"><button class="ps-btn" type="button" id="exPrev">← Previous</button><button class="ps-btn" type="button" id="exNext">Next →</button><a class="ps-btn" id="exOpen" href="accounting-textbook.html">Textbook Exercises</a></div>
+      </section>
+     </div>
      <div id="exMBox" hidden></div>
     </div>
     <label class="ps-note" for="pageNotes">Working for this page (saved on this device)</label>
@@ -185,7 +198,38 @@ const TYPES=['Quick Study','Exercise','Problem A','Problem B'];
 let exKind='w';
 function fillWritten(){ loadIndex().then(ix=>{ const sel=$('exSel'),items=(ix.items||[]).filter(i=>i.pdfPage&&TYPES.includes(i.type));
   sel.innerHTML='<option value="">Go to a written exercise…</option>'+(ix.chapters||[]).filter(c=>c.group==='chapter').map(c=>TYPES.map(t=>{ const its=items.filter(i=>i.chapter===c.chapter&&i.type===t); if(!its.length) return '';
-   return '<optgroup label="Ch '+c.chapter+' · '+esc(c.name)+' · '+t+'">'+its.map(i=>'<option value="'+i.pdfPage+'">'+esc(i.id.replace(/-/,' ')+' · '+i.title.replace(/\s+[A-Z]?[!"#$%&'()]+$/,''))+'</option>').join('')+'</optgroup>'; }).join('')).join(''); }); }
+   return '<optgroup label="Ch '+c.chapter+' · '+esc(c.name)+' · '+t+'">'+its.map(i=>'<option value="'+i.pdfPage+'" data-id="'+esc(i.id)+'">'+esc(i.id.replace(/-/,' ')+' · '+i.title.replace(/\s+[A-Z]?[!"#$%&'()]+$/,''))+'</option>').join('')+'</optgroup>'; }).join('')).join(''); }); }
+/* Written exercise panel: answers live with Textbook Exercises (studyos.accounting.textbook.progress.v1, per exercise id):
+   notes and status as on that page, plus book tables bje (journal rows) and bfs (statement rows). There is no answer key
+   for the book's own numbers, so the tables only keep Dr = Cr totals; rewritten Study OS versions are checked in Practice. */
+const TBP='studyos.accounting.textbook.progress.v1';
+let SOS=null,exCur=null,exTimer=null,exJe=null,exFs=null;
+function tbRead(){ try{ const v=JSON.parse(localStorage.getItem(TBP)||'{}'); return v&&typeof v==='object'&&!Array.isArray(v)?v:{}; }catch(e){ return {}; } }
+function tbPatch(id,fn){ try{ const all=tbRead(),rec={...(all[id]||{})}; fn(rec); rec.updated=new Date().toISOString(); all[id]=rec; localStorage.setItem(TBP,JSON.stringify(all)); window.StudyCloud&&StudyCloud.dirty(); }catch(e){ $('err').textContent='Could not save (storage full).'; } }
+async function loadSos(){ if(SOS) return SOS; SOS={}; await Promise.all([5,6,7,8,9].map(async n=>{ try{ const r=await fetch('data/textbook-sos/ch'+n+'.json'); if(r.ok) for(const it of await r.json()) if(it&&it.id) SOS[it.id]=it; }catch(e){} })); return SOS; }
+const JE_WORDS=/journal|entr(y|ies)|record(ing|s)?\b|adjusting|closing|posting|transactions?\b/i, FS_WORDS=/income statement|balance sheet|statement of|reconcil|classified|multiple-step|single-step|cash flows|current assets/i;
+function exTables(item){ const sos=SOS&&SOS[item.id],t=item.title||'';
+  const je=sos&&window.StudyJE?StudyJE.parse(sos.solution).length>0:JE_WORDS.test(t);
+  const fs=sos&&window.StudyFS?StudyFS.parse(sos.solution).rows.length>0:FS_WORDS.test(t);
+  const title=sos&&window.StudyFS?StudyFS.parse(sos.solution).title:'';
+  return {je,fs,title}; }
+const exList=()=>((INDEX&&INDEX.items)||[]).filter(i=>i.pdfPage&&TYPES.includes(i.type));
+function exFlush(){ clearTimeout(exTimer); exTimer=null; if(!exCur) return; const v=$('exAnswer').value; tbPatch(exCur.id,r=>{ if(v.trim()) r.notes=v; else delete r.notes; }); }
+async function openExercise(id){
+  if(exTimer) exFlush(); await loadSos(); const item=exList().find(i=>i.id===id); if(!item) return; exCur=item;
+  const rec=tbRead()[id]||{},tb=exTables(item),clean=t=>String(t).replace(/\s+[A-Z]?[!"#$%&'()]+$/,'');
+  $('exPanel').hidden=false; $('exTitle').textContent=item.id.replace(/-/,' ')+' · '+clean(item.title);
+  $('exStatus').value=['new','doing','done'].includes(rec.status)?rec.status:'new';
+  $('exAnswer').value=typeof rec.notes==='string'?rec.notes:'';
+  $('exOpen').href='accounting-textbook.html?q='+encodeURIComponent(id);
+  const showJe=tb.je||Array.isArray(rec.bje), showFs=tb.fs||Array.isArray(rec.bfs);
+  $('exHint').textContent=(showJe||showFs)?'Tables keep a running Debit = Credit / total check. The book\'s answers are not built in; the rewritten version of this exercise in Practice is checked.':'';
+  $('pjeBox').hidden=!showJe; $('pfsBox').hidden=!showFs; $('exAddJe').hidden=showJe; $('exAddFs').hidden=showFs;
+  exJe=showJe?StudyJE.mount($('pjeBox'),{answer:[],rows:rec.bje||[],noCheck:true,btnClass:'ps-btn',save:rows=>tbPatch(id,r=>{ if(rows.length) r.bje=rows; else delete r.bje; })}):null;
+  exFs=showFs?StudyFS.mount($('pfsBox'),{answer:{title:tb.title||'Statement',rows:[]},rows:rec.bfs||[],noCheck:true,btnClass:'ps-btn',save:rows=>tbPatch(id,r=>{ if(rows.length) r.bfs=rows; else delete r.bfs; })}):null;
+  const sel=$('exSel'); if(sel.value!==String(item.pdfPage)||sel.selectedOptions[0]?.dataset.id!==id){ const o=[...sel.options].find(x=>x.dataset.id===id); if(o) sel.value=o.value; }
+}
+function exStep(d){ const L=exList(); const i=L.findIndex(x=>exCur&&x.id===exCur.id); const n=L[i+d]; if(n){ goPage(n.pdfPage); openExercise(n.id); } }
 const mcIds=()=>Object.keys(data.sets).filter(id=>data.sets[id].book===BOOK_ID).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
 function renderMc(msg){
   $('exW').setAttribute('aria-pressed',String(exKind==='w')); $('exM').setAttribute('aria-pressed',String(exKind==='m'));
@@ -259,7 +303,14 @@ function renderSheet(){
 $('addBtn').onclick=()=>$('file').click();
 $('pageGo').onclick=()=>{ const p=parseInt($('pageInput').value,10); if(p>=1) goPage(p); };
 $('pageInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('pageGo').click(); } });
-$('exSel').onchange=()=>{ const p=+$('exSel').value; if(p) goPage(p); };
+$('exSel').onchange=()=>{ const o=$('exSel').selectedOptions[0],p=+$('exSel').value; if(p) goPage(p); if(o&&o.dataset.id) openExercise(o.dataset.id); };
+$('exStatus').onchange=()=>{ if(exCur){ const v=$('exStatus').value; tbPatch(exCur.id,r=>{ r.status=v; }); } };
+$('exAnswer').addEventListener('input',()=>{ clearTimeout(exTimer); exTimer=setTimeout(exFlush,500); });
+$('exAnswer').addEventListener('blur',()=>{ if(exTimer) exFlush(); });
+addEventListener('pagehide',()=>{ if(exTimer) exFlush(); if(exJe) exJe.flush(); if(exFs) exFs.flush(); });
+$('exPrev').onclick=()=>exStep(-1); $('exNext').onclick=()=>exStep(1);
+$('exAddJe').onclick=()=>{ if(!exCur) return; tbPatch(exCur.id,r=>{ if(!Array.isArray(r.bje)) r.bje=[]; }); openExercise(exCur.id); };
+$('exAddFs').onclick=()=>{ if(!exCur) return; tbPatch(exCur.id,r=>{ if(!Array.isArray(r.bfs)) r.bfs=[]; }); openExercise(exCur.id); };
 $('exW').onclick=()=>{ exKind='w'; renderMc(); }; $('exM').onclick=()=>{ exKind='m'; renderMc(); };
 $('pageNotes').addEventListener('input',()=>{ clearTimeout(notesTimer); notesTimer=setTimeout(flushNotes,500); });
 $('pageNotes').addEventListener('blur',()=>{ if(notesTimer) flushNotes(); });
@@ -278,6 +329,8 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
   renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
 <script src="scripts/pdf-mcq.js?v=2"></script>
+<script src="scripts/je-grid.js?v=4"></script>
+<script src="scripts/fs-grid.js?v=3"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
 <script src="scripts/study-nav.js?v=8"></script>

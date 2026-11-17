@@ -73,7 +73,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | `studyos.today.v1` | Exams, plan ticks, timetable. `markChapter` must keep the other fields. |
 | `studyos.grades.v1` | Grades. |
 | `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). |
-| `studyos.accounting.textbook.progress.v1` | Textbook answers (`notes`, `status`, `updated`, `je`: journal-entry grid rows `[date, account, debit, credit]` from `scripts/je-grid.js`, and `fs`: statement-table rows `[line item, amount, total]` from `scripts/fs-grid.js`, both on acc.html written practice). |
+| `studyos.accounting.textbook.progress.v1` | Textbook answers (`notes`, `status`, `updated`, `je`: journal-entry grid rows `[date, account, debit, credit]` from `scripts/je-grid.js`, and `fs`: statement-table rows `[line item, amount, total]` from `scripts/fs-grid.js`, both on acc.html written practice; `bje` / `bfs`: the same tables for the book's own exercise, from the My PDF sets Written panel, never checked against an answer). |
 | `vocabloom_mvp_v1` | WordNest English data. |
 | `studyos.pomolog.v1` | Pomodoro history for Stats: `days` (`YYYY-MM-DD` → minutes of finished 25-minute sessions) and `lastEnd` (end time of the last counted session, so one session counts once). Written only by `index.html`. |
 | `studyos.excel.v1` | Excel page: ticked steps (`done`) and quiz answers (`ans`, `x<n>` → option index). |

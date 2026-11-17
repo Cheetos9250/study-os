@@ -44,7 +44,11 @@
             (record.je !== undefined && (!Array.isArray(record.je) || record.je.length > 40 ||
               !record.je.every(function (r) { return Array.isArray(r) && r.length <= 4 && r.every(function (c) { return typeof c === "string"; }); }))) ||
             (record.fs !== undefined && (!Array.isArray(record.fs) || record.fs.length > 40 ||
-              !record.fs.every(function (r) { return Array.isArray(r) && r.length <= 3 && r.every(function (c) { return typeof c === "string"; }); }))))
+              !record.fs.every(function (r) { return Array.isArray(r) && r.length <= 3 && r.every(function (c) { return typeof c === "string"; }); }))) ||
+            (record.bje !== undefined && (!Array.isArray(record.bje) || record.bje.length > 40 ||
+              !record.bje.every(function (r) { return Array.isArray(r) && r.length <= 4 && r.every(function (c) { return typeof c === "string"; }); }))) ||
+            (record.bfs !== undefined && (!Array.isArray(record.bfs) || record.bfs.length > 40 ||
+              !record.bfs.every(function (r) { return Array.isArray(r) && r.length <= 3 && r.every(function (c) { return typeof c === "string"; }); }))))
           throw new Error("Invalid accounting textbook answer data");
       }
     } else if (key === "studyos.home.v1") {
