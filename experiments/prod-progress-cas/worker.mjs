@@ -9,7 +9,10 @@
  */
 const SUBJECTS=['acc','eco','math','eng','zh'];
 const SUBJECT_SET=new Set(SUBJECTS);
-const MAX_BYTES=350_000;
+// Site-wide data (timetable, exams, plan ticks, grades, notes, tasks, textbook answers) as one CAS document.
+const APP='app';
+const APP_KEYS=new Set(['studyos.today.v1','studyos.home.v1','studyos.grades.v1','studyos.notes.v1','studyos.accounting.textbook.progress.v1']);
+const MAX_BYTES=350_000,APP_MAX_BYTES=1_000_000;
 const PROD_HOST='vocabloom-progress-cas-prod.kasidit09022550.workers.dev';
 const ORIGIN='https://cheetos9250.github.io';
 const PROTOCOL='vocabloom-cas-prod-candidate-v1';
@@ -20,7 +23,10 @@ const JSON_HEADERS={
 };
 const record=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const initial=()=>({study:{ans:{},ats:{},known:[],rst:0},srs:{s:{},m:{day:0,newDone:0}}});
-const validator=x=>record(x)&&record(x.study)&&record(x.study.ans)&&
+const appInitial=()=>({v:1,keys:{}});
+const appValidator=x=>record(x)&&x.v===1&&record(x.keys)&&Object.entries(x.keys).every(([k,e])=>
+ APP_KEYS.has(k)&&record(e)&&typeof e.value==='string'&&Number.isFinite(e.ts)&&(e.dev===undefined||typeof e.dev==='string'));
+const progressValidator=x=>record(x)&&record(x.study)&&record(x.study.ans)&&
  record(x.study.ats)&&(x.study.known===undefined||Array.isArray(x.study.known))&&
  (x.study.rst===undefined||Number.isFinite(x.study.rst))&&
  record(x.srs)&&record(x.srs.s)&&record(x.srs.m);
@@ -44,8 +50,11 @@ function safeEqual(a,b){
 export class ProductionProgressDO {
  constructor(ctx){this.ctx=ctx;}
  async fetch(request){
+  // The Worker router tells the object which document it holds; anything else uses the progress schema.
+  const isApp=request.headers.get('X-Study-Subject')===APP;
+  const blank=isApp?appInitial:initial,validator=isApp?appValidator:progressValidator,limit=isApp?APP_MAX_BYTES:MAX_BYTES;
   if(request.method==='GET'){
-   const stored=this.ctx.storage.kv.get('record')??{revision:0,value:initial()};
+   const stored=this.ctx.storage.kv.get('record')??{revision:0,value:blank()};
    return json(stored.value,200,stored.revision);
   }
   if(request.method!=='PUT')return json({error:'Method not allowed'},405);
@@ -56,17 +65,17 @@ export class ProductionProgressDO {
   if(!/^application\/json(?:\s*;|$)/i.test(type))
    return json({error:'JSON content type required'},415);
   const declared=Number(request.headers.get('Content-Length'));
-  if(Number.isFinite(declared)&&declared>MAX_BYTES)
+  if(Number.isFinite(declared)&&declared>limit)
    return json({error:'Payload too large'},413);
   const raw=await request.text();
-  if(new TextEncoder().encode(raw).byteLength>MAX_BYTES)
+  if(new TextEncoder().encode(raw).byteLength>limit)
    return json({error:'Payload too large'},413);
   let submitted;
   try{submitted=JSON.parse(raw)}catch{return json({error:'Invalid JSON'},400)}
   if(!validator(submitted))return json({error:'Invalid progress schema'},400);
   // Synchronous kv.get + kv.put without await forms an atomic critical section
   // for SQLite-backed Durable Objects. Never insert an await between them.
-  const current=this.ctx.storage.kv.get('record')??{revision:0,value:initial()};
+  const current=this.ctx.storage.kv.get('record')??{revision:0,value:blank()};
   if(expected!=='"'+current.revision+'"')
    return json({error:'Revision conflict',revision:current.revision},409,current.revision);
   const next={revision:current.revision+1,value:submitted};
@@ -111,7 +120,7 @@ export default {
     subjects:SUBJECTS
    },200));
   const m=url.pathname.match(/^\/progress\/([a-z]+)$/);
-  if(!m||!SUBJECT_SET.has(m[1]))return cors(json({error:'Unknown endpoint'},404));
+  if(!m||!(SUBJECT_SET.has(m[1])||m[1]===APP))return cors(json({error:'Unknown endpoint'},404));
   if(request.method==='PUT'&&!writesEnabled)
    return cors(json({error:'Migration approval and write enablement required'},423));
   if(request.method!=='GET'&&request.method!=='PUT')
@@ -121,6 +130,8 @@ export default {
    return cors(json({error:'Dedicated production Durable Object binding missing'},503));
   const id=env.PROD_PROGRESS_DO.idFromName('vocabloom:production-progress:v1:'+m[1]);
   const stub=env.PROD_PROGRESS_DO.get(id);
-  return cors(await stub.fetch(request));
+  // Set by the router only (a client value is overwritten), so a course document can never take the app schema.
+  const inner=new Request(request);inner.headers.set('X-Study-Subject',m[1]);
+  return cors(await stub.fetch(inner));
  }
 };

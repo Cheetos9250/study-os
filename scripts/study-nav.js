@@ -1,5 +1,5 @@
 /* Study OS navigation: left sidebar on wide screens, bottom tab bar on narrow ones.
-   Reads and writes no study data. The theme control uses window.StudyTheme. */
+   Reads and writes no study data (Cloud sync opens window.StudySyncApp). The theme control uses window.StudyTheme. */
 (function(){
  'use strict';
  if(typeof document==='undefined'||document.getElementById('studyNav'))return;
@@ -97,7 +97,7 @@
   var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><button type="button" class="sn-fold" aria-pressed="false"></button><div class="sn-tabs">';
   TABS.forEach(function(t){h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+' title="'+esc(t.label)+'">'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
   h+='<button type="button" class="sn-more" aria-expanded="false" aria-controls="snFoot">'+svg('more')+'<span>More</span></button></div>';
-  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(course?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
+  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(course||window.StudySyncApp?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
   MORE.forEach(function(m){h+='<a href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
   h+='</div>';
   nav.innerHTML=h;document.body.appendChild(nav);if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){/* Course pages: load only the glyphs the nav shows (Google Fonts text=), a few KB instead of whole Japanese fonts. */var tx=nav.textContent.replace(/\s+/g,'');var u={};tx.split('').forEach(function(c){u[c]=1;});var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap&text='+encodeURIComponent(Object.keys(u).sort().join('')+'0123456789');document.head.appendChild(fl);}document.documentElement.classList.add('sn-on');
@@ -105,7 +105,9 @@
   more.onclick=function(e){e.stopPropagation();var o=nav.classList.toggle('sn-open');more.setAttribute('aria-expanded',o?'true':'false');};
   document.addEventListener('click',function(e){if(!nav.contains(e.target)){nav.classList.remove('sn-open');more.setAttribute('aria-expanded','false');}});
   var sy=nav.querySelector('.sn-sync');
-  if(sy)sy.onclick=function(){var on=document.documentElement.classList.toggle('show-sync');nav.classList.remove('sn-open');var bar=document.querySelector('.cloud-sync-bar');if(on&&bar&&bar.scrollIntoView)bar.scrollIntoView({block:'center'});};
+  // Core pages: the site-wide sync panel. Course pages: their own sync bar (course progress) as before.
+  if(sy&&!course)sy.onclick=function(){nav.classList.remove('sn-open');window.StudySyncApp.open();};
+  else if(sy)sy.onclick=function(){var on=document.documentElement.classList.toggle('show-sync');nav.classList.remove('sn-open');var bar=document.querySelector('.cloud-sync-bar');if(on&&bar&&bar.scrollIntoView)bar.scrollIntoView({block:'center'});};
   var tb=nav.querySelector('.sn-theme'),T=window.StudyTheme;
   function paint(){if(!T){tb.hidden=true;return;}var m=T.mode();tb.innerHTML=svg(m)+'<span>'+esc(T.LABEL[m])+'</span>';tb.setAttribute('aria-label',T.LABEL[m]+' (tap to change)');}
   tb.onclick=function(){if(T){T.cycle();paint();}};paint();

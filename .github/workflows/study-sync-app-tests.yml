@@ -1,0 +1,50 @@
+name: Study OS site-wide cloud sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/study-sync-app.js"
+      - "scripts/study-nav.js"
+      - "experiments/prod-progress-cas/**"
+      - "tests/study-sync-app*.cjs"
+      - "index.html"
+      - "calendar.html"
+      - ".github/workflows/study-sync-app-tests.yml"
+  pull_request:
+    paths:
+      - "scripts/study-sync-app.js"
+      - "scripts/study-nav.js"
+      - "experiments/prod-progress-cas/**"
+      - "tests/study-sync-app*.cjs"
+      - "index.html"
+      - "calendar.html"
+      - ".github/workflows/study-sync-app-tests.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: study-os-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  sync-app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Merge engine + Worker tests (offline, synthetic data)
+        run: node --test tests/study-sync-app.test.cjs experiments/prod-progress-cas/*.test.mjs
+      - name: Install isolated browser dependency
+        run: npm install --prefix "$RUNNER_TEMP/sync-browser" --no-save --ignore-scripts playwright@1.62.1
+      - name: Install Chromium
+        run: '"$RUNNER_TEMP/sync-browser/node_modules/.bin/playwright" install --with-deps chromium'
+      - name: Two-device browser check against a local mock Worker
+        env:
+          NODE_PATH: ${{ runner.temp }}/sync-browser/node_modules
+        run: node tests/study-sync-app-browser.cjs

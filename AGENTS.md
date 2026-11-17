@@ -95,6 +95,7 @@ node tests/auto-sync-browser.cjs
 - That deploy needs the owner to add the GitHub secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `PROGRESS_SYNC_KEY`, then run the workflow and type `DEPLOY`. The owner postponed this.
 - After the smoke test passes, add `progress_api` to `data/config.json`. Course pages and WordNest already support it, including auto sync.
 - Owner request (15 Nov 2026, after losing quiz answers when the iPad cleared site data): when cloud sync goes live it must also sync `studyos.today.v1` (timetable, exams, plan ticks), not only course progress. Until then the owner chose device-side protection: `navigator.storage.persist()` on every page and the Today backup reminder.
+- Site-wide sync (built 16 Nov 2026, waits for the same deploy): `scripts/study-sync-app.js` syncs `studyos.today.v1`, `studyos.home.v1` (tasks + checklist only; images stay local), `studyos.grades.v1`, `studyos.notes.v1` and the textbook answers through `/progress/app` on the same Worker (own schema, 1 MB limit). Opt-in with the shared `study-sync-auto-v1` switch, `progress_api` only. Local state keys: `study-sync-app-state-v1`, `study-sync-app-device-v1`, `study-sync-app-conflict-v1` (local value before a merge). A new synced key must be added to `KEYS` in that script and `APP_KEYS` in the Worker. Tests: `tests/study-sync-app.test.cjs`, `tests/study-sync-app-browser.cjs`.
 - `study-api-cas-staging-only` is a staging prototype. Do not use it for real data.
 
 ## Open items
