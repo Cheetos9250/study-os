@@ -1,0 +1,1 @@
+- Fix: Practice no longer jumps back to question 1 when the saved questions finish loading or when cloud sync refreshes your answers; it stays on the question you are on.

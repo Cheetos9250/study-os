@@ -332,9 +332,10 @@ if((window.ECO_PRACTICE_MCQ||[]).some(q=>q.cat==='f')&&!CATS.some(c=>c[0]==='f')
   const idx=q.opts.map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   QS.push({id:q.id,cat:q.cat,q:q.q,opts:q.opts,exp:q.exp,order:idx,right:0,case:q.case||''}); });
 let qcats=new Set(), missedOnly=false, unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
-function buildDeck(){ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
-  qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; } }
+  qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
+  else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
 let qJump=new URLSearchParams(location.search).get('q');
 function renderQ(){
   (function(box){ box.innerHTML='';
@@ -520,7 +521,7 @@ async function loadExtQ(){
       setExtQ(rows);
       const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
       qStat='Loaded from Notion · added '+n+' ข้อ'; qStatErr=false;
-      if(qpos>=QS.length) qpos=0; buildDeck(); renderQ(); return;
+      if(qpos>=QS.length) qpos=0; buildDeck(true); renderQ(); return;
     }catch(e){ lastErr=e; await new Promise(r=>setTimeout(r,2500*(a+1))); }
   }
   const n=QS.filter(q=>String(q.id).startsWith('n-')).length;
@@ -541,7 +542,7 @@ async function loadStatic(){
     if(c&&c.rows){ const cr=c.rows.filter(x=>x.Subject===SUBJ); setExt(cr); try{ localStorage.setItem(EXT_KEY,JSON.stringify(cr)); }catch(e){} cardsRow(); if(!shown) renderCard(); }
     const n=QS.filter(x=>String(x.id).startsWith('n-')).length;
     qStat='Saved questions · added '+n+' questions · updated '+(q.updated||'-'); qStatErr=false;
-    if(qpos>=QS.length) qpos=0; buildDeck(); renderQ();
+    if(qpos>=QS.length) qpos=0; buildDeck(true); renderQ();
   }catch(e){}
 }
 setInterval(()=>{ if(!cur&&!$('#tab-cards').hidden){ cardsRow(); renderCard(); } },20000);
@@ -594,7 +595,7 @@ window.__xs=(()=>{
     try{
       store.ans=m.study.ans; store.ats=m.study.ats; store.rst=m.study.rst; store.known=m.study.known; store.rv=m.study.rv||{}; window.StudyReview&&StudyReview.seed(store,QS,Date.now()); save();
       srs=m.srs.s; meta=m.srs.m; saveS();
-      try{ buildDeck(); renderQ(); cardsRow(); if(!shown) renderCard(); }catch(e){}
+      try{ buildDeck(true); renderQ(); cardsRow(); if(!shown) renderCard(); }catch(e){}
     } finally { applying=false; }
   }
   async function sync(manual,auto){
