@@ -54,7 +54,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 
 Shared scripts and styles:
 - `scripts/study-nav.js`: sidebar on screens ≥ 900 px, bottom bar below that. Tabs: Today · Flashcards · Practice · Lessons · Calendar. The footer has theme, Grades, Back up, Restore and Cloud sync (course pages only).
-- `scripts/study-theme.js`: auto/dark/light theme.
+- `scripts/study-theme.js`: auto/dark/light theme. It also registers `sw.js` (https only): network-first offline cache of same-origin files; never caches `data/config.json` or other origins. Bump `VERSION` in `sw.js` only when the cache layout changes.
 - `scripts/study-today.js`: `window.StudyToday`. Provides `COURSES`, `LANGS`, exams, the plan engine, `normalizeTimetable` and `classesOn`.
 - `scripts/study-grades.js`: grade maths.
 - `assets/study-unify.css`: gives course pages the site look.

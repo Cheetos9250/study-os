@@ -1,0 +1,33 @@
+name: Study OS offline (service worker)
+
+on:
+  push:
+    branches: [main]
+    paths: ["sw.js", "scripts/study-theme.js", "tests/offline-sw*.cjs", ".github/workflows/offline-sw.yml"]
+  pull_request:
+    paths: ["sw.js", "scripts/study-theme.js", "tests/offline-sw*.cjs", ".github/workflows/offline-sw.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: study-os-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/offline-sw.test.cjs
+      - run: npm install --prefix "$RUNNER_TEMP/sw" --no-save --ignore-scripts playwright@1.62.1
+      - run: '"$RUNNER_TEMP/sw/node_modules/.bin/playwright" install --with-deps chromium'
+      - name: Offline browser check
+        env:
+          NODE_PATH: ${{ runner.temp }}/sw/node_modules
+        run: node tests/offline-sw-browser.cjs

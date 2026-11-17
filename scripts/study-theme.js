@@ -20,6 +20,8 @@
  function cycle(){mode=NEXT[mode];apply(mode);try{if(mode==='auto')localStorage.removeItem(KEY);else localStorage.setItem(KEY,mode);}catch(e){}return mode;}
  /* Ask the browser to keep this site's data instead of clearing it under storage pressure (iPadOS honours this best for home-screen apps). */
  try{if(navigator.storage&&navigator.storage.persisted&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist();}).catch(function(){});}catch(e){}
+ /* Offline support: register sw.js (site root, next to this scripts/ folder) on https only. It caches site files, never study data. */
+ try{var cs=document.currentScript;if('serviceWorker' in navigator&&location.protocol==='https:'&&cs&&cs.src){var swu=new URL('../sw.js',cs.src);window.addEventListener('load',function(){navigator.serviceWorker.register(swu.href,{scope:new URL('./',swu).href}).catch(function(){});});}}catch(e){}
  /* read-only view of Today's running Pomodoro (studyos.pomo.v1 is written only by index.html) */
  function pomo(){try{var s=JSON.parse(localStorage.getItem('studyos.pomo.v1')||'null');return s&&s.endAt?s:null;}catch(e){return null;}}
  window.StudyTheme={pomo:pomo,mode:function(){return mode;},cycle:cycle,ICON:ICON,LABEL:LABEL,collapsed:function(){return collapsed;},setCollapsed:setCollapsed,focus:function(){return focus;},setFocus:setFocus};

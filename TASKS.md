@@ -84,7 +84,7 @@ Add `studyos.excel.v1` and `studyos.pdfsets.v1` to cloud sync, using the `home` 
 
 ### 7. Works offline (Thai: เปิดได้แม้ไม่มีเน็ต)
 
-Status: todo
+Status: done (#149)
 
 Add a service worker that caches the core pages, `scripts/`, `assets/` and `data/*.json`, so the site opens offline and as a home-screen app.
 - It must never touch localStorage or IndexedDB data.
