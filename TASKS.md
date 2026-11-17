@@ -109,7 +109,7 @@ On Today, add a **Continue** card that opens the last page and question the owne
 
 ### 10. Stats page (Thai: หน้าสถิติ)
 
-Status: todo
+Status: done (#155)
 
 Add a **Stats** page linked from the nav footer. It shows:
 - Pomodoro minutes per day;

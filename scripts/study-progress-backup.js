@@ -24,7 +24,7 @@
     Object.keys(COURSES).flatMap(function (course) {
       var mark = COURSES[course];
       return ["study-" + course, mark + "-srs", mark + "-typ"];
-    }).concat(["vocabloom_mvp_v1", "studyos.accounting.textbook.progress.v1", "studyos.home.v1", "studyos.today.v1", "studyos.grades.v1", "studyos.notes.v1", "studyos.pdfsets.v1", "studyos.excel.v1"])
+    }).concat(["vocabloom_mvp_v1", "studyos.accounting.textbook.progress.v1", "studyos.home.v1", "studyos.today.v1", "studyos.grades.v1", "studyos.notes.v1", "studyos.pdfsets.v1", "studyos.pomolog.v1", "studyos.excel.v1"])
   );
   var ALLOWED = new Set(KEYS);
 
@@ -116,6 +116,7 @@
     if (key === "studyos.notes.v1") return "Lesson notes";
     if (key === "studyos.pdfsets.v1") return "PDF practice answers";
     if (key === "studyos.excel.v1") return "Excel lesson progress";
+    if (key === "studyos.pomolog.v1") return "Pomodoro history";
     var names = { acc: "Accounting", eco: "Economics", math: "Mathematics", eng: "English", zh: "Chinese" };
     for (var course of Object.keys(COURSES)) {
       if (key === "study-" + course) return names[course] + " quiz answers";
