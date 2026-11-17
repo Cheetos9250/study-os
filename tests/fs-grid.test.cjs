@@ -38,3 +38,14 @@ test('acc.html shows the statement table and stores rows as fs in the textbook r
  R.plan(mem(),snap({'QS-9-26':{fs:[['Sales','248000','']]}}),'https://x.test');
  assert.throws(()=>R.plan(mem(),snap({'QS-9-26':{fs:[['a','b','c','d']]}}),'https://x.test'));
 });
+test('balance sheet: net receivables may be typed as its parts; title says Balance sheet',()=>{
+ const sol="| Current assets |  |\n|---|---|\n| Cash | 11,600 |\n| Accounts receivable 58,400 − allowance 3,150 | 55,250 |\n| Prepaid rent | 1,500 |\n| **Total current assets** | **68,350** |";
+ const a=F.parse(sol);
+ assert.ok(F.check([['Cash','11600',''],['Accounts receivable','58400',''],['Less allowance','(3,150)',''],['Prepaid rent','1500',''],['Total current assets','','68350']],a).all);
+ assert.ok(F.check([['Cash','11600',''],['Accounts receivable, net','55250',''],['Prepaid rent','1500',''],['Total current assets','','68350']],a).all);
+ assert.equal(F.check([['Cash','11600',''],['Total current assets','','68,000']],a).all,false);
+ assert.match(fs.readFileSync(path.join(root,'scripts/fs-grid.js'),'utf8'),/'Balance sheet · '\+x/);
+});
+test('"All correct" for the number checks stays hidden until the numbers are checked',()=>{
+ assert.match(fs.readFileSync(path.join(root,'acc.html'),'utf8'),/\.tb-row\[hidden\]\{display:none\}/);
+});

@@ -46,7 +46,9 @@
     const c=cells(lines[i]),label=(c[0]||'').replace(/\*+/g,'').trim();
     const amts=c.slice(1).map(num).filter(v=>v!==null&&v!==0).map(Math.abs);
     if(!label||!amts.length)continue;
-    rows.push({label,amts,total:/^\s*\*\*/.test(c[0])||c.slice(1).some(x=>/^\*\*/.test(x))});
+    /* numbers written inside a label ("Accounts receivable 58,400 − allowance 3,150") are accepted on their own lines too */
+    const inLabel=(label.match(/\(?\$?\d[\d,]*(?:\.\d+)?\)?/g)||[]).map(num).filter(v=>v!==null&&Math.abs(v)>=10).map(Math.abs);
+    rows.push({label,amts,also:inLabel,total:/^\s*\*\*/.test(c[0])||c.slice(1).some(x=>/^\*\*/.test(x))});
    }
    i--;
   }
@@ -71,8 +73,11 @@
   }
   const all=typed.flatMap(u=>u.amts);
   const need=plain.flatMap(r=>r.amts),pool=all.slice();let lOk=0;
-  for(const v of need){const k=pool.findIndex(x=>close(x,v));if(k>=0){pool.splice(k,1);lOk++;}}
-  const known=ans.rows.flatMap(r=>r.amts);
+  for(const r of plain)for(const v of r.amts){let k=pool.findIndex(x=>close(x,v));
+   /* a net line may be shown as its parts (58,400 and 3,150 for 55,250) */
+   if(k<0&&r.also&&r.also.length>=2&&r.also.every(a=>pool.some(x=>close(x,a)))){lOk++;continue;}
+   if(k>=0){pool.splice(k,1);lOk++;}}
+  const known=ans.rows.flatMap(r=>r.amts.concat(r.also||[]));
   const res=rows.map((r,i)=>{
    if(!filled(r))return null;const u=typed[i];
    if(!u.amts.length)return String(r[0]).trim()?null:{ok:false,why:'Enter an amount'};
@@ -101,7 +106,8 @@
  +'.fs-row{padding-bottom:6px;border-bottom:1px dashed rgba(127,127,127,.35)}.fs-head{display:none}}';
  function ensureCss(doc){if(doc.getElementById('fsCss'))return;const s=doc.createElement('style');s.id='fsCss';s.textContent=CSS;doc.head.appendChild(s);}
  function html(){return '<div class="fs" id="fsBox" role="group" aria-label="Statement"></div>';}
- const nice=t=>{const m=String(t).split(/\s+—\s+/);return m.length>1?m.slice(1).join(' — '):t;};
+ const nice=t=>{const m=String(t).split(/\s+—\s+/);const x=m.length>1?m.slice(1).join(' — '):String(t);
+  return /^(current|non-current|plant|long-term)?\s*(assets|liabilities|equity)\b/i.test(x)?'Balance sheet · '+x:x;};
  /* Mount the table in box. opts: {answer:{title,rows}, rows, save(rows), onAllCorrect()} */
  function mount(box,opts){
   if(!box)return null;ensureCss(box.ownerDocument);
