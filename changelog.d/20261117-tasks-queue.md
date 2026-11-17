@@ -1,0 +1,1 @@
+- Add `TASKS.md`: numbered work queue so the owner can hand a task to any agent ("ทำข้อ N ใน TASKS.md").
