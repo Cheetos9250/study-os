@@ -1,0 +1,1 @@
+- **Search** across the site: a search field at the top of the sidebar (More → Search on phones, or press `/`). Finds quiz questions, written exercises, flashcards, summaries, textbook exercises and your lesson notes; tap a result to open that question or chapter.
