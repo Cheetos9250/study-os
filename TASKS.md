@@ -61,7 +61,7 @@ Status: todo
 
 ### 5. Weekly backup prompt (Thai: Back up อัตโนมัติ)
 
-Status: todo
+Status: done (#148)
 
 Today already has a backup reminder (`studyos.backup-meta.v1`). Make it stronger:
 - once a week, offer a one-tap backup that downloads the JSON or opens the iPad share sheet (`navigator.share` with a file, falling back to a download);
