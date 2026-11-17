@@ -175,6 +175,7 @@ td:first-child{font-weight:500;min-width:7.5em}
     <div id="qBody"></div>
   </section>
 </div>
+<script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-progress-backup.js?v=20261113-compare"></script>
 <script src="scripts/study-course-storage.js?v=20261114-cross-tab"></script>
@@ -590,6 +591,7 @@ function renderQ(){
   h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missed||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
+  window.StudyLast&&StudyLast.mark({href:D.key+'.html?tab=prac&q='+encodeURIComponent(q.id),title:D.title+' · Practice',sub:'Q '+(qpos+1)+' · '+q.q,course:D.key});
   h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
   if(q.tb) h+='<div class="qsrc" style="font-size:12px;opacity:.7;margin:4px 0">Textbook style · '+esc(q.tb)+'</div>';
   if(q.case) h+='<div class="qcase" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;line-height:1.55;overflow-wrap:anywhere">'+rich(q.case)+'</div>';

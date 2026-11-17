@@ -1,0 +1,1 @@
+- Today: a **Continue** card reopens the last question you worked on (Accounting, Economics and Math practice, and Textbook exercises), with a large countdown to the next exam for that subject. Economics and Math practice now accept `?q=` links like Accounting.

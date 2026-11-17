@@ -171,6 +171,7 @@ td:first-child{font-weight:500;min-width:7.5em}
     <div id="qBody"></div>
   </section>
 </div>
+<script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-progress-backup.js?v=20261113-compare"></script>
 <script src="scripts/study-course-storage.js?v=20261114-cross-tab"></script>
@@ -332,7 +333,8 @@ const revChip=()=>'<button class="chip" id="revBtn" aria-pressed="'+reviewOnly+'
 let qcats=new Set(), missedOnly=false, unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
 function buildDeck(){ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
-  qpos=0; }
+  qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; } }
+let qJump=new URLSearchParams(location.search).get('q');
 function renderQ(){
   (function(box){ box.innerHTML='';
     [['all','All'],...CATS].forEach(([id,l])=>{
@@ -351,6 +353,8 @@ function renderQ(){
   h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>!qcats.size||qcats.has(q.cat)).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
+  if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
+  window.StudyLast&&StudyLast.mark({href:D.key+'.html?tab=prac&q='+encodeURIComponent(q.id),title:D.title+' · Practice',sub:'Q '+(qpos+1)+' · '+q.q,course:D.key});
   h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
   if(q.case) h+='<div class="qcase" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;line-height:1.55;overflow-wrap:anywhere">'+(window.StudySosMd?StudySosMd(q.case):rich(q.case))+'</div>';
   h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';

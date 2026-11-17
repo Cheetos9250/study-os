@@ -99,7 +99,7 @@ Add a search box to the nav (`scripts/study-nav.js`). It searches flashcards, su
 
 ### 9. "Continue where I left off" on Today (Thai: ปุ่มเรียนต่อจากล่าสุด)
 
-Status: todo
+Status: done (#151)
 
 On Today, add a **Continue** card that opens the last page and question the owner worked on, plus a large countdown to the next exam. Store the last place in sessionStorage or an existing key. A new localStorage key must follow the backup rules.
 
