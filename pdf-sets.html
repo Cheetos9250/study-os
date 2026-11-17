@@ -41,6 +41,7 @@ h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px)}
 .ps-viewer canvas{display:block;width:100%;height:auto;margin:0 0 8px;border-radius:6px;background:#fff}
 .ps-sheet{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
 @media (max-width:900px){.ps-sheet{position:static;max-height:none}}
+.ps-mc{display:grid;gap:8px;margin:0 0 14px}.ps-mc .ps-set{min-height:44px}.ps-mc small,.ps-mcnote{font-size:13px;opacity:.75}
 .ps-jump{display:none}@media (max-width:900px){.ps-jump{display:inline-flex}}
 .ps-sheet h2{font-size:16px;margin:0 0 6px}
 .ps-score{font:700 22px var(--mono);margin:4px 0 8px}
@@ -82,7 +83,11 @@ input[type=file]{display:none}
   <aside class="ps-sheet" aria-label="Answer sheet">
    <div class="ps-tools">
     <div class="ps-bar"><b id="pageNow">Page 1</b><input id="pageInput" type="number" min="1" inputmode="numeric" aria-label="Go to page" style="width:90px"><button class="ps-btn" id="pageGo" type="button">Go</button></div>
-    <div class="ps-bar" id="exBar" hidden><select id="exSel" class="ps-btn" aria-label="Go to exercise" style="max-width:100%"></select></div>
+    <div id="exBar" hidden>
+     <div class="ps-bar" role="group" aria-label="Exercise type"><button class="ps-btn" id="exW" type="button" aria-pressed="true">Written</button><button class="ps-btn" id="exM" type="button" aria-pressed="false">Multiple choice</button></div>
+     <div class="ps-bar" id="exWBox"><select id="exSel" class="ps-btn" aria-label="Go to a written exercise" style="max-width:100%"></select></div>
+     <div id="exMBox" hidden></div>
+    </div>
     <label class="ps-note" for="pageNotes">Working for this page (saved on this device)</label>
     <textarea id="pageNotes" class="ps-notes" maxlength="20000" placeholder="Write your working here…"></textarea>
    </div>
@@ -117,7 +122,7 @@ const COURSE={eco:'Economics',math:'Mathematics',acc:'Accounting',other:'Other'}
 const BOOK_ID='ptextbook', BOOK_DB='studyos-accounting-pdf-v1', BOOK_STORE='book';
 function bookDb(){ return new Promise((res,rej)=>{ const r=indexedDB.open(BOOK_DB,1); r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(BOOK_STORE)) r.result.createObjectStore(BOOK_STORE); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
 async function bookIdb(op,val){ const d=await bookDb(); return new Promise((res,rej)=>{ const tx=d.transaction(BOOK_STORE,op==='get'?'readonly':'readwrite'); const st=tx.objectStore(BOOK_STORE); const rq=op==='get'?st.get('pdf'):op==='put'?st.put(val,'pdf'):st.delete('pdf'); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); tx.oncomplete=()=>d.close(); }); }
-async function getBlob(id){ if(id===BOOK_ID){ const b=await bookIdb('get'); return b||null; } const rec=await idb('get',id); return rec&&rec.blob; }
+async function getBlob(id){ if(id===BOOK_ID||(data.sets[id]&&data.sets[id].book===BOOK_ID)){ const b=await bookIdb('get'); return b||null; } const rec=await idb('get',id); return rec&&rec.blob; }
 let INDEX=null; async function loadIndex(){ if(INDEX) return INDEX; try{ const r=await fetch('data/accounting-textbook-index.json'); INDEX=r.ok?await r.json():{items:[],chapters:[]}; }catch(e){ INDEX={items:[],chapters:[]}; } return INDEX; }
 
 function setId(f){ let h=0; const s=f.name+'|'+f.size; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return 'p'+(h>>>0).toString(36); }
@@ -169,15 +174,55 @@ async function select(id){
     io=new IntersectionObserver(es=>es.forEach(e=>{ const d=e.target; if(e.isIntersecting) draw(d).catch(()=>{ delete d.dataset.done; }); else if(d.dataset.done){ delete d.dataset.done; d.innerHTML='<span>'+d.dataset.p+'</span>'; } }),{rootMargin:'1500px 0px'});
     seen=new IntersectionObserver(es=>{ const vis=es.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(vis){ const p=+vis.target.dataset.p; if(p!==curPage){ if(notesTimer) flushNotes(); curPage=p; showPage(); } } },{threshold:[0.35,0.6]});
     v.querySelectorAll('.ps-pg').forEach(d=>{ io.observe(d); seen.observe(d); });
+    if(s.book&&s.page&&s.page[1]) requestAnimationFrame(()=>goPage(s.page[1]));
   }catch(e){ v.innerHTML='<p class="ps-err">'+esc(e.message||'Could not open the PDF.')+'</p>'; }
 }
 function goPage(p){ const el=$('pg'+p); if(el) el.scrollIntoView({behavior:'auto',block:'start'}); }
 function flushNotes(){ clearTimeout(notesTimer); notesTimer=null; const s=data.sets[cur]; if(!s) return; const t=$('pageNotes').value; s.notes=s.notes||{}; if(t.trim()) s.notes[curPage]=t; else delete s.notes[curPage]; save(); }
 function showPage(){ const s=data.sets[cur]; if(!s) return; $('pageNow').textContent='Page '+curPage+(s.pages?' of '+s.pages:''); $('pageNotes').value=(s.notes&&s.notes[curPage])||''; $('pageInput').placeholder=String(curPage); }
+/* ---------- textbook: written exercises (from the textbook index) and each chapter's multiple-choice quiz ---------- */
+const TYPES=['Quick Study','Exercise','Problem A','Problem B'];
+let exKind='w';
+function fillWritten(){ loadIndex().then(ix=>{ const sel=$('exSel'),items=(ix.items||[]).filter(i=>i.pdfPage&&TYPES.includes(i.type));
+  sel.innerHTML='<option value="">Go to a written exercise…</option>'+(ix.chapters||[]).filter(c=>c.group==='chapter').map(c=>TYPES.map(t=>{ const its=items.filter(i=>i.chapter===c.chapter&&i.type===t); if(!its.length) return '';
+   return '<optgroup label="Ch '+c.chapter+' · '+esc(c.name)+' · '+t+'">'+its.map(i=>'<option value="'+i.pdfPage+'">'+esc(i.id.replace(/-/,' ')+' · '+i.title.replace(/\s+[A-Z]?[!"#$%&'()]+$/,''))+'</option>').join('')+'</optgroup>'; }).join('')).join(''); }); }
+const mcIds=()=>Object.keys(data.sets).filter(id=>data.sets[id].book===BOOK_ID).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+function renderMc(msg){
+  $('exW').setAttribute('aria-pressed',String(exKind==='w')); $('exM').setAttribute('aria-pressed',String(exKind==='m'));
+  $('exWBox').hidden=exKind!=='w'; $('exMBox').hidden=exKind!=='m'; if(exKind!=='m') return;
+  const ids=mcIds();
+  $('exMBox').innerHTML=(ids.length?'<div class="ps-mc">'+ids.map(id=>{ const s=data.sets[id],st=stats(s); return '<button class="ps-set" type="button" data-mc="'+id+'"><b>'+esc(s.name.replace(/^Accounting textbook · /,''))+'</b><small>'+s.n+' questions · '+st.ans+' answered'+(st.keyN?' · '+st.ok+' correct':' · no key found')+'</small></button>'; }).join('')+'</div>':'')
+   +'<p class="ps-mcnote" role="status">'+esc(msg||(ids.length?'Answers are saved like any other set. The key comes from the answers printed in the book; check it in Answer key.':'Find each chapter\'s Multiple Choice Quiz in your PDF and make an answer sheet for it. This reads the pages near each chapter\'s end on this device.'))+'</p>'
+   +'<button class="ps-btn" type="button" id="mcScan">'+(ids.length?'Scan again':'Find multiple-choice quizzes')+'</button>';
+  $('exMBox').querySelectorAll('[data-mc]').forEach(b=>b.onclick=()=>select(b.dataset.mc));
+  $('mcScan').onclick=scanMcq;
+}
+let scanning=false;
+async function scanMcq(){
+  if(scanning||cur!==BOOK_ID||!window.PdfMcq) return; scanning=true; $('mcScan').disabled=true;
+  /* the book may still be opening right after it was added: wait for it (up to 20 s) */
+  if(!doc){ renderMc('Opening the book…'); for(let i=0;i<100&&!doc&&cur===BOOK_ID;i++) await new Promise(r=>setTimeout(r,200)); }
+  if(!doc||cur!==BOOK_ID){ scanning=false; renderMc('The book is not open yet. Tap the textbook above, then try again.'); return; }
+  try{ const ix=await loadIndex(); let found=0; const chs=(ix.chapters||[]).filter(c=>c.group==='chapter');
+    for(const c of chs){
+      const firsts=(ix.items||[]).filter(i=>i.chapter===c.chapter&&i.type==='Quick Study'&&i.pdfPage).map(i=>i.pdfPage); if(!firsts.length) continue;
+      const first=Math.min(...firsts),from=Math.max(1,first-20),to=Math.min(doc.numPages,first+1),lines=[];
+      renderMc('Reading Ch '+c.chapter+' (pages '+from+'–'+to+')…');
+      for(let p=from;p<=to;p++){ if(cur!==BOOK_ID||!doc) return; const page=await doc.getPage(p); lines.push(...PdfMcq.pageLines(await page.getTextContent(),p)); }
+      const q=PdfMcq.findQuiz(lines); if(!q.n) continue;
+      const id='ptbmc'+c.chapter,old=data.sets[id]||{};
+      data.sets[id]={name:'Accounting textbook · Ch '+c.chapter+' multiple choice',course:'acc',book:BOOK_ID,n:q.n,pages:doc.numPages,page:q.page,opts:q.opts,
+       ans:old.ans||{},key:old.key&&Object.keys(old.key).length?old.key:q.key,notes:old.notes||{},added:old.added||Date.now()}; found++;
+    }
+    save(); renderSets(); renderMc(found?'Found '+found+' chapter quiz'+(found>1?'zes':'')+'. Tap one to answer it.':'No Multiple Choice Quiz was found in this PDF.');
+  }catch(e){ renderMc('Could not read the PDF: '+((e&&e.message)||e)); }
+  finally{ scanning=false; }
+}
 function renderSheet(){
   const s=data.sets[cur]; if(!s) return; const st=stats(s);
+  $('removeSet').textContent=s.book?'Remove this quiz':'Remove PDF';
   $('sheetPart').hidden=!s.n; $('ansTools').hidden=!s.n; $('toSheet').textContent=s.n?'Answer sheet ↓':'Page tools ↓'; showPage();
-  $('exBar').hidden=cur!==BOOK_ID; if(cur===BOOK_ID&&!$('exSel').options.length) loadIndex().then(ix=>{ const sel=$('exSel'); sel.innerHTML='<option value="">Go to exercise…</option>'+(ix.chapters||[]).filter(c=>c.group==='chapter').map(c=>'<optgroup label="Ch '+c.chapter+' · '+esc(c.name)+'">'+(ix.items||[]).filter(i=>i.chapter===c.chapter&&i.pdfPage).map(i=>'<option value="'+i.pdfPage+'">'+esc(i.id.replace(/-/,' ')+' · '+i.title)+'</option>').join('')+'</optgroup>').join(''); });
+  $('exBar').hidden=cur!==BOOK_ID; if(cur===BOOK_ID){ if(!$('exSel').options.length) fillWritten(); renderMc(); }
   $('score').textContent=st.keyN?st.ok+' / '+Math.max(st.ans,0)+' correct':st.ans+' / '+s.n+' answered';
   $('modeAns').setAttribute('aria-pressed',String(mode==='ans')); $('modeKey').setAttribute('aria-pressed',String(mode==='key')); $('wrongOnly').setAttribute('aria-pressed',String(wrongOnly));
   $('keyBox').hidden=mode!=='key';
@@ -194,6 +239,7 @@ $('addBtn').onclick=()=>$('file').click();
 $('pageGo').onclick=()=>{ const p=parseInt($('pageInput').value,10); if(p>=1) goPage(p); };
 $('pageInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('pageGo').click(); } });
 $('exSel').onchange=()=>{ const p=+$('exSel').value; if(p) goPage(p); };
+$('exW').onclick=()=>{ exKind='w'; renderMc(); }; $('exM').onclick=()=>{ exKind='m'; renderMc(); };
 $('pageNotes').addEventListener('input',()=>{ clearTimeout(notesTimer); notesTimer=setTimeout(flushNotes,500); });
 $('pageNotes').addEventListener('blur',()=>{ if(notesTimer) flushNotes(); });
 addEventListener('pagehide',()=>{ if(notesTimer) flushNotes(); });
@@ -205,11 +251,12 @@ $('keyApply').onclick=()=>{ const s=data.sets[cur]; if(!s) return; const t=$('ke
   if(pairs.length) pairs.forEach(m=>{ if(+m[1]>=1&&+m[1]<=s.n) s.key[+m[1]]=m[2]; }); else [...t.replace(/[^a-e]/g,'')].forEach((L,i)=>{ if(i<s.n) s.key[i+1]=L; });
   save(); mode='ans'; renderSheet(); renderSets(); };
 $('clearAns').onclick=()=>{ const s=data.sets[cur]; if(!s||!confirm('Clear your answers for this set? The answer key is kept.')) return; s.ans={}; save(); renderSheet(); renderSets(); };
-$('removeSet').onclick=async()=>{ const s=data.sets[cur]; if(!s||!confirm('Remove "'+s.name+'" and its answers from this device?'+(cur===BOOK_ID?' The textbook PDF is also removed from Textbook Exercises.':''))) return; try{ if(cur===BOOK_ID) await bookIdb('del'); else await idb('del',cur); }catch(e){} delete data.sets[cur]; save(); cur=null; $('workArea').hidden=true; renderSets(); };
+$('removeSet').onclick=async()=>{ const s=data.sets[cur]; if(!s||!confirm('Remove "'+s.name+'" and its answers from this device?'+(cur===BOOK_ID?' The textbook PDF is also removed from Textbook Exercises.':''))) return; try{ if(cur===BOOK_ID) await bookIdb('del'); else if(!s.book) await idb('del',cur); }catch(e){} delete data.sets[cur]; save(); cur=null; $('workArea').hidden=true; renderSets(); };
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
 (async()=>{ try{ if(!data.sets[BOOK_ID]&&await bookIdb('get')){ data.sets[BOOK_ID]={name:'Accounting textbook (24e)',course:'acc',n:0,pages:1210,page:{},opts:{},ans:{},key:{},notes:{},added:Date.now()}; save(); } }catch(e){}
   renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
+<script src="scripts/pdf-mcq.js?v=1"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
 <script src="scripts/study-nav.js?v=8"></script>

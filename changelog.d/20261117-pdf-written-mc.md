@@ -1,0 +1,1 @@
+- My PDF sets, accounting textbook: the exercise menu is split into **Written** (Quick Study, Exercise, Problem A/B, grouped by chapter and type) and **Multiple choice**. Multiple choice finds each chapter's *Multiple Choice Quiz* in your PDF (on the device) and makes an answer sheet for it, with the key taken from the answers printed in the book.
