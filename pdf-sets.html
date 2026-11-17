@@ -214,7 +214,28 @@ async function scanMcq(){
       data.sets[id]={name:'Accounting textbook · Ch '+c.chapter+' multiple choice',course:'acc',book:BOOK_ID,n:q.n,pages:doc.numPages,page:q.page,opts:q.opts,
        ans:old.ans||{},key:old.key&&Object.keys(old.key).length?old.key:q.key,notes:old.notes||{},added:old.added||Date.now()}; found++;
     }
-    save(); renderSets(); renderMc(found?'Found '+found+' chapter quiz'+(found>1?'zes':'')+'. Tap one to answer it.':'No Multiple Choice Quiz was found in this PDF.');
+    /* not near the chapter ends: search the whole book once, then try each page that mentions multiple choice */
+    let hits=[];
+    if(!found){
+      const N=doc.numPages,byPage=new Map();
+      for(let p=1;p<=N;p++){ if(cur!==BOOK_ID||!doc) return; if(p%25===1) renderMc('Searching the whole book… page '+p+' of '+N);
+        const ls=PdfMcq.pageLines(await (await doc.getPage(p)).getTextContent(),p); byPage.set(p,ls); if(ls.some(l=>PdfMcq.MENTION.test(l.t))) hits.push(p); }
+      /* a quiz just before a chapter's exercises belongs to that chapter; otherwise the chapter whose page range holds it */
+      const chOf=p=>{ const near=chs.find(c=>c.pdfStartPage&&p>=c.pdfStartPage-25&&p<c.pdfStartPage); if(near) return near.chapter;
+        const inside=chs.find(c=>c.pdfStartPage&&p>=c.pdfStartPage&&p<=(c.pdfEndPage||c.pdfStartPage)); return inside?inside.chapter:null; };
+      const done=new Set();
+      for(const p of hits){ const ch=chOf(p); if(!ch||done.has(ch)) continue;
+        const lines=[]; for(let k=p;k<=Math.min(N,p+2);k++) lines.push(...(byPage.get(k)||[]));
+        const q=PdfMcq.findQuiz(lines); if(!q.n) continue;
+        const id='ptbmc'+ch,old=data.sets[id]||{};
+        data.sets[id]={name:'Accounting textbook · Ch '+ch+' multiple choice',course:'acc',book:BOOK_ID,n:q.n,pages:N,page:q.page,opts:q.opts,
+         ans:old.ans||{},key:old.key&&Object.keys(old.key).length?old.key:q.key,notes:old.notes||{},added:old.added||Date.now()}; done.add(ch); found++; }
+    }
+    save(); renderSets();
+    if(found) renderMc('Found '+found+' chapter quiz'+(found>1?'zes':'')+'. Tap one to answer it.');
+    else{ renderMc(hits.length?'Could not read a quiz automatically. "Multiple choice" appears on these pages — open one and send a screenshot so it can be supported:':'This PDF has no "Multiple choice" text, so there is no quiz to find (the book may keep its quizzes online).');
+      if(hits.length){ const box=document.createElement('div'); box.className='ps-bar'; box.innerHTML=hits.slice(0,12).map(p=>'<button class="ps-btn" type="button" data-pg="'+p+'">p. '+p+'</button>').join('');
+        box.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>goPage(+b.dataset.pg)); $('exMBox').insertBefore(box,$('mcScan')); } }
   }catch(e){ renderMc('Could not read the PDF: '+((e&&e.message)||e)); }
   finally{ scanning=false; }
 }
