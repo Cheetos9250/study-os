@@ -208,7 +208,7 @@ async function scanMcq(){
       const firsts=(ix.items||[]).filter(i=>i.chapter===c.chapter&&i.type==='Quick Study'&&i.pdfPage).map(i=>i.pdfPage); if(!firsts.length) continue;
       const first=Math.min(...firsts),from=Math.max(1,first-20),to=Math.min(doc.numPages,first+1),lines=[];
       renderMc('Reading Ch '+c.chapter+' (pages '+from+'–'+to+')…');
-      for(let p=from;p<=to;p++){ if(cur!==BOOK_ID||!doc) return; const page=await doc.getPage(p); lines.push(...PdfMcq.pageLines(await page.getTextContent(),p)); }
+      for(let p=from;p<=to;p++){ if(cur!==BOOK_ID||!doc) return; const page=await doc.getPage(p); lines.push(...PdfMcq.pageLines(await page.getTextContent(),p,page.getViewport({scale:1}).width)); }
       const q=PdfMcq.findQuiz(lines); if(!q.n) continue;
       const id='ptbmc'+c.chapter,old=data.sets[id]||{};
       data.sets[id]={name:'Accounting textbook · Ch '+c.chapter+' multiple choice',course:'acc',book:BOOK_ID,n:q.n,pages:doc.numPages,page:q.page,opts:q.opts,
@@ -219,7 +219,7 @@ async function scanMcq(){
     if(!found){
       const N=doc.numPages,byPage=new Map();
       for(let p=1;p<=N;p++){ if(cur!==BOOK_ID||!doc) return; if(p%25===1) renderMc('Searching the whole book… page '+p+' of '+N);
-        const ls=PdfMcq.pageLines(await (await doc.getPage(p)).getTextContent(),p); byPage.set(p,ls); if(ls.some(l=>PdfMcq.MENTION.test(l.t))) hits.push(p); }
+        const pg=await doc.getPage(p),ls=PdfMcq.pageLines(await pg.getTextContent(),p,pg.getViewport({scale:1}).width); byPage.set(p,ls); if(ls.some(l=>PdfMcq.MENTION.test(l.t))) hits.push(p); }
       /* a quiz just before a chapter's exercises belongs to that chapter; otherwise the chapter whose page range holds it */
       const chOf=p=>{ const near=chs.find(c=>c.pdfStartPage&&p>=c.pdfStartPage-25&&p<c.pdfStartPage); if(near) return near.chapter;
         const inside=chs.find(c=>c.pdfStartPage&&p>=c.pdfStartPage&&p<=(c.pdfEndPage||c.pdfStartPage)); return inside?inside.chapter:null; };
@@ -277,7 +277,7 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
 (async()=>{ try{ if(!data.sets[BOOK_ID]&&await bookIdb('get')){ data.sets[BOOK_ID]={name:'Accounting textbook (24e)',course:'acc',n:0,pages:1210,page:{},opts:{},ans:{},key:{},notes:{},added:Date.now()}; save(); } }catch(e){}
   renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
-<script src="scripts/pdf-mcq.js?v=1"></script>
+<script src="scripts/pdf-mcq.js?v=2"></script>
 <script src="scripts/study-today.js?v=2"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
 <script src="scripts/study-nav.js?v=8"></script>
