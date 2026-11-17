@@ -17,7 +17,7 @@
   return /^-?(\d+\.?\d*|\.\d+)$/.test(s)?parseFloat(s):null;
  }
  const ALIAS=[[/^a ?r$/,'accounts receivable'],[/^a ?p$/,'accounts payable'],[/^ar /,'accounts receivable '],
-  [/^cost of goods sold$/,'cost of sales'],[/^cogs$/,'cost of sales'],[/^inventory$/,'merchandise inventory'],
+  [/^cost of sales$/,'cost of goods sold'],[/^cogs$/,'cost of goods sold'],[/^inventory$/,'merchandise inventory'],
   [/^allowance for uncollectible accounts$/,'allowance for doubtful accounts'],[/^bad debt expense$/,'bad debts expense'],
   [/^uncollectible accounts expense$/,'bad debts expense'],[/^n ?r$/,'notes receivable'],[/^n ?p$/,'notes payable']];
  function norm(s){
@@ -44,16 +44,33 @@
   }
   return out;
  }
- const COMMON=['Cash','Accounts Receivable','Accounts Payable','Merchandise Inventory','Sales','Sales Discounts','Sales Returns and Allowances',
-  'Cost of Sales','Notes Receivable','Notes Payable','Interest Revenue','Interest Receivable','Interest Expense','Allowance for Doubtful Accounts',
-  'Bad Debts Expense','Credit Card Expense','Bank Service Charge Expense','Supplies','Prepaid Rent','Rent Expense','Utilities Expense',
-  'Salaries Expense','Delivery Expense','Equipment','Accumulated Depreciation','Depreciation Expense','Petty Cash','Cash Over and Short',
-  'Unearned Revenue','Service Revenue','Owner Capital','Owner Withdrawals','Income Summary'];
- /* Account names for the suggestion list: the answer's accounts mixed into a common list, sorted, so the list gives nothing away. */
+ /* Chart of accounts order: Assets, Liabilities, Equity, Revenue, Expenses (as in the textbook's ledger). */
+ const CHART=[
+  ['Asset',['Cash','Petty Cash','Accounts Receivable','Allowance for Doubtful Accounts','Allowance for Sales Discounts','Notes Receivable','Interest Receivable',
+   'Merchandise Inventory','Inventory Returns Estimated','Office Supplies','Store Supplies','Supplies','Prepaid Insurance','Prepaid Rent','Equipment','Accumulated Depreciation']],
+  ['Liability',['Accounts Payable','Notes Payable','Interest Payable','Salaries Payable','Sales Refund Payable','Unearned Revenue']],
+  ['Equity',['Owner Capital','Owner Withdrawals','Income Summary']],
+  ['Revenue',['Sales','Sales Discounts','Sales Returns and Allowances','Service Revenue','Interest Revenue']],
+  ['Expense',['Cost of Goods Sold','Purchases','Purchases Discounts','Purchases Returns and Allowances','Transportation-In','Discounts Lost','Bad Debts Expense',
+   'Credit Card Expense','Factoring Fee Expense','Bank Service Charge Expense','Cash Over and Short','Delivery Expense','Depreciation Expense','Insurance Expense',
+   'Rent Expense','Salaries Expense','Utilities Expense','Store Supplies Expense','Postage Expense','Repairs Expense','Travel Expense','Entertainment Expense',
+   'Miscellaneous Expense','Selling Expenses','Administrative Expenses','General Expenses','Interest Expense']]];
+ const CHART_POS=new Map();CHART.forEach(([cat,list],ci)=>list.forEach((a,i)=>CHART_POS.set(norm(a),{cat,ci,i})));
+ const GUESS=[[/receivable|^cash|petty cash|inventory|supplies$|prepaid|equipment|accumulated|land|building|allowance/,0],[/payable|unearned/,1],
+  [/capital|withdrawals|income summary/,2],[/revenue|^sales( |$)|^sales$/,3],[/expense|cost|purchases|lost|over and short|transportation/,4]];
+ /* Where an account sits in the chart: exact name, a subsidiary ("Accounts Receivable — A. Hale") after its control account, or a guess by keyword. */
+ function place(name){
+  const n=norm(name);
+  if(CHART_POS.has(n))return CHART_POS.get(n);
+  for(const [k,v] of CHART_POS)if(n.startsWith(k+' '))return {cat:v.cat,ci:v.ci,i:v.i+0.5};
+  for(const [re,ci] of GUESS)if(re.test(n))return {cat:CHART[ci][0],ci,i:999};
+  return {cat:'Other',ci:5,i:999};
+ }
+ /* Suggestions: the answer's accounts mixed into the chart, in chart order with the category shown, so the list gives nothing away. */
  function accounts(answer){
   const seen=new Map();
-  for(const a of [...answer.map(x=>x.acct),...COMMON]){const k=norm(a);if(k&&!seen.has(k))seen.set(k,a);}
-  return [...seen.values()].sort((a,b)=>a.localeCompare(b));
+  for(const a of [...answer.map(x=>x.acct),...CHART.flatMap(c=>c[1])]){const k=norm(a);if(k&&!seen.has(k))seen.set(k,a);}
+  return [...seen.values()].map(name=>({name,...place(name)})).sort((a,b)=>a.ci-b.ci||a.i-b.i||a.name.localeCompare(b.name));
  }
  function clean(rows){
   if(!Array.isArray(rows))return [];
@@ -129,7 +146,7 @@
    h+='<div class="je-bar"><button type="button" class="btn" data-add>+ Add line</button><button type="button" class="btn primary" data-check>Check entry</button>'
     +'<span class="je-sum'+(result&&result.all?' ok':'')+'" aria-live="polite">'+(result?result.all?'All lines correct.':result.ok+' of '+result.total+' lines correct'+(result.missing&&result.entered<result.total?' · '+(result.total-result.entered)+' line'+(result.total-result.entered>1?'s':'')+' missing':''):'')+'</span>'
     +(result&&result.all&&opts.onAllCorrect?'<button type="button" class="btn primary" data-got>Mark as got it</button>':'')+'</div>'
-    +'<datalist id="'+list+'">'+accounts(answer).map(a=>'<option value="'+esc(a)+'">').join('')+'</datalist>';
+    +'<datalist id="'+list+'">'+accounts(answer).map(a=>'<option value="'+esc(a.name)+'" label="'+esc(a.cat)+'">').join('')+'</datalist>';
    box.innerHTML=h;
    if(focus){const el=box.querySelector('[data-r="'+focus[0]+'"] [data-c="'+focus[1]+'"]');if(el)el.focus();}
   }

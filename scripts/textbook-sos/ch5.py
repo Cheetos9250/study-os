@@ -55,9 +55,9 @@ Advertising (5) and sales commissions (6) are selling expenses of the period.
 
 add('QS-5-5','Merchandise accounts and computations',f"""
 Use the data to compute each missing amount.
-{T(['Item','Shop A','Shop B'],['Net sales','$84,000','?'],['Cost of sales','?','$61,000'],['Gross profit','$29,400','$39,000'],['Operating expenses','$18,200','?'],['Net income','?','$12,500'])}
+{T(['Item','Shop A','Shop B'],['Net sales','$84,000','?'],['Cost of goods sold','?','$61,000'],['Gross profit','$29,400','$39,000'],['Operating expenses','$18,200','?'],['Net income','?','$12,500'])}
 """,f"""
-{T(['Item','Shop A','Shop B'],['Net sales','$84,000','**$100,000** (61,000 + 39,000)'],['Cost of sales','**$54,600** (84,000 − 29,400)','$61,000'],['Gross profit','$29,400','$39,000'],['Operating expenses','$18,200','**$26,500** (39,000 − 12,500)'],['Net income','**$11,200** (29,400 − 18,200)','$12,500'])}
+{T(['Item','Shop A','Shop B'],['Net sales','$84,000','**$100,000** (61,000 + 39,000)'],['Cost of goods sold','**$54,600** (84,000 − 29,400)','$61,000'],['Gross profit','$29,400','$39,000'],['Operating expenses','$18,200','**$26,500** (39,000 − 12,500)'],['Net income','**$11,200** (29,400 − 18,200)','$12,500'])}
 """)
 
 add('QS-5-6','Computing net invoice amounts',f"""
@@ -97,22 +97,22 @@ Pell Outfitters:
 - **Apr 11** Received payment of the balance.
 """,f"""
 Balance after the return: 3,000 − 400 = 2,600. Discount: 2,600 × 2% = 52.
-{JE(('Apr 2','Accounts Receivable',3000,''),('','Sales','',3000),('Apr 2','Cost of Sales',1800,''),('','Merchandise Inventory','',1800),('Apr 5','Sales Returns and Allowances',400,''),('','Accounts Receivable','',400),('Apr 5','Merchandise Inventory',240,''),('','Cost of Sales','',240),('Apr 11','Cash',2548,''),('Apr 11','Sales Discounts',52,''),('','Accounts Receivable','',2600))}
+{JE(('Apr 2','Accounts Receivable',3000,''),('','Sales','',3000),('Apr 2','Cost of Goods Sold',1800,''),('','Merchandise Inventory','',1800),('Apr 5','Sales Returns and Allowances',400,''),('','Accounts Receivable','',400),('Apr 5','Merchandise Inventory',240,''),('','Cost of Goods Sold','',240),('Apr 11','Cash',2548,''),('Apr 11','Sales Discounts',52,''),('','Accounts Receivable','',2600))}
 """)
 
 add('QS-5-21','Computing and analyzing gross margin ratio',f"""
 Compute the gross margin ratio for each company and say which is stronger.
-{T(['','North Co.','South Co.'],['Net sales','$420,000','$185,000'],['Cost of sales','$302,400','$118,400'])}
+{T(['','North Co.','South Co.'],['Net sales','$420,000','$185,000'],['Cost of goods sold','$302,400','$118,400'])}
 """,f"""
 - North: (420,000 − 302,400) ÷ 420,000 = 117,600 ÷ 420,000 = **28.0%**
 - South: (185,000 − 118,400) ÷ 185,000 = 66,600 ÷ 185,000 = **36.0%**
 
-South keeps more of each sales dollar after cost of sales, so its gross margin is stronger.
+South keeps more of each sales dollar after cost of goods sold, so its gross margin is stronger.
 """)
 check(117600/420000,0.28); check(66600/185000,0.36)
 
 add('QS-5-22','Multiple-step income statement',"""
-Classify each item for a multiple-step income statement: Net sales, Cost of sales, Selling expense, General & administrative expense, or Other revenues and expenses.
+Classify each item for a multiple-step income statement: Net sales, Cost of goods sold, Selling expense, General & administrative expense, or Other revenues and expenses.
 1. Sales discounts
 2. Office salaries
 3. Delivery expense
@@ -126,17 +126,17 @@ Classify each item for a multiple-step income statement: Net sales, Cost of sale
 2. General & administrative expense
 3. Selling expense
 4. Other revenues and expenses
-5. Cost of sales (part of inventory cost)
+5. Cost of goods sold (part of inventory cost)
 6. Other revenues and expenses
 7. Selling expense
 8. Net sales (contra revenue)
 """)
 
 add('QS-5-23','Closing entries',f"""
-Adjusted balances for Vale Store at Dec 31: Sales $150,000; Sales Returns and Allowances $4,000; Sales Discounts $2,500; Cost of Sales $88,000; Selling Expenses $21,000; Administrative Expenses $15,500; R. Vale, Withdrawals $9,000.
+Adjusted balances for Vale Store at Dec 31: Sales $150,000; Sales Returns and Allowances $4,000; Sales Discounts $2,500; Cost of Goods Sold $88,000; Selling Expenses $21,000; Administrative Expenses $15,500; R. Vale, Withdrawals $9,000.
 Prepare the closing entries.
 """,f"""
-{JE(('Dec 31','Sales',150000,''),('','Income Summary','',150000),('Dec 31','Income Summary',131000,''),('','Sales Returns and Allowances','',4000),('','Sales Discounts','',2500),('','Cost of Sales','',88000),('','Selling Expenses','',21000),('','Administrative Expenses','',15500),('Dec 31','Income Summary',19000,''),('','R. Vale, Capital','',19000),('Dec 31','R. Vale, Capital',9000,''),('','R. Vale, Withdrawals','',9000))}
+{JE(('Dec 31','Sales',150000,''),('','Income Summary','',150000),('Dec 31','Income Summary',131000,''),('','Sales Returns and Allowances','',4000),('','Sales Discounts','',2500),('','Cost of Goods Sold','',88000),('','Selling Expenses','',21000),('','Administrative Expenses','',15500),('Dec 31','Income Summary',19000,''),('','R. Vale, Capital','',19000),('Dec 31','R. Vale, Capital',9000,''),('','R. Vale, Withdrawals','',9000))}
 
 Net income = 150,000 − 131,000 = 19,000.
 """)
@@ -144,9 +144,9 @@ check(4000+2500+88000+21000+15500,131000)
 
 add('QS-5-24','Preparing a multiple-step income statement',f"""
 Prepare a multiple-step income statement for Orin Supply for the year.
-{T(['Account','Amount'],['Sales','$212,000'],['Sales returns and allowances','$6,000'],['Sales discounts','$3,000'],['Cost of sales','$121,000'],['Sales salaries','$27,000'],['Advertising expense','$8,500'],['Office salaries','$19,000'],['Rent expense — office','$7,200'],['Interest expense','$1,800'])}
+{T(['Account','Amount'],['Sales','$212,000'],['Sales returns and allowances','$6,000'],['Sales discounts','$3,000'],['Cost of goods sold','$121,000'],['Sales salaries','$27,000'],['Advertising expense','$8,500'],['Office salaries','$19,000'],['Rent expense — office','$7,200'],['Interest expense','$1,800'])}
 """,f"""
-{T(['Orin Supply — Income Statement','',''],['Sales','','212,000'],['Less: Sales returns and allowances','6,000',''],['Less: Sales discounts','3,000','9,000'],['**Net sales**','','**203,000**'],['Cost of sales','','121,000'],['**Gross profit**','','**82,000**'],['Selling expenses: Sales salaries','27,000',''],['Advertising','8,500','35,500'],['General & admin: Office salaries','19,000',''],['Rent — office','7,200','26,200'],['**Income from operations**','','**20,300**'],['Other expenses: Interest','','1,800'],['**Net income**','','**18,500**'])}
+{T(['Orin Supply — Income Statement','',''],['Sales','','212,000'],['Less: Sales returns and allowances','6,000',''],['Less: Sales discounts','3,000','9,000'],['**Net sales**','','**203,000**'],['Cost of goods sold','','121,000'],['**Gross profit**','','**82,000**'],['Selling expenses: Sales salaries','27,000',''],['Advertising','8,500','35,500'],['General & admin: Office salaries','19,000',''],['Rent — office','7,200','26,200'],['**Income from operations**','','**20,300**'],['Other expenses: Interest','','1,800'],['**Net income**','','**18,500**'])}
 """)
 check(203000-121000,82000); check(82000-35500-26200,20300)
 
@@ -170,7 +170,7 @@ Below 1.0: without selling inventory, the company could not cover all current li
 
 add('QS-5-27A','Contrasting periodic and perpetual systems',"""
 For each statement, write Periodic, Perpetual or Both.
-1. Cost of sales is recorded at the time of each sale.
+1. Cost of goods sold is recorded at the time of each sale.
 2. Purchases of merchandise are debited to a Purchases account.
 3. A physical count of inventory is taken at year-end.
 4. The Merchandise Inventory account is updated only at the end of the period.
@@ -198,7 +198,7 @@ Use a **periodic** system. Pell Outfitters:
 - **Apr 5** The customer returned $400 of goods (cost $240).
 - **Apr 11** Received payment of the balance.
 """,f"""
-Under a periodic system no cost of sales entries are made at the time of sale or return.
+Under a periodic system no cost of goods sold entries are made at the time of sale or return.
 {JE(('Apr 2','Accounts Receivable',3000,''),('','Sales','',3000),('Apr 5','Sales Returns and Allowances',400,''),('','Accounts Receivable','',400),('Apr 11','Cash',2548,''),('Apr 11','Sales Discounts',52,''),('','Accounts Receivable','',2600))}
 """)
 
@@ -215,7 +215,7 @@ Record at net: 4,200 × 98% = 4,116. Return at net: 700 × 98% = 686. Balance at
 add('QS-5-43B','Recording estimates of future returns',f"""
 At Dec 31, Harbor Goods estimates that $2,400 of this year's sales will be returned next year. The goods cost $1,440 and can be resold. Record the adjusting entries.
 """,f"""
-{JE(('Dec 31','Sales Returns and Allowances',2400,''),('','Sales Refund Payable','',2400),('Dec 31','Inventory Returns Estimated',1440,''),('','Cost of Sales','',1440))}
+{JE(('Dec 31','Sales Returns and Allowances',2400,''),('','Sales Refund Payable','',2400),('Dec 31','Inventory Returns Estimated',1440,''),('','Cost of Goods Sold','',1440))}
 
 Revenue is reduced for expected refunds, and the expected returned goods are shown as an asset.
 """)
@@ -227,14 +227,14 @@ Use the **net method** for sales (perpetual). Pell Outfitters:
 - **Apr 25** Received payment of the balance (discount period missed).
 """,f"""
 Sale at net: 3,000 × 98% = 2,940. Return at net: 400 × 98% = 392. Balance at net 2,548; customer pays the gross 2,600, so 52 is Interest Revenue (discounts forfeited).
-{JE(('Apr 2','Accounts Receivable',2940,''),('','Sales','',2940),('Apr 2','Cost of Sales',1800,''),('','Merchandise Inventory','',1800),('Apr 5','Sales Returns and Allowances',392,''),('','Accounts Receivable','',392),('Apr 5','Merchandise Inventory',240,''),('','Cost of Sales','',240),('Apr 25','Cash',2600,''),('','Accounts Receivable','',2548),('','Interest Revenue','',52))}
+{JE(('Apr 2','Accounts Receivable',2940,''),('','Sales','',2940),('Apr 2','Cost of Goods Sold',1800,''),('','Merchandise Inventory','',1800),('Apr 5','Sales Returns and Allowances',392,''),('','Accounts Receivable','',392),('Apr 5','Merchandise Inventory',240,''),('','Cost of Goods Sold','',240),('Apr 25','Cash',2600,''),('','Accounts Receivable','',2548),('','Interest Revenue','',52))}
 """)
 
 add('E-5-2','Computing revenues, expenses and income',f"""
 Fill in the missing amounts for three companies.
-{T(['','X','Y','Z'],['Sales','$64,000','$?','$95,500'],['Cost of sales','$?','$41,800','$63,200'],['Gross profit','$22,900','$27,600','$?'],['Expenses','$15,400','$?','$24,900'],['Net income (loss)','$?','$9,100','$?'])}
+{T(['','X','Y','Z'],['Sales','$64,000','$?','$95,500'],['Cost of goods sold','$?','$41,800','$63,200'],['Gross profit','$22,900','$27,600','$?'],['Expenses','$15,400','$?','$24,900'],['Net income (loss)','$?','$9,100','$?'])}
 """,f"""
-{T(['','X','Y','Z'],['Sales','64,000','**69,400**','95,500'],['Cost of sales','**41,100**','41,800','63,200'],['Gross profit','22,900','27,600','**32,300**'],['Expenses','15,400','**18,500**','24,900'],['Net income','**7,500**','9,100','**7,400**'])}
+{T(['','X','Y','Z'],['Sales','64,000','**69,400**','95,500'],['Cost of goods sold','**41,100**','41,800','63,200'],['Gross profit','22,900','27,600','**32,300**'],['Expenses','15,400','**18,500**','24,900'],['Net income','**7,500**','9,100','**7,400**'])}
 """)
 
 add('E-5-4','Operating cycle for a merchandiser',"""
@@ -266,7 +266,7 @@ Ocean Co. (the seller in the Nara Home purchase):
 - **May 5** Granted Nara a $500 allowance for scratched goods.
 - **May 11** Received payment of the balance.
 """,f"""
-{JE(('May 2','Accounts Receivable',8000,''),('','Sales','',8000),('May 2','Cost of Sales',4800,''),('','Merchandise Inventory','',4800),('May 5','Sales Returns and Allowances',500,''),('','Accounts Receivable','',500),('May 11','Cash',7350,''),('May 11','Sales Discounts',150,''),('','Accounts Receivable','',7500))}
+{JE(('May 2','Accounts Receivable',8000,''),('','Sales','',8000),('May 2','Cost of Goods Sold',4800,''),('','Merchandise Inventory','',4800),('May 5','Sales Returns and Allowances',500,''),('','Accounts Receivable','',500),('May 11','Cash',7350,''),('May 11','Sales Discounts',150,''),('','Accounts Receivable','',7500))}
 
 An allowance with no goods returned needs no inventory entry.
 """)
@@ -278,7 +278,7 @@ Fern Sports:
 - **Jul 8** Sold $2,200 of goods on credit (cost $1,320), terms 1/10, n/30.
 - **Jul 17** Collected the Jul 8 sale in full.
 """,f"""
-{JE(('Jul 4','Cash',1250,''),('','Sales','',1250),('Jul 4','Cost of Sales',700,''),('','Merchandise Inventory','',700),('Jul 8','Accounts Receivable',2200,''),('','Sales','',2200),('Jul 8','Cost of Sales',1320,''),('','Merchandise Inventory','',1320),('Jul 17','Cash',2178,''),('Jul 17','Sales Discounts',22,''),('','Accounts Receivable','',2200))}
+{JE(('Jul 4','Cash',1250,''),('','Sales','',1250),('Jul 4','Cost of Goods Sold',700,''),('','Merchandise Inventory','',700),('Jul 8','Accounts Receivable',2200,''),('','Sales','',2200),('Jul 8','Cost of Goods Sold',1320,''),('','Merchandise Inventory','',1320),('Jul 17','Cash',2178,''),('Jul 17','Sales Discounts',22,''),('','Accounts Receivable','',2200))}
 """)
 
 add('E-5-1','Recording purchases, purchases returns and allowances, and discounts',f"""
@@ -298,16 +298,16 @@ add('E-5-23','Preparing adjusting and closing entries for a merchandiser',f"""
 Selected Dec 31 data for Rook Market (perpetual):
 - Merchandise Inventory per ledger $31,600; physical count $30,750.
 - Store supplies on hand $420; Store Supplies account $1,180.
-- Sales $240,000; Sales Discounts $3,200; Cost of Sales (before adjustment) $143,000; Selling Expenses $38,000 (before supplies); General Expenses $29,500.
+- Sales $240,000; Sales Discounts $3,200; Cost of Goods Sold (before adjustment) $143,000; Selling Expenses $38,000 (before supplies); General Expenses $29,500.
 
 1. Prepare the two adjusting entries.
 2. Prepare the closing entries (close expenses and contra revenues in one entry).
 """,f"""
 1. Shrinkage 31,600 − 30,750 = 850. Supplies used 1,180 − 420 = 760.
-{JE(('Dec 31','Cost of Sales',850,''),('','Merchandise Inventory','',850),('Dec 31','Store Supplies Expense',760,''),('','Store Supplies','',760))}
+{JE(('Dec 31','Cost of Goods Sold',850,''),('','Merchandise Inventory','',850),('Dec 31','Store Supplies Expense',760,''),('','Store Supplies','',760))}
 
 2. Debit balances: 3,200 + (143,000 + 850) + 38,000 + 760 + 29,500 = 215,310.
-{JE(('Dec 31','Sales',240000,''),('','Income Summary','',240000),('Dec 31','Income Summary',215310,''),('','Sales Discounts','',3200),('','Cost of Sales','',143850),('','Selling Expenses','',38000),('','Store Supplies Expense','',760),('','General Expenses','',29500),('Dec 31','Income Summary',24690,''),('','Owner, Capital','',24690))}
+{JE(('Dec 31','Sales',240000,''),('','Income Summary','',240000),('Dec 31','Income Summary',215310,''),('','Sales Discounts','',3200),('','Cost of Goods Sold','',143850),('','Selling Expenses','',38000),('','Store Supplies Expense','',760),('','General Expenses','',29500),('Dec 31','Income Summary',24690,''),('','Owner, Capital','',24690))}
 """)
 check(3200+143850+38000+760+29500,215310)
 
@@ -318,7 +318,7 @@ Prepare entries for both companies.
 - **Aug 12** Ember paid Dune in full.
 """,f"""
 **Dune Co. (seller)**
-{JE(('Aug 3','Accounts Receivable',6000,''),('','Sales','',6000),('Aug 3','Cost of Sales',3700,''),('','Merchandise Inventory','',3700),('Aug 12','Cash',5880,''),('Aug 12','Sales Discounts',120,''),('','Accounts Receivable','',6000))}
+{JE(('Aug 3','Accounts Receivable',6000,''),('','Sales','',6000),('Aug 3','Cost of Goods Sold',3700,''),('','Merchandise Inventory','',3700),('Aug 12','Cash',5880,''),('Aug 12','Sales Discounts',120,''),('','Accounts Receivable','',6000))}
 
 **Ember Co. (buyer)**
 {JE(('Aug 3','Merchandise Inventory',6000,''),('','Accounts Payable','',6000),('Aug 12','Accounts Payable',6000,''),('','Merchandise Inventory','',120),('','Cash','',5880))}
@@ -336,13 +336,13 @@ Record the entries for Gale (seller) and Hollis (buyer).
 Balance 4,000; discount 80; cash 3,920.
 
 **Gale Co. (seller)**
-{JE(('Sep 5','Accounts Receivable',4500,''),('','Sales','',4500),('Sep 5','Cost of Sales',2600,''),('','Merchandise Inventory','',2600),('Sep 5','Delivery Expense',175,''),('','Cash','',175),('Sep 8','Sales Returns and Allowances',500,''),('','Accounts Receivable','',500),('Sep 8','Merchandise Inventory',290,''),('','Cost of Sales','',290),('Sep 15','Cash',3920,''),('Sep 15','Sales Discounts',80,''),('','Accounts Receivable','',4000))}
+{JE(('Sep 5','Accounts Receivable',4500,''),('','Sales','',4500),('Sep 5','Cost of Goods Sold',2600,''),('','Merchandise Inventory','',2600),('Sep 5','Delivery Expense',175,''),('','Cash','',175),('Sep 8','Sales Returns and Allowances',500,''),('','Accounts Receivable','',500),('Sep 8','Merchandise Inventory',290,''),('','Cost of Goods Sold','',290),('Sep 15','Cash',3920,''),('Sep 15','Sales Discounts',80,''),('','Accounts Receivable','',4000))}
 
 **Hollis Co. (buyer)** — no freight entry under FOB destination.
 {JE(('Sep 5','Merchandise Inventory',4500,''),('','Accounts Payable','',4500),('Sep 8','Accounts Payable',500,''),('','Merchandise Inventory','',500),('Sep 15','Accounts Payable',4000,''),('','Merchandise Inventory','',80),('','Cash','',3920))}
 """)
 
-add('E-5-9','Inventory and cost of sales transactions in T-accounts',f"""
+add('E-5-9','Inventory and cost of goods sold transactions in T-accounts',f"""
 Perpetual system. Beginning merchandise inventory is $9,000. During the month:
 - Purchases on credit $27,000
 - Purchase returns $1,200
@@ -351,26 +351,26 @@ Perpetual system. Beginning merchandise inventory is $9,000. During the month:
 - Cost of goods sold to customers $28,400
 - Customer returns of resaleable goods, cost $600
 
-Compute the ending balances of Merchandise Inventory and Cost of Sales.
+Compute the ending balances of Merchandise Inventory and Cost of Goods Sold.
 """,f"""
 {T(['Merchandise Inventory','Debit','Credit'],['Beginning','9,000',''],['Purchases','27,000',''],['Purchase returns','','1,200'],['Purchase discounts','','500'],['Freight-in','800',''],['Cost of goods sold','','28,400'],['Customer returns','600',''],['**Ending balance**','**7,300**',''])}
 
 Merchandise Inventory: 9,000 + 27,000 − 1,200 − 500 + 800 − 28,400 + 600 = **$7,300**.
 
-Cost of Sales: 28,400 − 600 = **$27,800**.
+Cost of Goods Sold: 28,400 − 600 = **$27,800**.
 """)
 check(9000+27000-1200-500+800-28400+600,7300)
 
 add('E-5-21','Preparing a multiple-step income statement',f"""
 Prepare a multiple-step income statement for Sable Co.
-{T(['Account','Amount'],['Sales','$365,000'],['Sales discounts','$5,200'],['Sales returns and allowances','$9,800'],['Cost of sales','$214,000'],['Selling expenses','$58,400'],['General & administrative expenses','$41,600'],['Interest revenue','$1,200'],['Interest expense','$3,900'])}
+{T(['Account','Amount'],['Sales','$365,000'],['Sales discounts','$5,200'],['Sales returns and allowances','$9,800'],['Cost of goods sold','$214,000'],['Selling expenses','$58,400'],['General & administrative expenses','$41,600'],['Interest revenue','$1,200'],['Interest expense','$3,900'])}
 """,f"""
-{T(['Sable Co. — Income Statement',''],['Sales','365,000'],['Less: discounts and returns','15,000'],['**Net sales**','**350,000**'],['Cost of sales','214,000'],['**Gross profit**','**136,000**'],['Selling expenses','58,400'],['General & administrative','41,600'],['**Income from operations**','**36,000**'],['Interest revenue','1,200'],['Interest expense','(3,900)'],['**Net income**','**33,300**'])}
+{T(['Sable Co. — Income Statement',''],['Sales','365,000'],['Less: discounts and returns','15,000'],['**Net sales**','**350,000**'],['Cost of goods sold','214,000'],['**Gross profit**','**136,000**'],['Selling expenses','58,400'],['General & administrative','41,600'],['**Income from operations**','**36,000**'],['Interest revenue','1,200'],['Interest expense','(3,900)'],['**Net income**','**33,300**'])}
 """)
 check(350000-214000-58400-41600+1200-3900,33300)
 
 add('E-5-22','Net sales computation for a multiple-step income statement',"""
-Gross sales were $128,500. Customers returned $4,700 of goods and received $1,300 in allowances. Sales discounts taken were $2,150. Compute net sales and gross profit if cost of sales was $73,400.
+Gross sales were $128,500. Customers returned $4,700 of goods and received $1,300 in allowances. Sales discounts taken were $2,150. Compute net sales and gross profit if cost of goods sold was $73,400.
 ""","""
 Net sales = 128,500 − 4,700 − 1,300 − 2,150 = **$120,350**.
 Gross profit = 120,350 − 73,400 = **$46,950**.
@@ -378,10 +378,10 @@ Gross profit = 120,350 − 73,400 = **$46,950**.
 
 add('E-5-24','Impacts of inventory error on key accounts',"""
 Lark Co.'s ending inventory for Year 1 was **understated** by $3,600 because some goods were missed in the count. The error was never corrected. State the effect (overstated, understated, no effect, and amount) on:
-1. Year 1 cost of sales
+1. Year 1 cost of goods sold
 2. Year 1 net income
 3. Year 1 ending owner's capital
-4. Year 2 cost of sales
+4. Year 2 cost of goods sold
 5. Year 2 net income
 6. Year 2 ending owner's capital
 ""","""
@@ -397,7 +397,7 @@ add('E-5-25','Physical count error and profits',"""
 Reported net income: Year 1 $52,000, Year 2 $47,500. The Year 1 ending inventory count included $2,800 of goods held on consignment for another company. Compute the correct net income for each year and the total for both years.
 ""","""
 Including consigned goods overstated Year 1 ending inventory by $2,800.
-- Year 1: cost of sales understated → income overstated: 52,000 − 2,800 = **$49,200**
+- Year 1: cost of goods sold understated → income overstated: 52,000 − 2,800 = **$49,200**
 - Year 2: beginning inventory overstated → income understated: 47,500 + 2,800 = **$50,300**
 - Two-year total unchanged: 99,500.
 """)
@@ -447,7 +447,7 @@ Quill Co. sold $180,000 of goods this year (cost 60% of sales). It expects 3% of
 2. Next year, customers return $4,900 of goods (cost $2,940) from this year's sales. Record the return.
 """,f"""
 1. Expected returns 180,000 × 3% = 5,400; cost 5,400 × 60% = 3,240.
-{JE(('Dec 31','Sales Returns and Allowances',5400,''),('','Sales Refund Payable','',5400),('Dec 31','Inventory Returns Estimated',3240,''),('','Cost of Sales','',3240))}
+{JE(('Dec 31','Sales Returns and Allowances',5400,''),('','Sales Refund Payable','',5400),('Dec 31','Inventory Returns Estimated',3240,''),('','Cost of Goods Sold','',3240))}
 
 2. Returns are charged against the liability set up last year.
 {JE(('Next yr','Sales Refund Payable',4900,''),('','Accounts Receivable (or Cash)','',4900),('Next yr','Merchandise Inventory',2940,''),('','Inventory Returns Estimated','',2940))}
@@ -466,7 +466,7 @@ add('E-5-44B','Recording estimates of future returns',f"""
 Tidal Co. expects $3,500 of this year's sales to be returned next year; the goods cost $2,100 and can be resold. The Sales Refund Payable account already has a $900 credit balance and Inventory Returns Estimated a $540 debit balance from unused prior estimates. Record the adjusting entries to bring the accounts to the new estimates.
 """,f"""
 Increase the liability by 3,500 − 900 = 2,600 and the asset by 2,100 − 540 = 1,560.
-{JE(('Dec 31','Sales Returns and Allowances',2600,''),('','Sales Refund Payable','',2600),('Dec 31','Inventory Returns Estimated',1560,''),('','Cost of Sales','',1560))}
+{JE(('Dec 31','Sales Returns and Allowances',2600,''),('','Sales Refund Payable','',2600),('Dec 31','Inventory Returns Estimated',1560,''),('','Cost of Goods Sold','',1560))}
 """)
 
 add('E-5-45C','Recording sales, purchases, shipping and returns: buyer and seller — net method',f"""
@@ -478,7 +478,7 @@ Use the **net method** for both companies (perpetual).
 Net amounts: sale 4,410; return 490; balance 3,920 (paid within discount period).
 
 **Gale Co. (seller)**
-{JE(('Sep 5','Accounts Receivable',4410,''),('','Sales','',4410),('Sep 5','Cost of Sales',2600,''),('','Merchandise Inventory','',2600),('Sep 5','Delivery Expense',175,''),('','Cash','',175),('Sep 8','Sales Returns and Allowances',490,''),('','Accounts Receivable','',490),('Sep 8','Merchandise Inventory',290,''),('','Cost of Sales','',290),('Sep 15','Cash',3920,''),('','Accounts Receivable','',3920))}
+{JE(('Sep 5','Accounts Receivable',4410,''),('','Sales','',4410),('Sep 5','Cost of Goods Sold',2600,''),('','Merchandise Inventory','',2600),('Sep 5','Delivery Expense',175,''),('','Cash','',175),('Sep 8','Sales Returns and Allowances',490,''),('','Accounts Receivable','',490),('Sep 8','Merchandise Inventory',290,''),('','Cost of Goods Sold','',290),('Sep 15','Cash',3920,''),('','Accounts Receivable','',3920))}
 
 **Hollis Co. (buyer)**
 {JE(('Sep 5','Merchandise Inventory',4410,''),('','Accounts Payable','',4410),('Sep 8','Accounts Payable',490,''),('','Merchandise Inventory','',490),('Sep 15','Accounts Payable',3920,''),('','Cash','',3920))}
@@ -523,7 +523,7 @@ Prepare journal entries for {co}:
 - **{mon} 20** Sold ${f(1500)} of goods for cash; cost ${f(870)}.
 """,f"""
 Vendor A balance: {f(buy)} − {f(allow)} = {f(b_bal)}; discount {disc_b}% = {f(b_disc)}. Client B balance: {f(sale)} − {f(ret)} = {f(s_bal)}; discount {disc_s}% = {f(s_disc)}.
-{JE((mon+' 2','Merchandise Inventory',buy,''),('','Accounts Payable','',buy),(mon+' 3','Merchandise Inventory',freight,''),('','Cash','',freight),(mon+' 5','Accounts Receivable',sale,''),('','Sales','',sale),(mon+' 5','Cost of Sales',cost,''),('','Merchandise Inventory','',cost),(mon+' 7','Accounts Payable',allow,''),('','Merchandise Inventory','',allow),(mon+' 8','Sales Returns and Allowances',ret,''),('','Accounts Receivable','',ret),(mon+' 8','Merchandise Inventory',retcost,''),('','Cost of Sales','',retcost),(mon+' 12','Accounts Payable',b_bal,''),('','Merchandise Inventory','',b_disc),('','Cash','',round(b_bal-b_disc,2)),(mon+' 15','Cash',round(s_bal-s_disc,2),''),(mon+' 15','Sales Discounts',s_disc,''),('','Accounts Receivable','',s_bal),(mon+' 20','Cash',1500,''),('','Sales','',1500),(mon+' 20','Cost of Sales',870,''),('','Merchandise Inventory','',870))}
+{JE((mon+' 2','Merchandise Inventory',buy,''),('','Accounts Payable','',buy),(mon+' 3','Merchandise Inventory',freight,''),('','Cash','',freight),(mon+' 5','Accounts Receivable',sale,''),('','Sales','',sale),(mon+' 5','Cost of Goods Sold',cost,''),('','Merchandise Inventory','',cost),(mon+' 7','Accounts Payable',allow,''),('','Merchandise Inventory','',allow),(mon+' 8','Sales Returns and Allowances',ret,''),('','Accounts Receivable','',ret),(mon+' 8','Merchandise Inventory',retcost,''),('','Cost of Goods Sold','',retcost),(mon+' 12','Accounts Payable',b_bal,''),('','Merchandise Inventory','',b_disc),('','Cash','',round(b_bal-b_disc,2)),(mon+' 15','Cash',round(s_bal-s_disc,2),''),(mon+' 15','Sales Discounts',s_disc,''),('','Accounts Receivable','',s_bal),(mon+' 20','Cash',1500,''),('','Sales','',1500),(mon+' 20','Cost of Goods Sold',870,''),('','Merchandise Inventory','',870))}
 """)
 prob_journal('P-5-2A','Kite Supply','Mar',5400,3240,600,360,9200,310,450,2,2)
 prob_journal('P-5-2B','Wren Supply','Jun',6300,3780,800,480,8600,280,350,2,1)
@@ -543,7 +543,7 @@ def prob_journal2(id,co,mon,a):
 - **{mon} 29** Fox paid in full (after the discount period).
 """,f"""
 Delta balance {f(buy-ret)}, discount 3% = {f(disc)}. Fox paid after 10 days, so no discount.
-{JE((mon+' 1','Merchandise Inventory',buy,''),('','Accounts Payable','',buy),(mon+' 4','Cash',sale1,''),('','Sales','',sale1),(mon+' 4','Cost of Sales',cost1,''),('','Merchandise Inventory','',cost1),(mon+' 6','Accounts Payable',ret,''),('','Merchandise Inventory','',ret),(mon+' 9','Accounts Receivable',sale2,''),('','Sales','',sale2),(mon+' 9','Cost of Sales',cost2,''),('','Merchandise Inventory','',cost2),(mon+' 9','Delivery Expense',freightout,''),('','Cash','',freightout),(mon+' 10','Accounts Payable',buy-ret,''),('','Merchandise Inventory','',disc),('','Cash','',round(buy-ret-disc,2)),(mon+' 29','Cash',sale2,''),('','Accounts Receivable','',sale2))}
+{JE((mon+' 1','Merchandise Inventory',buy,''),('','Accounts Payable','',buy),(mon+' 4','Cash',sale1,''),('','Sales','',sale1),(mon+' 4','Cost of Goods Sold',cost1,''),('','Merchandise Inventory','',cost1),(mon+' 6','Accounts Payable',ret,''),('','Merchandise Inventory','',ret),(mon+' 9','Accounts Receivable',sale2,''),('','Sales','',sale2),(mon+' 9','Cost of Goods Sold',cost2,''),('','Merchandise Inventory','',cost2),(mon+' 9','Delivery Expense',freightout,''),('','Cash','',freightout),(mon+' 10','Accounts Payable',buy-ret,''),('','Merchandise Inventory','',disc),('','Cash','',round(buy-ret-disc,2)),(mon+' 29','Cash',sale2,''),('','Accounts Receivable','',sale2))}
 """)
 prob_journal2('P-5-4A','Basil Goods','Jul',(12000,1000,4300,2580,7600,4560,190))
 prob_journal2('P-5-4B','Thyme Goods','Aug',(15000,2000,3900,2340,8800,5280,215))
@@ -555,7 +555,7 @@ def prob_adj(id,co,d):
     chk(id,('Net sales',netsales),('Gross profit',gp),('Net income',ni))
     add(id,'Preparing adjusting entries and income statements',f"""
 Unadjusted Dec 31 balances for {co} (perpetual):
-{T(['Account','Balance'],['Merchandise inventory','$'+f(inv_book)],['Store supplies','$'+f(sup_bal)],['Prepaid insurance','$'+f(prepaid_bal)],['Sales','$'+f(sales)],['Sales returns and allowances','$'+f(sret)],['Sales discounts','$'+f(sdisc)],['Cost of sales','$'+f(cos)],['Selling expenses (excl. supplies)','$'+f(sell)],['General & admin expenses (excl. insurance)','$'+f(adm)])}
+{T(['Account','Balance'],['Merchandise inventory','$'+f(inv_book)],['Store supplies','$'+f(sup_bal)],['Prepaid insurance','$'+f(prepaid_bal)],['Sales','$'+f(sales)],['Sales returns and allowances','$'+f(sret)],['Sales discounts','$'+f(sdisc)],['Cost of goods sold','$'+f(cos)],['Selling expenses (excl. supplies)','$'+f(sell)],['General & admin expenses (excl. insurance)','$'+f(adm)])}
 Additional information:
 - Physical count of inventory: ${f(inv_count)}.
 - Store supplies on hand: ${f(sup_on)} (a selling expense).
@@ -566,10 +566,10 @@ Additional information:
 3. Compute the gross margin ratio.
 """,f"""
 1. Adjusting entries
-{JE(('Dec 31','Cost of Sales',shrink,''),('','Merchandise Inventory','',shrink),('Dec 31','Store Supplies Expense',supused,''),('','Store Supplies','',supused),('Dec 31','Insurance Expense',prepaid_exp,''),('','Prepaid Insurance','',prepaid_exp))}
+{JE(('Dec 31','Cost of Goods Sold',shrink,''),('','Merchandise Inventory','',shrink),('Dec 31','Store Supplies Expense',supused,''),('','Store Supplies','',supused),('Dec 31','Insurance Expense',prepaid_exp,''),('','Prepaid Insurance','',prepaid_exp))}
 
 2. Income statement
-{T(['Item','Amount'],['Sales',f(sales)],['Less returns and discounts','('+f(sret+sdisc)+')'],['**Net sales**','**'+f(netsales)+'**'],['Cost of sales ('+f(cos)+' + '+f(shrink)+')',f(cos2)],['**Gross profit**','**'+f(gp)+'**'],['Selling expenses ('+f(sell)+' + '+f(supused)+')',f(sell2)],['General & admin ('+f(adm)+' + '+f(prepaid_exp)+')',f(adm2)],['**Net income**','**'+f(ni)+'**'])}
+{T(['Item','Amount'],['Sales',f(sales)],['Less returns and discounts','('+f(sret+sdisc)+')'],['**Net sales**','**'+f(netsales)+'**'],['Cost of goods sold ('+f(cos)+' + '+f(shrink)+')',f(cos2)],['**Gross profit**','**'+f(gp)+'**'],['Selling expenses ('+f(sell)+' + '+f(supused)+')',f(sell2)],['General & admin ('+f(adm)+' + '+f(prepaid_exp)+')',f(adm2)],['**Net income**','**'+f(ni)+'**'])}
 
 3. Gross margin ratio = {f(gp)} ÷ {f(netsales)} = **{gp/netsales*100:.1f}%**.
 """)
@@ -600,13 +600,13 @@ def prob_close(id,co,d):
     chk(id,('Net income',ni),('Change in owner\'s capital',ni-draw))
     add(id,'Preparing closing entries and interpreting information',f"""
 Adjusted balances for {co} at Dec 31:
-{T(['Account','Balance'],['Sales','$'+f(sales)],['Sales returns and allowances','$'+f(sret)],['Sales discounts','$'+f(sdisc)],['Cost of sales','$'+f(cos)],*[[n,'$'+f(v)] for n,v in expenses],['Owner, Withdrawals','$'+f(draw)])}
+{T(['Account','Balance'],['Sales','$'+f(sales)],['Sales returns and allowances','$'+f(sret)],['Sales discounts','$'+f(sdisc)],['Cost of goods sold','$'+f(cos)],*[[n,'$'+f(v)] for n,v in expenses],['Owner, Withdrawals','$'+f(draw)])}
 1. Prepare the closing entries.
 2. What is net income, and by how much does owner's capital change?
 3. Compute the gross margin ratio.
 """,f"""
 1.
-{JE(('Dec 31','Sales',sales,''),('','Income Summary','',sales),('Dec 31','Income Summary',tot,''),('','Sales Returns and Allowances','',sret),('','Sales Discounts','',sdisc),('','Cost of Sales','',cos),*[('',n,'',v) for n,v in expenses],('Dec 31','Income Summary',ni,''),('','Owner, Capital','',ni),('Dec 31','Owner, Capital',draw,''),('','Owner, Withdrawals','',draw))}
+{JE(('Dec 31','Sales',sales,''),('','Income Summary','',sales),('Dec 31','Income Summary',tot,''),('','Sales Returns and Allowances','',sret),('','Sales Discounts','',sdisc),('','Cost of Goods Sold','',cos),*[('',n,'',v) for n,v in expenses],('Dec 31','Income Summary',ni,''),('','Owner, Capital','',ni),('Dec 31','Owner, Capital',draw,''),('','Owner, Withdrawals','',draw))}
 
 2. Net income = {f(sales)} − {f(tot)} = **{f(ni)}**. Capital increases by {f(ni)} − {f(draw)} = **{f(ni-draw)}**.
 
@@ -649,7 +649,7 @@ chk('QS-5-44C',('Interest revenue (discount forfeited)',52))
 chk('E-5-5',('Cash paid on May 11',7350))
 chk('E-5-1',('Cash paid on Oct 10',3201))
 chk('E-5-23',('Net income',24690))
-chk('E-5-9',('Ending Merchandise Inventory',7300),('Cost of Sales',27800))
+chk('E-5-9',('Ending Merchandise Inventory',7300),('Cost of Goods Sold',27800))
 chk('E-5-21',('Net sales',350000),('Net income',33300))
 chk('E-5-22',('Net sales',120350),('Gross profit',46950))
 chk('E-5-25',('Correct Year 1 net income',49200),('Correct Year 2 net income',50300))

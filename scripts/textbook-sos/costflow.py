@@ -60,4 +60,4 @@ def perpetual(beg, events, method):
     return dict(cogs=cogs,end=end,rows=rows)
 
 def perp_table(res):
-    return T(['Date','Event','Cost of sales','Inventory on hand'],*res['rows'])
+    return T(['Date','Event','Cost of goods sold','Inventory on hand'],*res['rows'])

@@ -7,7 +7,7 @@ add('QS-9-2','Credit card sales',f"""
 Opal Boutique sells $3,600 of goods (cost $2,050) to customers using bank credit cards. The card company charges a 2.5% fee, and cash is deposited immediately. Record the sale.
 """,f"""
 Fee = 3,600 × 2.5% = 90.
-{JE(('Day','Cash',3510,''),('Day','Credit Card Expense',90,''),('','Sales','',3600),('Day','Cost of Sales',2050,''),('','Merchandise Inventory','',2050))}
+{JE(('Day','Cash',3510,''),('Day','Credit Card Expense',90,''),('','Sales','',3600),('Day','Cost of Goods Sold',2050,''),('','Merchandise Inventory','',2050))}
 """)
 
 add('QS-9-3','Direct write-off method',f"""
@@ -124,9 +124,9 @@ Fee = 24,000 × 3% = 720.
 
 add('QS-9-26','Preparing an income statement',f"""
 Prepare a single-step income statement for Opal Boutique for the year.
-{T(['Account','Amount'],['Sales','$248,000'],['Interest revenue','$1,450'],['Cost of sales','$139,000'],['Salaries expense','$46,500'],['Rent expense','$18,000'],['Credit card expense','$3,720'],['Bad debts expense','$2,980'],['Factoring fee expense','$720'])}
+{T(['Account','Amount'],['Sales','$248,000'],['Interest revenue','$1,450'],['Cost of goods sold','$139,000'],['Salaries expense','$46,500'],['Rent expense','$18,000'],['Credit card expense','$3,720'],['Bad debts expense','$2,980'],['Factoring fee expense','$720'])}
 """,f"""
-{T(['Opal Boutique — Income Statement',''],['Revenues: Sales','248,000'],['Interest revenue','1,450'],['**Total revenues**','**249,450**'],['Expenses: Cost of sales','139,000'],['Salaries','46,500'],['Rent','18,000'],['Credit card','3,720'],['Bad debts','2,980'],['Factoring fee','720'],['**Total expenses**','**210,920**'],['**Net income**','**38,530**'])}
+{T(['Opal Boutique — Income Statement',''],['Revenues: Sales','248,000'],['Interest revenue','1,450'],['**Total revenues**','**249,450**'],['Expenses: Cost of goods sold','139,000'],['Salaries','46,500'],['Rent','18,000'],['Credit card','3,720'],['Bad debts','2,980'],['Factoring fee','720'],['**Total expenses**','**210,920**'],['**Net income**','**38,530**'])}
 """)
 check(139000+46500+18000+3720+2980+720,210920)
 
@@ -167,7 +167,7 @@ Mira Supply:
 - **Jun 6** Sold $2,800 of goods (cost $1,680) on a card that pays the seller later, less a 3% fee.
 - **Jun 20** Received payment for the Jun 6 sales.
 """,f"""
-{JE(('Jun 4','Cash',5096,''),('Jun 4','Credit Card Expense',104,''),('','Sales','',5200),('Jun 4','Cost of Sales',3100,''),('','Merchandise Inventory','',3100),('Jun 6','Accounts Receivable — Card Co.',2716,''),('Jun 6','Credit Card Expense',84,''),('','Sales','',2800),('Jun 6','Cost of Sales',1680,''),('','Merchandise Inventory','',1680),('Jun 20','Cash',2716,''),('','Accounts Receivable — Card Co.','',2716))}
+{JE(('Jun 4','Cash',5096,''),('Jun 4','Credit Card Expense',104,''),('','Sales','',5200),('Jun 4','Cost of Goods Sold',3100,''),('','Merchandise Inventory','',3100),('Jun 6','Accounts Receivable — Card Co.',2716,''),('Jun 6','Credit Card Expense',84,''),('','Sales','',2800),('Jun 6','Cost of Goods Sold',1680,''),('','Merchandise Inventory','',1680),('Jun 20','Cash',2716,''),('','Accounts Receivable — Card Co.','',2716))}
 """)
 
 add('E-9-4','Sales on store credit card',f"""
@@ -177,7 +177,7 @@ Mira Supply has its own store card.
 - **Aug 10** Collected the full balance.
 """,f"""
 Interest = 1,800 × 1.5% = 27.
-{JE(('Jul 1','Accounts Receivable',1800,''),('','Sales','',1800),('Jul 1','Cost of Sales',1050,''),('','Merchandise Inventory','',1050),('Jul 31','Accounts Receivable',27,''),('','Interest Revenue','',27),('Aug 10','Cash',1827,''),('','Accounts Receivable','',1827))}
+{JE(('Jul 1','Accounts Receivable',1800,''),('','Sales','',1800),('Jul 1','Cost of Goods Sold',1050,''),('','Merchandise Inventory','',1050),('Jul 31','Accounts Receivable',27,''),('','Interest Revenue','',27),('Aug 10','Cash',1827,''),('','Accounts Receivable','',1827))}
 """)
 
 add('E-9-5','Direct write-off method',f"""
@@ -321,7 +321,7 @@ Lyra collects its receivables faster.
 def p_card(id,co,cardsales,fee,ar_sales,cost_pct,store,storeint):
     fee_amt=round(cardsales*fee/100,2)
     add(id,'Sales on account and credit card sales',f"""
-{co} (perpetual; cost of sales is {cost_pct}% of sales):
+{co} (perpetual; cost of goods sold is {cost_pct}% of sales):
 - **Day 3** Sold ${f(cardsales)} of goods on bank credit cards, fee {fee}%; cash received immediately.
 - **Day 8** Sold ${f(ar_sales)} of goods to customer Nova on account, n/30.
 - **Day 12** Sold ${f(store)} of goods on the company's own store card.
@@ -331,7 +331,7 @@ def p_card(id,co,cardsales,fee,ar_sales,cost_pct,store,storeint):
 Prepare the journal entries.
 """,f"""
 Card fee = {f(cardsales)} × {fee}% = {f(fee_amt)}. Store-card interest = {f(store)} × {storeint}% = {f(round(store*storeint/100,2))}.
-{JE(('Day 3','Cash',round(cardsales-fee_amt,2),''),('Day 3','Credit Card Expense',fee_amt,''),('','Sales','',cardsales),('Day 3','Cost of Sales',round(cardsales*cost_pct/100,2),''),('','Merchandise Inventory','',round(cardsales*cost_pct/100,2)),('Day 8','Accounts Receivable — Nova',ar_sales,''),('','Sales','',ar_sales),('Day 8','Cost of Sales',round(ar_sales*cost_pct/100,2),''),('','Merchandise Inventory','',round(ar_sales*cost_pct/100,2)),('Day 12','Accounts Receivable',store,''),('','Sales','',store),('Day 12','Cost of Sales',round(store*cost_pct/100,2),''),('','Merchandise Inventory','',round(store*cost_pct/100,2)),('Day 30','Accounts Receivable',round(store*storeint/100,2),''),('','Interest Revenue','',round(store*storeint/100,2)),('Day 38','Cash',ar_sales,''),('','Accounts Receivable — Nova','',ar_sales))}
+{JE(('Day 3','Cash',round(cardsales-fee_amt,2),''),('Day 3','Credit Card Expense',fee_amt,''),('','Sales','',cardsales),('Day 3','Cost of Goods Sold',round(cardsales*cost_pct/100,2),''),('','Merchandise Inventory','',round(cardsales*cost_pct/100,2)),('Day 8','Accounts Receivable — Nova',ar_sales,''),('','Sales','',ar_sales),('Day 8','Cost of Goods Sold',round(ar_sales*cost_pct/100,2),''),('','Merchandise Inventory','',round(ar_sales*cost_pct/100,2)),('Day 12','Accounts Receivable',store,''),('','Sales','',store),('Day 12','Cost of Goods Sold',round(store*cost_pct/100,2),''),('','Merchandise Inventory','',round(store*cost_pct/100,2)),('Day 30','Accounts Receivable',round(store*storeint/100,2),''),('','Interest Revenue','',round(store*storeint/100,2)),('Day 38','Cash',ar_sales,''),('','Accounts Receivable — Nova','',ar_sales))}
 """)
 p_card('P-9-2A','Sable Sports',8400,3,5600,60,2400,1.5)
 p_card('P-9-2B','Tulip Sports',7200,2.5,4800,55,3200,2)
@@ -383,7 +383,7 @@ p_aging('P-9-4B','Thistle Co.',[98000,36500,14200,6400,2900],[1,4,12,30,55],1780
 
 add('P-9-5A','Accounts receivable transactions and bad debts',f"""
 Umber Co. (allowance method; 360-day year). Beginning balances: Accounts Receivable $72,000; Allowance $3,100 credit.
-- **Jan 15** Sales on account $46,000 (ignore cost of sales).
+- **Jan 15** Sales on account $46,000 (ignore cost of goods sold).
 - **Feb 3** Collections on account $51,000.
 - **Mar 9** Wrote off W. Kerr's $1,350 account.
 - **Apr 2** Accepted a $6,000, 90-day, 8% note from Y. Lane for her overdue account.
