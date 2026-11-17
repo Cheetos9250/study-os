@@ -308,7 +308,7 @@ const clock=$('#clock'),fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+Stri
 function savePomo(){try{localStorage.setItem(POMO_KEY,JSON.stringify(endAt?{mins,endAt}:{mins,left}));}catch{}}
 function showClock(){clock.textContent=fmt(Math.max(0,left));document.title=(endAt?fmt(Math.max(0,left))+' · ':'')+'Today — Study OS';}
 function stop(){clearInterval(tick);tick=null;endAt=0;$('#pStart').textContent='start';}
-function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}return;}showClock();}
+function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){const m=mins;left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}window.StudyNav&&StudyNav.timesUp&&StudyNav.timesUp(m);return;}showClock();}
 function run(){tick=setInterval(step,500);$('#pStart').textContent='pause';step();}
 $('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();savePomo();showClock();$('#pStart').textContent='resume';return;}
  if(left<=0)left=mins*60;endAt=Date.now()+left*1000;savePomo();run();};
