@@ -93,7 +93,7 @@ Add a service worker that caches the core pages, `scripts/`, `assets/` and `data
 
 ### 8. Site-wide search (Thai: ค้นหารวมทั้งเว็บ)
 
-Status: todo
+Status: done (#156)
 
 Add a search box to the nav (`scripts/study-nav.js`). It searches flashcards, summaries, quiz questions, lesson notes and textbook exercise titles. Tapping a result opens the page at that item (for example with `?q=` on course pages, which already exists in `acc.html`). Load the search data lazily.
 

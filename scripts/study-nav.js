@@ -29,6 +29,7 @@
   lessons:'<path d="M4 5.5A2 2 0 0 1 6 3.5h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 20.5v-15M8 8h7M8 11.5h5"/>',
   calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   more:'<circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/>',
+  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20.5 20.5"/>',
   stats:'<path d="M4 19.5h16"/><path d="M4 15l4.5-4.5 3.5 3 7-7.5"/><path d="M15 6h4v4"/>',
   grades:'<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
   backup:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/>',
@@ -101,6 +102,9 @@
  +'#snAlert button:focus-visible,#snAlert a:focus-visible{outline:3px solid #fff;outline-offset:2px}'
  +'@keyframes snPop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}'
  +'@media(prefers-reduced-motion:reduce){#snAlert .sa-box{animation:none}}'
+ /* search: a field-like button under the brand in the sidebar, an item in More on phones */
+ +'#studyNav .sn-find{display:none}#studyNav .sn-find kbd{margin-left:auto;font:700 11px var(--ui,inherit);border:1.5px solid currentColor;border-radius:4px;padding:0 5px;opacity:.6}'
+ +'@media(min-width:900px){#studyNav .sn-find{display:flex;margin:0 0 10px;padding:0 12px;min-height:42px;border:2px solid var(--sn-line)!important;border-radius:6px;color:var(--sn-mute);font-size:14px;font-weight:700}#studyNav .sn-find:hover{color:var(--sn-fg);background:var(--sn-hi)}#studyNav .sn-foot .sn-find-m{display:none}html.sn-collapsed #studyNav .sn-find{display:none}}'
  +'@media print{#studyNav{display:none}html.sn-on body{padding:0!important}}';
  /* Red popup when a Pomodoro ends (Today calls it, other pages call it from the nav countdown). */
  function timesUp(mins){
@@ -122,17 +126,18 @@
   if(course&&typeof URLSearchParams==='function'&&new URLSearchParams(location.search).get('sync')==='1')document.documentElement.classList.add('show-sync');
   var st=document.createElement('style');st.id='studyNavCss';st.textContent=css;document.head.appendChild(st);
   var nav=document.createElement('nav');nav.id='studyNav';nav.setAttribute('aria-label','Main');
-  var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><button type="button" class="sn-fold" aria-pressed="false"></button><div class="sn-tabs">';
+  var h='<a class="sn-brand" href="index.html" aria-label="Study OS home"><span class="sn-bt">Study</span><b>OS</b></a><button type="button" class="sn-fold" aria-pressed="false"></button><button type="button" class="sn-find" aria-label="Search (press /)">'+svg('search')+'<span>Search</span><kbd>/</kbd></button><div class="sn-tabs">';
   var FOCUS=!!(window.StudyTheme&&window.StudyTheme.focus&&window.StudyTheme.focus());
   TABS.forEach(function(t){if(FOCUS&&t.id==='cards'&&active!=='cards')return;h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+' title="'+esc(t.label)+'">'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
   h+='<button type="button" class="sn-more" aria-expanded="false" aria-controls="snFoot">'+svg('more')+'<span>More</span></button></div>';
-  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-theme"></button>'+(window.StudyTheme&&window.StudyTheme.setFocus?'<button type="button" class="sn-focus" aria-pressed="'+FOCUS+'" title="Show or hide summaries and flashcards">'+svg('cards')+'<span>'+(FOCUS?'Show cards &amp; summaries':'Hide cards &amp; summaries')+'</span></button>':'')+((course||window.StudyCloud)?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
+  h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-find-m">'+svg('search')+'<span>Search</span></button><button type="button" class="sn-theme"></button>'+(window.StudyTheme&&window.StudyTheme.setFocus?'<button type="button" class="sn-focus" aria-pressed="'+FOCUS+'" title="Show or hide summaries and flashcards">'+svg('cards')+'<span>'+(FOCUS?'Show cards &amp; summaries':'Hide cards &amp; summaries')+'</span></button>':'')+((course||window.StudyCloud)?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
   MORE.forEach(function(m){h+='<a href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
   h+='</div>';
   nav.innerHTML=h;document.body.appendChild(nav);if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){/* Course pages: load only the glyphs the nav shows (Google Fonts text=), a few KB instead of whole Japanese fonts. */var tx=nav.textContent.replace(/\s+/g,'');var u={};tx.split('').forEach(function(c){u[c]=1;});var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap&text='+encodeURIComponent(Object.keys(u).sort().join('')+'0123456789');document.head.appendChild(fl);}document.documentElement.classList.add('sn-on');
   var more=nav.querySelector('.sn-more');
   more.onclick=function(e){e.stopPropagation();var o=nav.classList.toggle('sn-open');more.setAttribute('aria-expanded',o?'true':'false');};
   document.addEventListener('click',function(e){if(!nav.contains(e.target)){nav.classList.remove('sn-open');more.setAttribute('aria-expanded','false');}});
+  [].forEach.call(nav.querySelectorAll('.sn-find,.sn-find-m'),function(b){b.onclick=function(){nav.classList.remove('sn-open');openSearch();};});
   var sy=nav.querySelector('.sn-sync');
   if(sy)sy.onclick=function(){if(!course&&window.StudyCloud){nav.classList.remove('sn-open');window.StudyCloud.open();return;}var on=document.documentElement.classList.toggle('show-sync');nav.classList.remove('sn-open');var bar=document.querySelector('.cloud-sync-bar');if(on&&bar&&bar.scrollIntoView)bar.scrollIntoView({block:'center'});};
   var fo=nav.querySelector('.sn-focus');if(fo)fo.onclick=function(){window.StudyTheme.setFocus(!window.StudyTheme.focus());location.reload();};
@@ -157,7 +162,18 @@
    seen=true;
    a.textContent='\u23F1 '+String(Math.floor(l/60)).padStart(2,'0')+':'+String(l%60).padStart(2,'0');}
  }
- window.StudyNav={TABS:TABS,active:active,timesUp:timesUp};
+ /* Site search: scripts/study-search.js is loaded the first time search opens. */
+ var navSrc=(document.currentScript&&document.currentScript.src)||'';
+ function openSearch(q){
+  if(window.StudySearch){window.StudySearch.open(q);return;}
+  var sc=document.createElement('script');sc.src=navSrc?new URL('study-search.js?v=1',navSrc).href:'scripts/study-search.js?v=1';
+  sc.onload=function(){if(window.StudySearch)window.StudySearch.open(q);};document.head.appendChild(sc);
+ }
+ document.addEventListener('keydown',function(e){
+  if(e.key!=='/'||e.metaKey||e.ctrlKey||e.altKey)return;var a=document.activeElement;
+  if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return;e.preventDefault();openSearch();
+ });
+ window.StudyNav={TABS:TABS,active:active,timesUp:timesUp,search:openSearch};
  if(document.body)pomo();else document.addEventListener('DOMContentLoaded',pomo);
  if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
 })();
