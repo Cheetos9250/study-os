@@ -239,3 +239,39 @@ A warm paper colour theme for night reading, and a button that reads a lesson su
 Status: needs owner
 
 Share self-made question sets by link or QR. Needs a decision on what may leave the device (no personal data in links or in the repo).
+
+---
+
+## G. Stats page ideas, 18 Nov 2026 (Thai: ไอเดียหน้า Stats)
+
+The Stats page counts quantity (questions, words, minutes). These add quality, readiness and actions. All from existing data; no new storage unless a task says so.
+
+### 27. Accuracy and trend (Thai: ความแม่นยำและแนวโน้ม)
+
+Status: todo
+
+Accuracy % per subject and overall (`120 answered · 78% correct`), and a trend chart of this week's average against last week's, per chapter, so rising and falling chapters stand out.
+
+### 28. Exam readiness and coverage (Thai: ความพร้อมสอบ)
+
+Status: todo
+
+Per subject: a bar of how much of the question bank is answered and how much is right; an estimate of the days to finish at the last 7 days' pace, compared with the exam date.
+
+### 29. Study habit insights (Thai: วิเคราะห์พฤติกรรมการอ่าน)
+
+Status: todo
+
+Peak hours (when answers are most often right) and time balance (Pomodoro time per subject against accuracy, warning when strong subjects get most of the time). Needs a subject on Pomodoro sessions (see task 23).
+
+### 30. Actionable chapter list (Thai: ปุ่มลุยต่อจาก Stats)
+
+Status: todo
+
+In "By subject and chapter": a **Practice weakest** button on chapters under 70% or not practised for 7 days, and sorting by weakest, least recent or least progress.
+
+### 31. Timeframe switcher and weekly target (Thai: เลือกช่วงเวลาและเป้ารายสัปดาห์)
+
+Status: todo
+
+Switch the charts between 7 days, 30 days and all time; an editable weekly target (questions, Pomodoro minutes) on **This week** with a progress bar. The target is stored with `qgoal` in `studyos.home.v1` (validated on restore).
