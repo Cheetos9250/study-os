@@ -21,7 +21,7 @@
  // Course pages show one mode (?tab=cards|sum|prac); highlight the matching section.
  var mode=(typeof URLSearchParams==='function'?new URLSearchParams(location.search).get('tab'):'')||'cards';
  var course=/^(acc|eco|math|eng|zh)\.html$/.test(file)?({cards:'cards',sum:'lessons',prac:'practice'}[mode]||'cards'):'';
- var active=course||{'':'today','index.html':'today','flashcards.html':'cards','practice.html':'practice','accounting-textbook.html':'practice','pdf-sets.html':'practice','hub.html':'lessons','calendar.html':'calendar','today.html':'calendar','grades.html':'','classroom.html':'today'}[file]||'';
+ var active=course||{'':'today','index.html':'today','flashcards.html':'cards','practice.html':'practice','accounting-textbook.html':'practice','pdf-sets.html':'practice','mock.html':'practice','hub.html':'lessons','calendar.html':'calendar','today.html':'calendar','grades.html':'','classroom.html':'today'}[file]||'';
  /* Line icons, 24px grid, 1.8 stroke. */
  var ICONS={
   today:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>',

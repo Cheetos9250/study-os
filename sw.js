@@ -11,7 +11,8 @@ const CACHE = VERSION + '-files';
 const CORE = [
   './', 'index.html', 'flashcards.html', 'practice.html', 'hub.html', 'calendar.html', 'grades.html', 'stats.html',
   'acc.html', 'eco.html', 'math.html', 'eng.html', 'zh.html', 'excel.html',
-  'pdf-sets.html', 'tutor.html', 'classroom.html', 'progress-backup.html', 'progress-restore.html', 'vocabloom/index.html',
+  'pdf-sets.html', 'tutor.html', 'classroom.html', 'progress-backup.html', 'progress-restore.html', 'mock.html',
+  'vocabloom/', 'vocabloom/index.html', 'vocabloom/study-decks.json',
   'manifest.webmanifest', 'data/quiz.json', 'data/cards.json', 'data/accounting-textbook-index.json',
   'data/textbook-sos/ch5.json', 'data/textbook-sos/ch6.json', 'data/textbook-sos/ch7.json',
   'data/textbook-sos/ch8.json', 'data/textbook-sos/ch9.json'
@@ -72,6 +73,12 @@ self.addEventListener('fetch', event => {
       const hit = await cache.match(req) || await cache.match(req, { ignoreSearch: true });
       if (hit) return hit;
       if (req.mode === 'navigate') {
+        /* a folder link such as vocabloom/?lang=zh opens that folder's own page, not Today */
+        const path = new URL(req.url).pathname;
+        if (path.endsWith('/')) {
+          const own = await cache.match(path, { ignoreSearch: true }) || await cache.match(path + 'index.html', { ignoreSearch: true });
+          if (own) return own;
+        }
         const home = await cache.match('index.html');
         if (home) return home;
       }

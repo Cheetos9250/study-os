@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — timed mock exam">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Mock exam — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=8">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 110px max(18px,env(safe-area-inset-left))}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:16px 18px;margin:14px 0}
+.lead{color:var(--muted);margin:4px 0 0}
+label.f{display:block;font-weight:900;margin:14px 0 6px}
+select,input[type=number]{min-height:44px;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:600 16px var(--ui);padding:0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:700 14px var(--ui);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.mk-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.b{min-height:44px;padding:0 18px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 15px var(--ui);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.b.main{background:var(--ink);color:var(--paper)}.b:disabled{opacity:.5;cursor:default}
+.mk-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:10px 14px;margin:10px 0}
+.mk-clock{font:700 30px/1 var(--num);font-variant-numeric:tabular-nums}.mk-clock.low{color:var(--red,#c22)}
+.mk-bar .mk-sp{flex:1}
+.q{font:700 19px/1.6 var(--ui);margin:4px 0 12px;overflow-wrap:anywhere}
+.opt{display:block;width:100%;text-align:left;min-height:48px;margin:0 0 10px;padding:10px 14px;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:600 16px/1.5 var(--ui);cursor:pointer;overflow-wrap:anywhere}
+.opt[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.opt.right{background:var(--low);color:var(--low-t)}.opt.wrong{background:var(--hi);color:var(--hi-t)}
+.mk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;margin-top:10px}
+.mk-grid button{min-height:44px;border:2px solid var(--ink);border-radius:6px;background:var(--panel);color:var(--text);font:700 14px var(--ui);cursor:pointer}
+.mk-grid button.ans{background:var(--panel-2)}.mk-grid button.cur{background:var(--ink);color:var(--paper)}.mk-grid button.flag{box-shadow:inset 0 -5px 0 var(--acc,#e33)}
+.mk-big{font:700 clamp(48px,10vw,76px)/1 var(--num)}
+.mk-ch{display:grid;grid-template-columns:minmax(0,1fr) 120px 70px;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line-soft)}
+.mk-meter{height:9px;border-radius:5px;background:var(--line-soft);overflow:hidden}.mk-meter i{display:block;height:100%;background:var(--ink)}
+.mk-ch .mk-pc{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.mk-rev{border-top:2px solid var(--ink);padding:12px 0}.mk-rev:first-child{border-top:0}.mk-rev p{margin:4px 0;overflow-wrap:anywhere}
+.muted{color:var(--muted);font-size:14px}
+@media(max-width:480px){.mk-ch{grid-template-columns:minmax(0,1fr) 70px 56px}.mk-clock{font-size:26px}}
+</style>
+<script src="scripts/study-theme.js?v=5"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+</head>
+<body>
+<div class="page">
+<h1>Mock exam</h1>
+<p class="lead">Random questions from the exam chapters, with a timer. Answers are saved like normal practice, so missed questions come back in Review.</p>
+<main id="app"><p class="muted">Loading…</p></main>
+</div>
+<script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=5"></script>
+<script src="scripts/study-nav.js?v=11"></script>
+<script>
+(function(){
+'use strict';
+/* Storage: writes answers to study-<course> (ans, ats) when an exam finishes, like the course practice page.
+   sessionStorage studyos.mock.v1 keeps a running exam if the page reloads (this visit only, not backed up). */
+const T=window.StudyToday,$=s=>document.querySelector(s),RUN='studyos.mock.v1';
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rich=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+const COURSES=T.COURSES,data={};
+let st=null,timer=null;
+function read(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function getS(){try{return JSON.parse(sessionStorage.getItem(RUN)||'null');}catch(e){return null;}}
+function putS(v){try{if(v)sessionStorage.setItem(RUN,JSON.stringify(v));else sessionStorage.removeItem(RUN);}catch(e){}}
+async function load(key){if(data[key])return data[key];const c=COURSES.find(x=>x.key===key);const r=await fetch(c.data,{cache:'no-cache'});if(!r.ok)throw Error('HTTP '+r.status);return data[key]=T.parseCourseData(await r.text());}
+function exam(key){const s=T.loadSettings(read(T.SETTINGS_KEY));return s.exams.map(e=>({...e,d:T.daysUntil(e.date,Date.now())})).filter(e=>e.course===key&&e.d>=0).sort((a,b)=>a.d-b.d)[0]||null;}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+/* pick n questions spread across the chosen chapters (round robin), shuffled */
+function pick(D,cats,n){
+ const by=cats.map(c=>shuffle(D.quiz.map((q,i)=>({q,i})).filter(x=>x.q[0]===c&&Array.isArray(x.q[2])&&x.q[2].length>1)));
+ const out=[];let k=0;while(out.length<n&&by.some(l=>l.length)){const l=by[k++%by.length];if(l.length)out.push(l.shift());}
+ return shuffle(out).map(x=>({i:x.i,order:shuffle(x.q[2].map((_,j)=>j))}));
+}
+/* ---------- setup ---------- */
+async function setup(pref){
+ const u=new URLSearchParams(location.search),key=(pref&&pref.course)||u.get('course')||'acc',c=COURSES.find(x=>x.key===key)||COURSES[0];
+ const D=await load(c.key),ex=exam(c.key),cats=(pref&&pref.cats)||(ex&&ex.cats.length?ex.cats:D.cats.map(x=>x[0])).filter(id=>D.cats.some(x=>x[0]===id));
+ const sel=new Set(cats);
+ const count=id=>D.quiz.filter(q=>q[0]===id).length;
+ $('#app').innerHTML='<section class="panel"><label class="f" for="course">Subject</label><select id="course">'+COURSES.map(x=>'<option value="'+x.key+'"'+(x.key===c.key?' selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select>'
+  +(ex?'<p class="muted">'+esc(ex.title)+' '+(ex.d===0?'is today':'in '+ex.d+' day'+(ex.d>1?'s':''))+'. Chapters below follow its scope in Calendar.</p>':'')
+  +'<label class="f" id="chL">Chapters</label><div class="chips" role="group" aria-labelledby="chL">'+D.cats.map(x=>'<button type="button" class="chip" data-c="'+esc(x[0])+'" aria-pressed="'+sel.has(x[0])+'">'+esc(x[1])+' ('+count(x[0])+')</button>').join('')+'</div>'
+  +'<div class="mk-row" style="margin-top:6px"><div><label class="f" for="n">Questions</label><select id="n">'+[10,20,30,40,60].map(v=>'<option'+(v===20?' selected':'')+'>'+v+'</option>').join('')+'</select></div>'
+  +'<div><label class="f" for="mins">Minutes</label><input type="number" id="mins" min="1" max="240" value="30" style="width:110px"></div></div>'
+  +'<p class="muted" id="avail"></p><div class="mk-row" style="margin-top:12px"><button type="button" class="b main" id="go">Start mock exam</button></div></section>';
+ const avail=()=>{const n=[...sel].reduce((s,id)=>s+count(id),0),want=+$('#n').value;$('#avail').textContent=n+' questions in the chosen chapters'+(n<want?' · the exam will have '+n:'');$('#go').disabled=!n;};
+ const mins=()=>{$('#mins').value=Math.max(5,Math.round(+$('#n').value*1.5));};
+ document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const id=b.dataset.c;if(sel.has(id))sel.delete(id);else sel.add(id);b.setAttribute('aria-pressed',sel.has(id));avail();});
+ $('#course').onchange=()=>setup({course:$('#course').value});
+ $('#n').onchange=()=>{mins();avail();};mins();avail();
+ $('#go').onclick=()=>{const qs=pick(D,D.cats.map(x=>x[0]).filter(id=>sel.has(id)),+$('#n').value);if(!qs.length)return;
+  st={course:c.key,qs,ans:{},flag:{},pos:0,end:Date.now()+Math.max(1,+$('#mins').value||30)*60000,start:Date.now(),cats:[...sel]};putS(st);run();};
+}
+/* ---------- exam ---------- */
+function left(){return Math.max(0,st.end-Date.now());}
+function fmt(ms){const s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function tick(){const el=$('#clock');if(!el)return;const l=left();el.textContent=fmt(l);el.classList.toggle('low',l<5*60000);if(!l)finish(true);}
+async function run(){
+ const D=await load(st.course),q=st.qs[st.pos],raw=D.quiz[q.i],n=Object.keys(st.ans).length;
+ $('#app').innerHTML='<div class="mk-bar" role="group" aria-label="Exam"><span class="mk-clock" id="clock" role="timer" aria-live="off"></span><span class="muted">'+n+' / '+st.qs.length+' answered</span><span class="mk-sp"></span><button type="button" class="b" id="fin">Finish</button></div>'
+  +'<section class="panel"><p class="muted">Question '+(st.pos+1)+' of '+st.qs.length+' · '+esc((D.cats.find(c=>c[0]===raw[0])||[,''])[1])+'</p><div class="q">'+rich(raw[1])+'</div>'
+  +q.order.map((o,k)=>'<button type="button" class="opt" data-o="'+o+'" aria-pressed="'+(st.ans[q.i]===o)+'">'+'ABCDEF'[k]+'. '+rich(raw[2][o])+'</button>').join('')
+  +'<div class="mk-row"><button type="button" class="b" id="prev"'+(st.pos?'':' disabled')+'>← Back</button><button type="button" class="b" id="flag" aria-pressed="'+!!st.flag[q.i]+'">'+(st.flag[q.i]?'Flagged':'Flag')+'</button><button type="button" class="b main" id="next">'+(st.pos+1<st.qs.length?'Next →':'Finish')+'</button></div>'
+  +'<div class="mk-grid" aria-label="Jump to question">'+st.qs.map((x,k)=>'<button type="button" data-j="'+k+'" class="'+(st.ans[x.i]!==undefined?'ans ':'')+(k===st.pos?'cur ':'')+(st.flag[x.i]?'flag':'')+'" aria-label="Question '+(k+1)+(st.ans[x.i]!==undefined?', answered':'')+(st.flag[x.i]?', flagged':'')+'">'+(k+1)+'</button>').join('')+'</div></section>';
+ document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{st.ans[q.i]=+b.dataset.o;putS(st);run();});
+ document.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{st.pos=+b.dataset.j;putS(st);run();});
+ $('#prev').onclick=()=>{st.pos--;putS(st);run();};
+ $('#next').onclick=()=>{if(st.pos+1<st.qs.length){st.pos++;putS(st);run();}else finish(false);};
+ $('#flag').onclick=()=>{st.flag[q.i]=!st.flag[q.i];putS(st);run();};
+ $('#fin').onclick=()=>finish(false);
+ clearInterval(timer);timer=setInterval(tick,1000);tick();
+}
+/* ---------- result ---------- */
+function save(D){
+ const k='study-'+st.course;let o={};try{o=JSON.parse(read(k)||'{}')||{};}catch(e){}
+ o.ans=o.ans&&typeof o.ans==='object'?o.ans:{};o.ats=o.ats&&typeof o.ats==='object'?o.ats:{};
+ const t=Date.now();Object.keys(st.ans).forEach(i=>{o.ans[i]=st.ans[i];o.ats[i]=t;});
+ try{localStorage.setItem(k,JSON.stringify(o));}catch(e){return false;}
+ if(window.StudyCloud)StudyCloud.dirty();return true;
+}
+async function finish(timeUp){
+ const n=Object.keys(st.ans).length;
+ if(!timeUp&&n<st.qs.length&&!confirm((st.qs.length-n)+' question'+(st.qs.length-n>1?'s are':' is')+' not answered. Finish anyway?'))return;
+ clearInterval(timer);const D=await load(st.course);
+ if(!st.saved){st.saved=save(D);st.used=Date.now()-st.start;}
+ putS(null);
+ const c=COURSES.find(x=>x.key===st.course),per={};let right=0;
+ st.qs.forEach(x=>{const q=D.quiz[x.i],p=per[q[0]]=per[q[0]]||{n:0,r:0};p.n++;if(st.ans[x.i]===q[3]){p.r++;right++;}});
+ const pct=Math.round(right/st.qs.length*100),rows=Object.keys(per).map(id=>({id,label:(D.cats.find(x=>x[0]===id)||[,id])[1],...per[id]})).sort((a,b)=>a.r/a.n-b.r/b.n);
+ const wrong=st.qs.filter(x=>st.ans[x.i]!==D.quiz[x.i][3]),weak=rows.filter(r=>r.r/r.n<0.7).map(r=>r.id);
+ $('#app').innerHTML='<section class="panel"><p class="muted">'+(timeUp?'Time is up. ':'')+esc(c.name)+' · '+Math.round((st.used||0)/60000)+' min</p><div class="mk-big">'+right+' / '+st.qs.length+'</div><p><b>'+pct+'%</b> correct'+(st.saved?' · answers saved, missed questions come back in Review':'')+'</p>'
+  +'<div class="mk-row" style="margin-top:10px"><a class="b main" href="mock.html?course='+c.key+'">New mock exam</a>'+(wrong.length?'<a class="b" href="'+c.page+'?tab=prac&cat='+[...new Set(wrong.map(x=>D.quiz[x.i][0]))].join(',')+'&missed=1">Redo missed</a>':'')
+  +(weak.length?'<a class="b" href="'+c.page+'?tab=sum&cat='+weak[0]+'">Read weakest chapter</a>':'')+'</div></section>'
+  +'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">By chapter</h2>'+rows.map(r=>'<div class="mk-ch"><a href="'+c.page+'?tab=prac&cat='+esc(r.id)+'" style="color:inherit">'+esc(r.label)+'</a><span class="mk-meter" aria-hidden="true"><i style="width:'+Math.round(r.r/r.n*100)+'%"></i></span><span class="mk-pc">'+r.r+'/'+r.n+'</span></div>').join('')+'</section>'
+  +(wrong.length?'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">Missed questions</h2>'+wrong.map(x=>{const q=D.quiz[x.i],a=st.ans[x.i];
+    return '<div class="mk-rev"><p><b>'+rich(q[1])+'</b></p><p>'+(a===undefined?'Not answered':'Your answer: '+rich(q[2][a]))+'</p><p>✓ '+rich(q[2][q[3]])+'</p>'+(q[4]?'<p class="muted">'+rich(q[4])+'</p>':'')+'</div>';}).join('')+'</section>':'');
+ window.scrollTo({top:0});
+}
+/* resume a running exam after a reload */
+st=getS();
+if(st&&st.qs&&st.end){if(left()>0)run();else finish(true);}else{st=null;setup().catch(()=>{$('#app').innerHTML='<p class="muted">Could not load the subject. Check the connection and refresh.</p>';});}
+})();
+</script>
+</body>
+</html>

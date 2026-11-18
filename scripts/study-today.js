@@ -23,7 +23,7 @@
   {id:'acc-quiz-20261116',course:'acc',title:'Accounting quiz',date:'2026-11-16',cats:['c6','c8'],confirmed:true},
   {id:'acc-final-20261126',course:'acc',title:'Accounting final',date:'2026-11-26',cats:['c5','c6','c7','c8','c9'],confirmed:true},
   {id:'gc-video-20261120',course:'other',title:'Global Citizenship: group video due',date:'2026-11-20',cats:[],confirmed:true},
-  {id:'eco-final-20261127',course:'eco',title:'Economics final',date:'2026-11-27',cats:['g','i','b','a','d'],confirmed:true},
+  {id:'eco-final-20261127',course:'eco',title:'Economics final',date:'2026-11-27',cats:['g','i','b','a','d','m','f','n'],confirmed:true},
   {id:'math-final-20261201',course:'math',title:'Math final',date:'2026-12-01',cats:['c5','c6','c7'],confirmed:false}
  ]);
  const sod=t=>Math.floor((t+TZ)/DAY)*DAY-TZ;
@@ -70,7 +70,8 @@
  function upgradeDefault(e){
   if(e.id==='acc-final-20261126'&&!e.confirmed&&e.cats.join()==='c6,c7,c8,c9')return {...e,cats:['c5','c6','c7','c8','c9'],confirmed:true};
   // Economics outline (16 Nov 2026): final covers the post-midterm macro topics already in the default scope.
-  if(e.id==='eco-final-20261127'&&!e.confirmed&&e.cats.join()==='g,i,b,a,d')return {...e,confirmed:true};
+  // Money, fiscal and monetary policy chapters added 18 Nov 2026 (in the final per the outline): add them to the untouched scope.
+  if(e.id==='eco-final-20261127'&&e.cats.join()==='g,i,b,a,d')return {...e,cats:['g','i','b','a','d','m','f','n'],confirmed:true};
   return e;
  }
  function normalizeExams(list){
@@ -110,9 +111,16 @@
    const done=settings.done[e.id]||{};
    if(e.days===0){tasks.push({id:e.id+':day',kind:'exam',examId:e.id,course:e.course,title:'Exam today: '+e.title,detail:'Quick summary + missed questions'});return;}
    const scope=e.cats.map(id=>sum.per[id]).filter(Boolean);
+   /* exam mode (last 3 days): missed questions and the weakest chapters of this exam come first */
+   if(e.days<=3){
+    const missed=scope.reduce((n,p)=>n+Math.max(0,p.answered-p.correct),0),cats=scope.filter(p=>p.answered>p.correct).map(p=>p.id);
+    if(missed)tasks.push({id:e.id+':missed',kind:'missed',examId:e.id,course:e.course,cats,title:'Redo missed questions: '+e.title,detail:missed+' missed in '+cats.length+' chapter'+(cats.length>1?'s':'')+' · exam in '+e.days+' day'+(e.days>1?'s':''),exam:e.title,days:e.days});
+    scope.filter(p=>{const a=accuracy(p);return a!==null&&p.answered>=2&&a<0.7;}).sort((a,b)=>accuracy(a)-accuracy(b)).slice(0,2)
+     .forEach(p=>tasks.push({id:e.id+':weak:'+p.id,kind:'weak',examId:e.id,course:e.course,cat:p.id,title:'Weak chapter: '+p.label,detail:Math.round(accuracy(p)*100)+'% correct · practise until it is above 70%',exam:e.title,days:e.days}));
+   }
    const remaining=scope.filter(p=>!done[p.id]||done[p.id]===today).sort((a,b)=>priority(b)-priority(a));
    if(e.days===1||!remaining.length){
-    tasks.push({id:e.id+':final',kind:'final',examId:e.id,course:e.course,title:'Final review: '+e.title,detail:'Missed questions in all chapters'});return;
+    tasks.push({id:e.id+':final',kind:'final',examId:e.id,course:e.course,cats:e.cats.slice(),title:'Final review: '+e.title,detail:'Summaries + practice in all exam chapters'});return;
    }
    const studyDays=Math.max(1,e.days-1);
    let k=Math.ceil(remaining.length/studyDays);if(i>0)k=Math.min(k,1);
