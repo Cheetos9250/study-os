@@ -1,0 +1,4 @@
+- **Stats**: choose 7 days / 30 days / All time for the charts; a 6-week accuracy line and "▲/▼ vs last week" per subject; each chapter shows its trend and when you last practised it, with **Practice weakest →** on chapters under 70% or idle for a week; sort chapters by weakest, least recent or least progress.
+- **Stats → Study habits**: your most accurate time of day, accuracy by time of day, Pomodoro minutes per subject, and a warning when most of your time goes to a subject you are already strong in.
+- **Stats → This week**: an editable weekly target (questions and Pomodoro minutes) with progress bars; saved with your Today data (backed up and synced).
+- **Today → Pomodoro**: pick the subject you are studying (counts in Stats) and a background sound (rain, white or brown noise, made in the browser).

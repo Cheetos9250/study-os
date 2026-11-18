@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
 test('Pomodoro keeps its end time so it keeps counting when you leave Today, and resumes on return',()=>{
   const s=read('index.html');
-  assert.match(s,/function savePomo\(\)\{try\{localStorage\.setItem\(POMO_KEY,JSON\.stringify\(endAt\?\{mins,endAt\}:\{mins,left\}\)\);\}catch\{\}\}/);
+  assert.match(s,/function savePomo\(\)\{try\{localStorage\.setItem\(POMO_KEY,JSON\.stringify\(endAt\?\{mins,endAt,sub:psub\}:\{mins,left,sub:psub\}\)\);\}catch\{\}\}/);
   assert.match(s,/if\(s\.endAt&&s\.endAt>Date\.now\(\)\)\{endAt=s\.endAt;run\(\);\}/);
 });
 test('other pages show a countdown while it runs; the nav itself never touches storage',()=>{

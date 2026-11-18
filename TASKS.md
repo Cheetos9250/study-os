@@ -218,7 +218,7 @@ On Stats: this week's questions, accuracy change per subject, and chapters that 
 
 ### 23. Pomodoro sounds and per-subject time (Thai: เสียงฝนและเวลาแยกวิชา)
 
-Status: todo
+Status: done (#173)
 
 Rain / white-noise sound during Pomodoro (generated in the browser, no downloads), and minutes per subject in Stats.
 
@@ -248,7 +248,7 @@ The Stats page counts quantity (questions, words, minutes). These add quality, r
 
 ### 27. Accuracy and trend (Thai: ความแม่นยำและแนวโน้ม)
 
-Status: todo
+Status: done (#173)
 
 Accuracy % per subject and overall (`120 answered · 78% correct`), and a trend chart of this week's average against last week's, per chapter, so rising and falling chapters stand out.
 
@@ -260,18 +260,18 @@ Per subject: a bar of how much of the question bank is answered and how much is 
 
 ### 29. Study habit insights (Thai: วิเคราะห์พฤติกรรมการอ่าน)
 
-Status: todo
+Status: done (#173)
 
 Peak hours (when answers are most often right) and time balance (Pomodoro time per subject against accuracy, warning when strong subjects get most of the time). Needs a subject on Pomodoro sessions (see task 23).
 
 ### 30. Actionable chapter list (Thai: ปุ่มลุยต่อจาก Stats)
 
-Status: todo
+Status: done (#173)
 
 In "By subject and chapter": a **Practice weakest** button on chapters under 70% or not practised for 7 days, and sorting by weakest, least recent or least progress.
 
 ### 31. Timeframe switcher and weekly target (Thai: เลือกช่วงเวลาและเป้ารายสัปดาห์)
 
-Status: todo
+Status: done (#173)
 
 Switch the charts between 7 days, 30 days and all time; an editable weekly target (questions, Pomodoro minutes) on **This week** with a progress bar. The target is stored with `qgoal` in `studyos.home.v1` (validated on restore).

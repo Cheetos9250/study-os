@@ -40,12 +40,22 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 .ch{display:grid;grid-template-columns:minmax(0,1fr) 110px 76px;gap:10px;align-items:center;font-size:14px;padding:4px 0}
 .ch a{color:inherit;text-decoration:none;min-height:32px;display:flex;align-items:center}.ch a:hover{text-decoration:underline}
 .meter{height:8px;border-radius:4px;background:var(--line-soft);overflow:hidden}.meter i{display:block;height:100%;background:var(--ink);border-radius:4px}
-.ch .pc{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.ch .pc{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px;border:0;background:none;border-radius:0;white-space:nowrap}
 .note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
 .heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,var(--hc));grid-auto-columns:var(--hc);gap:3px;--hc:13px;overflow-x:auto;padding:4px 0 6px}
 .heat i{display:block;width:var(--hc);height:var(--hc);border-radius:3px;background:var(--line-soft);outline:none}.heat i.l1{background:color-mix(in srgb,var(--acc) 30%,var(--panel))}.heat i.l2{background:color-mix(in srgb,var(--acc) 55%,var(--panel))}.heat i.l3{background:color-mix(in srgb,var(--acc) 78%,var(--panel))}.heat i.l4{background:var(--acc)}.heat i.fut{background:transparent}
 .heat i:focus-visible{outline:2px solid var(--ink);outline-offset:1px}.heat-key{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);margin-top:4px}.heat-key i{width:12px;height:12px;border-radius:3px;display:inline-block}
 .wk{width:100%;border-collapse:collapse;font-size:14px}.wk th,.wk td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line-soft)}.wk td.n{text-align:right;font-variant-numeric:tabular-nums}.wk .up{color:var(--ok,#1c7c4a);font-weight:700}.wk .down{color:var(--red,#c21f2f);font-weight:700}
+.tf{display:inline-flex;border:2.5px solid var(--ink);border-radius:6px;overflow:hidden;margin:4px 0 2px}.tf button{min-height:40px;padding:0 14px;border:0;background:var(--panel);color:var(--text);font:700 14px var(--ui);cursor:pointer}.tf button+button{border-left:2px solid var(--ink)}.tf button[aria-pressed="true"]{background:var(--ink);color:var(--accent-ink)}
+.wtarget{margin-top:12px;display:grid;gap:8px}.wtarget h4{margin:0;font-size:15px}.tg{display:grid;gap:4px;font-size:14px}.tgb{height:10px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;background:var(--panel)}.tgb i{display:block;height:100%;background:var(--acc)}
+.wtarget label{display:grid;gap:4px;font-size:13px;font-weight:700}.wtarget input{min-height:44px;border:2px solid var(--ink);border-radius:var(--r-s);background:var(--panel);color:var(--text);font:600 16px var(--ui);padding:0 10px;max-width:200px}
+.wtarget button,.tgrow button{min-height:40px;padding:0 14px;border:2px solid var(--ink);border-radius:var(--r-s);background:var(--panel);color:var(--text);font:700 14px var(--ui);cursor:pointer;justify-self:start}.tgrow{display:flex;gap:8px}
+.habits p{margin:4px 0;font-size:14.5px;line-height:1.55}.habits .warn{border-left:4px solid var(--red,#c21f2f);padding-left:10px}.habits a{font-weight:700}
+.hrs{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;height:90px;align-items:end;margin:6px 0 10px;max-width:420px}.hrs span{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}.hrs i{display:block;background:var(--ink);border-radius:3px 3px 0 0;min-height:0}.hrs small{font-size:11px;color:var(--muted);margin-top:3px}
+.sortbar{margin:0 0 6px}.sortbar label{font-size:13px;font-weight:700;display:inline-flex;gap:8px;align-items:center}.sortbar select{min-height:40px;border:2px solid var(--ink);border-radius:var(--r-s);background:var(--panel);color:var(--text);font:600 14px var(--ui);padding:0 8px}
+.spark{width:108px;height:34px;flex:none}.spark polyline{fill:none;stroke:var(--acc);stroke-width:2.2}.spark circle{fill:var(--acc)}.spark .base{stroke:var(--line-soft);stroke-width:1}
+.subj .up{color:var(--ok,#1c7c4a);font-weight:700}.subj .down{color:var(--red,#c21f2f);font-weight:700}
+.ch .cx{grid-column:1/-1;font-size:12.5px;color:var(--muted);margin-top:-4px}.ch .pw{margin-left:6px;font-weight:700;color:var(--link,var(--acc-t))}
 .ready{display:grid;gap:12px}.rd{border-top:2px solid var(--line-soft);padding-top:10px}.rd:first-child{border-top:0;padding-top:0}
 .rd .hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}.rd .hd b{font-size:16px;flex:1}.rd .tag{font-size:12px;font-weight:900;border:2px solid currentColor;border-radius:4px;padding:0 6px}
 .rd .tag.ok{color:var(--ok,#1c7c4a)}.rd .tag.bad{color:var(--red,#c21f2f)}.rd .tag.mute{color:var(--muted)}
@@ -55,7 +65,7 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.bdg{border:2px solid var(--ink);border-radius:var(--r);padding:10px 12px;background:var(--panel);display:grid;gap:2px}.bdg .ic{font-size:26px;line-height:1}.bdg b{font-size:14px}.bdg span{font-size:12.5px;color:var(--muted)}
 .bdg.off{border-style:dashed;opacity:.62}.bdg.off .ic{filter:grayscale(1)}.bdg .pg{height:6px;border-radius:3px;background:var(--line-soft);overflow:hidden;margin-top:4px}.bdg .pg i{display:block;height:100%;background:var(--ink)}
 @media(max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:420px){.ch{grid-template-columns:minmax(0,1fr) 70px 62px}.tile .n{font-size:34px}}
+@media(max-width:420px){.ch{grid-template-columns:minmax(0,1fr) 56px auto}.tile .n{font-size:34px}}
 </style>
 <script src="scripts/study-theme.js?v=5"></script>
 <script src="scripts/study-accent.js?v=2"></script>
@@ -65,15 +75,17 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 <h1>Stats</h1>
 <div class="tiles" id="tiles" aria-label="Summary"></div>
 <main>
-<section class="panel" aria-labelledby="qh"><h3 id="qh">Questions answered</h3><p class="sub">Last 30 days · each question counts on the day you last answered it</p><div class="chart" id="qChart"></div></section>
-<section class="panel" aria-labelledby="wh"><h3 id="wh">WordNest words</h3><p class="sub" id="wsub">Last 30 days · English and Chinese answers in WordNest</p><div class="chart" id="wChart"></div></section>
-<section class="panel" aria-labelledby="ph"><h3 id="ph">Pomodoro minutes</h3><p class="sub">Last 30 days · finished 25-minute sessions</p><div class="chart" id="pChart"></div></section>
+<div class="tf" role="group" aria-label="Time range for the charts"><button type="button" data-tf="7">7 days</button><button type="button" data-tf="30" aria-pressed="true">30 days</button><button type="button" data-tf="all">All time</button></div>
+<section class="panel" aria-labelledby="qh"><h3 id="qh">Questions answered</h3><p class="sub"><span class="tfl">Last 30 days</span> · each question counts on the day you last answered it</p><div class="chart" id="qChart"></div></section>
+<section class="panel" aria-labelledby="wh"><h3 id="wh">WordNest words</h3><p class="sub" id="wsub"><span class="tfl">Last 30 days</span> · English and Chinese answers in WordNest</p><div class="chart" id="wChart"></div></section>
+<section class="panel" aria-labelledby="ph"><h3 id="ph">Pomodoro minutes</h3><p class="sub"><span class="tfl">Last 30 days</span> · finished 25-minute sessions</p><div class="chart" id="pChart"></div></section>
 <section class="panel" aria-labelledby="rh"><h3 id="rh">Exam readiness</h3><p class="sub">How much of each question bank you have done and got right, and whether your pace finishes it before the exam</p><div id="ready" class="ready"><p class="note">Loading…</p></div></section>
 <section class="panel" aria-labelledby="hh"><h3 id="hh">Study heatmap</h3><p class="sub" id="hsub">Questions answered and WordNest words per day</p><div id="heat"></div></section>
-<section class="panel" aria-labelledby="kh"><h3 id="kh">This week</h3><p class="sub" id="ksub">Monday to today, against the same days last week</p><div id="week"></div></section>
+<section class="panel" aria-labelledby="kh"><h3 id="kh">This week</h3><p class="sub" id="ksub">Monday to today, against the same days last week</p><div id="week"></div><div id="wtarget" class="wtarget"></div></section>
+<section class="panel" aria-labelledby="ih"><h3 id="ih">Study habits</h3><p class="sub">From the time of your answers and your Pomodoro subjects</p><div id="habits" class="habits"><p class="note">Loading…</p></div></section>
 <section class="panel" aria-labelledby="bh"><h3 id="bh">Badges</h3><p class="sub" id="bsub">Earned from what you have already done</p><div id="badges" class="badges"></div></section>
 <h2>By subject and chapter</h2>
-<section class="panel"><ul class="subj" id="subj"><li class="note">Loading…</li></ul></section>
+<section class="panel"><div class="sortbar"><label>Sort chapters <select id="sortCh"><option value="">Course order</option><option value="weak">Weakest first</option><option value="recent">Least recent first</option><option value="progress">Least progress first</option></select></label></div><ul class="subj" id="subj"><li class="note">Loading…</li></ul></section>
 </main>
 </div>
 <script src="scripts/study-today.js?v=3"></script>
@@ -88,7 +100,7 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 const T=window.StudyToday,S=window.StudyStats,$=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function read(k){try{return localStorage.getItem(k);}catch{return null;}}
-const now=Date.now(),days=S.lastDays(now,30);
+const now=Date.now();let days=S.lastDays(now,30),tfLabel='Last 30 days';
 const ALL=T.COURSES.concat(T.LANGS);
 const answered=S.answersPerDay(ALL.map(c=>read('study-'+c.key)));
 const pomo=S.pomoPerDay(read('studyos.pomolog.v1'));
@@ -101,7 +113,7 @@ function tiles(pct){
  const a30=sum(answered,days),p7=sum(pomo,days.slice(-7)),today=days[days.length-1];
  $('#tiles').innerHTML=[
   [streak,streak===1?'day':'days','Streak',streak?'Answered, timed, ticked or learned words each day':'Study today to start one'],
-  [a30,'','Answered','Last 30 days'+(answered[today]?' · '+answered[today]+' today':'')],
+  [a30,'','Answered',tfLabel+(answered[today]?' · '+answered[today]+' today':'')],
   [pct==null?'–':pct,pct==null?'':'%','Correct','All practice so far'],
   [p7,'min','Pomodoro','Last 7 days'+(pomo[today]?' · '+pomo[today]+' today':'')]
  ].map(([n,u,l,s])=>'<div class="tile"><span class="n">'+n+(u?'<small>'+u+'</small>':'')+'</span><span class="l">'+l+'</span><span class="s">'+esc(s)+'</span></div>').join('');
@@ -117,7 +129,7 @@ function chart(el,map,unit){
   g+='<rect class="hit" x="'+(P.l+i*slot)+'" y="'+P.t+'" width="'+slot+'" height="'+(base-P.t)+'" tabindex="0" data-tip="'+esc(lab)+'" aria-label="'+esc(lab)+'"></rect>'
    +'<path class="bar'+(i===n-1?' today':'')+'" d="'+bar(x,v)+'"/>';});
  g+='<line class="axis" x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+base+'" y2="'+base+'"/>';
- [0,14,n-1].forEach(i=>{g+='<text x="'+(P.l+i*slot+slot/2)+'" y="'+(H-4)+'" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+(i===n-1?'Today':fmtDay(days[i]))+'</text>';});
+ [0,Math.floor((n-1)/2),n-1].forEach(i=>{g+='<text x="'+(P.l+i*slot+slot/2)+'" y="'+(H-4)+'" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+(i===n-1?'Today':fmtDay(days[i]))+'</text>';});
  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(unit)+' per day, last 30 days, highest '+max+'">'+g+'</svg><div class="tip" hidden></div>'
   +'<details class="tbl"><summary>Show as table</summary><table><thead><tr><th>Day</th><th>'+esc(unit[0].toUpperCase()+unit.slice(1))+'</th></tr></thead><tbody>'
   +days.slice().reverse().map((d,i)=>'<tr><td>'+fmtDay(d)+'</td><td class="n">'+(map[d]||0)+'</td></tr>').join('')+'</tbody></table></details>';
@@ -128,8 +140,17 @@ function chart(el,map,unit){
  svg.addEventListener('pointerleave',()=>{tip.hidden=true;});svg.addEventListener('focusout',()=>{tip.hidden=true;});
 }
 function charts(){chart($('#qChart'),answered,'questions');chart($('#wChart'),words,'words');chart($('#pChart'),pomo,'minutes');}
-if(wn)$('#wsub').textContent='Last 30 days · English and Chinese answers in WordNest · goal '+wn.goal+' a day'+(wn.streak?' · '+wn.streak+'-day goal streak':'');
+if(wn)$('#wsub').innerHTML='<span class="tfl">Last 30 days</span> · English and Chinese answers in WordNest · goal '+wn.goal+' a day'+(wn.streak?' · '+wn.streak+'-day goal streak':'');
 tiles(null);charts();
+/* time range (TASK 31): 7 days, 30 days or all time (from the first day with data, at most a year) */
+let lastPct=null;
+function setRange(v){const first=[answered,pomo,words].flatMap(m=>Object.keys(m)).sort()[0];
+ const n=v==='7'?7:v==='all'?Math.max(7,Math.min(366,first?Math.round((Date.parse(S.dayKey(now)+'T00:00:00Z')-Date.parse(first+'T00:00:00Z'))/864e5)+1:30)):30;
+ days=S.lastDays(now,n);tfLabel=v==='all'?'All time ('+n+' days)':'Last '+n+' days';
+ document.querySelectorAll('.tfl').forEach(e=>e.textContent=tfLabel);document.querySelectorAll('[data-tf]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tf===v)));
+ try{sessionStorage.setItem('studyos.stats.tf',v);}catch(e){}tiles(lastPct);charts();}
+document.querySelectorAll('[data-tf]').forEach(b=>b.onclick=()=>setRange(b.dataset.tf));
+try{const v=sessionStorage.getItem('studyos.stats.tf');if(v==='7'||v==='all')setRange(v);}catch(e){}
 /* heatmap, this week, badges (scripts/study-motivation.js) */
 (function(){const M=window.StudyMotivation;if(!M)return;
  const per={},raw={};T.COURSES.forEach(c=>{raw[c.key]=read('study-'+c.key);per[c.key]=S.answersPerDay([raw[c.key]]);});
@@ -147,6 +168,16 @@ tiles(null);charts();
   +wk.rows.map(r=>{const d=r.now-r.before;return '<tr><td>'+esc(NAME[r.key]||r.key)+(NAME[r.key]&&T.COURSES.some(c=>c.key===r.key)?' questions':'')+'</td><td class="n">'+r.now+'</td><td class="n">'+r.before+'</td><td class="n '+(d>0?'up':d<0?'down':'')+'">'+(d>0?'+':'')+d+'</td></tr>';}).join('')+'</tbody></table>'
   +'<p class="note">'+(()=>{const q=wk.rows.filter(r=>per[r.key]),qn=q.reduce((n,r)=>n+r.now,0),qb=q.reduce((n,r)=>n+r.before,0),quiet=q.filter(r=>!r.now).map(r=>NAME[r.key]);
     return (qn>qb?'More practice than last week. ':qn<qb?'Less practice than last week so far. ':'')+(quiet.length?'Not practised this week: '+quiet.join(', ')+'. ':'')+'Counts each question on the day you last answered it.';})()+'</p>';
+ /* weekly target (TASK 31): wtarget {q, p} in studyos.home.v1, edited here */
+ function paintTarget(){let h0={};try{h0=JSON.parse(read('studyos.home.v1')||'{}')||{};}catch(e){}
+  const tg=M.target(h0.wtarget),qn=wk.rows.filter(r=>per[r.key]).reduce((n,r)=>n+r.now,0),pn=(wk.rows.find(r=>r.key==='pomo')||{now:0}).now;
+  const bar=(v,t,l)=>{const pc=t?Math.min(100,Math.round(v/t*100)):0;return '<div class="tg"><span>'+l+': <b>'+v+' / '+t+'</b>'+(t&&v>=t?' · done ✓':'')+'</span><span class="tgb" role="img" aria-label="'+esc(l+' '+v+' of '+t)+'"><i style="width:'+pc+'%"></i></span></div>';};
+  const box=$('#wtarget');box.innerHTML='<h4>Weekly target</h4>'+bar(qn,tg.q,'Questions')+bar(pn,tg.p,'Pomodoro minutes')+'<button type="button" class="tgedit">Edit target</button>';
+  box.querySelector('.tgedit').onclick=()=>{box.innerHTML='<h4>Weekly target</h4><label>Questions a week <input type="number" min="0" max="5000" inputmode="numeric" id="tgq" value="'+tg.q+'"></label><label>Pomodoro minutes a week <input type="number" min="0" max="10080" step="25" inputmode="numeric" id="tgp" value="'+tg.p+'"></label><div class="tgrow"><button type="button" class="tgsave">Save</button><button type="button" class="tgcancel">Cancel</button></div>';
+   box.querySelector('.tgcancel').onclick=paintTarget;
+   box.querySelector('.tgsave').onclick=()=>{let h={};try{h=JSON.parse(read('studyos.home.v1')||'{}')||{};}catch(e){alert('Could not read your Today data; nothing was saved.');return;}
+    h.wtarget=M.target({q:$('#tgq').value,p:$('#tgp').value});try{localStorage.setItem('studyos.home.v1',JSON.stringify(h));window.StudyCloud&&StudyCloud.dirty&&StudyCloud.dirty();}catch(e){alert('Could not save.');return;}paintTarget();};};}
+ paintTarget();
  const byCourse={};let total=0,retired=0;T.COURSES.forEach(c=>{let n=0;try{const st=JSON.parse(raw[c.key]||'{}');n=Object.keys((st&&st.ans)||{}).length;}catch(e){}byCourse[c.key]=n;total+=n;if(window.StudyReview)retired+=StudyReview.retiredRaw(raw[c.key],now);});
  const pomoMin=Object.values(pomo).reduce((a,b)=>a+b,0),wordsN=Object.values(words).reduce((a,b)=>a+b,0),goalDays=Object.keys(answered).filter(d=>answered[d]>=g).length;
  const list=M.badges({total,byCourse,bestStreak:M.bestStreak([answered,pomo,ticks,words]),goalDays,retired,pomoMin,words:wordsN}),got=list.filter(b=>b.got).length;
@@ -177,16 +208,40 @@ function renderReady(){const M=window.StudyMotivation,el=$('#ready');if(!M||!el)
   :'<p class="note">Could not load the course data. Check your connection and reload.</p>';}
 Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{
  let A=0,C=0;
- const rows=T.COURSES.filter(c=>data[c.key]).map(c=>{
-  const s=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now),per=Object.values(s.per).filter(p=>p.quiz>0);
-  const a=per.reduce((n,p)=>n+p.answered,0),r=per.reduce((n,p)=>n+p.correct,0),q=per.reduce((n,p)=>n+p.quiz,0);A+=a;C+=r;
-  return '<li><div class="hd"><b>'+esc(c.name)+'</b><span>'+a+' / '+q+' answered'+(a?' · '+Math.round(r/a*100)+'% correct':'')+'</span></div>'
-   +per.map(p=>{const pc=p.answered?Math.round(p.correct/p.answered*100):null;
-    return '<div class="ch"><a href="'+esc(c.page+'?tab=prac&cat='+encodeURIComponent(p.id))+'">'+esc(p.label)+'</a><span class="meter" role="img" aria-label="'+(pc==null?'not practised':pc+'% correct')+'"><i style="width:'+(pc||0)+'%"></i></span><span class="pc">'+(pc==null?'–':pc+'%')+' · '+p.answered+'/'+p.quiz+'</span></div>';}).join('')+'</li>';});
+ const M=window.StudyMotivation,study={};T.COURSES.forEach(c=>{try{study[c.key]=JSON.parse(read('study-'+c.key)||'{}')||{};}catch(e){study[c.key]={};}});
+ const accBy={};
+ function rowsHTML(mode){A=0;C=0;return T.COURSES.filter(c=>data[c.key]).map(c=>{
+  const list=M.chapters(data[c.key],study[c.key],now),a=list.reduce((n,p)=>n+p.answered,0),r=list.reduce((n,p)=>n+p.correct,0),q=list.reduce((n,p)=>n+p.quiz,0);A+=a;C+=r;accBy[c.key]=a?Math.round(r/a*100):null;
+  const wa=M.weeklyAccuracy(data[c.key],study[c.key],now,6),pts=wa.map((w,i)=>w.pct===null?null:[4+i*20,30-w.pct*0.26]).filter(Boolean);
+  const spark='<svg class="spark" viewBox="0 0 108 34" role="img" aria-label="'+esc('Weekly accuracy, last 6 weeks: '+wa.map(w=>w.pct===null?'–':w.pct+'%').join(', '))+'"><line x1="0" x2="108" y1="30" y2="30" class="base"/>'
+   +(pts.length>1?'<polyline points="'+pts.map(p=>p.join(',')).join(' ')+'"/>':'')+pts.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.6"/>').join('')+'</svg>';
+  const tw=wa[5],lw=wa[4],td=tw.pct!==null&&lw.pct!==null&&tw.a>=3&&lw.a>=3?tw.pct-lw.pct:null;
+  return '<li><div class="hd"><b>'+esc(c.name)+'</b><span>'+a+' / '+q+' answered'+(a?' · <b>'+Math.round(r/a*100)+'% correct</b>':'')+(td!==null?' · <span class="'+(td>0?'up':td<0?'down':'')+'">'+(td>0?'▲ +':td<0?'▼ ':'')+td+' vs last week</span>':'')+'</span>'+spark+'</div>'
+   +M.sortChapters(list,mode).map(p=>{const pc=p.pct,go=c.page+'?tab=prac&cat='+encodeURIComponent(p.id)+(p.answered>p.correct?'&missed=1':'');
+    return '<div class="ch"><a href="'+esc(c.page+'?tab=prac&cat='+encodeURIComponent(p.id))+'">'+esc(p.label)+'</a><span class="meter" role="img" aria-label="'+(pc==null?'not practised':pc+'% correct')+'"><i style="width:'+(pc||0)+'%"></i></span><span class="pc">'+(pc==null?'–':pc+'%')+' · '+p.answered+'/'+p.quiz
+     +(p.trend!==null&&p.trend!==0?' <span class="'+(p.trend>0?'up':'down')+'">'+(p.trend>0?'▲':'▼')+Math.abs(p.trend)+'</span>':'')+'</span>'
+     +'<span class="cx">'+(p.idle===null?'not started':p.idle===0?'today':p.idle+'d ago')+(p.weak?' <a class="pw" href="'+esc(go)+'">Practice weakest →</a>':'')+'</span></div>';}).join('')+'</li>';});}
+ let mode='';try{mode=sessionStorage.getItem('studyos.stats.sort')||'';}catch(e){}$('#sortCh').value=mode;
+ const rows=rowsHTML(mode);
+ $('#sortCh').onchange=()=>{mode=$('#sortCh').value;try{sessionStorage.setItem('studyos.stats.sort',mode);}catch(e){}$('#subj').innerHTML=rowsHTML(mode).join('');};
+ /* study habits (TASK 29) */
+ (function(){const pk=M.peakHours(T.COURSES.filter(c=>data[c.key]).map(c=>({D:data[c.key],study:study[c.key]}))),blk=x=>String(x.from).padStart(2,'0')+':00–'+String((x.from+3)%24).padStart(2,'0')+':00';
+  let pl={};try{pl=JSON.parse(read('studyos.pomolog.v1')||'{}')||{};}catch(e){}const mins={};Object.keys(pl.bySub||{}).forEach(d=>{Object.entries(pl.bySub[d]||{}).forEach(([k,v])=>{mins[k]=(mins[k]||0)+(+v||0);});});
+  const accOnly={};T.COURSES.forEach(c=>{if(accBy[c.key]!==undefined)accOnly[c.key]=accBy[c.key];});const bl=M.balance(mins,accOnly),NM={};T.COURSES.forEach(c=>NM[c.key]=c.name);
+  const out=[];
+  out.push(pk.best?'<p>🕘 Most accurate time: <b>'+blk(pk.best)+'</b> ('+pk.best.pct+'% right over '+pk.best.a+' answers).'+(pk.busiest&&pk.busiest.from!==pk.best.from?' You answer most at '+blk(pk.busiest)+' ('+(pk.busiest.pct===null?'–':pk.busiest.pct+'%')+').':'')+'</p>'
+   :'<p>🕘 Answer at least 10 questions in some 3-hour window to see when you are most accurate.</p>');
+  out.push('<div class="hrs" role="img" aria-label="Accuracy by time of day">'+pk.blocks.map(x=>'<span title="'+esc(blk(x)+': '+(x.a?x.pct+'% of '+x.a:'no answers'))+'"><i style="height:'+(x.a?Math.max(6,x.pct):0)+'%"></i><small>'+String(x.from).padStart(2,'0')+'</small></span>').join('')+'</div>');
+  const totalMin=Object.values(mins).reduce((a,b)=>a+b,0);
+  out.push(totalMin?'<p>⏱️ Pomodoro by subject: '+Object.entries(mins).sort((a,b)=>b[1]-a[1]).map(([k,v])=>esc((NM[k]||({excel:'Excel',eng:'English',zh:'Chinese'})[k]||k))+' '+v+' min').join(' · ')+'.</p>'
+   :'<p>⏱️ Pick a subject under the Pomodoro timer on Today to see where your study time goes.</p>');
+  if(bl&&bl.warn)out.push('<p class="warn">⚖️ Most of your Pomodoro time ('+bl.share+'%) goes to <b>'+esc(NM[bl.most])+'</b>, already your strongest. <b>'+esc(NM[bl.weakest])+'</b> is at '+accOnly[bl.weakest]+'%: give it the next sessions. <a href="'+esc((T.COURSES.find(c=>c.key===bl.weakest)||{}).page+'?tab=prac')+'">Practice '+esc(NM[bl.weakest])+' →</a></p>');
+  else if(bl)out.push('<p>⚖️ Your time and your weak spots line up: the most-studied subject is not your strongest.</p>');
+  $('#habits').innerHTML=out.join('');})();
  /* exam readiness (TASK 28) */
  renderReady();
  $('#subj').innerHTML=rows.join('')||'<li class="note">Could not load the course data. Check your connection and reload.</li>';
- tiles(A?Math.round(C/A*100):null);
+ lastPct=A?Math.round(C/A*100):null;tiles(lastPct);
 });
 })();
 </script>
