@@ -1,0 +1,8 @@
+- Economics: new chapters Money & Banking, Fiscal Policy and Monetary Policy (summaries, 50 cards, 21 questions), added to the final exam scope.
+- Today: exam mode. In the last 3 days before an exam the plan starts with "Redo missed questions" and the weakest chapters.
+- New Mock exam page: timed random questions from the exam chapters, score per chapter, missed questions; answers count like practice.
+- Course pages open straight to given chapters and the Missed filter from a link (?cat=…&missed=1).
+- WordNest Chinese: Tones, Type pinyin (nǐ hǎo or ni3 hao3) and Speak games, and an "Only my mistakes" filter. Chinese answers now count toward the daily goal.
+- WordNest English: 🎤 speaking check on each word; "AI quiz on my mistakes" on the games page.
+- WordNest daily-goal streak on Today; Stats shows WordNest words per day.
+- WordNest and the mock exam open offline (WordNest links no longer fall back to Today when offline).

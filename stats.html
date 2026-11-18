@@ -54,6 +54,7 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 <div class="tiles" id="tiles" aria-label="Summary"></div>
 <main>
 <section class="panel" aria-labelledby="qh"><h3 id="qh">Questions answered</h3><p class="sub">Last 30 days · each question counts on the day you last answered it</p><div class="chart" id="qChart"></div></section>
+<section class="panel" aria-labelledby="wh"><h3 id="wh">WordNest words</h3><p class="sub" id="wsub">Last 30 days · English and Chinese answers in WordNest</p><div class="chart" id="wChart"></div></section>
 <section class="panel" aria-labelledby="ph"><h3 id="ph">Pomodoro minutes</h3><p class="sub">Last 30 days · finished 25-minute sessions</p><div class="chart" id="pChart"></div></section>
 <h2>By subject and chapter</h2>
 <section class="panel"><ul class="subj" id="subj"><li class="note">Loading…</li></ul></section>
@@ -61,6 +62,7 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 </div>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-stats.js?v=1"></script>
+<script src="scripts/study-wordnest.js?v=2"></script>
 <script src="scripts/study-nav.js?v=11"></script>
 <script>
 (function(){
@@ -73,13 +75,14 @@ const ALL=T.COURSES.concat(T.LANGS);
 const answered=S.answersPerDay(ALL.map(c=>read('study-'+c.key)));
 const pomo=S.pomoPerDay(read('studyos.pomolog.v1'));
 const ticks=S.tickDays(read('studyos.today.v1'));
-const streak=S.streak(now,[answered,pomo,ticks]);
+const W=window.StudyWordNest,vocabRaw=read('vocabloom_mvp_v1'),words=W?W.perDay((()=>{try{return JSON.parse(vocabRaw||'{}')||{};}catch(e){return {};}})()):{},wn=W?W.daily(vocabRaw,null,null,now):null;
+const streak=S.streak(now,[answered,pomo,ticks,words]);
 const sum=(map,list)=>list.reduce((n,d)=>n+(map[d]||0),0);
 const fmtDay=d=>new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}).format(new Date(d+'T00:00:00Z'));
 function tiles(pct){
  const a30=sum(answered,days),p7=sum(pomo,days.slice(-7)),today=days[days.length-1];
  $('#tiles').innerHTML=[
-  [streak,streak===1?'day':'days','Streak',streak?'Answered, timed or ticked something each day':'Study today to start one'],
+  [streak,streak===1?'day':'days','Streak',streak?'Answered, timed, ticked or learned words each day':'Study today to start one'],
   [a30,'','Answered','Last 30 days'+(answered[today]?' · '+answered[today]+' today':'')],
   [pct==null?'–':pct,pct==null?'':'%','Correct','All practice so far'],
   [p7,'min','Pomodoro','Last 7 days'+(pomo[today]?' · '+pomo[today]+' today':'')]
@@ -106,7 +109,8 @@ function chart(el,map,unit){
  svg.addEventListener('pointerover',e=>{if(e.target.dataset.tip)show(e.target);});svg.addEventListener('focusin',e=>{if(e.target.dataset.tip)show(e.target);});
  svg.addEventListener('pointerleave',()=>{tip.hidden=true;});svg.addEventListener('focusout',()=>{tip.hidden=true;});
 }
-function charts(){chart($('#qChart'),answered,'questions');chart($('#pChart'),pomo,'minutes');}
+function charts(){chart($('#qChart'),answered,'questions');chart($('#wChart'),words,'words');chart($('#pChart'),pomo,'minutes');}
+if(wn)$('#wsub').textContent='Last 30 days · English and Chinese answers in WordNest · goal '+wn.goal+' a day'+(wn.streak?' · '+wn.streak+'-day goal streak':'');
 tiles(null);charts();
 /* drawn at the real width so axis text keeps its size on a phone */
 let rw=innerWidth,rt=null;addEventListener('resize',()=>{if(innerWidth===rw)return;rw=innerWidth;clearTimeout(rt);rt=setTimeout(charts,150);});
