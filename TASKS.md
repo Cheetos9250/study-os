@@ -254,7 +254,7 @@ Accuracy % per subject and overall (`120 answered · 78% correct`), and a trend 
 
 ### 28. Exam readiness and coverage (Thai: ความพร้อมสอบ)
 
-Status: todo
+Status: done (#172)
 
 Per subject: a bar of how much of the question bank is answered and how much is right; an estimate of the days to finish at the last 7 days' pace, compared with the exam date.
 
