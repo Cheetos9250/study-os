@@ -2,8 +2,8 @@
 const test=require("node:test"),assert=require("node:assert/strict"),fs=require("fs"),path=require("path");
 const R=p=>fs.readFileSync(path.join(__dirname,"..",p),"utf8");
 test("WordNest controls are at least 44px for iPad touch",()=>{
-  const html=R("vocabloom/index.html"),js=R("vocabloom/wordnest.js");
-  const m=html.match(/iPad touch targets[\s\S]*?<\/style>/);
+  const css=R("vocabloom/wordnest-ink.css"),js=R("vocabloom/wordnest.js");
+  const m=css.match(/iPad touch targets[\s\S]*$/);
   assert.ok(m,"touch-target block present");
   for(const sel of [".mobile-nav button",".icon-btn",".text-link",".btn",".pill","main button"])assert.ok(m[0].includes(sel),sel);
   assert.match(m[0],/min-height:44px/);
