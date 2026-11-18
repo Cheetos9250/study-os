@@ -1,0 +1,1 @@
+- WordNest: every button and link is now at least 44 px tall for iPad touch (mobile tabs, chips, sound button, language switch).
