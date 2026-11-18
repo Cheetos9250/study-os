@@ -1,0 +1,5 @@
+- **Cram Mode** (Practice → Pinned formulas → Cram Mode, or `acc.html?tab=prac&cram=1`): one page with every question you got wrong (or that is back in review), its right answer and explanation, your pinned formulas and your note cards. Read-only.
+- **Pinned formulas** at the top of Practice and of each subject's practice: one per line, `title :: formula`. Saved in your notes, so they are backed up and synced.
+- **Note cards**: write `question :: answer` lines in chapter notes; Notes → **Cards** shows them as flip cards (also in Cram Mode).
+- **Calculator history**: Calc → **History** keeps your last 30 results on this device; tap one to reuse it.
+- **My PDF sets** reopens each PDF at the page you last viewed on this device (links to a textbook exercise still open at that exercise).

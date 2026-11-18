@@ -176,7 +176,12 @@ function renderSets(){
   $('sets').querySelectorAll('.ps-set').forEach(b=>b.onclick=()=>select(b.dataset.id));
 }
 let doc=null, io=null, seen=null, curPage=1, notesTimer=null;
-async function select(id){
+/* the page last viewed per PDF, on this device only (not backed up; studyos.pdfpos.v1 → {setId: page}) */
+const POS_KEY='studyos.pdfpos.v1'; let posTimer=null;
+function readPos(){ try{ const o=JSON.parse(localStorage.getItem(POS_KEY)||'{}'); return o&&typeof o==='object'&&!Array.isArray(o)?o:{}; }catch(e){ return {}; } }
+function savePos(id,p){ clearTimeout(posTimer); posTimer=setTimeout(()=>{ const o=readPos(); if(p>1) o[id]=p; else delete o[id]; try{ localStorage.setItem(POS_KEY,JSON.stringify(o)); }catch(e){} },700); }
+async function select(id,opts){
+  opts=opts||{};
   if(notesTimer) flushNotes();
   cur=id; curPage=1; renderSets(); const s=data.sets[id]; if(!s) return; s.notes=s.notes||{}; $('workArea').hidden=false; $('setName').textContent=s.name;
   $('setInfo').textContent=COURSE[s.course]+(s.n?' · '+s.n+' questions detected':'')+(s.pages?' · '+s.pages+' pages':''); renderSheet();
@@ -187,9 +192,11 @@ async function select(id){
     for(let p=1;p<=pdf.numPages;p++){ const d=document.createElement('div'); d.className='ps-pg'; d.id='pg'+p; d.dataset.p=p; d.style.aspectRatio=String(1/ratio); d.setAttribute('aria-label','Page '+p); d.innerHTML='<span>'+p+'</span>'; v.appendChild(d); }
     const draw=async d=>{ if(d.dataset.done||!doc||cur!==id) return; d.dataset.done='1'; const page=await doc.getPage(+d.dataset.p); const w=d.clientWidth||800; const scale=Math.min(2.4,(w/page.getViewport({scale:1}).width)*Math.min(2,window.devicePixelRatio||1)); const vp2=page.getViewport({scale}); const c=document.createElement('canvas'); c.width=vp2.width; c.height=vp2.height; await page.render({canvasContext:c.getContext('2d'),viewport:vp2}).promise; if(d.dataset.done) d.replaceChildren(c); };
     io=new IntersectionObserver(es=>es.forEach(e=>{ const d=e.target; if(e.isIntersecting) draw(d).catch(()=>{ delete d.dataset.done; }); else if(d.dataset.done){ delete d.dataset.done; d.innerHTML='<span>'+d.dataset.p+'</span>'; } }),{rootMargin:'1500px 0px'});
-    seen=new IntersectionObserver(es=>{ const vis=es.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(vis){ const p=+vis.target.dataset.p; if(p!==curPage){ if(notesTimer) flushNotes(); curPage=p; showPage(); } } },{threshold:[0.35,0.6]});
+    seen=new IntersectionObserver(es=>{ const vis=es.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(vis){ const p=+vis.target.dataset.p; if(p!==curPage){ if(notesTimer) flushNotes(); curPage=p; showPage(); savePos(id,p); } } },{threshold:[0.35,0.6]});
     v.querySelectorAll('.ps-pg').forEach(d=>{ io.observe(d); seen.observe(d); });
-    if(s.book&&s.page&&s.page[1]) requestAnimationFrame(()=>goPage(s.page[1]));
+    const back=+readPos()[id]||0;
+    if(!opts.noResume&&back>1&&back<=pdf.numPages){ requestAnimationFrame(()=>goPage(back)); $('setInfo').textContent+=' · reopened at page '+back; }
+    else if(s.book&&s.page&&s.page[1]) requestAnimationFrame(()=>goPage(s.page[1]));
   }catch(e){ v.innerHTML='<p class="ps-err">'+esc(e.message||'Could not open the PDF.')+'</p>'; }
 }
 function goPage(p){ const el=$('pg'+p); if(el) el.scrollIntoView({behavior:'auto',block:'start'}); }
@@ -324,7 +331,7 @@ $('exAnswer').addEventListener('input',()=>{ $('exFeedback').hidden=true; });
 (async()=>{ const u=new URLSearchParams(location.search); if(!u.get('book')) return;
   for(let i=0;i<50&&!data.sets[BOOK_ID];i++) await new Promise(r=>setTimeout(r,100));
   if(!data.sets[BOOK_ID]){ $('err').textContent='Add the accounting textbook PDF (1,210 pages) with Add PDF to open its exercises.'; return; }
-  await select(BOOK_ID); const ix=await loadIndex(); exKind='w'; renderMc();
+  await select(BOOK_ID,{noResume:!!(u.get('q')||u.get('ch'))}); const ix=await loadIndex(); exKind='w'; renderMc();
   const q=u.get('q'),ch=u.get('ch'),list=exList();
   const item=q?list.find(i=>i.id===q):ch?list.find(i=>i.chapter===ch):null;
   if(item){ await new Promise(r=>setTimeout(r,300)); goPage(item.pdfPage); openExercise(item.id); }
@@ -351,7 +358,7 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
 <script src="scripts/pdf-mcq.js?v=2"></script>
 <script src="scripts/accounting-answer-check.js?v=20261117"></script>
 <script src="scripts/acc-textbook-mcq.js?v=1"></script>
-<script src="scripts/study-calc.js?v=2"></script>
+<script src="scripts/study-calc.js?v=3"></script>
 <script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/je-grid.js?v=4"></script>
 <script src="scripts/fs-grid.js?v=3"></script>

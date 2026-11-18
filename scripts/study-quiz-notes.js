@@ -28,6 +28,14 @@
  +'#qn .qn-s.err{color:#c21f2f}'
  +'#qn textarea{flex:1;min-height:0;width:100%;resize:none;border:0;margin:0;padding:6px 18px 28px;font-weight:500;font-size:16px;line-height:32px;font-family:inherit;color:var(--qn-ink);background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--qn-rule) 31px 32px) 0 6px/100% 32px local,var(--qn-paper);caret-color:var(--qn-acc);box-sizing:border-box}'
  +'#qn textarea:focus{outline:none}'
+ +'#qn .qn-c{min-height:42px;padding:0 12px;border:2.5px solid var(--qn-ink);border-radius:6px;background:var(--qn-paper);color:var(--qn-ink);font-weight:700;font-size:14px;font-family:inherit;cursor:pointer}'
+ +'#qn .qn-c[aria-pressed="true"]{background:var(--qn-ink);color:var(--qn-paper)}'
+ +'#qn .qn-cards{flex:1;min-height:0;overflow-y:auto;padding:10px 12px 20px;display:grid;gap:8px;align-content:start}'
+ +'#qn .qn-cards[hidden]{display:none}'
+ +'#qn .qn-card{min-height:72px;text-align:left;border:2px solid var(--qn-ink);border-radius:8px;background:var(--qn-paper);color:var(--qn-ink);padding:10px 12px;font-family:inherit;font-size:15px;line-height:1.5;cursor:pointer;overflow-wrap:anywhere}'
+ +'#qn .qn-card small{display:block;font-size:12px;color:var(--qn-mute);margin-bottom:4px}'
+ +'#qn .qn-card.on{border-color:var(--qn-acc)}'
+ +'#qn .qn-empty{font-size:14px;color:var(--qn-mute);margin:6px 2px}'
  +'#qn textarea::placeholder{color:var(--qn-mute)}'
  /* wide screens: a column on the right; the page shrinks so the question stays visible */
  +'@media(min-width:1000px){#qn{top:0;right:0;bottom:0;width:min(380px,32vw);border-width:0 0 0 3px}html.qn-open body{padding-right:min(380px,32vw)!important}html.qn-open #qnBtn{display:none}}'
@@ -65,9 +73,18 @@
   btn=document.createElement('button');btn.type='button';btn.id='qnBtn';btn.setAttribute('aria-controls','qn');btn.setAttribute('aria-expanded','false');btn.innerHTML=PEN+'<span>Notes</span>';
   panel=document.createElement('aside');panel.id='qn';panel.hidden=true;panel.setAttribute('aria-label','Chapter notes');
   var opts='<option value="general">General</option>'+cats().map(function(c){return '<option value="'+esc(c[0])+'">'+esc(c[1])+'</option>';}).join('');
-  panel.innerHTML='<div class="qn-bar"><h2 class="qn-t">Notes</h2><select aria-label="Chapter">'+opts+'</select><button type="button" class="qn-x qn-f" aria-pressed="false" aria-label="Full screen"></button><button type="button" class="qn-x" aria-label="Close notes">'+X+'</button><span class="qn-s" role="status"></span><p class="qn-hint">Swipe from the right towards the left to open notes full screen; swipe right to go back.</p></div><textarea maxlength="'+MAX+'" spellcheck="true" aria-label="Chapter notes"></textarea>';
+  panel.innerHTML='<div class="qn-bar"><h2 class="qn-t">Notes</h2><select aria-label="Chapter">'+opts+'</select><button type="button" class="qn-c" aria-pressed="false" title="Lines written as question :: answer become flip cards">Cards</button><button type="button" class="qn-x qn-f" aria-pressed="false" aria-label="Full screen"></button><button type="button" class="qn-x" aria-label="Close notes">'+X+'</button><span class="qn-s" role="status"></span><p class="qn-hint">Swipe from the right towards the left to open notes full screen; swipe right to go back.</p></div><textarea maxlength="'+MAX+'" spellcheck="true" aria-label="Chapter notes"></textarea><div class="qn-cards" hidden></div>';
   document.body.appendChild(panel);document.body.appendChild(btn);document.documentElement.classList.add('qn-ready');
   ta=panel.querySelector('textarea');sel=panel.querySelector('select');st=panel.querySelector('.qn-s');
+  /* note cards: lines "question :: answer" in this chapter's note, as flip cards; the note itself is not changed */
+  var cb=panel.querySelector('.qn-c'),cv=panel.querySelector('.qn-cards');
+  function cardsOn(on){cb.setAttribute('aria-pressed',String(on));cv.hidden=!on;ta.hidden=on;if(on){flush();paintCards();}else ta.focus({preventScroll:true});}
+  function paintCards(){var list=[];ta.value.split('\n').forEach(function(raw){var l=raw.trim().replace(/^[-•*]\s*/,''),i=l.indexOf('::');if(i>0){var q=l.slice(0,i).trim(),a=l.slice(i+2).trim();if(q&&a)list.push({q:q,a:a});}});
+   cv.innerHTML=list.length?list.map(function(x,i){return '<button type="button" class="qn-card" data-i="'+i+'" aria-pressed="false"><small>Card '+(i+1)+' of '+list.length+' · tap to flip</small><span>'+esc(x.q)+'</span></button>';}).join('')
+    :'<p class="qn-empty">No cards in this chapter yet. In your note, write one per line:<br><b>question :: answer</b><br>e.g. Normal balance of Accounts Receivable :: Debit</p>';
+   cv.querySelectorAll('.qn-card').forEach(function(b){b.onclick=function(){var on=b.getAttribute('aria-pressed')!=='true',x=list[+b.dataset.i];b.setAttribute('aria-pressed',String(on));b.classList.toggle('on',on);b.querySelector('span').textContent=on?x.a:x.q;};});}
+  cb.onclick=function(){cardsOn(cv.hidden);};
+  sel.addEventListener('change',function(){if(!cv.hidden)setTimeout(paintCards,0);});
   btn.onclick=function(){setOpen(true);};
   panel.querySelector('.qn-x:not(.qn-f)').onclick=function(){setOpen(false);};
   panel.querySelector('.qn-f').onclick=function(){if(panel.hidden)setOpen(true);setFull(!panel.classList.contains('full'));ta.focus({preventScroll:true});};

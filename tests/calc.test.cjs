@@ -15,7 +15,8 @@ test('practice calculator does arithmetic without eval',()=>{
  for(const bad of ['1/0','(1+2','1+','2**3','alert(1)','1..2'])assert.throws(()=>evaluate(bad),bad);
  assert.equal(fmt(1234567.5),'1,234,567.5');
  const src=fs.readFileSync(path.join(__dirname,'..','scripts/study-calc.js'),'utf8');
- assert.doesNotMatch(src,/\beval\(|new Function|localStorage|sessionStorage|fetch\(/);
+ assert.doesNotMatch(src,/\beval\(|new Function|sessionStorage|fetch\(/);
+ assert.deepEqual([...new Set(src.match(/localStorage\.\w+\(\w+/g))].sort(),['localStorage.getItem(HK','localStorage.setItem(HK'],'only its own history key');
 });
 test('calculator is on the quiz pages and the textbook exercises',()=>{
  for(const f of ['acc.html','eco.html','math.html','pdf-sets.html'])

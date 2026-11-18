@@ -192,6 +192,24 @@ function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):nu
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
   else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
+/* Cram Mode (?tab=prac&cram=1): one read-only page of the questions to fix before the exam — answered wrong now,
+   or back in review box 0 — each with its right answer and explanation. Never changes answers. */
+const CRAM=/[?&]cram=1\b/.test(location.search);
+function cramList(){
+  const rv=store.rv||{};
+  return QS.filter(q=>!q.open&&(!qcats.size||qcats.has(q.cat))&&store.ans[q.id]!==undefined&&(store.ans[q.id]!==q.right||(Array.isArray(rv[q.id])&&rv[q.id][0]===0)))
+    .map(q=>({q,wrong:store.ans[q.id]!==q.right})).sort((a,b)=>(b.wrong-a.wrong)||CATS.findIndex(c=>c[0]===a.q.cat)-CATS.findIndex(c=>c[0]===b.q.cat));
+}
+function renderCram(box){
+  const list=cramList(),answered=QS.filter(q=>!q.open&&store.ans[q.id]!==undefined).length;
+  let h='<div class="cram-head"><b>Cram Mode</b> · '+list.length+' question'+(list.length===1?'':'s')+' to fix'+(qcats.size?' in the chosen chapters':'')+' · <a href="'+D.key+'.html?tab=prac">Back to practice</a></div>';
+  if(!list.length){ box.innerHTML=h+'<div class="empty">'+(answered?'Nothing to fix here: every answered question is right. Practise more questions to find weak spots.':'No answers yet. Do some practice first; the questions you get wrong will show up here.')+'</div>'; return; }
+  h+='<ol class="cram-list">'+list.map(({q,wrong})=>{ const right=q.opts[q.right],mine=store.ans[q.id];
+    return '<li class="qcard"><div class="qmeta"><span>'+esc(catLabel(q.cat))+'</span>'+(wrong?'<b class="cram-tag">Wrong</b>':'<b class="cram-tag soft">Review</b>')+'</div>'
+     +(q.case?'<div class="qcase" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:8px 12px;margin:6px 0;font-size:14px">'+(q.md&&window.StudySosMd?StudySosMd(q.case):rich(q.case))+'</div>':'')
+     +'<p class="qtext">'+rich(q.q)+'</p><div class="explain good"><b class="v">Answer: '+rich(right)+'</b>'+(wrong&&q.opts[mine]!==undefined?'<div class="cram-mine">You chose: '+rich(q.opts[mine])+'</div>':'')+(q.exp?rich(q.exp):'')+'</div></li>'; }).join('')+'</ol>';
+  box.innerHTML=h;
+}
 function renderQ(){
   (function(box){ box.innerHTML='';
     [['all','All'],...CATS].forEach(([id,l])=>{
@@ -203,6 +221,7 @@ function renderQ(){
       b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qJump=null; buildDeck();renderQ(); };
       box.appendChild(b); });
   })($('#qCats'));
+  if(CRAM){ renderCram($('#qBody')); return; }
   const box=$('#qBody');
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
