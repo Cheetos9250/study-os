@@ -79,7 +79,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 <form class="compose" id="form" autocomplete="off">
  <div class="quick" role="group" aria-label="Quick asks"><button type="button" class="qk" data-quick="explain">Explain this chapter</button><button type="button" class="qk" data-quick="quiz">Quiz me</button><button type="button" class="qk" data-quick="mistakes">Common mistakes</button><button type="button" class="qk" data-quick="plan">Study plan to my exams</button></div>
  <label for="q" class="note">Ask a question, paste your working, or add a photo of the problem.</label>
- <textarea id="q" rows="3" maxlength="8000" placeholder="e.g. Why is Accounts Receivable debited here?"></textarea>
+ <textarea id="q" rows="3" maxlength="8000" placeholder="Ask anything, or type /help for commands (e.g. /quiz 10)"></textarea>
  <div class="btnrow">
   <input type="file" id="photo" accept="image/*" hidden>
   <button type="button" class="b" id="photoBtn" aria-label="Add a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Photo</button>
@@ -92,7 +92,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 </div>
 <script src="scripts/textbook-sos-render.js?v=1"></script>
 <script src="scripts/study-today.js?v=3"></script>
-<script src="scripts/study-tutor.js?v=3"></script>
+<script src="scripts/study-tutor.js?v=4"></script>
 <script src="scripts/study-nav.js?v=11"></script>
 <script>
 (function(){
@@ -107,7 +107,7 @@ let cfg=A.normalize((()=>{try{return JSON.parse(getL(A.KEY)||'{}');}catch(e){ret
 try{const s=JSON.parse(getS(A.SKEY)||'null');if(s&&s.p&&cfg[s.p]&&!cfg[s.p].key)cfg[s.p].key=String(s.k||'');}catch(e){}
 let chat=(()=>{try{const c=JSON.parse(getS(A.CHAT)||'[]');return Array.isArray(c)?c.filter(m=>m&&(m.role==='user'||m.role==='assistant')&&typeof m.text==='string'):[];}catch(e){return [];}})();
 let image=null,busy=false;const data={};
-function saveChat(){try{sessionStorage.setItem(A.CHAT,JSON.stringify(chat.slice(-A.MAX_TURNS).map(m=>({role:m.role,text:m.text,img:!!m.image}))));}catch(e){}}
+function saveChat(){try{sessionStorage.setItem(A.CHAT,JSON.stringify(chat.slice(-A.MAX_TURNS).map(m=>{const o={role:m.role,text:m.text,img:!!m.image};if(m.show)o.show=m.show;if(m.local)o.local=true;return o;})));}catch(e){}}
 function saveCfg(){
  const keep=JSON.parse(JSON.stringify(cfg));
  try{sessionStorage.removeItem(A.SKEY);}catch(e){}
@@ -155,7 +155,7 @@ function paintState(){const ready=!!cfg[cfg.provider].key;$('#send').disabled=bu
 function paintLog(){const log=$('#log');
  if(!chat.length){log.innerHTML='<div class="empty">Pick a subject and chapter so the tutor reads your course notes, then ask anything.<br>It explains step by step, checks your working and makes journal-entry tables.</div>';return;}
  log.innerHTML=chat.map((m,i)=>m.role==='user'
-  ?'<div class="msg u"><span class="who">You</span>'+(m.image?'<img src="data:'+esc(m.image.mime)+';base64,'+m.image.data+'" alt="Your photo">':m.img?'<i>(photo)</i><br>':'')+esc(m.text)+'</div>'
+  ?'<div class="msg u"><span class="who">You</span>'+(m.image?'<img src="data:'+esc(m.image.mime)+';base64,'+m.image.data+'" alt="Your photo">':m.img?'<i>(photo)</i><br>':'')+esc(m.show||m.text)+'</div>'
   :m.error?'<div class="msg e">'+esc(m.text)+' <button type="button" class="b" data-retry="'+i+'">Try again</button></div>'
   :'<div class="msg a"><span class="who">Tutor</span>'+md(m.text)+'</div>').join('');
  const r=log.querySelector('[data-retry]');if(r)r.onclick=()=>{chat=chat.filter(m=>!m.error);ask();};
@@ -168,7 +168,7 @@ async function ask(){
  const key=$('#course').value,D=key?await loadCourse(key):null,catSel=$('#cat').value;
  const course=key?(COURSES.find(x=>x.key===key)||{}).name:'',chapter=catSel&&D?((D.cats||[]).find(x=>x[0]===catSel)||[,''])[1]:'';
  const sys=A.system({course:course&&D?D.title||course:course,chapter,notes:D?A.notes(D,catSel):''});
- const msgs=chat.filter(m=>!m.error);let ctl=null,timer=null;
+ const msgs=chat.filter(m=>!m.error&&!m.local);let ctl=null,timer=null;
  try{ctl=new AbortController();timer=setTimeout(()=>ctl.abort(),120000);
   const send=async()=>{const r=A.request(cfg,sys,msgs);r.init.signal=ctl.signal;const res=await fetch(r.url,r.init);return {status:res.status,j:await res.json().catch(()=>null)};};
   let out=await send(),note='';
@@ -186,18 +186,27 @@ async function ask(){
  const last=$('#log').lastElementChild;if(last)last.scrollIntoView({block:'start',behavior:'smooth'});
 }
 $('#form').onsubmit=e=>{e.preventDefault();const t=$('#q').value.trim();if(!t&&!image)return;if(busy)return;
+ /* typed commands: /quiz 10 inventory, /explain, /summary, /example, /check …, /mistakes, /plan, /new, /help */
+ const cmd=A.command(t);
+ if(cmd){
+  if(cmd.action==='new'){$('#q').value='';$('#newChat').click();return;}
+  if(cmd.action==='help'||cmd.action==='unknown'){$('#q').value='';chat.push({role:'user',text:t,local:true},{role:'assistant',local:true,text:(cmd.action==='unknown'?'There is no command /'+cmd.name+'.\n\n':'')+A.help()});saveChat();paintLog();
+   const last=$('#log').lastElementChild;if(last)last.scrollIntoView({block:'start',behavior:'smooth'});return;}
+  runQuick(cmd.kind,{n:cmd.n,topic:cmd.topic,show:t});return;}
  if(!cfg[cfg.provider].key){openSet(true);say('#setMsg','Add your API key first',true);return;}
  chat=chat.filter(m=>!m.error);chat.push({role:'user',text:t||'Please help me with this problem.',image});
  $('#q').value='';dropPhoto();paintLog();ask();};
 /* quick asks: a ready prompt for the chosen subject and chapter; the study plan also lists upcoming exams from Calendar */
-document.querySelectorAll('[data-quick]').forEach(b=>b.onclick=async()=>{if(busy)return;
+document.querySelectorAll('[data-quick]').forEach(b=>b.onclick=()=>runQuick(b.dataset.quick,{}));
+async function runQuick(kind,extra){if(busy)return;
  if(!cfg[cfg.provider].key){openSet(true);say('#setMsg','Add your API key first',true);return;}
- const key=$('#course').value,D=key?await loadCourse(key):null,cat=$('#cat').value,kind=b.dataset.quick;
- if((kind==='explain'||kind==='quiz'||kind==='mistakes')&&!key){say('#state','Pick a subject (and a chapter) first',true);$('#course').focus();return;}
- const o={course:key?(D&&D.title)||(COURSES.find(x=>x.key===key)||{}).name:'',chapter:cat&&D?((D.cats||[]).find(x=>x[0]===cat)||[,''])[1]:''};
+ const key=$('#course').value,D=key?await loadCourse(key):null,cat=$('#cat').value;
+ if(['explain','quiz','mistakes','summary','example'].includes(kind)&&!key&&!extra.topic){say('#state','Pick a subject (and a chapter) first, or add a topic after the command',true);$('#course').focus();return;}
+ const o={course:key?(D&&D.title)||(COURSES.find(x=>x.key===key)||{}).name:'',chapter:cat&&D?((D.cats||[]).find(x=>x[0]===cat)||[,''])[1]:'',topic:extra.topic||'',n:extra.n||''};
  if(kind==='plan'&&T){let st=null;try{st=T.loadSettings(localStorage.getItem(T.SETTINGS_KEY));}catch(e){}
   o.exams=((st&&st.exams)||[]).map(e=>({name:e.title,date:e.date,days:T.daysUntil(e.date,Date.now())})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days).slice(0,8);}
- chat=chat.filter(m=>!m.error);chat.push({role:'user',text:A.quick(kind,o)});paintLog();ask();});
+ const m={role:'user',text:A.quick(kind,o)};if(extra.show)m.show=extra.show;if(image)m.image=image;
+ chat=chat.filter(x=>!x.error);chat.push(m);$('#q').value='';dropPhoto();paintLog();ask();}
 $('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();$('#form').requestSubmit();}});
 $('#newChat').onclick=()=>{if(chat.length&&!confirm('Start a new chat? This chat is cleared.'))return;chat=[];saveChat();paintLog();};
 /* photo: scaled to at most 1600 px, sent as JPEG; kept only for this chat */
