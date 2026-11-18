@@ -6,12 +6,12 @@
 const fs=require('node:fs'),path=require('node:path');
 const ROOT=path.join(__dirname,'..');
 const COURSE=/^(acc|eco|math|eng|zh)\.html$/;
-const TAGS=/((?:<script src="data\/courses\/[^"]+"><\/script>\n)+)<script>(window\.StudyCourseOpts=[^\n]*)<\/script>\n<script src="scripts\/study-course-engine\.js[^"]*"><\/script>/;
+const TAGS=/((?:<script src="data\/courses\/[^"]+"><\/script>\n)+)<script>(window\.StudyCourseOpts=[^\n]*)<\/script>\n((?:<script src="scripts\/study-qsets\.js[^"]*"><\/script>\n)?)<script src="scripts\/study-course-engine\.js[^"]*"><\/script>/;
 function file(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}
 function inline(html){
- return html.replace(TAGS,(m,data,opts)=>{
+ return html.replace(TAGS,(m,data,opts,extra)=>{
   const parts=[...data.matchAll(/src="([^"?]+)/g)].map(x=>file(x[1]));
-  return '<script>\n'+parts.join('\n')+opts+'\n'+file('scripts/study-course-engine.js')+'</script>';
+  return (extra||'')+'<script>\n'+parts.join('\n')+opts+'\n'+file('scripts/study-course-engine.js')+'</script>';
  });
 }
 function readSource(rel){

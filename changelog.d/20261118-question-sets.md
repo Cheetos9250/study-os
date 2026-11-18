@@ -1,0 +1,2 @@
+- **Question sets** on Accounting, Economics and Math practice: repeated questions are hidden, and each chapter is split into up to 3 sets of 10–100 questions. Set 1 is open; the next set opens when 90% of the current one is answered right twice in a row. Pick one chapter to choose a set, or show all questions. Review due, Missed, links to one question and Cram Mode still show everything.
+- Fixed: links that open a chapter (from Lessons, Today and Stats) opened every chapter instead of the chosen one.

@@ -13,7 +13,8 @@
   const i=D.cats.findIndex(c=>c[0]===cat);
   if(i<0)return true;
   const chips=document.querySelectorAll(tabs[tab].box+' .chip');
-  if(chips[i+1])chips[i+1].click(); // index 0 is "all"
+  /* index 0 is "all"; the engine may already have selected it from ?cat= (a second click would turn it off again) */
+  if(chips[i+1]&&chips[i+1].getAttribute('aria-pressed')!=='true')chips[i+1].click();
   return true;
  }
  if(typeof module==='object'&&module.exports)module.exports={apply};
