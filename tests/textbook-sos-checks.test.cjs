@@ -15,5 +15,4 @@ test('key-answer checks: well formed, and each value appears in its worked solut
 });
 test('both pages render the check boxes',()=>{
   assert.match(R('acc.html'),/StudySosChecks\.html\(q\.checks\)/); assert.match(R('acc.html'),/id=\\"tbGotQuick\\"|id="tbGotQuick"/);
-  assert.match(R('accounting-textbook.html'),/StudySosChecks\.wire\(\$\('sosChecks'\)/);
 });

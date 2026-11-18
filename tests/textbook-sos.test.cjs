@@ -17,8 +17,3 @@ test('every journal-entry table in the solutions balances',()=>{
       while(i<L.length&&L[i].startsWith('|')){const c=L[i].replace(/^\||\|$/g,'').split('|').map(x=>x.trim());dr+=num(c[2]);cr+=num(c[3]);i++;}
       assert.ok(Math.abs(dr-cr)<0.005,it.id+' '+dr+' vs '+cr);}}
 });
-test('textbook page shows the Study OS version instead of the PDF when one exists',()=>{
-  const s=R('accounting-textbook.html');
-  assert.match(s,/id="sosView"/);assert.match(s,/id="sosShow"/);assert.match(s,/data\/textbook-sos\/ch'\+ch\+'\.json/);
-  assert.match(s,/renderList\(\);if\(!applySos\(q\)\)paint\(\);\}/);assert.match(s,/async function paint\(\)\{if\(sosActive\(\)\)return;/);
-});

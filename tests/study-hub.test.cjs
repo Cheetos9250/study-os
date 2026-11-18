@@ -6,7 +6,7 @@ test('hub page is read-only and links courses, chapters and VocaBloom',()=>{
   assert.match(s,/NOTES_KEY='studyos\.notes\.v1'/);
   assert.match(s,/scripts\/study-today\.js/);
   assert.match(s,/vocabloom\/index\.html/);
-  assert.match(s,/accounting-textbook\.html\?ch=/);
+  assert.match(s,/pdf-sets\.html\?book=1&amp;ch=/);
   assert.match(s,/link\(c,'prac'/);
 });
 test('homepage reaches the hub through the shared navigation',()=>{

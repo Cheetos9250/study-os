@@ -15,7 +15,7 @@ test('course and textbook pages record the place; eco/math accept ?q= like acc',
   assert.match(s,/<script src="scripts\/study-last\.js\?v=\d+"><\/script>/,f);
   assert.match(s,/StudyLast\.mark\(\{href:D\.key\+'\.html\?tab=prac&q='\+encodeURIComponent\(q\.id\)/,f);
   assert.match(s,/qpos=0; if\(qJump\)\{ const ji=deck\.findIndex\(x=>String\(x\.id\)===qJump\); if\(ji>=0\) qpos=ji; \}/,f);}
- assert.match(read('accounting-textbook.html'),/StudyLast\.mark\(\{href:'accounting-textbook\.html\?q='\+encodeURIComponent\(q\.id\)/);
+ assert.match(read('pdf-sets.html'),/StudyLast\.mark\(\{href:'pdf-sets\.html\?book=1&q='\+encodeURIComponent\(id\)/);
 });
 test('Today shows the Continue card with a countdown to the next exam (that subject first)',()=>{
  const s=read('index.html');

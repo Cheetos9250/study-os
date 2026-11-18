@@ -103,6 +103,10 @@
  +'.fs-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.fs-sum{font-size:13px}.fs-sum.ok{color:var(--ok,#2f8f5b);font-weight:700}.fs-miss{font-size:12.5px;margin:6px 0 0;color:var(--bad,#d6453d)}'
  +'@media (max-width:560px){.fs-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 34px;grid-template-areas:"lab lab x" "amt tot ."}'
  +'.fs-row .l{grid-area:lab}.fs-row .a{grid-area:amt}.fs-row .t{grid-area:tot}.fs-row .fs-x{grid-area:x}'
+ +'.fs-row{padding-bottom:6px;border-bottom:1px dashed rgba(127,127,127,.35)}.fs-head{display:none}}'
+ /* the same narrow layout when the table sits in a narrow panel (My PDF sets side panel) */
+ +'.fs{container-type:inline-size}@container (max-width:560px){.fs-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 34px;grid-template-areas:"lab lab x" "amt tot ."}'
+ +'.fs-row .l{grid-area:lab}.fs-row .a{grid-area:amt}.fs-row .t{grid-area:tot}.fs-row .fs-x{grid-area:x}'
  +'.fs-row{padding-bottom:6px;border-bottom:1px dashed rgba(127,127,127,.35)}.fs-head{display:none}}';
  function ensureCss(doc){if(doc.getElementById('fsCss'))return;const s=doc.createElement('style');s.id='fsCss';s.textContent=CSS;doc.head.appendChild(s);}
  function html(){return '<div class="fs" id="fsBox" role="group" aria-label="Statement"></div>';}
@@ -111,6 +115,7 @@
  /* Mount the table in box. opts: {answer:{title,rows}, rows, save(rows), onAllCorrect()} */
  function mount(box,opts){
   if(!box)return null;ensureCss(box.ownerDocument);
+  const B=opts.btnClass||'btn'; /* noCheck: a free table with live totals only (no answer to compare with) */
   const ans=opts.answer||{title:'',rows:[]};
   let rows=clean(opts.rows);while(rows.length<4)rows.push(['','','']);
   let result=null,timer=null;
@@ -125,9 +130,9 @@
      +'<input class="n t tot" data-c="2" inputmode="decimal" value="'+esc(r[2])+'" placeholder="Total" aria-label="Line '+(i+1)+' total" autocomplete="off">'
      +'<button type="button" class="fs-x" data-x="'+i+'" aria-label="Remove line '+(i+1)+'">×</button>'
      +(rr?'<div class="fs-why '+(rr.ok?'ok':'no')+'">'+(rr.ok?'✓ in the answer':'✗ '+esc(rr.why))+'</div>':'')+'</div>';});
-   h+='<div class="fs-bar"><button type="button" class="btn" data-add>+ Add line</button><button type="button" class="btn primary" data-check>Check statement</button>'
+   h+='<div class="fs-bar"><button type="button" class="'+B+'" data-add>+ Add line</button>'+(opts.noCheck?'':'<button type="button" class="'+B+' primary" data-check>Check statement</button>')+''
     +'<span class="fs-sum'+(result&&result.all?' ok':'')+'" aria-live="polite">'+(result?result.all?'All correct.':'Totals '+result.totalsOk+' of '+result.totals+' · amounts '+result.linesOk+' of '+result.lines:'')+'</span>'
-    +(result&&result.all&&opts.onAllCorrect?'<button type="button" class="btn primary" data-got>Mark as got it</button>':'')+'</div>'
+    +(result&&result.all&&opts.onAllCorrect?'<button type="button" class="'+B+' primary" data-got>Mark as got it</button>':'')+'</div>'
     +(result&&!result.all&&result.totalsMissing.length?'<p class="fs-miss">Missing or wrong: '+result.totalsMissing.map(esc).join(', ')+'</p>':'');
    box.innerHTML=h;
    if(focus){const el=box.querySelector('[data-r="'+focus[0]+'"] [data-c="'+focus[1]+'"]');if(el)el.focus();}

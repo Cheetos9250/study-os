@@ -47,7 +47,8 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 | `stats.html` | **Stats** (nav footer): streak, 30-day answers and Pomodoro charts, accuracy per subject/chapter. Read-only; helpers in `scripts/study-stats.js`. |
 | `grades.html` | Weighted course items, letter per course scale, "needed on the rest", estimated GPA. |
 | `acc/eco/math/eng/zh.html` | Course pages. Data is embedded as `const D={...}` (one huge line; never rewrite it with regex). Each page shows one mode via `?tab=cards|sum|prac` (`scripts/study-course-mode.js`) and has its own sync engine. |
-| `accounting-textbook.html` | Index of 403 textbook exercises, Ch1–9. |
+| `accounting-textbook.html` | **Redirect only** (17 Nov 2026): Textbook Exercises was merged into My PDF sets. Old links `?q=<id>` / `?ch=<n>` go to `pdf-sets.html?book=1&q=…` / `&ch=…`. |
+| `pdf-sets.html` | **My PDF sets**: teacher PDFs with answer sheets, and the accounting textbook (403 written exercises with answer panel, journal/statement tables, reviewed final-answer checks from `scripts/accounting-answer-check.js`, MCQ links; chapter multiple-choice quizzes). Links: `?book=1[&q=<id>|&ch=<n>]`. |
 | `excel.html` | **Excel** subject (not in `COURSES`; synced through the `extra` subject): basic dashboard step-by-step from the class, exam tips, quiz. Linked from Lessons and Practice. |
 | `progress-backup.html` / `progress-restore.html` | Local JSON backup and validated restore. |
 | `today.html` | Redirects to `calendar.html` (old links). |
@@ -73,13 +74,13 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | `studyos.today.v1` | Exams, plan ticks, timetable. `markChapter` must keep the other fields. |
 | `studyos.grades.v1` | Grades. |
 | `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). |
-| `studyos.accounting.textbook.progress.v1` | Textbook answers (`notes`, `status`, `updated`, `je`: journal-entry grid rows `[date, account, debit, credit]` from `scripts/je-grid.js`, and `fs`: statement-table rows `[line item, amount, total]` from `scripts/fs-grid.js`, both on acc.html written practice). |
+| `studyos.accounting.textbook.progress.v1` | Textbook answers (`notes`, `status`, `updated`, `je`: journal-entry grid rows `[date, account, debit, credit]` from `scripts/je-grid.js`, and `fs`: statement-table rows `[line item, amount, total]` from `scripts/fs-grid.js`, both on acc.html written practice; `bje` / `bfs`: the same tables for the book's own exercise, from the My PDF sets Written panel, never checked against an answer). |
 | `vocabloom_mvp_v1` | WordNest English data. |
 | `studyos.pomolog.v1` | Pomodoro history for Stats: `days` (`YYYY-MM-DD` → minutes of finished 25-minute sessions) and `lastEnd` (end time of the last counted session, so one session counts once). Written only by `index.html`. |
 | `studyos.excel.v1` | Excel page: ticked steps (`done`) and quiz answers (`ans`, `x<n>` → option index). |
 | `studyos.pdfsets.v1` | **My PDF sets** (`pdf-sets.html`): per uploaded PDF its name, subject, detected question count, my answers, answer key and per-page working notes (`notes`). PDFs over 60 pages are books (no question detection, lazy page rendering). The 1,210-page textbook is set `ptextbook` and its file lives in the Textbook page's IDB `studyos-accounting-pdf-v1` (shared, added once). The PDFs themselves are in IndexedDB `studyos-pdf-sets-v1` on the device only (not backed up, never uploaded). Chapter multiple-choice quizzes found in the textbook (`scripts/pdf-mcq.js`) are sets `ptbmc<chapter>` with `book: 'ptextbook'`: they read the textbook file and removing one never deletes it. |
 
-Not backed up: `studyos.theme.v1`, `studyos.nav.v1` (collapsed sidebar), `studyos.focus.v1` (focus mode, default on: hides summaries and flashcards; all three written only by `scripts/study-theme.js`), `studyos.last.v1` (last study place for Today's **Continue** card: page link + label, written by `scripts/study-last.js` from acc/eco/math practice and the textbook page), `studyos.pomo.v1` (running Pomodoro end time, written only by `index.html`, read by `StudyTheme.pomo()` for the nav countdown), `studyos.backup-meta.v1` (time **Back up now** was last tapped on Today, written only by `index.html`; drives the Today backup reminder. `progress-backup.html` must stay read-only, CI checks it), sync keys (`study-sync-*`), caches.
+Not backed up: `studyos.theme.v1`, `studyos.nav.v1` (collapsed sidebar), `studyos.focus.v1` (focus mode, default on: hides summaries and flashcards; all three written only by `scripts/study-theme.js`), `studyos.last.v1` (last study place for Today's **Continue** card: page link + label, written by `scripts/study-last.js` from acc/eco/math practice and the textbook in My PDF sets), `studyos.pomo.v1` (running Pomodoro end time, written only by `index.html`, read by `StudyTheme.pomo()` for the nav countdown), `studyos.backup-meta.v1` (time **Back up now** was last tapped on Today, written only by `index.html`; drives the Today backup reminder. `progress-backup.html` must stay read-only, CI checks it), sync keys (`study-sync-*`), caches.
 
 ## Tests
 

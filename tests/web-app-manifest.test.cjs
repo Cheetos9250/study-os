@@ -1,7 +1,7 @@
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const pages=['index.html','flashcards.html','practice.html','hub.html','calendar.html','grades.html','acc.html','eco.html','math.html','eng.html','zh.html','accounting-textbook.html','progress-backup.html','progress-restore.html'];
+const pages=['index.html','flashcards.html','practice.html','hub.html','calendar.html','grades.html','acc.html','eco.html','math.html','eng.html','zh.html','progress-backup.html','progress-restore.html'];
 test('Home Screen opens Study OS full screen, inside the site folder',()=>{
   const m=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));
   assert.equal(m.display,'standalone');assert.equal(m.start_url,'./index.html');assert.equal(m.scope,'./');

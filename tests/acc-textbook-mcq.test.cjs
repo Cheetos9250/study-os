@@ -13,6 +13,6 @@ test('accounting practice includes them in the main pool and supports ?q= deep l
   const s=R('acc.html'); assert.match(s,/scripts\/acc-textbook-mcq\.js/); assert.match(s,/window\.ACC_TB_MCQ\|\|\[\]\)\.forEach/);
   assert.match(s,/get\('q'\)/); assert.match(s,/Textbook style/);
 });
-test('textbook page links each exercise to its multiple-choice question',()=>{
-  const s=R('accounting-textbook.html'); assert.match(s,/scripts\/acc-textbook-mcq\.js/); assert.match(s,/id="mcqLink"/); assert.match(s,/acc\.html\?tab=prac&q=/);
+test('textbook exercises (My PDF sets) link each exercise to its multiple-choice question',()=>{
+  const s=R('pdf-sets.html'); assert.match(s,/scripts\/acc-textbook-mcq\.js/); assert.match(s,/id="exMcq"/); assert.match(s,/acc\.html\?tab=prac&q='/);
 });
