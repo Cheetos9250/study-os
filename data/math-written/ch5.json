@@ -1,0 +1,172 @@
+[
+ {
+  "id": "MATH5-1",
+  "title": "Ordinary simple interest",
+  "prompt": "A loan of 24,000 baht is taken at 7.5% simple interest for 120 days. Use **ordinary interest (360-day year)**.\n- Find the interest.\n- Find the amount to repay.",
+  "solution": "I = P × r × t = 24,000 × 0.075 × 120/360 = **600.00** baht.\n\nAmount = P + I = 24,000 + 600.00 = **24,600.00** baht.",
+  "checks": [
+   [
+    "Interest (baht)",
+    600.0,
+    0.01
+   ],
+   [
+    "Amount to repay (baht)",
+    24600.0,
+    0.01
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-2",
+  "title": "Exact simple interest",
+  "prompt": "Find the **exact interest (365-day year)** on 36,500 baht at 6% for 73 days, and the maturity value.",
+  "solution": "I = 36,500 × 0.06 × 73/365 = **438.00** baht.\n\nMaturity value = 36,500 + 438.00 = **36,938.00** baht.",
+  "checks": [
+   [
+    "Interest (baht)",
+    438.0,
+    0.01
+   ],
+   [
+    "Maturity value (baht)",
+    36938.0,
+    0.01
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-3",
+  "title": "Finding the interest rate",
+  "prompt": "A 18,000-baht loan for 150 days costs 450 baht in ordinary interest. What is the annual interest rate (%)?",
+  "solution": "r = I ÷ (P × t) = 450 ÷ (18,000 × 150/360) = 450 ÷ 7,500.00 = 0.0600 = **6.00%**.",
+  "checks": [
+   [
+    "Rate (%)",
+    6.0,
+    0.01
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-4",
+  "title": "Compound interest",
+  "prompt": "50,000 baht is deposited at 4% per year compounded quarterly for 3 years.\n- Find the compound amount.\n- Find the compound interest earned.",
+  "solution": "i = 0.04/4 = 0.01, n = 4×3 = 12 periods.\n\nA = P(1 + i)ⁿ = 50,000 × (1.01)^12 = **56,341.25** baht.\n\nInterest = A − P = **6,341.25** baht.",
+  "checks": [
+   [
+    "Compound amount (baht)",
+    56341.25,
+    0.05
+   ],
+   [
+    "Compound interest (baht)",
+    6341.25,
+    0.05
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-5",
+  "title": "Present value",
+  "prompt": "How much must be invested now at 5% compounded annually to have 100,000 baht in 4 years?",
+  "solution": "P = A ÷ (1 + i)ⁿ = 100,000 ÷ 1.05⁴ = 100,000 ÷ 1.215506 = **82,270.25** baht.",
+  "checks": [
+   [
+    "Present value (baht)",
+    82270.25,
+    0.05
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-6",
+  "title": "Discount and 7% sales tax",
+  "prompt": "A jacket has a list price of 2,500 baht. The shop gives 20% off, then adds 7% sales tax (VAT).\n- Find the sale price.\n- Find the total you pay.",
+  "solution": "Discount = 2,500 × 0.2 = 500.00; sale price = **2,000.00** baht.\n\nTax = 2,000.00 × 0.07 = 140.00; total = **2,140.00** baht.",
+  "checks": [
+   [
+    "Sale price (baht)",
+    2000.0,
+    0.01
+   ],
+   [
+    "Total paid (baht)",
+    2140.0,
+    0.01
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-7",
+  "title": "Successive discounts",
+  "prompt": "A TV listed at 8,000 baht gets discounts of 20% and then 10%.\n- Find the net price.\n- Find the single equivalent discount rate (%).",
+  "solution": "Net = 8,000 × 0.80 × 0.90 = **5,760.00** baht.\n\nSingle equivalent rate = 1 − 0.80 × 0.90 = 1 − 0.72 = **28%** (not 30%).",
+  "checks": [
+   [
+    "Net price (baht)",
+    5760.0,
+    0.01
+   ],
+   [
+    "Single equivalent discount (%)",
+    28.0,
+    0.01
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-8",
+  "title": "Markup",
+  "prompt": "A shop buys a bag for 640 baht and marks it up 35% **on cost**.\n- Find the selling price.\n- Find the markup as a percent of the selling price.",
+  "solution": "Markup = 640 × 0.35 = 224.00; selling price = **864.00** baht.\n\nMarkup on selling price = 224.00 ÷ 864.00 = **25.93%**.",
+  "checks": [
+   [
+    "Selling price (baht)",
+    864.0,
+    0.01
+   ],
+   [
+    "Markup on selling price (%)",
+    25.93,
+    0.01
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-9",
+  "title": "Average daily balance",
+  "prompt": "A credit card has a 30-day billing cycle:\n- days 1–10: balance 12,000 baht\n- days 11–22: balance 9,500 baht\n- days 23–30: balance 15,500 baht\n\nThe annual rate is 18%. Find the average daily balance and the finance charge (use days/365).",
+  "solution": "Sum of daily balances = 12,000×10 + 9,500×12 + 15,500×8 = 358,000.\n\nAverage daily balance = 358,000 ÷ 30 = **11,933.33** baht.\n\nFinance charge = 11,933.33 × 0.18 × 30/365 = **176.55** baht.",
+  "checks": [
+   [
+    "Average daily balance (baht)",
+    11933.33,
+    0.01
+   ],
+   [
+    "Finance charge (baht)",
+    176.55,
+    0.01
+   ]
+  ]
+ },
+ {
+  "id": "MATH5-10",
+  "title": "Percent change",
+  "prompt": "A product's price rises from 1,250 to 1,400 baht, then falls back to 1,250 baht.\n- Find the percent increase.\n- Find the percent decrease on the way back.",
+  "solution": "Increase = (1,400 − 1,250) ÷ 1,250 = 150 ÷ 1,250 = **12.00%**.\n\nDecrease = 150 ÷ 1,400 = **10.71%** (smaller, because the base is bigger).",
+  "checks": [
+   [
+    "Percent increase (%)",
+    12.0,
+    0.01
+   ],
+   [
+    "Percent decrease (%)",
+    10.71,
+    0.01
+   ]
+  ]
+ }
+]

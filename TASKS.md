@@ -51,7 +51,7 @@ Prefer the existing `study-acc` store. A new key must follow the backup and rest
 
 ### 4. Math: written calculation practice (Thai: โจทย์คณิตแบบเขียนตอบ)
 
-Status: todo
+Status: done (#174)
 
 `math.html` already has 62 MCQs for Ch5–7 (`scripts/math-practice-mcq.js`). Add 10 written calculation problems per chapter (financial maths). Each problem gets a worked solution and number-check boxes, the same way `acc.html` shows written exercises (`StudySosChecks` in `scripts/textbook-sos-render.js`).
 

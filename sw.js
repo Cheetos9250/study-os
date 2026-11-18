@@ -15,7 +15,8 @@ const CORE = [
   'vocabloom/', 'vocabloom/index.html', 'vocabloom/study-decks.json',
   'manifest.webmanifest', 'data/quiz.json', 'data/cards.json', 'data/accounting-textbook-index.json',
   'data/textbook-sos/ch5.json', 'data/textbook-sos/ch6.json', 'data/textbook-sos/ch7.json',
-  'data/textbook-sos/ch8.json', 'data/textbook-sos/ch9.json'
+  'data/textbook-sos/ch8.json', 'data/textbook-sos/ch9.json',
+  'data/math-written/ch5.json', 'data/math-written/ch6.json', 'data/math-written/ch7.json'
 ];
 const SKIP = /\/data\/config\.json$/;
 const FILE = /\.(html|js|css|json|webmanifest|png|svg|ico|jpg|jpeg|gif|webp|woff2?)$/i;
