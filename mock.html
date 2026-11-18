@@ -77,6 +77,10 @@ function getS(){try{return JSON.parse(sessionStorage.getItem(RUN)||'null');}catc
 function putS(v){try{if(v)sessionStorage.setItem(RUN,JSON.stringify(v));else sessionStorage.removeItem(RUN);}catch(e){}}
 async function load(key){if(data[key])return data[key];const c=COURSES.find(x=>x.key===key);const r=await fetch(c.data,{cache:'no-cache'});if(!r.ok)throw Error('HTTP '+r.status);return data[key]=T.parseCourseData(await r.text());}
 function exam(key){const s=T.loadSettings(read(T.SETTINGS_KEY));return s.exams.map(e=>({...e,d:T.daysUntil(e.date,Date.now())})).filter(e=>e.course===key&&e.d>=0).sort((a,b)=>a.d-b.d)[0]||null;}
+/* "Ask AI why": opens the AI tutor with the question filled in; nothing is sent until Send is tapped there */
+function askHref(key,q,a){const L='ABCDEFGH',x=t=>String(t==null?'':t).replace(/\*\*/g,'');
+ const p='Practice question: '+x(q[1])+'\n'+q[2].map((t,i)=>L[i]+') '+x(t)).join('\n')+'\n\n'+(a!==undefined&&q[2][a]!==undefined?'My answer: '+L[a]+') '+x(q[2][a])+'\n':'')+'Correct answer: '+L[q[3]]+') '+x(q[2][q[3]])+'\n\nExplain why the correct answer is right'+(a!==undefined?' and why mine is wrong':'')+', step by step. Then give me one similar question to try.';
+ return 'tutor.html?course='+encodeURIComponent(key)+'&cat='+encodeURIComponent(q[0])+'&q='+encodeURIComponent(p.slice(0,6000));}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 /* pick n questions spread across the chosen chapters (round robin), shuffled */
 function pick(D,cats,n){
@@ -146,7 +150,7 @@ async function finish(timeUp){
   +(weak.length?'<a class="b" href="'+c.page+'?tab=sum&cat='+weak[0]+'">Read weakest chapter</a>':'')+'</div></section>'
   +'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">By chapter</h2>'+rows.map(r=>'<div class="mk-ch"><a href="'+c.page+'?tab=prac&cat='+esc(r.id)+'" style="color:inherit">'+esc(r.label)+'</a><span class="mk-meter" aria-hidden="true"><i style="width:'+Math.round(r.r/r.n*100)+'%"></i></span><span class="mk-pc">'+r.r+'/'+r.n+'</span></div>').join('')+'</section>'
   +(wrong.length?'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">Missed questions</h2>'+wrong.map(x=>{const q=D.quiz[x.i],a=st.ans[x.i];
-    return '<div class="mk-rev"><p><b>'+rich(q[1])+'</b></p><p>'+(a===undefined?'Not answered':'Your answer: '+rich(q[2][a]))+'</p><p>✓ '+rich(q[2][q[3]])+'</p>'+(q[4]?'<p class="muted">'+rich(q[4])+'</p>':'')+'</div>';}).join('')+'</section>':'');
+    return '<div class="mk-rev"><p><b>'+rich(q[1])+'</b></p><p>'+(a===undefined?'Not answered':'Your answer: '+rich(q[2][a]))+'</p><p>✓ '+rich(q[2][q[3]])+'</p>'+(q[4]?'<p class="muted">'+rich(q[4])+'</p>':'')+'<p><a class="b" href="'+askHref(c.key,q,a)+'">Ask AI why</a></p></div>';}).join('')+'</section>':'');
  window.scrollTo({top:0});
 }
 /* resume a running exam after a reload */

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — journal entry drill">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>JE Drill — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=9">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 110px max(18px,env(safe-area-inset-left))}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:16px 18px;margin:14px 0}
+.lead{color:var(--muted);margin:4px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:700 14px var(--ui);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.mk-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.b{min-height:44px;padding:0 18px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 15px var(--ui);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.b.main{background:var(--ink);color:var(--paper)}.b:disabled{opacity:.5;cursor:default}
+.muted{color:var(--muted);font-size:14px}
+.jd-q{font:700 19px/1.6 var(--ui);margin:6px 0 14px;overflow-wrap:anywhere}
+.jd-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:14px}
+.jd-tag{border:2px solid var(--ink);border-radius:999px;padding:2px 10px;font-weight:900;color:var(--text)}
+.jd-hint,.jd-ans{border:2px dashed var(--ink);border-radius:var(--r-s,8px);padding:10px 12px;margin:12px 0 0;overflow-wrap:anywhere}
+.jd-ans table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.jd-ans td,.jd-ans th{padding:6px 8px;border-bottom:1px solid var(--line-soft);text-align:left}
+.jd-ans td.n,.jd-ans th.n{text-align:right}.jd-ans td.cr{padding-left:28px}
+.jd-res{font-weight:900;margin:12px 0 0}.jd-res.ok{color:var(--low-t,inherit)}
+.jd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.jd-stat{border:2px solid var(--ink);border-radius:var(--r-s,8px);padding:10px;text-align:center}.jd-stat b{display:block;font:700 28px/1.1 var(--num)}
+.jd-weak{list-style:none;margin:10px 0 0;padding:0}.jd-weak li{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line-soft);flex-wrap:wrap}
+h2{font-size:20px;margin:0 0 8px}
+</style>
+<script src="scripts/study-theme.js?v=6"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+</head>
+<body>
+<div class="page">
+<h1>JE Drill</h1>
+<p class="lead">Journal entries for the accounting final (Ch5–9): a new transaction every time, checked line by line. Types you miss come back more often.</p>
+<section class="panel"><div class="chips" id="chs" role="group" aria-label="Chapters"></div></section>
+<main id="app"><p class="muted">Loading…</p></main>
+<section class="panel" id="score"></section>
+</div>
+<script src="scripts/je-grid.js?v=4"></script>
+<script src="scripts/study-je-drill.js?v=1"></script>
+<script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-nav.js?v=12"></script>
+<script>
+(function(){
+'use strict';
+/* Storage: only studyos.jedrill.v1 (score per day and per transaction type; backed up). Nothing is sent anywhere. */
+const J=window.StudyJEDrill,E=window.StudyJE,$=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dayKey=t=>new Date(Math.floor((t+7*3600000)/86400000)*86400000).toISOString().slice(0,10);
+const u=new URLSearchParams(location.search);
+let chs=(u.get('ch')||'').split(',').map(Number).filter(n=>J.CHAPTERS.some(c=>c[0]===n));
+let st=load(),cur=null,ctl=null,scored=false,shown=false,only=u.get('t')&&J.TEMPLATES.some(t=>t.id===u.get('t'))?u.get('t'):null;
+function load(){try{return J.normalize(JSON.parse(localStorage.getItem(J.KEY)||'{}'));}catch(e){return J.normalize({});}}
+function save(){try{localStorage.setItem(J.KEY,JSON.stringify(st));}catch(e){}}
+function score(ok){if(scored)return;scored=true;st=J.record(load(),cur.id,ok,dayKey(Date.now()));save();paintScore();}
+function chips(){
+ $('#chs').innerHTML='<button type="button" class="chip" data-ch="" aria-pressed="'+(!chs.length&&!only)+'">All</button>'+J.CHAPTERS.map(([n,l])=>'<button type="button" class="chip" data-ch="'+n+'" aria-pressed="'+(chs.includes(n)&&!only)+'">'+esc(l)+'</button>').join('');
+ $('#chs').onclick=e=>{const b=e.target.closest('[data-ch]');if(!b)return;only=null;const n=Number(b.dataset.ch);
+  chs=!n?[]:chs.includes(n)?chs.filter(x=>x!==n):chs.concat(n).sort();chips();next();};
+}
+function next(){
+ const t=only?J.TEMPLATES.find(x=>x.id===only):J.choose(st,chs,Math.random,cur&&cur.id);
+ cur=J.make(t,Math.floor(Math.random()*4294967295));scored=false;shown=false;paint();
+}
+function ansTable(){return '<table><thead><tr><th>Account</th><th class="n">Debit</th><th class="n">Credit</th></tr></thead><tbody>'+cur.je.map(l=>'<tr><td'+(l.cr?' class="cr"':'')+'>'+esc(l.acct)+'</td><td class="n">'+(l.dr?J.money(l.dr):'')+'</td><td class="n">'+(l.cr?J.money(l.cr):'')+'</td></tr>').join('')+'</tbody></table>';}
+function paint(){
+ const ch=J.CHAPTERS.find(c=>c[0]===cur.ch);
+ $('#app').innerHTML='<section class="panel"><div class="jd-meta"><span class="jd-tag">'+esc(ch?ch[1]:'Ch'+cur.ch)+'</span>'+(shown||scored?'<span>'+esc(cur.title)+'</span>':'')+(only?'<span>· practising one type</span>':'')+'</div>'
+  +'<p class="jd-q">'+esc(cur.text)+'</p><div id="jeBox" class="je" role="group" aria-label="Journal entry"></div><div id="jdOut" aria-live="polite"></div>'
+  +'<div class="mk-row" style="margin-top:12px"><button type="button" class="b" id="jdHint">Hint</button><button type="button" class="b" id="jdShow">Show answer</button><button type="button" class="b main" id="jdNext">Next drill</button>'
+  +'<a class="b" id="jdAsk" href="#">Ask AI</a></div></section>';
+ ctl=E.mount($('#jeBox'),{answer:cur.je,rows:[],btnClass:'b',onAllCorrect:next});
+ $('#jeBox').addEventListener('click',e=>{if(!e.target.closest('[data-check]'))return;const r=E.check(ctl.rows(),cur.je);if(!r.entered)return;
+  if(!scored&&!shown)score(r.all);out(r.all?'<p class="jd-res ok">✓ Correct. Tap Next drill for a new one.</p>':'<p class="jd-res">Not yet. Fix the marked lines and check again, or tap Show answer.</p>');});
+ $('#jdHint').onclick=()=>out('<div class="jd-hint"><b>Hint:</b> '+esc(cur.hint)+'</div>');
+ $('#jdShow').onclick=()=>{if(!scored)score(false);shown=true;out('<div class="jd-ans"><b>Answer</b>'+ansTable()+'<p class="muted" style="margin:8px 0 0">'+esc(cur.hint)+'</p></div>');};
+ $('#jdNext').onclick=()=>{if(!scored&&ctl.rows().some(r=>r.some(x=>String(x).trim())))score(E.check(ctl.rows(),cur.je).all);next();window.scrollTo({top:0});};
+ $('#jdAsk').onclick=e=>{e.preventDefault();location.href='tutor.html?course=acc&cat=c'+cur.ch+'&q='+encodeURIComponent(J.askPrompt(cur,ctl.rows()));};
+}
+function out(h){$('#jdOut').innerHTML=h;}
+function paintScore(){
+ const d=st.days[dayKey(Date.now())]||{a:0,c:0},all=Object.values(st.days).reduce((s,x)=>({a:s.a+x.a,c:s.c+x.c}),{a:0,c:0}),weak=J.weak(st,3);
+ $('#score').innerHTML='<h2>Your drills</h2><div class="jd-stats"><div class="jd-stat"><b>'+d.c+' / '+d.a+'</b><span class="muted">right today</span></div><div class="jd-stat"><b>'+all.a+'</b><span class="muted">done in all</span></div><div class="jd-stat"><b>'+(all.a?Math.round(all.c/all.a*100)+'%':'–')+'</b><span class="muted">right first time</span></div></div>'
+  +(weak.length?'<h2 style="margin-top:14px">Practise these</h2><ul class="jd-weak">'+weak.map(w=>'<li><span>'+esc(w.title)+' <span class="muted">· '+w.right+' of '+w.tries+' right</span></span><a class="b" href="je-drill.html?t='+esc(w.id)+'">Practise</a></li>').join('')+'</ul>':'<p class="muted" style="margin:10px 0 0">Types you get wrong will be listed here.</p>');
+}
+chips();paintScore();next();
+})();
+</script>
+</body>
+</html>

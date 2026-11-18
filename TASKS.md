@@ -309,3 +309,25 @@ Status: done (#174)
 ### 38. Repeating tasks (Thai: งานที่ทำซ้ำ)
 
 Status: done (#174)
+
+## I. Study ideas, 18 Nov 2026 (Thai: ไอเดียเพิ่มเติม)
+
+The owner said "ทำเลย" to the recommended order: JE Drill, then Ask AI, then the mistake notebook.
+
+### 39. JE Drill (Thai: ฝึกบันทึกบัญชีไม่จำกัด)
+
+`je-drill.html`: endless journal-entry transactions for the accounting final (Ch5, 6, 8, 9) from 30 templates with random amounts (`scripts/study-je-drill.js`), checked line by line by the journal grid. Types answered wrong come back more often. Score in `studyos.jedrill.v1` (backed up).
+
+Status: done
+
+### 40. Ask AI why on wrong answers (Thai: ถาม AI ว่าทำไมผิด)
+
+A link on every wrong multiple-choice answer (course pages, Cram Mode, mock exam, Mistakes) that opens the AI tutor with the question, my answer and the right one filled in. Nothing is sent until Send.
+
+Status: done
+
+### 41. Mistake notebook (Thai: สมุดรวมข้อที่ผิด)
+
+`mistakes.html`: every question answered wrong in Accounting, Economics and Math, by chapter, with Redo, Redo all and Ask AI why, plus the weakest JE Drill types. Read-only.
+
+Status: done

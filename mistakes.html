@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — mistake notebook">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Mistakes — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=9">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 110px max(18px,env(safe-area-inset-left))}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:16px 18px;margin:14px 0}
+.lead{color:var(--muted);margin:4px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:700 14px var(--ui);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.mk-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.b{min-height:44px;padding:0 18px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 15px var(--ui);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.b.main{background:var(--ink);color:var(--paper)}.b:disabled{opacity:.5;cursor:default}
+.muted{color:var(--muted);font-size:14px}
+.mn-ch{border-top:2px solid var(--ink);padding:10px 0}.mn-ch:first-of-type{border-top:0}
+.mn-ch summary{cursor:pointer;font-weight:900;min-height:44px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mn-ch summary .muted{font-weight:600}
+.mn-q{border:2px solid var(--ink);border-radius:var(--r-s,8px);padding:10px 12px;margin:10px 0}.mn-q p{margin:4px 0;overflow-wrap:anywhere}
+.mn-bad{color:var(--hi-t,inherit)}.mn-ok{font-weight:700}
+h2{font-size:20px;margin:0 0 8px}
+</style>
+<script src="scripts/study-theme.js?v=6"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+</head>
+<body>
+<div class="page">
+<h1>Mistakes</h1>
+<p class="lead">Every practice question you got wrong (and haven't fixed yet), by subject and chapter. Tap Redo to answer it again, or Ask AI why.</p>
+<section class="panel"><div class="chips" id="subs" role="group" aria-label="Subject"></div></section>
+<main id="app"><p class="muted">Loading…</p></main>
+</div>
+<script src="scripts/study-je-drill.js?v=1"></script>
+<script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-nav.js?v=12"></script>
+<script>
+(function(){
+'use strict';
+/* Read-only: reads study-<course> answers, the course data files and studyos.jedrill.v1. Writes nothing. */
+const T=window.StudyToday,J=window.StudyJEDrill,$=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rich=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+const L='ABCDEFGH',x=t=>String(t==null?'':t).replace(/\*\*/g,'');
+let sub=new URLSearchParams(location.search).get('course')||'all';const data={};
+function read(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+async function load(c){if(data[c.key])return data[c.key];const r=await fetch(c.data,{cache:'no-cache'});if(!r.ok)throw Error('HTTP '+r.status);return data[c.key]=T.parseCourseData(await r.text());}
+/* wrong now: answered, not the right option, not before a reset; newest first */
+function mistakes(D,st){const ans=(st&&st.ans)||{},ats=(st&&st.ats)||{},rst=Number(st&&st.rst)||0,out=[];
+ (D.quiz||[]).forEach((q,i)=>{const a=ans[i];if(a===undefined||a===null||a===q[3])return;const t=Number(ats[i])||0;if(rst&&t&&t<rst)return;out.push({i,q,a,t});});
+ return out.sort((p,r)=>r.t-p.t);}
+function ask(key,q,a){const p='Practice question: '+x(q[1])+'\n'+q[2].map((t,i)=>L[i]+') '+x(t)).join('\n')+'\n\nMy answer: '+L[a]+') '+x(q[2][a])+'\nCorrect answer: '+L[q[3]]+') '+x(q[2][q[3]])+'\n\nExplain why the correct answer is right and why mine is wrong, step by step. Then give me one similar question to try.';
+ return 'tutor.html?course='+key+'&cat='+encodeURIComponent(q[0])+'&q='+encodeURIComponent(p.slice(0,6000));}
+function chips(){$('#subs').innerHTML=[['all','All']].concat(T.COURSES.map(c=>[c.key,c.name])).map(([k,l])=>'<button type="button" class="chip" data-k="'+k+'" aria-pressed="'+(sub===k)+'">'+esc(l)+'</button>').join('');
+ $('#subs').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;sub=b.dataset.k;chips();paint();};}
+async function paint(){
+ const list=T.COURSES.filter(c=>sub==='all'||c.key===sub);let h='',total=0;
+ for(const c of list){let D;try{D=await load(c);}catch(e){h+='<section class="panel"><h2>'+esc(c.name)+'</h2><p class="muted">Could not load this subject.</p></section>';continue;}
+  const ms=mistakes(D,read('study-'+c.key));total+=ms.length;
+  const by={};ms.forEach(m=>{(by[m.q[0]]=by[m.q[0]]||[]).push(m);});
+  const cats=(D.cats||[]).filter(k=>by[k[0]]);
+  h+='<section class="panel"><h2>'+esc(c.name)+' <span class="muted">· '+ms.length+' to fix</span></h2>'
+   +(ms.length?cats.map(([id,label])=>'<details class="mn-ch"><summary>'+esc(label)+' <span class="muted">'+by[id].length+' wrong</span><a class="b" href="'+c.page+'?tab=prac&cat='+id+'&missed=1">Redo all</a></summary>'
+    +by[id].slice(0,60).map(m=>'<div class="mn-q"><p><b>'+rich(m.q[1])+'</b></p><p class="mn-bad">✗ You chose: '+rich(m.q[2][m.a])+'</p><p class="mn-ok">✓ '+rich(m.q[2][m.q[3]])+'</p>'+(m.q[4]?'<p class="muted">'+rich(m.q[4])+'</p>':'')
+     +'<div class="mk-row" style="margin-top:6px"><a class="b" href="'+c.page+'?tab=prac&q='+m.i+'">Redo</a><a class="b" href="'+ask(c.key,m.q,m.a)+'">Ask AI why</a></div></div>').join('')
+    +(by[id].length>60?'<p class="muted">'+(by[id].length-60)+' more · use Redo all.</p>':'')+'</details>').join('')
+    :'<p class="muted" style="margin:0">Nothing wrong right now. 🎉</p>')
+   +'<p class="muted" style="margin:10px 0 0">Extra sets and written answers: <a href="'+c.page+'?tab=prac&cram=1">Cram Mode</a></p></section>';}
+ if(sub==='all'||sub==='acc'){const w=J.weak(read(J.KEY),5);
+  h+='<section class="panel"><h2>Journal entries <span class="muted">· JE Drill</span></h2>'+(w.length?w.map(t=>'<div class="mn-q"><p><b>'+esc(t.title)+'</b> <span class="muted">· '+t.right+' of '+t.tries+' right</span></p><a class="b" href="je-drill.html?t='+esc(t.id)+'">Practise</a></div>').join(''):'<p class="muted" style="margin:0">No weak entry types yet. <a href="je-drill.html">Start a drill</a></p>')+'</section>';}
+ $('#app').innerHTML=(sub==='all'?'<p class="muted">'+total+' question'+(total===1?'':'s')+' to fix in all.</p>':'')+h;
+}
+chips();paint();
+})();
+</script>
+</body>
+</html>
