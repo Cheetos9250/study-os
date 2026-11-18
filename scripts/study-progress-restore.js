@@ -65,6 +65,8 @@
       if (value.focus !== undefined && !object(value.focus)) throw new Error("Invalid home dashboard checklist");
       if (value.qgoal !== undefined && (!Number.isInteger(value.qgoal) || value.qgoal < 1 || value.qgoal > 200))
         throw new Error("Invalid daily practice goal");
+      if (value.wtarget !== undefined && (!object(value.wtarget) || !["q", "p"].every(function (k) { return value.wtarget[k] === undefined || (Number.isInteger(value.wtarget[k]) && value.wtarget[k] >= 0 && value.wtarget[k] <= 10080); })))
+        throw new Error("Invalid weekly target");
       var jpeg = { test: function (v) { return /^data:image\/(jpeg|gif|png);base64,[A-Za-z0-9+\/=]+$/.test(v) || /^https:\/\/[^\s"'()\\<>]{4,1990}$/.test(v); } };
       if (value.avatar !== undefined && (typeof value.avatar !== "string" || !jpeg.test(value.avatar)))
         throw new Error("Invalid home dashboard avatar");
@@ -119,6 +121,14 @@
       for (var pd of Object.keys(value.days))
         if (!/^\d{4}-\d{2}-\d{2}$/.test(pd) || !Number.isFinite(value.days[pd]) || value.days[pd] < 0 || value.days[pd] > 1440)
           throw new Error("Invalid Pomodoro history");
+      if (value.bySub !== undefined) {
+        if (!object(value.bySub)) throw new Error("Invalid Pomodoro history");
+        for (var bd of Object.keys(value.bySub)) {
+          var bs = value.bySub[bd];
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(bd) || !object(bs) || !Object.keys(bs).every(function (k) { return /^[a-z]{2,8}$/.test(k) && Number.isFinite(bs[k]) && bs[k] >= 0 && bs[k] <= 1440; }))
+            throw new Error("Invalid Pomodoro history");
+        }
+      }
     } else if (key === "studyos.excel.v1") {
       if ((value.done !== undefined && !object(value.done)) || (value.ans !== undefined && !object(value.ans)))
         throw new Error("Invalid Excel lesson progress");

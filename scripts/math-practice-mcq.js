@@ -69,5 +69,10 @@ window.MATH_PRACTICE_MCQ=[
 {id:"mp7-17",cat:"c7",case:"Test scores and frequencies: 90 (1), 80 (3), 70 (10), 60 (5), 50 (2)",q:"What is the mean score, to one decimal?",opts:["68.1","70.0","66.7","71.4"],exp:"(90 + 240 + 700 + 300 + 100) ÷ 21 = 1,430 ÷ 21 ≈ 68.1."},
 {id:"mp7-18",cat:"c7",case:"Test scores and frequencies: 90 (1), 80 (3), 70 (10), 60 (5), 50 (2)",q:"What are the median and the mode?",opts:["Median 70, mode 70","Median 60, mode 70","Median 70, mode 10","Median 65, mode 70"],exp:"21 scores → the 11th in order is 70; 70 appears most often."},
 {id:"mp7-19",cat:"c7",q:"Scores (ascending): 38, 47, 49, 58, 60, 65, 70, 79, 80, 92. What is the percentile rank of 79?",opts:["70","80","79","60"],exp:"7 scores are below 79: 7 ÷ 10 × 100 = 70."},
-{id:"mp7-20",cat:"c7",q:"A jar has 25 blue, 55 striped and 20 clear marbles. One is drawn at random. What is P(clear)?",opts:["0.20","0.25","0.55","0.80"],exp:"20 ÷ 100."}
+{id:"mp7-20",cat:"c7",q:"A jar has 25 blue, 55 striped and 20 clear marbles. One is drawn at random. What is P(clear)?",opts:["0.20","0.25","0.55","0.80"],exp:"20 ÷ 100."},
+{id:"mp6-16",cat:"c6",q:"U = {1, 2, …, 10}, A = {2, 4, 6, 8, 10}. The complement A′ is",opts:["{1, 3, 5, 7, 9}", "{2, 4, 6, 8, 10}", "{1, 2, 3, 4, 5}", "∅"],exp:"A′ is every element of U that is not in A."},
+{id:"mp6-17",cat:"c6",q:"A = {1, 2, 3} and B = {3, 4}. A ∪ B is",opts:["{1, 2, 3, 4}", "{3}", "{1, 2}", "{1, 2, 3, 3, 4}"],exp:"The union lists each element of either set once."},
+{id:"mp6-18",cat:"c6",q:"In a class of 40 students, 25 like tea, 18 like coffee and 8 like both. How many like neither?",opts:["5", "13", "3", "8"],exp:"n(T ∪ C) = 25 + 18 − 8 = 35; neither = 40 − 35 = 5."},
+{id:"mp6-19",cat:"c6",q:"A = {a, b, c, d} and B = {c, d, e}. A ∩ B is",opts:["{c, d}", "{a, b, c, d, e}", "{a, b}", "{e}"],exp:"The intersection holds the elements in both sets."},
+{id:"mp6-20",cat:"c6",q:"If n(A) = 12, n(B) = 9 and n(A ∩ B) = 4, then n(A only) is",opts:["8", "12", "4", "5"],exp:"Only A = n(A) − n(A ∩ B) = 12 − 4 = 8."}
 ];

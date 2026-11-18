@@ -65,5 +65,54 @@
    accuracy:answered?Math.round(right/answered*100):null,pace:Math.round(pace*10)/10,daysToFinish,examDays,needPerDay,
    onTrack:left===0||(examDays!==null&&daysToFinish!==null&&daysToFinish<=Math.max(1,examDays))};
  }
- return {DAY,GOALS,DEFAULT_GOAL,dayKey,goal,nextGoal,goalStreak,heatmap,weekly,badges,bestStreak,readiness};
+ /* ---------- quality (TASKS 27, 29, 30) from the lesson bank D.quiz and study-<course> ---------- */
+ const weekStart=t=>{const d=dayKey(t),dow=(new Date(d+'T00:00:00Z').getUTCDay()+6)%7;return Date.parse(d+'T00:00:00Z')-TZ-dow*DAY;};
+ function answers(D,study){
+  const out=[],ans=(study&&study.ans)||{},ats=(study&&study.ats)||{},rst=Number(study&&study.rst)||0;
+  ((D&&D.quiz)||[]).forEach((q,i)=>{const a=ans[i];if(a===undefined||a===null)return;const t=Number(ats[i])||0;if(rst&&t&&t<rst)return;out.push({i,cat:q[0],ok:a===q[3],t});});
+  return out;
+ }
+ /* per chapter: answered, right, last answer time, and accuracy this week vs last week (by the time of the last answer) */
+ function chapters(D,study,now){
+  const w0=weekStart(now),w1=w0-7*DAY,per={};
+  for(const [id,label] of (D&&D.cats)||[])per[id]={id,label,quiz:0,answered:0,correct:0,last:0,tw:{a:0,c:0},lw:{a:0,c:0}};
+  ((D&&D.quiz)||[]).forEach(q=>{if(per[q[0]])per[q[0]].quiz++;});
+  for(const x of answers(D,study)){const p=per[x.cat];if(!p)continue;p.answered++;if(x.ok)p.correct++;if(x.t>p.last)p.last=x.t;
+   const b=x.t>=w0?p.tw:x.t>=w1?p.lw:null;if(b){b.a++;if(x.ok)b.c++;}}
+  return Object.values(per).filter(p=>p.quiz>0).map(p=>{const pct=p.answered?Math.round(p.correct/p.answered*100):null,
+   tw=p.tw.a>=3?Math.round(p.tw.c/p.tw.a*100):null,lw=p.lw.a>=3?Math.round(p.lw.c/p.lw.a*100):null,idle=p.last?Math.floor((now-p.last)/DAY):null;
+   return Object.assign(p,{pct,trend:tw!==null&&lw!==null?tw-lw:null,idle,weak:p.answered>=3&&pct<70||idle!==null&&idle>=7});});
+ }
+ /* accuracy per week for the last n weeks (oldest first); weeks with no answers have pct null */
+ function weeklyAccuracy(D,study,now,n){
+  n=n||6;const w0=weekStart(now),out=[];for(let k=n-1;k>=0;k--)out.push({from:w0-k*7*DAY,a:0,c:0,pct:null});
+  for(const x of answers(D,study)){const k=Math.floor((x.t-(w0-(n-1)*7*DAY))/(7*DAY));if(k>=0&&k<n){out[k].a++;if(x.ok)out[k].c++;}}
+  out.forEach(w=>{w.pct=w.a?Math.round(w.c/w.a*100):null;});return out;
+ }
+ function sortChapters(list,mode){
+  const l=list.slice(),inf=v=>v===null?Infinity:v;
+  if(mode==='weak')l.sort((a,b)=>inf(a.pct)-inf(b.pct)||b.answered-a.answered);
+  else if(mode==='recent')l.sort((a,b)=>(a.last||0)-(b.last||0));
+  else if(mode==='progress')l.sort((a,b)=>a.answered/a.quiz-b.answered/b.quiz);
+  return l;
+ }
+ /* peak hours (TASK 29): accuracy in 3-hour blocks of the day (Bangkok) by the time of the last answer */
+ function peakHours(list){
+  const b=[...Array(8)].map((_,k)=>({from:k*3,a:0,c:0}));
+  for(const {D,study} of list)for(const x of answers(D,study)){if(!x.t)continue;const h=new Date(x.t+TZ).getUTCHours(),k=Math.floor(h/3);b[k].a++;if(x.ok)b[k].c++;}
+  b.forEach(x=>{x.pct=x.a?Math.round(x.c/x.a*100):null;});
+  const ok=b.filter(x=>x.a>=10).sort((p,q)=>q.pct-p.pct||q.a-p.a),busy=b.slice().sort((p,q)=>q.a-p.a)[0];
+  return {blocks:b,best:ok[0]||null,busiest:busy&&busy.a?busy:null};
+ }
+ /* time balance (TASK 29): Pomodoro minutes per subject against accuracy; warns when the most-studied subject is
+    already the strongest while another is 15+ points weaker */
+ function balance(mins,acc){
+  const keys=Object.keys(acc).filter(k=>acc[k]!==null&&acc[k]!==undefined);if(keys.length<2)return null;
+  const total=keys.reduce((n,k)=>n+(mins[k]||0),0);if(total<50)return null;
+  const most=keys.slice().sort((a,b)=>(mins[b]||0)-(mins[a]||0))[0],weakest=keys.slice().sort((a,b)=>acc[a]-acc[b])[0];
+  return {most,weakest,share:Math.round((mins[most]||0)/total*100),warn:most!==weakest&&acc[most]-acc[weakest]>=15};
+ }
+ /* weekly target (TASK 31): wtarget {q, p} in studyos.home.v1 */
+ function target(v){const o=v&&typeof v==='object'?v:{},n=(x,d,max)=>{x=Math.round(Number(x));return Number.isFinite(x)&&x>=0&&x<=max?x:d;};return {q:n(o.q,70,5000),p:n(o.p,300,10080)};}
+ return {DAY,GOALS,DEFAULT_GOAL,dayKey,goal,nextGoal,goalStreak,heatmap,weekly,badges,bestStreak,readiness,weekStart,chapters,weeklyAccuracy,sortChapters,peakHours,balance,target};
 });

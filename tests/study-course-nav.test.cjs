@@ -5,7 +5,7 @@ test('academic course pages load the deep-link helper, then the shared navigatio
  for(const f of ['acc.html','eco.html','math.html']){
   const h=read(f);
   assert.doesNotMatch(h,/href="today\.html"/);
-  assert.match(h,/<script src="scripts\/study-course-nav\.js\?v=1"><\/script>\s*<script src="scripts\/study-nav\.js\?v=\d+"><\/script>\s*<\/html>\s*$/);
+  assert.match(h,/<script src="scripts\/study-course-nav\.js\?v=\d+"><\/script>\s*<script src="scripts\/study-nav\.js\?v=\d+"><\/script>\s*<\/html>\s*$/);
  }
 });
 test('deep-link helper is read-only and ignores unknown tabs',()=>{

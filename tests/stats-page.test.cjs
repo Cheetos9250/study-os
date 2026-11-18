@@ -26,14 +26,14 @@ test('Pomodoro history is a new backed-up key with a label and restore validatio
  assert.throws(()=>R.plan(mem(),snap({days:{'17 Nov':50}}),'https://x.test'));
  assert.throws(()=>R.plan(mem(),snap({days:{'2026-11-17':-5}}),'https://x.test'));
  const s=read('index.html');
- assert.match(s,/function logPomo\(end,m\)\{if\(m!==25\|\|!end\)return;/);
+ assert.match(s,/function logPomo\(end,m,sub\)\{if\(m!==25\|\|!end\)return;/);
  assert.match(s,/if\(o\.lastEnd===end\)return;/,'one session counts once');
- assert.match(s,/logPomo\(endAt,m\);left=0;stop\(\);/);assert.match(s,/else if\(s\.endAt\)\{logPomo\(s\.endAt,mins\);/);
+ assert.match(s,/logPomo\(endAt,m,psub\);left=0;stop\(\);/);assert.match(s,/else if\(s\.endAt\)\{logPomo\(s\.endAt,mins,psub\);/);
 });
 test('Stats page is linked from the nav footer and cached for offline use',()=>{
  assert.match(read('scripts/study-nav.js'),/\{href:'stats\.html',label:'Stats',icon:'stats'\}/);
  assert.match(read('sw.js'),/'stats\.html'/);
  const s=read('stats.html');
  assert.match(s,/<script src="scripts\/study-stats\.js\?v=\d+"><\/script>/);
- assert.doesNotMatch(s,/localStorage\.(setItem|removeItem)/,'Stats only reads');
+ assert.doesNotMatch(s,/localStorage\.removeItem/);assert.deepEqual(s.match(/localStorage\.setItem\([^,]+/g),["localStorage.setItem('studyos.home.v1'"],'Stats only writes the weekly target');
 });
