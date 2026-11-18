@@ -47,6 +47,8 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 .empty{color:var(--muted);font-size:15px;text-align:center;padding:24px 8px;border:2px dashed var(--line-soft,#ccc);border-radius:var(--r)}
 .compose{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));background:var(--paper);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:10px;display:grid;gap:8px}
 .compose .btnrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.compose .btnrow .sp{flex:1}
+.quick{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -2px;padding:2px}.quick::-webkit-scrollbar{display:none}
+.qk{flex:none;font:700 14px var(--ui);min-height:40px;padding:0 14px;border-radius:999px;border:2px solid var(--ink);background:var(--panel);color:var(--text);cursor:pointer}.qk:hover{background:var(--acc-soft)}.qk:disabled{opacity:.5;cursor:default}
 .thumb{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}.thumb img{width:44px;height:44px;object-fit:cover;border-radius:6px;border:2px solid var(--ink)}
 @media(max-width:899px){.compose{bottom:calc(86px + env(safe-area-inset-bottom))}.page{padding-bottom:200px}}
 </style>
@@ -75,6 +77,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 </section>
 <main id="log" aria-live="polite"></main>
 <form class="compose" id="form" autocomplete="off">
+ <div class="quick" role="group" aria-label="Quick asks"><button type="button" class="qk" data-quick="explain">Explain this chapter</button><button type="button" class="qk" data-quick="quiz">Quiz me</button><button type="button" class="qk" data-quick="mistakes">Common mistakes</button><button type="button" class="qk" data-quick="plan">Study plan to my exams</button></div>
  <label for="q" class="note">Ask a question, paste your working, or add a photo of the problem.</label>
  <textarea id="q" rows="3" maxlength="8000" placeholder="e.g. Why is Accounts Receivable debited here?"></textarea>
  <div class="btnrow">
@@ -89,7 +92,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 </div>
 <script src="scripts/textbook-sos-render.js?v=1"></script>
 <script src="scripts/study-today.js?v=3"></script>
-<script src="scripts/study-tutor.js?v=2"></script>
+<script src="scripts/study-tutor.js?v=3"></script>
 <script src="scripts/study-nav.js?v=11"></script>
 <script>
 (function(){
@@ -147,7 +150,7 @@ async function paintCats(sel){const key=$('#course').value,D=await loadCourse(ke
 $('#course').onchange=()=>{paintCats();try{sessionStorage.setItem('studyos.tutor.ctx',JSON.stringify({c:$('#course').value,k:''}));}catch(e){}};
 $('#cat').onchange=()=>{try{sessionStorage.setItem('studyos.tutor.ctx',JSON.stringify({c:$('#course').value,k:$('#cat').value}));}catch(e){}};
 /* ---------- chat ---------- */
-function paintState(){const ready=!!cfg[cfg.provider].key;$('#send').disabled=busy||!ready;
+function paintState(){const ready=!!cfg[cfg.provider].key;$('#send').disabled=busy||!ready;document.querySelectorAll('[data-quick]').forEach(b=>b.disabled=busy);
  say('#state',busy?'Thinking…':ready?'':'Add your API key in Settings',false);}
 function paintLog(){const log=$('#log');
  if(!chat.length){log.innerHTML='<div class="empty">Pick a subject and chapter so the tutor reads your course notes, then ask anything.<br>It explains step by step, checks your working and makes journal-entry tables.</div>';return;}
@@ -157,7 +160,8 @@ function paintLog(){const log=$('#log');
   :'<div class="msg a"><span class="who">Tutor</span>'+md(m.text)+'</div>').join('');
  const r=log.querySelector('[data-retry]');if(r)r.onclick=()=>{chat=chat.filter(m=>!m.error);ask();};
 }
-async function newestModel(){try{const r=A.modelsRequest(cfg),res=await fetch(r.url,r.init);if(!res.ok)return '';return A.pickModel(cfg.provider,A.models(cfg.provider,await res.json()));}catch(e){return '';}}
+async function modelIds(){try{const r=A.modelsRequest(cfg),res=await fetch(r.url,r.init);if(!res.ok)return [];return A.models(cfg.provider,await res.json());}catch(e){return [];}}
+async function newestModel(){return A.pickModel(cfg.provider,await modelIds());}
 async function ask(){
  if(busy)return;const c=cfg[cfg.provider];if(!c.key){openSet(true);return;}
  busy=true;paintState();
@@ -167,11 +171,16 @@ async function ask(){
  const msgs=chat.filter(m=>!m.error);let ctl=null,timer=null;
  try{ctl=new AbortController();timer=setTimeout(()=>ctl.abort(),120000);
   const send=async()=>{const r=A.request(cfg,sys,msgs);r.init.signal=ctl.signal;const res=await fetch(r.url,r.init);return {status:res.status,j:await res.json().catch(()=>null)};};
-  let out=await send();
+  let out=await send(),note='';
   /* Gemini retires models (404 "no longer available"): switch once to the newest stable Flash model this key can use */
   if(out.status===404&&cfg.provider==='gemini'){const m=await newestModel();
    if(m&&m!==cfg.gemini.model){cfg.gemini.model=m;saveCfg();say('#state','Model switched to '+m);out=await send();}}
-  chat.push({role:'assistant',text:A.reply(cfg.provider,out.status,out.j||{})});}
+  /* busy servers (5xx): wait and try again twice */
+  for(const wait of [2500,6000]){if(out.status<500)break;say('#state','Google is busy, trying again…');await new Promise(r=>setTimeout(r,wait));out=await send();}
+  /* still busy, or this model's free quota is used up (429): answer once with another model (it has its own quota) */
+  if((out.status>=500||out.status===429)&&cfg.provider==='gemini'){const ids=await modelIds(),alt=A.backupModel('gemini',ids,cfg.gemini.model);
+   if(alt){const keep=cfg.gemini.model,why=out.status===429?'out of free quota':'busy';cfg.gemini.model=alt;say('#state','Trying '+alt+'…');try{out=await send();}finally{cfg.gemini.model=keep;}if(out.status===200)note='\n\n*(Answered by '+alt+' because '+keep+' was '+why+'.)*';}}
+  chat.push({role:'assistant',text:A.reply(cfg.provider,out.status,out.j||{})+note});}
  catch(e){chat.push({role:'assistant',error:true,text:e&&e.name==='AbortError'?'No answer after 2 minutes.':(e&&e.message&&/fetch|network|load failed/i.test(e.message)?'Could not reach the AI service (offline, or the base URL is wrong).':String(e&&e.message||e))});}
  clearTimeout(timer);busy=false;saveChat();paintLog();paintState();
  const last=$('#log').lastElementChild;if(last)last.scrollIntoView({block:'start',behavior:'smooth'});
@@ -180,6 +189,15 @@ $('#form').onsubmit=e=>{e.preventDefault();const t=$('#q').value.trim();if(!t&&!
  if(!cfg[cfg.provider].key){openSet(true);say('#setMsg','Add your API key first',true);return;}
  chat=chat.filter(m=>!m.error);chat.push({role:'user',text:t||'Please help me with this problem.',image});
  $('#q').value='';dropPhoto();paintLog();ask();};
+/* quick asks: a ready prompt for the chosen subject and chapter; the study plan also lists upcoming exams from Calendar */
+document.querySelectorAll('[data-quick]').forEach(b=>b.onclick=async()=>{if(busy)return;
+ if(!cfg[cfg.provider].key){openSet(true);say('#setMsg','Add your API key first',true);return;}
+ const key=$('#course').value,D=key?await loadCourse(key):null,cat=$('#cat').value,kind=b.dataset.quick;
+ if((kind==='explain'||kind==='quiz'||kind==='mistakes')&&!key){say('#state','Pick a subject (and a chapter) first',true);$('#course').focus();return;}
+ const o={course:key?(D&&D.title)||(COURSES.find(x=>x.key===key)||{}).name:'',chapter:cat&&D?((D.cats||[]).find(x=>x[0]===cat)||[,''])[1]:''};
+ if(kind==='plan'&&T){let st=null;try{st=T.loadSettings(localStorage.getItem(T.SETTINGS_KEY));}catch(e){}
+  o.exams=((st&&st.exams)||[]).map(e=>({name:e.title,date:e.date,days:T.daysUntil(e.date,Date.now())})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days).slice(0,8);}
+ chat=chat.filter(m=>!m.error);chat.push({role:'user',text:A.quick(kind,o)});paintLog();ask();});
 $('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();$('#form').requestSubmit();}});
 $('#newChat').onclick=()=>{if(chat.length&&!confirm('Start a new chat? This chat is cleared.'))return;chat=[];saveChat();paintLog();};
 /* photo: scaled to at most 1600 px, sent as JPEG; kept only for this chat */

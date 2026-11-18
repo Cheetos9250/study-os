@@ -71,7 +71,7 @@
  function reply(provider,status,j){
   const err=j&&(j.error&&(j.error.message||j.error.status||j.error.code)||j.message);
   if(status<200||status>=299){
-   const hint=status===401||status===403?' Check the API key.':status===404?' Check the model name.':status===429?' Rate limit or free quota reached; wait a minute or check your plan.':'';
+   const hint=status===401||status===403?' Check the API key.':status===404?' Check the model name.':status===429?' Free quota reached for now; wait a minute (per-minute limit) or try again tomorrow (daily limit).':status>=500?' Google\'s servers are busy; try again in a minute.':'';
    throw new Error('The AI service answered '+status+(err?': '+clean(err,300):'')+'.'+hint);
   }
   let t='';
@@ -105,5 +105,25 @@
   if(ids.includes('gemini-flash-latest'))return 'gemini-flash-latest';
   return ids.find(id=>/flash/.test(id)&&!/(lite|image|tts|live|audio|embed|thinking|exp)/.test(id))||'';
  }
- return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl,pickModel};
+ /* A different model to answer with when the current one is busy (503) or its free quota is used up (429):
+    each model has its own quota. Prefers another plain Flash, then Flash-Lite, newest first. */
+ function backupModel(provider,ids,current){
+  if(provider!=='gemini')return '';
+  ids=(ids||[]).map(String).filter(id=>id!==current);
+  const ver=(id,re)=>{const m=re.exec(id);return m?parseFloat(m[1]):-1;};
+  const flash=/^gemini-(\d+(?:\.\d+)?)-flash$/,lite=/^gemini-(\d+(?:\.\d+)?)-flash-lite$/;
+  const by=re=>ids.filter(id=>ver(id,re)>=0).sort((a,b)=>ver(b,re)-ver(a,re));
+  return by(flash)[0]||(ids.includes('gemini-flash-latest')?'gemini-flash-latest':'')||by(lite)[0]||(ids.includes('gemini-flash-lite-latest')?'gemini-flash-lite-latest':'');
+ }
+ /* quick actions: prompts in Thai so answers come back in Thai */
+ function quick(kind,o){
+  o=o||{};const where=o.chapter?'บท '+o.chapter+(o.course?' วิชา '+o.course:''):(o.course?'วิชา '+o.course:'เรื่องที่ผมกำลังเรียน');
+  if(kind==='explain')return 'อธิบาย'+where+'ให้เข้าใจง่าย ๆ: ประเด็นหลัก สูตรหรือหลักการที่ต้องจำ และตัวอย่างสั้น ๆ 1 ข้อ';
+  if(kind==='quiz')return 'ตั้งคำถามปรนัย 4 ตัวเลือกจาก'+where+' ทีละข้อ รวม 5 ข้อ ถามข้อเดียวแล้วรอผมตอบก่อน แล้วค่อยเฉลยพร้อมเหตุผลและถามข้อต่อไป';
+  if(kind==='mistakes')return 'จุดที่นักศึกษามักทำผิดใน'+where+' มีอะไรบ้าง บอกวิธีจำหรือวิธีเช็กคำตอบให้ไม่พลาด';
+  if(kind==='plan'){const ex=(o.exams||[]).map(e=>'- '+e.name+': '+e.date+' (อีก '+e.days+' วัน)').join('\n');
+   return 'ช่วยจัดแผนอ่านหนังสือรายวันจนถึงวันสอบ ให้เหมาะกับเวลาที่เหลือ บอกว่าวันไหนควรอ่านบทไหนและทำแบบฝึกหัดอะไร'+(ex?'\nวันสอบของผม:\n'+ex:'');}
+  return '';
+ }
+ return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl,pickModel,backupModel,quick};
 });

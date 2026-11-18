@@ -1,0 +1,2 @@
+- AI tutor: when Google is busy (error 503) it waits and tries again twice, then answers once with another Gemini model (and says so); the same happens when one model's free quota is used up (429). Clearer error messages.
+- AI tutor: quick-ask buttons — Explain this chapter, Quiz me (5 questions, one at a time), Common mistakes, Study plan to my exams (uses your exam dates from Calendar).
