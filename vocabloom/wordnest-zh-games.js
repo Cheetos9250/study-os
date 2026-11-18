@@ -50,7 +50,8 @@
   ['meaning','💬','Meaning','See the characters, pick the meaning'],
   ['tones','〰️','Tones','Hear the word, pick the right tones'],
   ['type','⌨️','Type pinyin','Type the pinyin: nǐ hǎo or ni3 hao3'],
-  ['speak','🎤','Speak','Say the word; the iPad checks it']];
+  ['speak','🎤','Speak','Say the word; the iPad checks it'],
+  ['dictate','👂','Dictation','Hear the word, type its pinyin']];
  const ROUND=10,PAIRS=5;
  const G={mode:'',cat:'all',miss:false,items:[],i:0,answer:null,typed:'',heard:'',score:0,missed:[],board:null};
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -72,7 +73,7 @@
   const s=srs().s,now=Date.now();
   let all=words().filter(w=>G.cat==='all'||w.cat===G.cat);
   if(G.miss)all=all.filter(w=>isMiss(s[w.mid]));
-  if(mode==='tones'||mode==='type')all=all.filter(w=>PY_OK.test(nfd(w.py)));
+  if(mode==='tones'||mode==='type'||mode==='dictate')all=all.filter(w=>PY_OK.test(nfd(w.py)));
   const due=all.filter(w=>s[w.mid]&&Number(s[w.mid].due||0)<=now),fresh=all.filter(w=>!s[w.mid]),rest=all.filter(w=>s[w.mid]&&Number(s[w.mid].due||0)>now);
   return shuffle(due).concat(shuffle(fresh),shuffle(rest));                 // due words first, then new, then the rest
  }
@@ -103,17 +104,18 @@
  }
  const FIELD={listen:'hz',pinyin:'py',meaning:'mean',tones:'tone'};
  const rightOf=(mode,w)=>mode==='listen'?w.hz:mode==='pinyin'?w.py:mode==='tones'?w.py.trim().split(/\s+/).join(' '):meaning(w);
- function start(mode){
+ /* forced: a ready word list (Review weakest 10) instead of the chapter pool */
+ function start(mode,forced){
   G.mode=mode;G.i=0;G.answer=null;G.typed='';G.heard='';G.score=0;G.missed=[];G.board=null;
-  const list=pool(mode),all=words();
-  if(list.length<(mode==='match'?2:mode==='type'||mode==='speak'||mode==='tones'?1:4)){toast(G.miss?'No missed words here yet. Play the other games first.':'This chapter has too few words for this game');G.mode='';return;}
+  const list=Array.isArray(forced)&&forced.length?forced.filter(w=>mode!=='type'&&mode!=='dictate'&&mode!=='tones'||PY_OK.test(nfd(w.py))):pool(mode),all=words();
+  if(list.length<(mode==='match'?2:forced||mode==='type'||mode==='speak'||mode==='tones'||mode==='dictate'?1:4)){toast(G.miss?'No missed words here yet. Play the other games first.':'This chapter has too few words for this game');G.mode='';return;}
   if(mode==='match'){
    const pick=list.slice(0,PAIRS);
    G.board={left:shuffle(pick),right:shuffle(pick),sel:null,done:{},wrong:{},flash:null};
    G.items=pick;
   }else{
    G.items=list.slice(0,ROUND).map(w=>({w,opts:FIELD[mode]?options(w,FIELD[mode],all):[]}));
-   if(mode==='listen'||mode==='tones')setTimeout(()=>say(G.items[0].w.hz),250);
+   if(mode==='listen'||mode==='tones'||mode==='dictate')setTimeout(()=>say(G.items[0].w.hz),250);
   }
  }
  /* ---------- speech recognition (Speak game; Safari on iPad needs Dictation turned on) ---------- */
@@ -142,6 +144,7 @@
    +'<div class="u-cats" role="group" aria-label="Words"><button class="'+(G.miss?'':'on')+'" data-action="zg-miss" data-v="0" aria-pressed="'+!G.miss+'">All words</button><button class="'+(G.miss?'on':'')+'" data-action="zg-miss" data-v="1" aria-pressed="'+G.miss+'">Only my mistakes ('+miss+')</button>'
    +(miss?'<button data-action="ai-quiz" data-lang="zh">✦ AI quiz on my mistakes</button>':'')+'</div>'
    +'<p class="subheading">'+due+(due===1?' word':' words')+' due · due words come first, then new ones. A wrong answer brings the word back soon.</p>'
+   +(window.WordNestZhMenuExtra?WordNestZhMenuExtra():'')
    +'<div class="zg-modes">'+MODES.map(m=>'<button class="zg-mode" data-action="zg-start" data-mode="'+m[0]+'"><span class="zg-ic" aria-hidden="true">'+m[1]+'</span><b>'+m[2]+'</b><small>'+m[3]+'</small></button>').join('')+'</div>';
  }
  function matchHTML(){
@@ -155,16 +158,17 @@
  }
  function feedback(w,ok,extra){
   return '<div class="notice mt20" role="status"><b>'+(ok?'✓ Correct':'✗ Not quite')+'</b>'+(extra?'<p>'+extra+'</p>':'')+'<p><span lang="zh" class="zg-hzs">'+esc(w.hz)+'</span> · '+esc(w.py)+' · '+esc(meaning(w))+'</p>'
-   +'<div class="pill-row"><button class="btn btn-outline" data-action="zg-say">♫ Listen</button>'+aiBtn(w)+'<button class="btn btn-primary" data-action="zg-next">'+(G.i+1<G.items.length?'Next →':'See result →')+'</button></div></div>';
+   +(window.WordNestConfuse?WordNestConfuse.zhLine(w):'')+'<div class="pill-row"><button class="btn btn-outline" data-action="zg-say">♫ Listen</button>'+aiBtn(w)+'<button class="btn btn-primary" data-action="zg-next">'+(G.i+1<G.items.length?'Next →':'See result →')+'</button></div></div>';
  }
  function questionHTML(){
   const it=G.items[G.i],w=it.w,found=G.answer!==null,head='<div class="panel"><div class="panel-header"><span class="badge">'+(G.i+1)+' / '+G.items.length+'</span><span class="question-number">'+G.score+' correct</span></div>';
-  if(G.mode==='type'){
-   const ok=found&&G.answer===1,near=found&&!ok&&sameLetters(G.typed,w.py);
-   return head+'<div class="zg-q"><div class="zg-big" lang="zh">'+esc(w.hz)+'</div><p class="subheading">'+esc(meaning(w))+'</p></div>'
+  if(G.mode==='type'||G.mode==='dictate'){
+   const ok=found&&G.answer===1,near=found&&!ok&&sameLetters(G.typed,w.py),hide=G.mode==='dictate'&&!found;
+   const D=window.WordNestTools,typo=found&&!ok&&D?'<p class="wd-line">'+D.diffHTML(G.typed,w.py)+'</p>':'';
+   return head+'<div class="zg-q">'+(hide?'<button class="btn btn-primary btn-lg" data-action="zg-say">♫ Play again</button><p class="subheading mt10">Type the pinyin of the word you hear</p>':'<div class="zg-big" lang="zh">'+esc(w.hz)+'</div><p class="subheading">'+esc(meaning(w))+'</p>')+'</div>'
     +'<form class="zg-type" data-zg-form><label for="zgIn" class="subheading">Type the pinyin with tones (nǐ hǎo or ni3 hao3)</label><div class="pill-row"><input id="zgIn" class="answer-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="'+esc(G.typed)+'" '+(found?'disabled':'')+'>'
-    +(found?'':'<button class="btn btn-primary" type="submit">Check</button><button class="btn btn-outline" type="button" data-action="zg-say">♫ Hint</button>')+'</div></form>'
-    +(found?feedback(w,ok,ok?'':near?'Letters right, tones wrong. You typed '+esc(G.typed)+'.':'You typed '+esc(G.typed||'nothing')+'.'):'')+'</div>';
+    +(found?'':'<button class="btn btn-primary" type="submit">Check</button>'+(G.mode==='type'?'<button class="btn btn-outline" type="button" data-action="zg-say">♫ Hint</button>':''))+'</div></form>'
+    +(found?feedback(w,ok,ok?'':(near?'Letters right, tones wrong. You typed '+esc(G.typed)+'.':'You typed '+esc(G.typed||'nothing')+'.')+typo):'')+'</div>';
   }
   if(G.mode==='speak'){
    return head+'<div class="zg-q"><div class="zg-big" lang="zh">'+esc(w.hz)+'</div><p class="zg-py">'+esc(w.py)+'</p><p class="subheading">'+esc(meaning(w))+'</p>'
@@ -236,7 +240,7 @@
    if((G.mode!=='listen'&&G.mode!=='tones')||!ok)say(w.hz);
    paint();return true;
   }
-  if(a==='zg-next'){G.i++;G.answer=null;G.typed='';G.heard='';paint();const it=G.items[G.i];if((G.mode==='listen'||G.mode==='tones')&&it)setTimeout(()=>say(it.w.hz),200);return true;}
+  if(a==='zg-next'){G.i++;G.answer=null;G.typed='';G.heard='';paint();const it=G.items[G.i];if((G.mode==='listen'||G.mode==='tones'||G.mode==='dictate')&&it)setTimeout(()=>say(it.w.hz),200);return true;}
   if(a==='zg-left'){const b=G.board;b.sel=b.sel===el.dataset.id?null:el.dataset.id;b.flash=null;const w=b.left.find(x=>x.mid===b.sel);if(w)say(w.hz);paint();return true;}
   if(a==='zg-right'){
    const b=G.board;if(!b.sel){toast('Tap a word on the left first');return true;}
@@ -271,7 +275,7 @@
  render=function(){if(ui.page==='zhgames')return paint();return baseRender();};
  const baseHandle=handleAction;
  handleAction=function(el){if(String(el.dataset.action||'').startsWith('zg-')&&act(el))return;return baseHandle(el);};
- window.WordNestZhGames={words,options,start,state:G,record,check};
+ window.WordNestZhGames={words,options,start,state:G,record,check,meaning,isMiss,srs,paint,say,MODES};
  const q=new URLSearchParams(location.search),want=q.get('game');if(q.get('miss')==='1')G.miss=true;
  const open=()=>{ui.page='zhgames';if(want&&MODES.some(m=>m[0]===want))start(want);render();};
  if(want!==null){if(deck())open();else{let n=0;const t=setInterval(()=>{if(deck()||++n>40){clearInterval(t);open();}},250);}}

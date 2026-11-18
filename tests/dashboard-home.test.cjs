@@ -33,7 +33,9 @@ test('removed sections stay removed (no Quick Launch, no start/end checklists)',
 });
 test('home writes only its own key and the shared Today settings key',()=>{
  const writes=[...html.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]).sort();
- assert.deepEqual(writes,['BK_META','KEY','POMOLOG','POMO_KEY','SOUND_KEY','T.SETTINGS_KEY']);
+ assert.deepEqual(writes,['BK_META','KEY','POMOLOG','POMO_KEY','SOUND_KEY','T.SETTINGS_KEY','WN_KEY']);
+ // + New word: only appends one word to WordNest My words, keeping everything else in that key
+ assert.match(html,/WN_KEY='vocabloom_mvp_v1'/);assert.match(html,/v\.custom=custom\.concat\(\[/);
  assert.match(html,/SOUND_KEY='studyos\.pomosound\.v1'/);assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.pomosound.v1'));
  assert.match(html,/POMO_KEY='studyos\.pomo\.v1'/);assert.ok(!require('../scripts/study-progress-backup.js').keys.includes('studyos.pomo.v1'));
  assert.match(html,/BK_META='studyos\.backup-meta\.v1'/);
