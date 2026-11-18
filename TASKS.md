@@ -19,7 +19,7 @@ Status values: `todo`, `needs owner` (blocked on an owner decision), `done (#PR)
 
 ### 1. Economics: fiscal policy, monetary policy, growth (Thai: เพิ่มบทเศรษฐศาสตร์ที่ยังไม่มี)
 
-Status: todo
+Status: done (#170: Money & Banking, Fiscal and Monetary Policy chapters; more practice questions in #173)
 
 `eco.html` has no chapters on fiscal policy, monetary policy or growth & development. All three are in the final on 27 Nov (see Open items in `AGENTS.md`). For each chapter, add:
 - a summary;
@@ -30,7 +30,7 @@ Write all of it yourself; never copy textbook or test-bank text. Use new ids and
 
 ### 2. Excel: practice data file (Thai: ไฟล์ฝึกทำ dashboard)
 
-Status: todo
+Status: dropped (owner, 18 Nov 2026: not needed)
 
 On `excel.html`, add a **Download practice data** button that produces an .xlsx file built in the browser. The file has two sheets:
 - `Categories`: Subcategory, Category, Category Type.
@@ -40,7 +40,7 @@ Add a second practice set built on accounting data, for example a trial balance 
 
 ### 3. Accounting: timed mock final (Thai: ข้อสอบเสมือนจริงจับเวลา)
 
-Status: todo
+Status: done (#170: Mock exam page, timed, score per chapter)
 
 Add a **Mock final** mode to `acc.html`:
 - draws questions from Ch5–9 in proportion to the size of each chapter;
