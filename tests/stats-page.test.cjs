@@ -28,7 +28,7 @@ test('Pomodoro history is a new backed-up key with a label and restore validatio
  const s=read('index.html');
  assert.match(s,/function logPomo\(end,m,sub\)\{if\(m!==25\|\|!end\)return;/);
  assert.match(s,/if\(o\.lastEnd===end\)return;/,'one session counts once');
- assert.match(s,/logPomo\(endAt,m,psub\);left=0;stop\(\);/);assert.match(s,/else if\(s\.endAt\)\{logPomo\(s\.endAt,mins,psub\);/);
+ assert.match(s,/logPomo\(endAt,m,psub\);(?:if\(m===25&&window\.StudyTodayX\)StudyTodayX\.sessionDone\(psub,endAt\);)?left=0;stop\(\);/);assert.match(s,/else if\(s\.endAt\)\{logPomo\(s\.endAt,mins,psub\);/);
 });
 test('Stats page is linked from the nav footer and cached for offline use',()=>{
  assert.match(read('scripts/study-nav.js'),/\{href:'stats\.html',label:'Stats',icon:'stats'\}/);

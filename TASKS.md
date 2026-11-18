@@ -275,3 +275,37 @@ In "By subject and chapter": a **Practice weakest** button on chapters under 70%
 Status: done (#173)
 
 Switch the charts between 7 days, 30 days and all time; an editable weekly target (questions, Pomodoro minutes) on **This week** with a progress bar. The target is stored with `qgoal` in `studyos.home.v1` (validated on restore).
+
+---
+
+## H. Today page ideas, 18 Nov 2026 (Thai: ไอเดียหน้า Today)
+
+Already in place before this list: offline use (service worker, task 7), JSON back up / restore (Back up, Restore in the nav), exam countdowns, pinned formulas (task 15).
+
+### 32. Study time per subject on Today (Thai: เวลาอ่านแยกวิชา)
+
+Status: done (#174)
+
+### 33. Session log after a Pomodoro (Thai: บันทึกหลังจบรอบ)
+
+Status: done (#174)
+
+### 34. Formulas drawer (Thai: แผงสูตรด่วน)
+
+Status: done (#174)
+
+### 35. Quick words during breaks (Thai: ทวนศัพท์ตอนพัก)
+
+Status: done (#174)
+
+### 36. Keyboard shortcuts on Today (Thai: คีย์ลัด)
+
+Status: done (#174)
+
+### 37. Exam colours: amber under 14 days, red under 5 (Thai: สีเตือนวันสอบ)
+
+Status: done (#174)
+
+### 38. Repeating tasks (Thai: งานที่ทำซ้ำ)
+
+Status: done (#174)

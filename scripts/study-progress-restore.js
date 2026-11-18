@@ -56,7 +56,7 @@
       for (var t of (value.tasks || [])) {
         if (!object(t) || typeof t.id !== "string" || typeof t.title !== "string" || t.title.length > 80 ||
             !/^\d{4}-\d{2}-\d{2}$/.test(String(t.date)) || !["High", "Medium", "Low"].includes(t.pri) ||
-            (t.done !== undefined && typeof t.done !== "boolean"))
+            (t.done !== undefined && typeof t.done !== "boolean") || (t.rep !== undefined && t.rep !== "d" && t.rep !== "w"))
           throw new Error("Invalid home dashboard task");
         if ((t.link !== undefined && (typeof t.link !== "string" || t.link.length > 500 || !/^https:\/\/classroom\.google\.com\/[^\s"'<>]*$/.test(t.link))) ||
             (t.src !== undefined && t.src !== "classroom"))
@@ -121,6 +121,14 @@
       for (var pd of Object.keys(value.days))
         if (!/^\d{4}-\d{2}-\d{2}$/.test(pd) || !Number.isFinite(value.days[pd]) || value.days[pd] < 0 || value.days[pd] > 1440)
           throw new Error("Invalid Pomodoro history");
+      if (value.logs !== undefined) {
+        if (!object(value.logs)) throw new Error("Invalid Pomodoro history");
+        for (var ld of Object.keys(value.logs)) {
+          var ll = value.logs[ld];
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(ld) || !Array.isArray(ll) || ll.length > 40 || !ll.every(function (x) { return object(x) && Number.isFinite(x.t) && typeof x.n === "string" && x.n.length <= 200 && (x.s === undefined || /^[a-z]{2,8}$/.test(x.s)); }))
+            throw new Error("Invalid Pomodoro history");
+        }
+      }
       if (value.bySub !== undefined) {
         if (!object(value.bySub)) throw new Error("Invalid Pomodoro history");
         for (var bd of Object.keys(value.bySub)) {

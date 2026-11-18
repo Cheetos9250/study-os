@@ -1,0 +1,4 @@
+- **Today**: Study time this week per subject (from Pomodoro subjects); after a 25-minute Pomodoro, "What did you finish?" saves a short session log; **Formulas** drawer with your pinned formulas plus accounting and Excel basics (VLOOKUP, XLOOKUP, INDEX/MATCH, SUMIFS…); **Quick words** shows 5 English words to flip, and opens by itself when a break starts.
+- **Keyboard shortcuts on Today**: Space start/pause the Pomodoro, N new task, F formulas, W quick words, ? help.
+- **Exams** turn amber under 14 days and red under 5.
+- **Repeating tasks**: choose Daily or Weekly when adding a task; ticking it adds the next one (↻).
