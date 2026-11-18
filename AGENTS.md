@@ -45,7 +45,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 | `hub.html` | **Lessons**: subject → chapters → Lesson / Cards / Practice / Notes. |
 | `calendar.html` | Month view, weekly **timetable** (edit + import), **exam schedule** editor. |
 | `mock.html` | **Mock exam** (Practice → More practice; Today's final-review task): timed random questions from the exam chapters (acc/eco/math `D.quiz`), score per chapter, missed list. Saves answers to `study-<course>` (`ans`/`ats`) like practice; a running exam is kept in sessionStorage `studyos.mock.v1`. |
-| `stats.html` | **Stats** (nav footer): streak, 30-day answers and Pomodoro charts, WordNest words per day (goal streak from `scripts/study-wordnest.js`), accuracy per subject/chapter. Read-only; helpers in `scripts/study-stats.js`. |
+| `stats.html` | **Stats** (nav footer): streak, 30-day answers and Pomodoro charts, WordNest words per day (goal streak from `scripts/study-wordnest.js`), accuracy per subject/chapter. Read-only; helpers in `scripts/study-stats.js`.  Also a study heatmap, **This week** vs last week and **Badges** (all computed from existing data, `scripts/study-motivation.js`). |
 | `tutor.html` | **AI tutor** (nav footer, 18 Nov 2026): chat with Gemini (Google AI Studio key) or any OpenAI-compatible API such as Hermes on OpenRouter/Nous, called straight from the browser with the owner's own key. Subject + chapter adds that chapter's summary from `data/courses/<course>.js` to the system prompt; replies render with `StudySosMd` (tables for journal entries); photos are sent inline. Deep link `?course=&cat=&q=` fills the box only. Helpers: `scripts/study-tutor.js`. |
 | `classroom.html` | **Classroom import** (link on Today → Tasks): Google Identity Services token client with the owner's own OAuth client ID (public id, saved on the device), read-only Classroom scopes, adds chosen assignments to `studyos.home.v1` tasks as `gc-<courseWorkId>` with `src:'classroom'` and `link` (validated on restore: classroom.google.com only). The access token is memory only. Helpers: `scripts/study-classroom.js`. |
 | `grades.html` | Weighted course items, letter per course scale, "needed on the rest", estimated GPA. |
@@ -73,7 +73,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 |---|---|
 | `<mark>-srs`, `<mark>-typ` | Flashcard SRS. Marks: `acc-flashcards-v1`, `econ-flashcards-v1`, `math-flashcards-v1`, `eng-vocab-v1`, `zh-vocab-v1`. |
 | `study-<course>` | Quiz answers (`ans`, `ats`) and the quiz review schedule `rv` (`id → [box, dueMs]`, `scripts/study-review.js`; gaps 1/3/7/14/30/90 days, box ≥ 4 = retired). |
-| `studyos.home.v1` | Owner tasks, cover, icon, card images. |
+| `studyos.home.v1` | Owner tasks, cover, icon, card images, and `qgoal` (daily practice goal, 1–200 questions; Today goal card, `scripts/study-motivation.js`). |
 | `studyos.today.v1` | Exams, plan ticks, timetable. `markChapter` must keep the other fields. |
 | `studyos.grades.v1` | Grades. |
 | `studyos.notes.v1` | Lesson notes (`<course>:<chapter>` → text). `<course>:pins` holds the pinned formulas (one per line, `title :: formula`, `scripts/study-pins.js`); lines `question :: answer` in any note are note cards (Notes panel **Cards**, Cram Mode). |

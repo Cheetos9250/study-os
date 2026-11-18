@@ -113,6 +113,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .cont .cd{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:112px;max-width:42%;padding-left:14px;border-left:2.5px solid var(--ink);text-align:center}
 .cont .cd .n{font:700 46px/1 var(--num,serif);font-variant-numeric:tabular-nums}.cont .cd.hot .n{color:var(--red)}
 .cont .cd .l{font-size:12.5px;font-weight:700;line-height:1.3;margin-top:4px}
+/* practice goal (scripts/study-motivation.js) */
+.qg .qgo{flex:none;display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:120px;padding-left:14px;border-left:2.5px solid var(--ink)}
+.qg .qgo a,.qg .qgo button{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:2px solid var(--ink);border-radius:var(--r-s);background:var(--panel);color:inherit;font:700 14px var(--ui);text-decoration:none;cursor:pointer}
+.qg .qgo a{background:var(--ink);color:var(--accent-ink)}
+.qg.met .bar i{background:var(--ok,#1c7c4a)}
+@media(max-width:560px){.qg{flex-wrap:wrap}.qg .qgo{flex-direction:row;border-left:0;padding-left:0;width:100%}.qg .qgo>*{flex:1}}
 /* WordNest daily goal (scripts/study-wordnest.js) */
 .wng{display:flex;align-items:center;gap:14px;margin:12px 0 0;padding:12px 18px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel);color:inherit;text-decoration:none;min-height:44px}
 .wng[hidden]{display:none}.wng:focus-visible{outline:3px solid var(--focus,#2f6bff);outline-offset:3px}
@@ -222,6 +228,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <div class="chips scoreboard" id="chips" aria-label="Scoreboard"></div>
 <main>
 <a class="cont" id="continue" hidden></a>
+<div class="wng qg" id="qGoal" hidden></div>
 <a class="wng" id="wordGoal" hidden></a>
 <h2>Today</h2>
 <div class="classes" id="classes" aria-label="Classes today"></div>
@@ -254,6 +261,8 @@ a.sb:hover{background:var(--dots),var(--panel)}
 </main>
 </div>
 <script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-stats.js?v=1"></script>
+<script src="scripts/study-motivation.js?v=1"></script>
 <script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=3"></script>
@@ -538,7 +547,18 @@ function renderWordGoal(){
   +'<span class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></span></span>'
   +'<span class="wdue" aria-hidden="true"><span class="n">'+g.due+'</span><span class="l">due '+(g.due===1?'word':'words')+' →</span></span>';
 }
-function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderContinue();renderWordGoal();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
+/* ---------- practice goal: questions answered today (any subject) vs the owner's goal, saved as qgoal in studyos.home.v1 ---------- */
+function renderPracticeGoal(){
+ const el=$('#qGoal'),M=window.StudyMotivation;if(!el||!M||!window.StudyStats)return;
+ const per=StudyStats.answersPerDay(T.COURSES.map(c=>read('study-'+c.key))),now=Date.now(),today=M.dayKey(now),done=per[today]||0,g=M.goal(st.qgoal),met=done>=g,streak=M.goalStreak(per,g,now);
+ const pct=Math.min(100,Math.round(done/g*100));
+ el.hidden=false;el.classList.toggle('met',met);
+ el.innerHTML='<span class="wt"><span class="k">Practice'+(met?' · goal met':' · daily goal')+(streak?' · '+streak+'-day streak':'')+'</span><b>'+done+' / '+g+' questions today</b>'
+  +'<span class="q">'+(met?'Goal met. Every extra question still helps.':(g-done)+' more to reach your goal.')+'</span><span class="bar" role="img" aria-label="'+done+' of '+g+' questions"><i style="width:'+pct+'%"></i></span></span>'
+  +'<span class="qgo"><a href="practice.html">Practice →</a><button type="button" id="qGoalSet" aria-label="Daily goal: '+g+' questions. Change">Goal: '+g+'</button></span>';
+ $('#qGoalSet').onclick=()=>{st.qgoal=M.nextGoal(g);save();renderPracticeGoal();};
+}
+function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderContinue();renderPracticeGoal();renderWordGoal();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
 renderAll();
 Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
 Promise.all(T.LANGS.map(l=>fetch(l.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});

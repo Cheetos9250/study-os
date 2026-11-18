@@ -192,25 +192,25 @@ My PDF sets opens each PDF at the page last viewed on this device.
 
 ### 19. Daily goal bar on Today (Thai: หลอดเป้าหมายรายวัน)
 
-Status: todo
+Status: done (#171)
 
 A small daily goal (e.g. 5 practice questions + 10 WordNest words) with a progress bar that fills as you study. #169 added a WordNest daily goal; extend it to practice questions.
 
 ### 20. Study heatmap (Thai: ปฏิทินความสม่ำเสมอ)
 
-Status: todo
+Status: done (#171)
 
 GitHub-style coloured squares on Stats: questions answered per day for the last months.
 
 ### 21. Badges and milestones (Thai: เหรียญรางวัล)
 
-Status: todo
+Status: done (#171)
 
 Unlock badges, e.g. first 100 accounting questions, a 7-day streak, a full chapter retired. Computed from existing data where possible.
 
 ### 22. Weekly summary (Thai: สรุปรายสัปดาห์)
 
-Status: todo
+Status: done (#171)
 
 On Stats: this week's questions, accuracy change per subject, and chapters that did not improve.
 
