@@ -258,7 +258,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=5"></script>
-<script src="scripts/study-wordnest.js?v=1"></script>
+<script src="scripts/study-wordnest.js?v=2"></script>
 <script src="scripts/study-nav.js?v=11"></script>
 <script>
 (function(){
@@ -387,6 +387,9 @@ function renderPlan(){
   if(t.kind==='quiz')acts='<a class="main" href="'+link(t.top,'prac')+'&review=1">Start review</a>';
   else if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
   else if(c&&t.kind==='chapter')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="pdf-sets.html?book=1&ch='+t.cat.slice(1)+'">Textbook</a>':'');
+  else if(c&&t.kind==='missed')acts='<a class="main" href="'+link(c,'prac',t.cats.join(','))+'&missed=1">Redo missed</a>';
+  else if(c&&t.kind==='weak')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>';
+  else if(c&&t.kind==='final')acts=(FOCUS?'':'<a href="'+link(c,'sum')+'">Summaries</a>')+'<a class="main" href="'+link(c,'prac',(t.cats||[]).join(','))+'">Practice</a><a href="mock.html?course='+c.key+'">Mock exam</a>';
   else if(c)acts='<a class="main" href="'+link(c,'prac')+'">Practice</a>';
   return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
   :'<p class="empty">Nothing planned. Free time? Go to Practice.</p>';
@@ -529,8 +532,8 @@ function renderWordGoal(){
  el.hidden=false;el.classList.toggle('met',g.met);
  el.href=g.dueZh>g.dueEn?'vocabloom/?lang=zh':'vocabloom/?lang=en';
  const parts=[];if(g.dueEn)parts.push(g.dueEn+' English');if(g.dueZh)parts.push(g.dueZh+' Chinese');
- el.setAttribute('aria-label','WordNest: '+g.done+' of '+g.goal+' words reviewed today'+(g.met?', goal met':'')+'. '+g.due+' words due.');
- el.innerHTML='<span class="wt"><span class="k">WordNest'+(g.met?' · goal met':' · daily goal')+'</span><b>'+g.done+' / '+g.goal+' words today</b>'
+ el.setAttribute('aria-label','WordNest: '+g.done+' of '+g.goal+' words reviewed today'+(g.met?', goal met':'')+(g.streak?', '+g.streak+'-day streak':'')+'. '+g.due+' words due.');
+ el.innerHTML='<span class="wt"><span class="k">WordNest'+(g.met?' · goal met':' · daily goal')+(g.streak?' · '+g.streak+'-day streak':'')+'</span><b>'+g.done+' / '+g.goal+' words today</b>'
   +'<span class="q">'+(g.met?'Done for today. Extra reviews still help.':left+' more to reach your goal.')+(parts.length?' Due now: '+esc(parts.join(' · '))+'.':' Nothing due.')+'</span>'
   +'<span class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></span></span>'
   +'<span class="wdue" aria-hidden="true"><span class="n">'+g.due+'</span><span class="l">due '+(g.due===1?'word':'words')+' →</span></span>';

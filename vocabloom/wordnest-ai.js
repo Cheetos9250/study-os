@@ -63,6 +63,10 @@
    if(b.classList.contains('btn')){x.className='btn btn-outline';x.textContent='✦ Ask AI';}else{x.className=b.className;x.textContent='AI';x.setAttribute('aria-label','Ask AI about this word');x.title='Ask AI';}
    b.after(x);
   });
+  if(LANG==='en'&&typeof ui==='object'&&ui.page==='practice'&&!ui.game&&!root.querySelector('[data-action="ai-quiz"]')){
+   const sel=root.querySelector('.games-selection');
+   if(sel){const p=document.createElement('div');p.className='pill-row mt20';p.innerHTML='<button class="btn btn-outline" data-action="ai-quiz" data-lang="en">✦ AI quiz on my mistakes</button>';sel.after(p);}
+  }
   const sp=root.querySelector('[data-action="u-speak"]');
   if(sp&&!(sp.nextElementSibling&&sp.nextElementSibling.dataset.action==='ai-card')){
    const x=document.createElement('button');x.type='button';x.className='btn btn-outline mt20';x.dataset.action='ai-card';x.textContent='✦ Ask AI';sp.after(x);

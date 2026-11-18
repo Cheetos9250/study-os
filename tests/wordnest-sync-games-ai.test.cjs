@@ -2,18 +2,19 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const W=require('../scripts/study-wordnest.js');
 
-test('WordNest daily goal: English answers today + Chinese cards reviewed today, due cards only, sync shadows skipped',()=>{
+test('WordNest daily goal: answers today vs goal, streak, due cards only, sync shadows skipped',()=>{
  const now=Date.parse('2026-11-18T10:00:00+07:00'),day=W.dayKey(now);
  assert.equal(day,'2026-11-18');
- const vocab={settings:{goal:8},progress:{apple:{seen:true}},days:{[day]:{answered:5},'2026-11-17':{answered:40}}};
+ const vocab={settings:{goal:8},progress:{apple:{seen:true}},days:{[day]:{answered:5},'2026-11-17':{answered:40},'2026-11-16':{answered:8},'2026-11-15':{answered:3}}};
  const eng={s:{'e1-1':{due:now-1,ts:now-5e8},'e1-2':{due:now+864e5,ts:now-1000},'vb/v1/word/apple':{kind:'word',ts:now,due:0}}};
- const zh={s:{'zr-1':{due:now-1,ts:now-60000},'zr-2':{due:now+1e6,ts:now-3*36e5},'zr-3':{due:now+1e6,ts:now-2*864e5}}};
+ const zh={s:{'zr-1':{due:now-1,ts:now-60000},'zr-2':{due:now+1e6,ts:now-3*36e5}}};
  const g=W.daily(vocab,JSON.stringify(eng),zh,now);
- assert.deepEqual([g.goal,g.en,g.zh,g.done,g.met],[8,5,2,7,false]);
+ assert.deepEqual([g.goal,g.done,g.met,g.streak],[8,5,false,2],'today still open: streak counts from yesterday');
  assert.deepEqual([g.dueEn,g.dueZh,g.due],[1,1,2],'vb/ shadow entries are not cards');
+ vocab.days[day].answered=9;assert.deepEqual([W.daily(vocab,eng,zh,now).met,W.daily(vocab,eng,zh,now).streak],[true,3]);
  assert.equal(W.daily({},null,null,now).goal,10,'default goal');
  assert.equal(W.daily({},null,null,now).started,false,'hidden before WordNest is used');
- assert.equal(W.daily(vocab,eng,{s:{a:{ts:now},b:{ts:now},c:{ts:now}}},now).met,true);
+ assert.equal(W.daily('not json',null,null,now).done,0);
 });
 
 test('Today shows the WordNest goal card and loads the read-only helper',()=>{

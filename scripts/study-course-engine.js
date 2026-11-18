@@ -16,6 +16,8 @@ let store = {known:[], ans:{}};
 try{ const r = localStorage.getItem(KEY); if(r) store = Object.assign(store, JSON.parse(r)); }catch(e){}
 const save = () => { progressWrites.write(KEY,JSON.stringify(store)); window.__xs&&window.__xs.dirty(); };
 const CATS = D.cats; // [[id,label],...]
+/* links from Today: ?cat=<id>[,<id>…] opens those chapters, &missed=1 shows only missed questions */
+const URL_CATS=(()=>{try{return (new URLSearchParams(location.search).get('cat')||'').split(',').filter(id=>id&&D.cats.some(c=>c[0]===id));}catch(e){return [];}})();
 const catLabel = id => (CATS.find(c=>c[0]===id)||[0,id])[1];
 
 function chipRow(box, sel, onPick, countFn){
@@ -36,7 +38,7 @@ try{ const r=JSON.parse(localStorage.getItem(D.markKey+'-srs')||'{}'); srs=r.s||
 const saveS=()=>{ progressWrites.write(D.markKey+'-srs',JSON.stringify({s:srs,m:meta,lim:NEWLIM})); window.__xs&&window.__xs.dirty(); };
 const chkDay=()=>{ const d=sod(Date.now()); if(meta.day!==d){ meta.day=d; meta.newDone=0; } };
 const CARDS = D.cards.map((c,i)=>({id:i,cat:c[0],f:c[1],b:c[2],ref:c[3]||'',mid:c[4],tp:c[5],tb:c[6],ans:c[7]}));
-let fcat='all', dirBack=false, cur=null, shown=false;
+let fcat=URL_CATS.length===1?URL_CATS[0]:'all', dirBack=false, cur=null, shown=false;
 const LEARN=[1,10];
 const CAN_TYPE=!!D.typing; let TYPING=CAN_YES();
 function CAN_YES(){ if(!D.typing) return false; try{ return localStorage.getItem(D.markKey+'-typ')!=='0'; }catch(e){ return true; } }
@@ -132,7 +134,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ---------- summary ---------- */
-let scat='all';
+let scat=URL_CATS.length===1?URL_CATS[0]:'all';
 function renderSum(){
   chipRow($('#sumCats'), scat, id=>{scat=id;renderSum()}, id=>id==='all'?D.sum.length:D.sum.filter(s=>s.cat===id).length);
   $('#sumBody').innerHTML = D.sum.filter(s=>scat==='all'||s.cat===scat).map(s=>{
@@ -187,7 +189,8 @@ function tbSave(id,text){ try{ const raw=localStorage.getItem(TBP_KEY); const p=
 const QTYPE_KEY='studyos.'+D.key+'.qtype';
 let qtype=(()=>{if(!OPT.written)return 'all';try{const u=new URLSearchParams(location.search);const v=u.get('type')||(u.get('q')?'all':sessionStorage.getItem(QTYPE_KEY));return v==='mcq'||v==='written'?v:'all';}catch(e){return 'all';}})();
 const typeOk=q=>qtype==='all'||(qtype==='written'?!!q.open:!q.open);
-let qcats=new Set(), missedOnly=false, unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
+let qcats=new Set(), missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
+URL_CATS.forEach(id=>qcats.add(id));
 function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; deck=QS.filter(q=>typeOk(q)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }

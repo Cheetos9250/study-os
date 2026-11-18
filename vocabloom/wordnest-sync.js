@@ -28,7 +28,28 @@
   if(typeof cApplyShadows!=='function')return;
   try{cApplyShadows(readSrs().s||{});}catch{}
  }
- window.WordNestSync={persist,pull};
+ /* one WordNest answer that is not an English word game (Chinese games and cards): counts toward the day like English
+    answers do (data.days for this device's view, and the per-device day log that syncs) */
+ function count(correct,id){
+  if(typeof dayData!=='function'||typeof today!=='function')return;
+  const d=dayData();d.answered=(Number(d.answered)||0)+1;if(correct)d.correct=(Number(d.correct)||0)+1;
+  d.ids=Array.isArray(d.ids)?d.ids:[];if(id&&!d.ids.includes(id))d.ids.push(id);
+  data.days[today()]=d;if(typeof store==='function')store();
+  if(typeof cLocalRecord==='function')cLocalRecord(id||null,correct);
+  if(typeof updateChrome==='function')updateChrome();
+  if(typeof cCloudDebounce==='function')cCloudDebounce();
+ }
+ window.WordNestSync={persist,pull,count};
+ // Chinese flashcards rated in WordNest count too
+ if(typeof uRate==='function'){
+  const baseRate=uRate;
+  uRate=function(d,rating){
+   const c=d&&d.key==='zh'&&typeof uCurrent==='function'?uCurrent(d):null,before=c&&uReadSrs(d).s[c.mid]?Number(uReadSrs(d).s[c.mid].ts||0):0;
+   const r=baseRate.apply(this,arguments);
+   if(c&&Number((uReadSrs(d).s[c.mid]||{}).ts||0)>before)count(Number(rating)>=3,'zh:'+c.mid);
+   return r;
+  };
+ }
 
  // The old WordNest writer never runs on its own any more.
  if(typeof CLOUD==='object'){CLOUD.enabled=false;clearTimeout(CLOUD.timer);}

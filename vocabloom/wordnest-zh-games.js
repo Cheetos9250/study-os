@@ -1,18 +1,58 @@
-/* WordNest Chinese games (?lang=zh): Match, Listen, Pinyin and Meaning over the 279 Chinese flashcards.
+/* WordNest Chinese games (?lang=zh): Match, Listen, Pinyin, Meaning, Tones, Type pinyin and Speak over the 279 Chinese
+   flashcards, for all words or only the ones I keep missing.
    Progress goes into the Chinese flashcard schedule (zh-vocab-v1-srs, already backed up and synced):
    - a wrong answer counts as "Again" (the word comes back soon);
    - a right answer on a word that is due or new counts as "Good"; a right answer on a word that is not due yet changes nothing.
-   No new storage keys. Deep link: vocabloom/?lang=zh&game=match|listen|pinyin|meaning */
+   No new storage keys. Deep link: vocabloom/?lang=zh&game=match|listen|pinyin|meaning|tones|type|speak[&miss=1] */
 'use strict';
 (function(){
+ /* ---------- pinyin helpers (also used by tests) ---------- */
+ const MARK={'\u0304':1,'\u0301':2,'\u030c':3,'\u0300':4};
+ const TONE_MARK=['','\u0304','\u0301','\u030c','\u0300'];
+ const PY_OK=/^[a-zü'\s\u0300\u0301\u0304\u030c\u0308]+$/i;
+ const nfd=s=>String(s||'').normalize('NFD');
+ function toneless(py){return nfd(py).replace(/[\u0300\u0301\u0304\u030c]/g,'').normalize('NFC');}
+ function toneOf(syl){for(const ch of nfd(syl))if(MARK[ch])return MARK[ch];return 5;}
+ /* put tone 1–5 on a toneless syllable: a/e first, then o in "ou", else the last vowel */
+ function withTone(syl,t){
+  const base=toneless(syl).replace(/v|u:/g,'ü');if(t<1||t>4)return base;
+  let i=base.search(/[ae]/i);if(i<0)i=base.toLowerCase().indexOf('ou');
+  if(i<0){const m=[...base.matchAll(/[iouü]/gi)];if(!m.length)return base;i=m[m.length-1].index;}
+  return nfd(base.slice(0,i+1)).concat(TONE_MARK[t]).normalize('NFC')+base.slice(i+1);
+ }
+ /* "ni3 hao3", "ni3hao3", "nǐ hǎo", "Ni Hao" → "nǐhǎo" / "nihao" (lower case, no spaces) */
+ function normPy(s){
+  s=String(s||'').toLowerCase().trim().replace(/u:|v/g,'ü').normalize('NFC');
+  s=s.replace(/([a-zü\u0300-\u036f]+)([1-5])/g,(m,syl,d)=>withTone(syl,+d));
+  return s.replace(/[\s'’\-]/g,'').normalize('NFC');
+ }
+ function sameLetters(a,b){return toneless(normPy(a))===toneless(normPy(b));}
+ /* up to 4 tone-marked spellings: the right one and others with different tones */
+ function toneOptions(py,rnd=Math.random){
+  const syl=String(py).trim().split(/\s+/),out=[syl.join(' ')],seen=new Set(out);let guard=0;
+  while(out.length<4&&guard++<60){
+   const v=syl.map(s=>s),k=Math.floor(rnd()*v.length),t=toneOf(v[k]);
+   let n=1+Math.floor(rnd()*4);if(n===t)n=n%4+1;v[k]=withTone(v[k],n);
+   if(syl.length>1&&rnd()<.4){const k2=Math.floor(rnd()*v.length);if(k2!==k)v[k2]=withTone(v[k2],1+Math.floor(rnd()*4));}
+   const s=v.join(' ');if(!seen.has(s)){seen.add(s);out.push(s);}
+  }
+  return out;
+ }
+ const PY={toneless,toneOf,withTone,normPy,sameLetters,toneOptions};
+ if(typeof module==='object'&&module.exports){module.exports=PY;return;}
+ window.WordNestPinyin=PY;
  if(!window.WORDNEST||WORDNEST.lang!=='zh')return;
+
  const MODES=[
   ['match','🧩','Match','Pair each word with its meaning'],
   ['listen','🎧','Listen','Hear the word, pick the characters'],
   ['pinyin','🔤','Pinyin','See the characters, pick the pinyin'],
-  ['meaning','💬','Meaning','See the characters, pick the meaning']];
+  ['meaning','💬','Meaning','See the characters, pick the meaning'],
+  ['tones','〰️','Tones','Hear the word, pick the right tones'],
+  ['type','⌨️','Type pinyin','Type the pinyin: nǐ hǎo or ni3 hao3'],
+  ['speak','🎤','Speak','Say the word; the iPad checks it']];
  const ROUND=10,PAIRS=5;
- const G={mode:'',cat:'all',items:[],i:0,answer:null,score:0,missed:[],board:null};
+ const G={mode:'',cat:'all',miss:false,items:[],i:0,answer:null,typed:'',heard:'',score:0,missed:[],board:null};
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
  function deck(){return typeof uDeck==='function'?uDeck('zh'):null;}
@@ -27,13 +67,18 @@
  }
  const meaning=w=>w.th+(w.en&&w.en!==w.th?' · '+w.en:'');
  function srs(){return uReadSrs(deck());}
- function pool(){
-  const all=words().filter(w=>G.cat==='all'||w.cat===G.cat),s=srs().s,now=Date.now();
+ const isMiss=v=>!!v&&(Number(v.lapses)>0||Number(v.last)===1);
+ function pool(mode){
+  const s=srs().s,now=Date.now();
+  let all=words().filter(w=>G.cat==='all'||w.cat===G.cat);
+  if(G.miss)all=all.filter(w=>isMiss(s[w.mid]));
+  if(mode==='tones'||mode==='type')all=all.filter(w=>PY_OK.test(nfd(w.py)));
   const due=all.filter(w=>s[w.mid]&&Number(s[w.mid].due||0)<=now),fresh=all.filter(w=>!s[w.mid]),rest=all.filter(w=>s[w.mid]&&Number(s[w.mid].due||0)>now);
   return shuffle(due).concat(shuffle(fresh),shuffle(rest));                 // due words first, then new, then the rest
  }
  /* record one answer in the Chinese schedule */
  function record(w,correct){
+  if(window.WordNestSync)WordNestSync.count(correct,'zh:'+w.mid);                 // every answer counts toward the daily goal
   const d=deck();if(!d||typeof uSchedule!=='function')return;
   const p=uReadSrs(d),cur=p.s[w.mid],now=Date.now(),isDue=!cur||Number(cur.due||0)<=now;
   if(correct&&!isDue)return;
@@ -50,29 +95,52 @@
   speechSynthesis.speak(u);
  }
  function options(w,field,list){
+  if(field==='tone')return shuffle(toneOptions(w.py));
   const val=x=>field==='mean'?meaning(x):x[field];
   const same=shuffle(list.filter(x=>x.cat===w.cat)),other=shuffle(list.filter(x=>x.cat!==w.cat)),out=[val(w)],seen=new Set(out);
   for(const x of same.concat(other)){if(out.length>=4)break;const v=val(x);if(!v||seen.has(v)||x.hz===w.hz)continue;seen.add(v);out.push(v);}
   return shuffle(out);
  }
+ const FIELD={listen:'hz',pinyin:'py',meaning:'mean',tones:'tone'};
+ const rightOf=(mode,w)=>mode==='listen'?w.hz:mode==='pinyin'?w.py:mode==='tones'?w.py.trim().split(/\s+/).join(' '):meaning(w);
  function start(mode){
-  G.mode=mode;G.i=0;G.answer=null;G.score=0;G.missed=[];G.board=null;
-  const list=pool(),all=words();
-  if(list.length<4){toast('This chapter has too few words for a game');G.mode='';return;}
+  G.mode=mode;G.i=0;G.answer=null;G.typed='';G.heard='';G.score=0;G.missed=[];G.board=null;
+  const list=pool(mode),all=words();
+  if(list.length<(mode==='match'?2:mode==='type'||mode==='speak'||mode==='tones'?1:4)){toast(G.miss?'No missed words here yet. Play the other games first.':'This chapter has too few words for this game');G.mode='';return;}
   if(mode==='match'){
    const pick=list.slice(0,PAIRS);
    G.board={left:shuffle(pick),right:shuffle(pick),sel:null,done:{},wrong:{},flash:null};
    G.items=pick;
   }else{
-   G.items=list.slice(0,ROUND).map(w=>({w,opts:options(w,mode==='listen'?'hz':mode==='pinyin'?'py':'mean',all)}));
-   if(mode==='listen')setTimeout(()=>say(G.items[0].w.hz),250);
+   G.items=list.slice(0,ROUND).map(w=>({w,opts:FIELD[mode]?options(w,FIELD[mode],all):[]}));
+   if(mode==='listen'||mode==='tones')setTimeout(()=>say(G.items[0].w.hz),250);
   }
  }
+ /* ---------- speech recognition (Speak game; Safari on iPad needs Dictation turned on) ---------- */
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ let rec=null;
+ function hear(lang){
+  return new Promise((ok,fail)=>{
+   if(!SR){fail(Error('Speech recognition is not available in this browser'));return;}
+   try{if(rec)rec.abort();}catch{}
+   rec=new SR();rec.lang=lang;rec.interimResults=false;rec.maxAlternatives=5;
+   let done=false;
+   rec.onresult=e=>{done=true;const r=e.results[0];ok([...r].map(a=>a.transcript));};
+   rec.onerror=e=>{done=true;fail(Error(e.error==='not-allowed'?'Microphone blocked: allow it in Settings → Safari → Microphone':e.error==='no-speech'?'No speech heard. Try again.':'Could not listen ('+e.error+')'));};
+   rec.onend=()=>{if(!done)fail(Error('No speech heard. Try again.'));};
+   rec.start();
+  });
+ }
+ const cleanZh=s=>String(s||'').replace(/[\s。，！？、.,!?]/g,'');
+ window.WordNestHear=hear;
+ /* ---------- screens ---------- */
  function aiBtn(w){return '<button class="btn btn-outline" data-action="ai-word" data-lang="zh" data-term="'+esc(w.hz)+'" data-mean="'+esc(w.py+' · '+meaning(w))+'">✦ Ask AI</button>';}
  function menuHTML(){
-  const d=deck(),all=words(),s=srs().s,now=Date.now(),due=all.filter(w=>s[w.mid]&&Number(s[w.mid].due||0)<=now).length;
+  const d=deck(),all=words(),s=srs().s,now=Date.now(),due=all.filter(w=>s[w.mid]&&Number(s[w.mid].due||0)<=now).length,miss=all.filter(w=>isMiss(s[w.mid])).length;
   return '<div class="u-cats" role="group" aria-label="Chapter"><button class="'+(G.cat==='all'?'on':'')+'" data-action="zg-cat" data-cat="all">All ('+all.length+')</button>'
    +(d?d.cats.map(c=>'<button class="'+(G.cat===c[0]?'on':'')+'" data-action="zg-cat" data-cat="'+esc(c[0])+'">'+esc(c[1])+'</button>').join(''):'')+'</div>'
+   +'<div class="u-cats" role="group" aria-label="Words"><button class="'+(G.miss?'':'on')+'" data-action="zg-miss" data-v="0" aria-pressed="'+!G.miss+'">All words</button><button class="'+(G.miss?'on':'')+'" data-action="zg-miss" data-v="1" aria-pressed="'+G.miss+'">Only my mistakes ('+miss+')</button>'
+   +(miss?'<button data-action="ai-quiz" data-lang="zh">✦ AI quiz on my mistakes</button>':'')+'</div>'
    +'<p class="subheading">'+due+(due===1?' word':' words')+' due · due words come first, then new ones. A wrong answer brings the word back soon.</p>'
    +'<div class="zg-modes">'+MODES.map(m=>'<button class="zg-mode" data-action="zg-start" data-mode="'+m[0]+'"><span class="zg-ic" aria-hidden="true">'+m[1]+'</span><b>'+m[2]+'</b><small>'+m[3]+'</small></button>').join('')+'</div>';
  }
@@ -85,20 +153,39 @@
   return '<div class="panel"><div class="panel-header"><span class="badge">'+n+' / '+b.left.length+' matched</span><span class="question-number">Tap a word, then its meaning</span></div>'
    +'<div class="zg-match"><div>'+left+'</div><div>'+right+'</div></div></div>';
  }
+ function feedback(w,ok,extra){
+  return '<div class="notice mt20" role="status"><b>'+(ok?'✓ Correct':'✗ Not quite')+'</b>'+(extra?'<p>'+extra+'</p>':'')+'<p><span lang="zh" class="zg-hzs">'+esc(w.hz)+'</span> · '+esc(w.py)+' · '+esc(meaning(w))+'</p>'
+   +'<div class="pill-row"><button class="btn btn-outline" data-action="zg-say">♫ Listen</button>'+aiBtn(w)+'<button class="btn btn-primary" data-action="zg-next">'+(G.i+1<G.items.length?'Next →':'See result →')+'</button></div></div>';
+ }
  function questionHTML(){
-  const it=G.items[G.i],w=it.w,found=G.answer!==null,right=G.mode==='listen'?w.hz:G.mode==='pinyin'?w.py:meaning(w);
+  const it=G.items[G.i],w=it.w,found=G.answer!==null,head='<div class="panel"><div class="panel-header"><span class="badge">'+(G.i+1)+' / '+G.items.length+'</span><span class="question-number">'+G.score+' correct</span></div>';
+  if(G.mode==='type'){
+   const ok=found&&G.answer===1,near=found&&!ok&&sameLetters(G.typed,w.py);
+   return head+'<div class="zg-q"><div class="zg-big" lang="zh">'+esc(w.hz)+'</div><p class="subheading">'+esc(meaning(w))+'</p></div>'
+    +'<form class="zg-type" data-zg-form><label for="zgIn" class="subheading">Type the pinyin with tones (nǐ hǎo or ni3 hao3)</label><div class="pill-row"><input id="zgIn" class="answer-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="'+esc(G.typed)+'" '+(found?'disabled':'')+'>'
+    +(found?'':'<button class="btn btn-primary" type="submit">Check</button><button class="btn btn-outline" type="button" data-action="zg-say">♫ Hint</button>')+'</div></form>'
+    +(found?feedback(w,ok,ok?'':near?'Letters right, tones wrong. You typed '+esc(G.typed)+'.':'You typed '+esc(G.typed||'nothing')+'.'):'')+'</div>';
+  }
+  if(G.mode==='speak'){
+   return head+'<div class="zg-q"><div class="zg-big" lang="zh">'+esc(w.hz)+'</div><p class="zg-py">'+esc(w.py)+'</p><p class="subheading">'+esc(meaning(w))+'</p>'
+    +(found?'':'<div class="pill-row" style="justify-content:center"><button class="btn btn-outline" data-action="zg-say">♫ Hear it first</button><button class="btn btn-primary btn-lg" data-action="zg-mic">🎤 Say it</button><button class="btn btn-outline" data-action="zg-skip">Skip</button></div>')
+    +(SR?'':'<p class="footnote mt10">This browser cannot check speech. On iPad use Safari with Dictation on (Settings → General → Keyboard).</p>')
+    +'<p class="footnote" id="zgHeard" role="status">'+esc(G.heard)+'</p></div>'
+    +(found?feedback(w,G.answer===1,G.answer===1?'I heard: '+esc(G.heard):G.answer===2?'Skipped.':'I heard: '+esc(G.heard||'nothing')):'')+'</div>';
+  }
+  const right=rightOf(G.mode,w);
   const prompt=G.mode==='listen'
    ?'<button class="btn btn-primary btn-lg" data-action="zg-say">♫ Play again</button><p class="subheading mt10">Which word did you hear?</p>'
+   :G.mode==='tones'
+   ?'<div class="zg-big" lang="zh">'+esc(w.hz)+'</div><p class="zg-py">'+esc(toneless(w.py))+'</p><button class="btn btn-outline" data-action="zg-say">♫ Play again</button><p class="subheading mt10">Pick the right tones</p>'
    :'<div class="zg-big" lang="zh">'+esc(w.hz)+'</div>'+(G.mode==='meaning'&&found?'<p class="zg-py">'+esc(w.py)+'</p>':'')
     +'<p class="subheading">'+(G.mode==='pinyin'?'Pick the pinyin':'Pick the meaning')+'</p>';
   const opts=it.opts.map((o,k)=>{const cls=found?(o===right?' right':k===G.answer?' wrong':''):'';
-   return '<button class="u-option'+cls+'" data-action="zg-pick" data-k="'+k+'" '+(found?'disabled':'')+(G.mode==='listen'?' lang="zh"':'')+'>'+'ABCD'[k]+'. '+esc(o)+'</button>';}).join('');
-  const fb=found?'<div class="notice mt20"><b>'+(it.opts[G.answer]===right?'✓ Correct':'✗ Not quite')+'</b><p><span lang="zh" class="zg-hzs">'+esc(w.hz)+'</span> · '+esc(w.py)+' · '+esc(meaning(w))+'</p>'
-   +'<div class="pill-row"><button class="btn btn-outline" data-action="zg-say">♫ Listen</button>'+aiBtn(w)+'<button class="btn btn-primary" data-action="zg-next">'+(G.i+1<G.items.length?'Next →':'See result →')+'</button></div></div>':'';
-  return '<div class="panel"><div class="panel-header"><span class="badge">'+(G.i+1)+' / '+G.items.length+'</span><span class="question-number">'+G.score+' correct</span></div><div class="zg-q">'+prompt+'</div>'+opts+fb+'</div>';
+   return '<button class="u-option'+cls+(G.mode==='tones'?' zg-tone':'')+'" data-action="zg-pick" data-k="'+k+'" '+(found?'disabled':'')+(G.mode==='listen'?' lang="zh"':'')+'>'+'ABCD'[k]+'. '+esc(o)+'</button>';}).join('');
+  return head+'<div class="zg-q">'+prompt+'</div>'+opts+(found?feedback(w,it.opts[G.answer]===right):'')+'</div>';
  }
  function resultHTML(){
-  const total=G.mode==='match'?G.items.length:G.items.length,miss=G.missed;
+  const total=G.items.length,miss=G.missed;
   const list=miss.length?'<h3 class="mt20">Words to practise</h3><div class="zg-miss">'+miss.map(w=>'<div class="word-row"><div class="word-meta"><h3 lang="zh">'+esc(w.hz)+' <small>'+esc(w.py)+'</small></h3><p>'+esc(meaning(w))+'</p></div><div class="word-trail"><button class="icon-small" data-action="zg-sayw" data-hz="'+esc(w.hz)+'" aria-label="Listen">♫</button></div></div>').join('')+'</div>':'<p>No mistakes. 加油!</p>';
   return '<div class="panel"><h2>'+G.score+' / '+total+' correct</h2>'+list
    +'<div class="pill-row mt20"><button class="btn btn-primary" data-action="zg-start" data-mode="'+G.mode+'">Play again</button>'
@@ -107,35 +194,49 @@
  }
  function html(){
   const m=MODES.find(x=>x[0]===G.mode);
-  const title=m?m[2]+' · Chinese':'Chinese games';
+  const title=m?m[2]+' · Chinese'+(G.miss?' · mistakes':''):'Chinese games';
   const back=m?'<button class="btn btn-outline" data-action="zg-menu">← All games</button>':'';
   let body;
   if(!deck())body='<div class="panel"><h3>Loading words…</h3></div>';
   else if(!m)body=menuHTML();
   else if(G.mode==='match')body=Object.keys(G.board.done).length===G.board.left.length?resultHTML():matchHTML();
   else body=G.i>=G.items.length?resultHTML():questionHTML();
-  return heading(title,m?m[3]:'Match, listen and guess pinyin or meaning for '+words().length+' words',back)+body;
+  return heading(title,m?m[3]:'Match, listen, tones, typing and speaking for '+words().length+' words',back)+body;
  }
  function paint(){
   updateChrome();const bc=document.getElementById('breadcrumbCurrent');if(bc)bc.textContent='Games';
   document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page==='zhgames'));
   document.getElementById('mainContent').innerHTML=html();
+  const f=document.querySelector('[data-zg-form]');
+  if(f){f.onsubmit=e=>{e.preventDefault();check(document.getElementById('zgIn').value);};const inp=document.getElementById('zgIn');if(inp&&!inp.disabled)inp.focus({preventScroll:true});}
+ }
+ function settle(ok){const w=G.items[G.i].w;G.answer=ok===null?2:ok?1:0;if(ok)G.score++;else if(ok===false)G.missed.push(w);if(ok!==null)record(w,ok);}
+ function check(text){
+  if(G.answer!==null)return;G.typed=String(text||'').trim();if(!G.typed){toast('Type the pinyin first');return;}
+  const w=G.items[G.i].w;settle(normPy(G.typed)===normPy(w.py));say(w.hz);paint();
  }
  function act(el){
   const a=el.dataset.action;
   if(a==='zg-cat'){G.cat=el.dataset.cat;paint();return true;}
+  if(a==='zg-miss'){G.miss=el.dataset.v==='1';paint();return true;}
   if(a==='zg-start'){start(el.dataset.mode);paint();window.scrollTo({top:0,behavior:'instant'});return true;}
   if(a==='zg-menu'){G.mode='';paint();return true;}
   if(a==='zg-say'){const it=G.items[G.i];if(it)say(it.w.hz);return true;}
   if(a==='zg-sayw'){say(el.dataset.hz);return true;}
+  if(a==='zg-skip'){if(G.answer===null){settle(null);paint();}return true;}
+  if(a==='zg-mic'){
+   const w=G.items[G.i].w;G.heard='Listening… say the word now';paint();
+   hear('zh-CN').then(alts=>{if(G.items[G.i]&&G.items[G.i].w===w&&G.answer===null){const ok=alts.some(t=>cleanZh(t).includes(cleanZh(w.hz)));G.heard=alts[0]||'';settle(ok);paint();}})
+    .catch(e=>{G.heard=String(e.message||e);paint();});
+   return true;
+  }
   if(a==='zg-pick'){
-   if(G.answer!==null)return true;const it=G.items[G.i],w=it.w,k=Number(el.dataset.k);
-   const right=G.mode==='listen'?w.hz:G.mode==='pinyin'?w.py:meaning(w),ok=it.opts[k]===right;
+   if(G.answer!==null)return true;const it=G.items[G.i],w=it.w,k=Number(el.dataset.k),ok=it.opts[k]===rightOf(G.mode,w);
    G.answer=k;if(ok)G.score++;else G.missed.push(w);record(w,ok);
-   if(G.mode!=='listen'||!ok)say(w.hz);
+   if((G.mode!=='listen'&&G.mode!=='tones')||!ok)say(w.hz);
    paint();return true;
   }
-  if(a==='zg-next'){G.i++;G.answer=null;paint();const it=G.items[G.i];if(G.mode==='listen'&&it)setTimeout(()=>say(it.w.hz),200);return true;}
+  if(a==='zg-next'){G.i++;G.answer=null;G.typed='';G.heard='';paint();const it=G.items[G.i];if((G.mode==='listen'||G.mode==='tones')&&it)setTimeout(()=>say(it.w.hz),200);return true;}
   if(a==='zg-left'){const b=G.board;b.sel=b.sel===el.dataset.id?null:el.dataset.id;b.flash=null;const w=b.left.find(x=>x.mid===b.sel);if(w)say(w.hz);paint();return true;}
   if(a==='zg-right'){
    const b=G.board;if(!b.sel){toast('Tap a word on the left first');return true;}
@@ -157,7 +258,8 @@
   +'.zg-py{font-size:20px;font-weight:700;margin:0 0 6px}.zg-hzs{font-size:20px;font-weight:700}'
   +'.zg-match{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:10px}.zg-tile{min-height:56px;margin:0 0 10px;text-align:center;overflow-wrap:anywhere}'
   +'.zg-hz{font-size:24px;font-weight:700}.zg-tile.zg-on{background:var(--ink);color:var(--paper)}'
-  +'.u-option[lang=zh]{font-size:24px;font-weight:700}.zg-miss{display:grid;gap:8px}.zg-miss small{font-size:14px;font-weight:600;color:var(--muted)}'
+  +'.u-option[lang=zh]{font-size:24px;font-weight:700}.u-option.zg-tone{font-size:20px;font-weight:700}.zg-miss{display:grid;gap:8px}.zg-miss small{font-size:14px;font-weight:600;color:var(--muted)}'
+  +'.zg-type{margin:0 0 6px}.zg-type .pill-row{flex-wrap:wrap}.zg-type input{flex:1;min-width:0;min-height:48px;font-size:20px;padding:0 12px}'
   +'@media(max-width:520px){.zg-tile{font-size:14px;padding:8px}.zg-tile.zg-hz{font-size:22px}}';
  document.head.appendChild(css);
  // nav: "Games" next to Flashcards
@@ -169,8 +271,8 @@
  render=function(){if(ui.page==='zhgames')return paint();return baseRender();};
  const baseHandle=handleAction;
  handleAction=function(el){if(String(el.dataset.action||'').startsWith('zg-')&&act(el))return;return baseHandle(el);};
- window.WordNestZhGames={words,options,start,state:G,record};
- const want=new URLSearchParams(location.search).get('game');
+ window.WordNestZhGames={words,options,start,state:G,record,check};
+ const q=new URLSearchParams(location.search),want=q.get('game');if(q.get('miss')==='1')G.miss=true;
  const open=()=>{ui.page='zhgames';if(want&&MODES.some(m=>m[0]===want))start(want);render();};
  if(want!==null){if(deck())open();else{let n=0;const t=setInterval(()=>{if(deck()||++n>40){clearInterval(t);open();}},250);}}
  // repaint once the deck arrives if the games page is open
