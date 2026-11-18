@@ -26,7 +26,7 @@
  +'.wn-switch a[aria-current=page]{background:var(--purple,#5b53d7);border-color:var(--purple,#5b53d7);color:#fff}'
  +'.wn-back{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;font-weight:700;text-decoration:none;color:inherit;opacity:.75;margin:0 0 10px}'
  +'.u-subjects{display:none!important}'
- +'.wn-zh .main-nav [data-page]:not([data-page=studymerge]),.wn-zh .mobile-nav [data-page]:not([data-page=studymerge]),.wn-zh .sidebar-settings,.wn-zh .sidebar-target{display:none!important}';
+ +'.wn-zh .main-nav [data-page]:not([data-page=studymerge]):not([data-page=zhgames]),.wn-zh .mobile-nav [data-page]:not([data-page=studymerge]):not([data-page=zhgames]),.wn-zh .sidebar-settings,.wn-zh .sidebar-target{display:none!important}';
  document.head.appendChild(css);
  const sw=document.createElement('div');
  sw.innerHTML='<a class="wn-back" href="../index.html">← Study OS</a><div class="wn-switch" role="group" aria-label="Language"><a href="./?lang=en"'+(LANG==='en'?' aria-current="page"':'')+'>English</a><a href="./?lang=zh"'+(LANG==='zh'?' aria-current="page"':'')+'>中文</a></div>';

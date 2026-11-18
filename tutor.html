@@ -140,7 +140,7 @@ $('#loadModels').onclick=async()=>{if(!readSet())return;const r=A.modelsRequest(
   say('#setMsg',ids.length+' models · tap the Model box to pick one'+(cfg.provider==='openai'&&ids.some(x=>/hermes/i.test(x))?' (Hermes models first)':''));}
  catch(e){say('#setMsg','Could not list models ('+String(e.message||e).slice(0,160)+')',true);}};
 /* ---------- subject and chapter ---------- */
-const COURSES=(T?T.COURSES:[]);
+const COURSES=(T?T.COURSES.concat(T.LANGS||[]):[]);   // English and Chinese too (WordNest "Ask AI" links)
 $('#course').insertAdjacentHTML('beforeend',COURSES.map(c=>'<option value="'+c.key+'">'+esc(c.name)+'</option>').join(''));
 async function loadCourse(key){if(!key||data[key])return data[key];const c=COURSES.find(x=>x.key===key);if(!c)return null;
  try{const r=await fetch(c.data,{cache:'no-cache'});data[key]=r.ok?T.parseCourseData(await r.text()):null;}catch(e){data[key]=null;}return data[key];}

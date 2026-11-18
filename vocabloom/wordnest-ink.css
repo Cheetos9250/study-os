@@ -63,3 +63,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .word-row .word-main,.word-row strong{color:var(--text)}
 .mini-metric,.spaced-line{background:var(--panel-2);color:var(--text);border-radius:var(--r)}
 .notice{border:2px solid var(--ink);border-radius:var(--r)}
+/* Word library: long examples no longer push rows past the screen on iPad portrait / phone */
+#wordList{min-width:0;max-width:100%}
+.word-row{min-width:0;max-width:100%}
+.word-thumb,.word-trail{flex:none}
