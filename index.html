@@ -121,6 +121,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 @media(max-width:560px){.qg{flex-wrap:wrap}.qg .qgo{flex-direction:row;border-left:0;padding-left:0;width:100%}.qg .qgo>*{flex:1}}
 /* WordNest daily goal (scripts/study-wordnest.js) */
 .wng{display:flex;align-items:center;gap:14px;margin:12px 0 0;padding:12px 18px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel);color:inherit;text-decoration:none;min-height:44px}
+.wng-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0 0}.wng-add{min-height:44px;padding:0 16px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 14px var(--ui);cursor:pointer}.wng-hint{font-size:13px;color:var(--muted)}
+.wng-dlg{max-width:min(440px,calc(100vw - 32px));border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel);color:var(--text);padding:18px}.wng-dlg h2{margin:0 0 8px;font:700 22px var(--num)}.wng-dlg label{display:block;font-weight:900;margin:10px 0 4px}.wng-dlg input{width:100%;min-height:44px;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:600 16px var(--ui);padding:0 10px}.wa-msg{min-height:20px;margin:8px 0 0;font-size:14px}.wa-acts{display:flex;gap:8px;margin-top:10px}.wa-acts button{min-height:44px;padding:0 16px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 14px var(--ui);cursor:pointer}.wa-acts .main{background:var(--ink);color:var(--paper)}
 .wng[hidden]{display:none}.wng:focus-visible{outline:3px solid var(--focus,#2f6bff);outline-offset:3px}
 .wng .wt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .wng .k{font:900 12px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--acc-t,var(--red))}
@@ -231,6 +233,12 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <a class="cont" id="continue" hidden></a>
 <div class="wng qg" id="qGoal" hidden></div>
 <a class="wng" id="wordGoal" hidden></a>
+<div class="wng-tools"><button type="button" id="wordAdd" class="wng-add">+ New word</button><span class="wng-hint">Jot down a word you meet while studying. It goes to WordNest → My words.</span></div>
+<dialog id="wordAddDlg" class="wng-dlg" aria-labelledby="wordAddT"><form method="dialog" id="wordAddForm"><h2 id="wordAddT">New English word</h2>
+<label for="waEn">Word</label><input id="waEn" required maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false">
+<label for="waTh">Meaning (Thai)</label><input id="waTh" required maxlength="120" autocomplete="off">
+<label for="waEx">Example sentence (optional)</label><input id="waEx" maxlength="200" autocomplete="off">
+<p class="wa-msg" id="waMsg" role="status"></p><div class="wa-acts"><button type="submit" class="main" value="save">Add word</button><button type="button" id="waCancel">Cancel</button></div></form></dialog>
 <h2>Today</h2>
 <div class="classes" id="classes" aria-label="Classes today"></div>
 <section class="top">
@@ -405,10 +413,14 @@ function renderPlan(){
  if(window.StudyReview){const qd=T.COURSES.map(x=>({x,n:StudyReview.countRaw(read('study-'+x.key),now)})).filter(y=>y.n).sort((a,b)=>b.n-a.n);
   if(FOCUS)plan.tasks=plan.tasks.filter(t=>t.kind!=='review');
   const n=qd.reduce((s,y)=>s+y.n,0);if(n)plan.tasks.unshift({id:'quiz-review',kind:'quiz',course:qd[0].x.key,title:'Review '+n+' question'+(n>1?'s':'')+' due',detail:qd.map(y=>y.x.name+' '+y.n).join(' · ')+' · missed or due again today',top:qd[0].x});}
+ /* WordNest daily goal as a plan task: it ticks itself once the goal is met */
+ const wg=window.StudyWordNest&&StudyWordNest.read();
+ if(wg&&wg.started)plan.tasks.push({id:'wordnest-goal',kind:'words',title:'Review vocabulary (WordNest)',detail:wg.done+' / '+wg.goal+' words today'+(wg.met?' · goal met, ticked automatically':' · ticks itself at the goal'),auto:wg.met,lang:wg.dueZh>wg.dueEn?'zh':'en'});
  $('#today').textContent=DAYS[dowOf(plan.today)]+', '+p.d+' '+MO[p.m];
  if(!Object.keys(summaries).length){$('#planBox').innerHTML='<p class="empty">'+(loadFailed?'Could not load subjects. Refresh to retry.':'Loading…')+'</p>';return;}
  $('#planBox').innerHTML=plan.tasks.length?'<ul class="plan">'+plan.tasks.map((t,i)=>{
-  const c=t.course?course(t.course):null,done=t.kind==='chapter'?t.done:!!doneToday[t.id];let acts='';
+  const c=t.course?course(t.course):null,done=t.kind==='chapter'?t.done:!!(doneToday[t.id]||t.auto);let acts='';
+  if(t.kind==='words')acts='<a class="main" href="vocabloom/?lang='+t.lang+'">Open WordNest</a>';
   if(t.kind==='quiz')acts='<a class="main" href="'+link(t.top,'prac')+'&review=1">Start review</a>';
   else if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
   else if(c&&t.kind==='chapter')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="pdf-sets.html?book=1&ch='+t.cat.slice(1)+'">Textbook</a>':'');
@@ -416,7 +428,7 @@ function renderPlan(){
   else if(c&&t.kind==='weak')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>';
   else if(c&&t.kind==='final')acts=(FOCUS?'':'<a href="'+link(c,'sum')+'">Summaries</a>')+'<a class="main" href="'+link(c,'prac',(t.cats||[]).join(','))+'">Practice</a><a href="mock.html?course='+c.key+'">Mock exam</a>';
   else if(c)acts='<a class="main" href="'+link(c,'prac')+'">Practice</a>';
-  return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
+  return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+(t.auto?' disabled':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
   :'<p class="empty">Nothing planned. Free time? Go to Practice.</p>';
  $('#planBox').querySelectorAll('input[type=checkbox]').forEach(b=>b.onchange=()=>{settings=T.markChapter(settings,plan.tasks[+b.dataset.i],b.checked,Date.now());saveSettings();renderAll();});
 }
@@ -563,6 +575,27 @@ function renderWordGoal(){
   +'<span class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></span></span>'
   +'<span class="wdue" aria-hidden="true"><span class="n">'+g.due+'</span><span class="l">due '+(g.due===1?'word':'words')+' →</span></span>';
 }
+/* ---------- + New word: adds to WordNest My words (vocabloom_mvp_v1.custom, same shape as WordNest's own Add word) ---------- */
+(function(){
+ const WN_KEY='vocabloom_mvp_v1',dlg=$('#wordAddDlg'),btn=$('#wordAdd');if(!dlg||!btn)return;
+ const msg=t=>{$('#waMsg').textContent=t;};
+ btn.onclick=()=>{$('#wordAddForm').reset();msg('');if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','');$('#waEn').focus();};
+ $('#waCancel').onclick=()=>dlg.close();
+ $('#wordAddForm').onsubmit=e=>{
+  e.preventDefault();
+  const en=$('#waEn').value.trim().toLowerCase(),th=$('#waTh').value.trim(),ex=$('#waEx').value.trim();
+  if(!en||!th){msg('Type the word and its meaning.');return;}
+  let v={};try{v=JSON.parse(read(WN_KEY)||'{}')||{};}catch(err){msg('WordNest data could not be read here; add the word inside WordNest.');return;}
+  if(!v||typeof v!=='object'||Array.isArray(v)){msg('WordNest data could not be read here; add the word inside WordNest.');return;}
+  const custom=Array.isArray(v.custom)?v.custom:[];
+  if(custom.some(w=>w&&String(w.en).toLowerCase()===en)){msg('“'+en+'” is already in My words.');return;}
+  const t=Date.now();
+  v.custom=custom.concat([{id:'custom-'+t+'-'+Math.random().toString(36).slice(2,7),en,th,example:ex||en,emoji:'💡',category:'personal',level:'B1',syncTs:t}]);
+  try{localStorage.setItem(WN_KEY,JSON.stringify(v));}catch(err){msg('Could not save on this device.');return;}
+  msg('Added “'+en+'”. Open WordNest once to sync it to your other devices.');
+  $('#wordAddForm').reset();setTimeout(()=>dlg.close(),1200);
+ };
+})();
 /* ---------- practice goal: questions answered today (any subject) vs the owner's goal, saved as qgoal in studyos.home.v1 ---------- */
 function renderPracticeGoal(){
  const el=$('#qGoal'),M=window.StudyMotivation;if(!el||!M||!window.StudyStats)return;

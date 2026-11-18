@@ -19,6 +19,9 @@
   if(!o.m)o.m={day:0,newDone:0};
   const before=JSON.stringify(o.s);
   try{cShadowFromLocal(o.s);}catch{return false;}
+  // confusable-word links I made (wordnest-plus.js): one entry, the newest edit wins
+  const lt=+(data.settings&&data.settings.linksTs)||0,lk='vb/v1/links';
+  if(lt&&(!o.s[lk]||+o.s[lk].ts<lt))o.s[lk]={kind:'links',value:data.settings.links||{},ts:lt};
   if(JSON.stringify(o.s)===before)return false;
   if(localStorage.getItem(ENG)!==raw)return false;                        // another tab wrote meanwhile; next change retries
   try{localStorage.setItem(ENG,JSON.stringify(o));return true;}catch{return false;}
@@ -27,6 +30,8 @@
  function pull(){
   if(typeof cApplyShadows!=='function')return;
   try{cApplyShadows(readSrs().s||{});}catch{}
+  const e=(readSrs().s||{})['vb/v1/links'];
+  if(e&&e.value&&typeof e.value==='object'&&!Array.isArray(e.value)&&+e.ts>(+data.settings.linksTs||0)){data.settings.links=e.value;data.settings.linksTs=+e.ts;store();}
  }
  /* one WordNest answer that is not an English word game (Chinese games and cards): counts toward the day like English
     answers do (data.days for this device's view, and the per-device day log that syncs) */
