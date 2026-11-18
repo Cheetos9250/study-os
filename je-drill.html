@@ -56,6 +56,7 @@ h2{font-size:20px;margin:0 0 8px}
 <script src="scripts/je-grid.js?v=4"></script>
 <script src="scripts/study-je-drill.js?v=1"></script>
 <script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=6"></script>
 <script src="scripts/study-nav.js?v=12"></script>
 <script>
 (function(){
@@ -68,7 +69,7 @@ const u=new URLSearchParams(location.search);
 let chs=(u.get('ch')||'').split(',').map(Number).filter(n=>J.CHAPTERS.some(c=>c[0]===n));
 let st=load(),cur=null,ctl=null,scored=false,shown=false,only=u.get('t')&&J.TEMPLATES.some(t=>t.id===u.get('t'))?u.get('t'):null;
 function load(){try{return J.normalize(JSON.parse(localStorage.getItem(J.KEY)||'{}'));}catch(e){return J.normalize({});}}
-function save(){try{localStorage.setItem(J.KEY,JSON.stringify(st));}catch(e){}}
+function save(){try{localStorage.setItem(J.KEY,JSON.stringify(st));}catch(e){}if(window.StudyCloud)StudyCloud.dirty();}
 function score(ok){if(scored)return;scored=true;st=J.record(load(),cur.id,ok,dayKey(Date.now()));save();paintScore();}
 function chips(){
  $('#chs').innerHTML='<button type="button" class="chip" data-ch="" aria-pressed="'+(!chs.length&&!only)+'">All</button>'+J.CHAPTERS.map(([n,l])=>'<button type="button" class="chip" data-ch="'+n+'" aria-pressed="'+(chs.includes(n)&&!only)+'">'+esc(l)+'</button>').join('');
@@ -101,6 +102,7 @@ function paintScore(){
   +(weak.length?'<h2 style="margin-top:14px">Practise these</h2><ul class="jd-weak">'+weak.map(w=>'<li><span>'+esc(w.title)+' <span class="muted">· '+w.right+' of '+w.tries+' right</span></span><a class="b" href="je-drill.html?t='+esc(w.id)+'">Practise</a></li>').join('')+'</ul>':'<p class="muted" style="margin:10px 0 0">Types you get wrong will be listed here.</p>');
 }
 chips();paintScore();next();
+window.addEventListener('studycloud:applied',()=>{st=load();paintScore();});
 })();
 </script>
 </body>

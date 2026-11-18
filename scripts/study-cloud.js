@@ -12,7 +12,8 @@
   var PROGRESS_LSK = 'study-sync-progress-key-v1', AUTOK = 'study-sync-auto-v1',
       BASEK = 'study-sync-today-base-v1', LASTK = 'study-sync-last-v1', TODAYK = 'studyos.today.v1', NOTESK = 'studyos.notes.v1',
       MAXB = 340000, HOMEK = 'studyos.home.v1', GRADESK = 'studyos.grades.v1', HBASEK = 'study-sync-home-base-v1', MAXH = 1850000,
-      EXCELK = 'studyos.excel.v1', PDFK = 'studyos.pdfsets.v1', TBK = 'studyos.accounting.textbook.progress.v1', EBASEK = 'study-sync-extra-base-v1';
+      EXCELK = 'studyos.excel.v1', PDFK = 'studyos.pdfsets.v1', TBK = 'studyos.accounting.textbook.progress.v1', EBASEK = 'study-sync-extra-base-v1',
+      POMOK = 'studyos.pomolog.v1', JDK = 'studyos.jedrill.v1';
   var J = function (v) { return JSON.stringify(v === undefined ? null : v); };
   var obj = function (v) { return !!v && typeof v === 'object' && !Array.isArray(v); };
 
@@ -123,8 +124,66 @@
     return out;
   }
 
+  /* Pomodoro history and JE Drill score (18 Nov 2026) travel inside the 'home' document as home._pomolog / home._jedrill
+     (the Worker accepts any fields in home, so no redeploy). Counts only grow on each device, so a count both sides
+     raised since the last sync adds both gains (base + local gain + remote gain); with no base the larger one wins,
+     so nothing is ever counted twice. */
+  function addCount(b, l, r, cap) {
+    l = Number(l) || 0; r = Number(r) || 0;
+    var out = (typeof b === 'number' && l >= b && r >= b) ? l + r - b : Math.max(l, r);
+    return cap ? Math.min(cap, out) : out;
+  }
+  function addMap(b, l, r, cap) {
+    var out = {}; b = obj(b) ? b : {}; l = obj(l) ? l : {}; r = obj(r) ? r : {};
+    Object.keys(l).concat(Object.keys(r)).forEach(function (k) { if (!(k in out)) out[k] = addCount(typeof b[k] === 'number' ? b[k] : undefined, l[k], r[k], cap); });
+    return out;
+  }
+  function mergePomolog(base, local, remote) {
+    var b = obj(base) ? base : {}, l = obj(local) ? local : {}, r = obj(remote) ? remote : {}, out = Object.assign({}, r, l);
+    out.days = addMap(b.days, l.days, r.days, 1440);
+    if (obj(l.bySub) || obj(r.bySub)) {
+      var bs = obj(b.bySub) ? b.bySub : {}, ls2 = obj(l.bySub) ? l.bySub : {}, rs = obj(r.bySub) ? r.bySub : {};
+      out.bySub = {};
+      Object.keys(ls2).concat(Object.keys(rs)).forEach(function (d) { if (!out.bySub[d]) out.bySub[d] = addMap(bs[d], ls2[d], rs[d], 1440); });
+    }
+    if (obj(l.logs) || obj(r.logs)) {
+      var ll = obj(l.logs) ? l.logs : {}, rl = obj(r.logs) ? r.logs : {};
+      out.logs = {};
+      Object.keys(ll).concat(Object.keys(rl)).forEach(function (d) {
+        if (out.logs[d]) return; var seen = {}, list = [];
+        (Array.isArray(ll[d]) ? ll[d] : []).concat(Array.isArray(rl[d]) ? rl[d] : []).forEach(function (x) { if (!obj(x)) return; var k = x.t + '|' + x.n; if (!seen[k]) { seen[k] = 1; list.push(x); } });
+        out.logs[d] = list.sort(function (a, c) { return a.t - c.t; }).slice(-40);
+      });
+    }
+    var le = Math.max(Number(l.lastEnd) || 0, Number(r.lastEnd) || 0); if (le) out.lastEnd = le; else delete out.lastEnd;
+    return out;
+  }
+  function mergeJEDrill(base, local, remote) {
+    var b = obj(base) ? base : {}, l = obj(local) ? local : {}, r = obj(remote) ? remote : {}, out = { days: {}, tpl: {} };
+    var bd = obj(b.days) ? b.days : {}, ld = obj(l.days) ? l.days : {}, rd = obj(r.days) ? r.days : {};
+    Object.keys(ld).concat(Object.keys(rd)).forEach(function (d) {
+      if (out.days[d]) return; var x = bd[d] || {}, y = ld[d] || {}, z = rd[d] || {};
+      var a = addCount(typeof x.a === 'number' ? x.a : undefined, y.a, z.a, 10000), c = addCount(typeof x.c === 'number' ? x.c : undefined, y.c, z.c, 10000);
+      out.days[d] = { a: a, c: Math.min(a, c) };
+    });
+    var bt = obj(b.tpl) ? b.tpl : {}, lt = obj(l.tpl) ? l.tpl : {}, rt = obj(r.tpl) ? r.tpl : {};
+    Object.keys(lt).concat(Object.keys(rt)).forEach(function (k) {
+      if (out.tpl[k]) return; var x = Array.isArray(bt[k]) ? bt[k] : [], y = Array.isArray(lt[k]) ? lt[k] : [], z = Array.isArray(rt[k]) ? rt[k] : [];
+      var n = addCount(typeof x[0] === 'number' ? x[0] : undefined, y[0], z[0]), ok = addCount(typeof x[1] === 'number' ? x[1] : undefined, y[1], z[1]);
+      out.tpl[k] = [n, Math.min(n, ok)];
+    });
+    return out;
+  }
+
+  /* home document → {home without the extra fields, pomolog, jedrill} */
+  function splitHome(h) {
+    var out = {}, x = obj(h) ? h : {};
+    Object.keys(x).forEach(function (k) { if (k !== '_pomolog' && k !== '_jedrill') out[k] = x[k]; });
+    return { home: out, pomolog: obj(x._pomolog) ? x._pomolog : null, jedrill: obj(x._jedrill) ? x._jedrill : null };
+  }
+
   /* ---------- browser part ---------- */
-  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map, mergeNotes: mergeNotes, mergeHome: mergeHome, mergeGrades: mergeGrades, mergeExcel: mergeExcel, mergePdfSets: mergePdfSets, mergeTextbook: mergeTextbook }; return; }
+  if (typeof window === 'undefined') { module.exports = { mergeCourse: mergeCourse, mergeToday: mergeToday, merge3map: merge3map, mergeNotes: mergeNotes, mergeHome: mergeHome, mergeGrades: mergeGrades, mergeExcel: mergeExcel, mergePdfSets: mergePdfSets, mergeTextbook: mergeTextbook, mergePomolog: mergePomolog, mergeJEDrill: mergeJEDrill, splitHome: splitHome }; return; }
   var T = root.StudyToday;
   var ls = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -199,18 +258,27 @@
               return ch;
             };
           } else if (s.id === 'home') {
-            var hraw = ls.get(HOMEK), graw = ls.get(GRADESK), lh = {}, lg = {}, hb = null;
+            var hraw = ls.get(HOMEK), graw = ls.get(GRADESK), praw = ls.get(POMOK), jraw = ls.get(JDK), lh = {}, lg = {}, lp = {}, lj = {}, hb = null;
             try { var ph = JSON.parse(hraw || '{}'); if (obj(ph)) lh = ph; } catch (e) {}
             try { var pg = JSON.parse(graw || '{}'); if (obj(pg)) lg = pg; } catch (e) {}
+            try { var pp = JSON.parse(praw || '{}'); if (obj(pp)) lp = pp; } catch (e) {}
+            try { var pj = JSON.parse(jraw || '{}'); if (obj(pj)) lj = pj; } catch (e) {}
             try { hb = JSON.parse(ls.get(HBASEK) || 'null'); } catch (e) {}
-            var mh = mergeHome(hb && hb.home, lh, obj(remote.home) ? remote.home : {});
+            var bs = splitHome(hb && hb.home), rs = splitHome(remote.home);
+            var mh = mergeHome(hb && hb.home ? bs.home : null, splitHome(lh).home, rs.home);
             var mg = mergeGrades(hb && obj(hb.grades) ? hb.grades : null, lg, obj(remote.grades) ? remote.grades : {});
-            body = { home: mh, grades: mg };
+            var mpo = mergePomolog(bs.pomolog, lp, rs.pomolog), mjd = mergeJEDrill(bs.jedrill, lj, rs.jedrill);
+            var hx = Object.assign({}, mh);
+            if (praw || rs.pomolog) hx._pomolog = mpo;
+            if (jraw || rs.jedrill) hx._jedrill = mjd;
+            body = { home: hx, grades: mg };
             if (new TextEncoder().encode(J(body)).length > MAXH) throw Error('cover and card images are too big to sync (over 1.8 MB); use an image link for big GIFs');
             after = function () {
-              if (ls.get(HOMEK) !== hraw || ls.get(GRADESK) !== graw) return 'retry';
+              if (ls.get(HOMEK) !== hraw || ls.get(GRADESK) !== graw || ls.get(POMOK) !== praw || ls.get(JDK) !== jraw) return 'retry';
               var ch = false;
               if (J(lh) !== J(mh)) { ls.set(HOMEK, J(mh)); ch = true; }
+              if (hx._pomolog && J(lp) !== J(mpo)) { ls.set(POMOK, J(mpo)); ch = true; }
+              if (hx._jedrill && J(lj) !== J(mjd)) { ls.set(JDK, J(mjd)); ch = true; }
               if (J(lg) !== J(mg) && (graw || Object.keys(mg).length)) { ls.set(GRADESK, J(mg)); ch = true; }
               ls.set(HBASEK, J(body));
               return ch;
