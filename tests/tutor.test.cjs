@@ -10,7 +10,7 @@ test('settings keep the key per provider, drop junk and refuse non-https base UR
 test('Gemini request: key in a header (never the URL), system prompt, photo as inline data',()=>{
   const c=A.normalize({gemini:{key:'SECRET'}});
   const r=A.request(c,'SYS',[{role:'user',text:'hi',image:{mime:'image/jpeg',data:'AAAA'}},{role:'assistant',text:'yo'}]);
-  assert.match(r.url,/^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-2\.5-flash:generateContent$/);
+  assert.match(r.url,/^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-flash-latest:generateContent$/);
   assert.doesNotMatch(r.url,/SECRET/);assert.equal(r.init.headers['x-goog-api-key'],'SECRET');
   const b=JSON.parse(r.init.body);assert.equal(b.systemInstruction.parts[0].text,'SYS');
   assert.deepEqual(b.contents.map(x=>x.role),['user','model']);assert.equal(b.contents[0].parts[0].inline_data.data,'AAAA');

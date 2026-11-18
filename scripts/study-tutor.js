@@ -13,7 +13,7 @@
  'use strict';
  const KEY='studyos.tutor.v1',SKEY='studyos.tutor.key',CHAT='studyos.tutor.chat.v1';
  const PROVIDERS={
-  gemini:{label:'Gemini (Google AI Studio)',base:'https://generativelanguage.googleapis.com/v1beta',model:'gemini-2.5-flash',keyHelp:'Get a free key at aistudio.google.com → Get API key.'},
+  gemini:{label:'Gemini (Google AI Studio)',base:'https://generativelanguage.googleapis.com/v1beta',model:'gemini-flash-latest',keyHelp:'Get a free key at aistudio.google.com → Get API key.'},
   openai:{label:'Hermes / OpenAI-compatible',base:'https://openrouter.ai/api/v1',model:'nousresearch/hermes-4-70b',keyHelp:'For Hermes, an OpenRouter key (openrouter.ai → Keys) or a Nous Research API key with its base URL.'}
  };
  const MAX_TURNS=24,MAX_NOTES=9000;
@@ -94,5 +94,16 @@
   if(provider==='gemini')return ((j&&j.models)||[]).filter(m=>!m.supportedGenerationMethods||m.supportedGenerationMethods.includes('generateContent')).map(m=>String(m.name||'').replace(/^models\//,'')).filter(Boolean);
   return ((j&&j.data)||[]).map(m=>String(m.id||'')).filter(Boolean);
  }
- return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl};
+ /* Newest stable model to fall back on when the saved one is retired (Gemini answers 404):
+    the highest gemini-<version>-flash without a suffix, else gemini-flash-latest, else any plain Flash model. */
+ function pickModel(provider,ids){
+  ids=(ids||[]).map(String);
+  if(provider!=='gemini')return '';
+  const ver=id=>{const m=/^gemini-(\d+(?:\.\d+)?)-flash$/.exec(id);return m?parseFloat(m[1]):-1;};
+  const stable=ids.filter(id=>ver(id)>=0).sort((a,b)=>ver(b)-ver(a));
+  if(stable.length)return stable[0];
+  if(ids.includes('gemini-flash-latest'))return 'gemini-flash-latest';
+  return ids.find(id=>/flash/.test(id)&&!/(lite|image|tts|live|audio|embed|thinking|exp)/.test(id))||'';
+ }
+ return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl,pickModel};
 });

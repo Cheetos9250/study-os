@@ -1,0 +1,2 @@
+- AI tutor: the default Gemini model is now the Flash alias, and if Google retires a saved model (error 404) the tutor switches once to the newest stable Flash model your key can use, saves it and answers.
+- Sidebar: no sideways scrollbar; it scrolls quietly when the menu is taller than the screen.

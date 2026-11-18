@@ -89,8 +89,8 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 </div>
 <script src="scripts/textbook-sos-render.js?v=1"></script>
 <script src="scripts/study-today.js?v=3"></script>
-<script src="scripts/study-tutor.js?v=1"></script>
-<script src="scripts/study-nav.js?v=10"></script>
+<script src="scripts/study-tutor.js?v=2"></script>
+<script src="scripts/study-nav.js?v=11"></script>
 <script>
 (function(){
 'use strict';
@@ -157,6 +157,7 @@ function paintLog(){const log=$('#log');
   :'<div class="msg a"><span class="who">Tutor</span>'+md(m.text)+'</div>').join('');
  const r=log.querySelector('[data-retry]');if(r)r.onclick=()=>{chat=chat.filter(m=>!m.error);ask();};
 }
+async function newestModel(){try{const r=A.modelsRequest(cfg),res=await fetch(r.url,r.init);if(!res.ok)return '';return A.pickModel(cfg.provider,A.models(cfg.provider,await res.json()));}catch(e){return '';}}
 async function ask(){
  if(busy)return;const c=cfg[cfg.provider];if(!c.key){openSet(true);return;}
  busy=true;paintState();
@@ -164,9 +165,13 @@ async function ask(){
  const course=key?(COURSES.find(x=>x.key===key)||{}).name:'',chapter=catSel&&D?((D.cats||[]).find(x=>x[0]===catSel)||[,''])[1]:'';
  const sys=A.system({course:course&&D?D.title||course:course,chapter,notes:D?A.notes(D,catSel):''});
  const msgs=chat.filter(m=>!m.error);let ctl=null,timer=null;
- try{const r=A.request(cfg,sys,msgs);ctl=new AbortController();timer=setTimeout(()=>ctl.abort(),120000);r.init.signal=ctl.signal;
-  const res=await fetch(r.url,r.init);const j=await res.json().catch(()=>null);
-  chat.push({role:'assistant',text:A.reply(cfg.provider,res.status,j||{})});}
+ try{ctl=new AbortController();timer=setTimeout(()=>ctl.abort(),120000);
+  const send=async()=>{const r=A.request(cfg,sys,msgs);r.init.signal=ctl.signal;const res=await fetch(r.url,r.init);return {status:res.status,j:await res.json().catch(()=>null)};};
+  let out=await send();
+  /* Gemini retires models (404 "no longer available"): switch once to the newest stable Flash model this key can use */
+  if(out.status===404&&cfg.provider==='gemini'){const m=await newestModel();
+   if(m&&m!==cfg.gemini.model){cfg.gemini.model=m;saveCfg();say('#state','Model switched to '+m);out=await send();}}
+  chat.push({role:'assistant',text:A.reply(cfg.provider,out.status,out.j||{})});}
  catch(e){chat.push({role:'assistant',error:true,text:e&&e.name==='AbortError'?'No answer after 2 minutes.':(e&&e.message&&/fetch|network|load failed/i.test(e.message)?'Could not reach the AI service (offline, or the base URL is wrong).':String(e&&e.message||e))});}
  clearTimeout(timer);busy=false;saveChat();paintLog();paintState();
  const last=$('#log').lastElementChild;if(last)last.scrollIntoView({block:'start',behavior:'smooth'});

@@ -57,7 +57,7 @@
  +'#studyNav .sn-more{display:none}'
  +'@media(min-width:900px){'
  +' html.sn-on body{padding-left:224px!important}'
- +' #studyNav{overflow-y:auto;overscroll-behavior:contain;left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
+ +' #studyNav{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:none;left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
  +' #studyNav .sn-brand{font:700 25px/1 "Kaisei Decol",serif;padding:4px 12px 22px;min-height:0;margin-right:54px}'
  +' #studyNav .sn-brand b{color:var(--sn-on);font-weight:700;margin-left:.25em}'
  /* Safari rubber-band scrolling moves fixed elements; extend the sidebar colour above and below so no gap shows */
@@ -65,6 +65,7 @@
  +' #studyNav::before{bottom:100%}#studyNav::after{top:100%}'
  +' #studyNav .sn-tab{padding:0 12px;font-size:15px}'
  +' #studyNav .sn-tab:hover{background:var(--sn-hi);color:var(--sn-fg)}'
+ +' #studyNav::-webkit-scrollbar{display:none}'
  +' #studyNav .sn-foot{margin-top:auto;display:grid;gap:2px;border-top:2px solid var(--sn-line);padding-top:12px}'
  +' #studyNav .sn-foot a,#studyNav .sn-foot button{padding:0 12px;font-size:14px;color:var(--sn-mute);width:100%;text-align:left}'
  +' #studyNav .sn-foot a:hover,#studyNav .sn-foot button:hover{background:var(--sn-hi);color:var(--sn-fg)}'
