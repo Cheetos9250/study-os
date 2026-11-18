@@ -133,7 +133,7 @@
   var api = '', ready = null, busy = false, dirtyTimer = null, status = null, listeners = [];
   function cfg() {
     if (ready) return ready;
-    ready = fetch('data/config.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (j) {
+    ready = fetch((root.STUDY_BASE || '') + 'data/config.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (j) {
       var original = String(j.api || '').replace(/\/+$/, ''), next = String(j.progress_api || '').replace(/\/+$/, '');
       api = next && next !== original ? next : '';                                  // never the legacy study-api Worker
       return api;

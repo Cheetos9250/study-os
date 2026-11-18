@@ -39,7 +39,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 
 | Page | Purpose |
 |---|---|
-| `index.html` | **Today**. Shows the cover and icon (local images; animated GIFs and https or Google Drive image links work), summary chips, today's classes, today's plan, a Pomodoro timer, exam countdowns, the owner's tasks and subject cards. |
+| `index.html` | **Today**. Shows the cover and icon (local images; animated GIFs and https or Google Drive image links work), summary chips, the WordNest daily goal (answers today vs the WordNest goal and words due, read-only `scripts/study-wordnest.js`), today's classes, today's plan, a Pomodoro timer, exam countdowns, the owner's tasks and subject cards. |
 | `flashcards.html` | Due/new cards per subject. English and Chinese open WordNest. |
 | `practice.html` | Quizzes per subject, weak chapters, WordNest English games, the accounting textbook. |
 | `hub.html` | **Lessons**: subject → chapters → Lesson / Cards / Practice / Notes. |
@@ -54,7 +54,7 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 | `excel.html` | **Excel** subject (not in `COURSES`; synced through the `extra` subject): basic dashboard step-by-step from the class, exam tips, quiz. Linked from Lessons and Practice. |
 | `progress-backup.html` / `progress-restore.html` | Local JSON backup and validated restore. |
 | `today.html` | Redirects to `calendar.html` (old links). |
-| `vocabloom/` | **WordNest** (formerly VocaBloom). `?lang=en` gives English games + English cards, `?lang=zh` gives Chinese cards. The folder name and storage keys stay `vocabloom` so progress is kept. `vocabloom/wordnest.js` is the language layer. |
+| `vocabloom/` | **WordNest** (formerly VocaBloom). `?lang=en` gives English games + English cards, `?lang=zh` gives Chinese cards + **Chinese games** (Match, Listen, Pinyin, Meaning; `vocabloom/wordnest-zh-games.js`, deep link `?lang=zh&game=match`; answers go into `zh-vocab-v1-srs`: wrong = Again, right on a due/new word = Good). The folder name and storage keys stay `vocabloom` so progress is kept. `vocabloom/wordnest.js` is the language layer. **Sync** (18 Nov 2026): `vocabloom/wordnest-sync.js` writes WordNest progress as `vb/v1/…` shadow entries into `eng-vocab-v1-srs` after every change and reads them back, so the main `StudyCloud` (subject `eng`) syncs it automatically; the old WordNest sync in `unified-progress.js` no longer runs (its code stays for the old tests). **Ask AI** (`vocabloom/wordnest-ai.js`): example sentences, similar words, `/quiz` on most-missed words → `tutor.html?course=eng|zh&q=…` (the tutor now lists English and Chinese). |
 
 Shared scripts and styles:
 - `scripts/study-nav.js`: sidebar on screens ≥ 900 px, bottom bar below that. Tabs: Today · Flashcards · Practice · Lessons · Calendar. The footer has theme, Grades, Back up, Restore and Cloud sync (course pages only).

@@ -1,0 +1,69 @@
+/* WordNest in the Study OS "ink manga" look.
+   assets/study-world.css (loaded before this file) maps the shared colour names (--bg, --white, --text, --line,
+   --purple, --lav, --shadow …) and the light/dark theme. This file restyles the parts WordNest hard-codes:
+   fonts, radii, frames, the hero and the flashcard faces. Layout and behaviour are unchanged. */
+body{font-family:var(--ui);font-size:15px;background:var(--bg);color:var(--text)}
+h1,h2,h3,.mobile-logo,.logo,.stat-card strong,.big-number,.score{font-family:var(--num)}
+.sidebar{background:var(--panel);border-right:var(--bw) solid var(--ink)}
+.topbar{background:var(--panel);border-bottom:var(--bw) solid var(--ink)}
+.panel,.stat-card,.path-card,.game-card,.u-summary,.u-subject{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);box-shadow:none;color:var(--text)}
+body .u-flip{border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel);color:var(--text)}
+body .u-flip.back{background:var(--acc-soft);border-color:var(--ink)}
+body .u-option,body .u-rate button,body .u-cats button,body .u-tabs button,.select-input,.answer-input,input,select,textarea{border:2px solid var(--ink);border-radius:var(--r-s);background:var(--panel);color:var(--text);font-family:var(--ui)}
+body .u-tabs{background:var(--panel-2);border:2px solid var(--ink);border-radius:var(--r-s)}
+body .u-tabs button{border:0}
+body .u-tabs button.on,body .u-cats button.on,body .u-subject.on{background:var(--ink);border-color:var(--ink);color:var(--paper);box-shadow:none}
+body .u-option.right{background:var(--low);border-color:var(--ink);color:var(--low-t)}
+body .u-option.wrong{background:var(--hi);border-color:var(--ink);color:var(--hi-t)}
+body .u-summary th,.u-summary td{border-bottom:1px solid var(--line-soft)}
+.btn{border:2px solid var(--ink);border-radius:var(--r-s);font-family:var(--ui);font-weight:900}
+.btn-primary{background:var(--ink);color:var(--paper)}
+.btn-primary:hover{background:var(--acc);color:var(--acc-ink)}
+.btn-outline,.btn-ghost{background:var(--panel);color:var(--text)}
+.btn-outline:hover,.btn-ghost:hover{background:var(--panel-2)}
+.nav-item{border-radius:var(--r-s);font-weight:900;color:var(--text)}
+.nav-item.active{background:var(--ink);color:var(--paper)}
+.nav-item.active .nav-icon{filter:none}
+.mobile-nav{background:var(--panel);border-bottom:2px solid var(--ink)}
+.mobile-nav button{color:var(--text);font-weight:900;border-radius:var(--r-s)}
+.mobile-nav button.active{background:var(--ink);color:var(--paper)}
+.icon-btn{background:var(--panel);border:2px solid var(--ink);color:var(--text)}
+.avatar{background:var(--acc);color:var(--acc-ink);border:2px solid var(--ink)}
+.text-link,.view-link{color:var(--acc-t);font-weight:900}
+.section-kicker,.hero-kicker,.eyebrow,.small-label{font-family:var(--ui);font-weight:900;letter-spacing:.04em;color:var(--muted)}
+.hero{background:#111;color:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r);box-shadow:none;
+ background-image:repeating-linear-gradient(135deg,transparent 0 7px,rgba(255,255,255,.07) 7px 8px)}
+.hero h1,.hero h2{color:#fff}
+.hero p,.hero-text p{color:#e6e6e4}
+.hero .accent,.hero h1 span,.hero h2 span{color:var(--acc)}
+.hero-kicker{background:transparent;border:2px solid #fff;color:#fff;border-radius:var(--r-s)}
+.hero .btn-light,.hero .btn{background:#fff;color:#111;border-color:#fff}
+.hero .btn:hover{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.track,.progress-track{background:var(--panel-2);border:2px solid var(--ink);border-radius:99px}
+.track i,.track span,.progress-fill{background:var(--acc)}
+.toast{background:var(--ink);color:var(--paper);border-radius:var(--r-s)}
+.badge{border:2px solid var(--ink);border-radius:var(--r-s);color:var(--ink)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+
+/* iPad touch targets: every control at least 44px (Study OS rule) */
+.mobile-nav button,.icon-btn,.text-link,.btn,.pill,.wn-back,main button,.sidebar-settings{min-height:44px}
+.icon-btn{min-width:44px}
+.mobile-nav button{min-width:44px;padding-top:0;padding-bottom:0}
+.text-link{display:inline-flex;align-items:center}
+.sidebar-settings{display:flex;align-items:center}
+.nav-item{min-height:44px}
+.sidebar-target{background:var(--panel-2);border:2px solid var(--ink);border-radius:var(--r)}
+.sidebar-target b,.sidebar-target strong{color:var(--text)}
+#studyThemeBtn{left:auto!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;border:2px solid var(--ink)!important;background:var(--panel)!important}
+.sidebar-target,.sidebar-target [class]{color:var(--text)}
+.breadcrumb #breadcrumbCurrent{color:var(--text)}
+.word-row,.pill,.search-input{background:var(--panel);color:var(--text);border:2px solid var(--ink);border-radius:var(--r)}
+.pill{border-radius:var(--r-s)}
+.search-input{border-radius:var(--r-s)}
+.word-row .word-main,.word-row strong{color:var(--text)}
+.mini-metric,.spaced-line{background:var(--panel-2);color:var(--text);border-radius:var(--r)}
+.notice{border:2px solid var(--ink);border-radius:var(--r)}
+/* Word library: long examples no longer push rows past the screen on iPad portrait / phone */
+#wordList{min-width:0;max-width:100%}
+.word-row{min-width:0;max-width:100%}
+.word-thumb,.word-trail{flex:none}

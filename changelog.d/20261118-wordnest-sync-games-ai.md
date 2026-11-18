@@ -1,0 +1,6 @@
+- WordNest: word-game progress now syncs automatically with the main Cloud sync (same key, no separate "Sync now"); the old WordNest-only sync is retired.
+- WordNest Chinese: new Games tab with Match, Listen, Pinyin and Meaning games for the 279 words; answers update the Chinese flashcard schedule.
+- WordNest: "Ask AI" on each word and flashcard opens the AI tutor with example sentences, similar-word differences, or a /quiz on the words you miss most.
+- Today: WordNest daily goal card (words reviewed today vs goal, words due in English and Chinese).
+- AI tutor: English and Chinese are now in the subject list.
+- WordNest word library no longer overflows the screen on iPad portrait and phones.
