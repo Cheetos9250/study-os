@@ -59,8 +59,8 @@ The owner reads **Thai**. Write replies to the owner in short, plain Thai. Keep 
 
 Shared scripts and styles:
 - `scripts/study-nav.js`: sidebar on screens ≥ 900 px, bottom bar below that. Tabs: Today · Flashcards · Practice · Lessons · Calendar. The footer has theme, Grades, Back up, Restore and Cloud sync (course pages only).
-- `scripts/study-search.js`: site search, loaded by the nav on first use (sidebar **Search** field, More → Search on phones, `/` key). Indexes course quiz/cards/summaries, `data/quiz.json`, textbook-style and written questions, the textbook index and lesson notes; read-only.
-- `scripts/study-theme.js`: auto/dark/light theme. It also registers `sw.js` (https only): network-first offline cache of same-origin files; never caches `data/config.json` or other origins. Bump `VERSION` in `sw.js` only when the cache layout changes.
+- `scripts/study-search.js`: site search, loaded by the nav on first use (sidebar **Search** field, More → Search on phones, `/` key). Indexes course quiz/cards/summaries, `data/quiz.json`, textbook-style and written questions, the textbook index and lesson notes; read-only. **Ctrl+K / ⌘K** opens it from anywhere; with an empty box it lists the `#tags` written in notes (e.g. `#ออกสอบชัวร์`) to tap. Course lesson summaries have **Read aloud** (`scripts/study-speak.js`, browser speech, Thai or English per section, nothing stored).
+- `scripts/study-theme.js`: auto/dark/light/**warm paper** theme (warm = `data-theme="light"` plus class `.warm`, tokens in `study-world.css` / `study-unify.css`). It also registers `sw.js` (https only): network-first offline cache of same-origin files; never caches `data/config.json` or other origins. Bump `VERSION` in `sw.js` only when the cache layout changes.
 - `scripts/study-today.js`: `window.StudyToday`. Provides `COURSES`, `LANGS`, exams, the plan engine, `normalizeTimetable` and `classesOn`.
 - `scripts/study-grades.js`: grade maths.
 - `assets/study-unify.css`: gives course pages the site look.

@@ -4,8 +4,9 @@
 (function(){
  'use strict';
  var KEY='studyos.theme.v1',root=document.documentElement;
- function read(){try{var v=localStorage.getItem(KEY);return v==='dark'||v==='light'?v:'auto';}catch(e){return 'auto';}}
- function apply(m){if(m==='auto')root.removeAttribute('data-theme');else root.setAttribute('data-theme',m);}
+ function read(){try{var v=localStorage.getItem(KEY);return v==='dark'||v==='light'||v==='warm'?v:'auto';}catch(e){return 'auto';}}
+ /* warm = the light theme with warm paper colours (class .warm), so every light-mode rule still applies */
+ function apply(m){root.classList.toggle('warm',m==='warm');if(m==='auto')root.removeAttribute('data-theme');else root.setAttribute('data-theme',m==='warm'?'light':m);}
  var mode=read();apply(mode);
  var NAV_KEY='studyos.nav.v1',collapsed=false;
  try{collapsed=localStorage.getItem(NAV_KEY)==='collapsed';}catch(e){}
@@ -16,7 +17,7 @@
  try{focus=localStorage.getItem(FOCUS_KEY)!=='off';}catch(e){}
  if(focus)root.classList.add('focus');
  function setFocus(on){focus=!!on;root.classList.toggle('focus',focus);try{localStorage.setItem(FOCUS_KEY,focus?'on':'off');}catch(e){}return focus;}
- var ICON={auto:'🌓',dark:'🌙',light:'☀️'},LABEL={auto:'Theme: Auto',dark:'Theme: Dark',light:'Theme: Light'},NEXT={auto:'dark',dark:'light',light:'auto'};
+ var ICON={auto:'🌓',dark:'🌙',light:'☀️',warm:'📜'},LABEL={auto:'Theme: Auto',dark:'Theme: Dark',light:'Theme: Light',warm:'Theme: Warm paper'},NEXT={auto:'dark',dark:'light',light:'warm',warm:'auto'};
  function cycle(){mode=NEXT[mode];apply(mode);try{if(mode==='auto')localStorage.removeItem(KEY);else localStorage.setItem(KEY,mode);}catch(e){}return mode;}
  /* Ask the browser to keep this site's data instead of clearing it under storage pressure (iPadOS honours this best for home-screen apps). */
  try{if(navigator.storage&&navigator.storage.persisted&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist();}).catch(function(){});}catch(e){}

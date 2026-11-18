@@ -224,13 +224,13 @@ Rain / white-noise sound during Pomodoro (generated in the browser, no downloads
 
 ### 24. Ctrl+K and tags (Thai: ค้นหาด่วนและแท็ก)
 
-Status: todo
+Status: done (#174)
 
 Ctrl+K / Cmd+K opens search; tags such as `#ออกสอบชัวร์`, `#สูตรลัด`, `#จุดหลอก` in notes are searchable.
 
 ### 25. Warm paper theme and read-aloud (Thai: ธีมถนอมสายตาและอ่านออกเสียง)
 
-Status: todo
+Status: done (#174)
 
 A warm paper colour theme for night reading, and a button that reads a lesson summary aloud (browser speech).
 
