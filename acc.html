@@ -169,7 +169,7 @@ td:first-child{font-weight:500;min-width:7.5em}
   </section>
   <section id="tab-prac" hidden>
     <div class="row" style="margin:0 0 14px">
-      <a class="btn" href="accounting-textbook.html" style="text-decoration:none">Textbook Exercises · 24th Edition</a>
+      <a class="btn" href="pdf-sets.html?book=1" style="text-decoration:none">Textbook (My PDF sets) · 24th Edition</a>
     </div>
     <div class="row" id="qCats" style="margin-bottom:14px"></div>
     <div id="qBody"></div>
@@ -605,7 +605,7 @@ function renderQ(){
     const jeOn=!!(q.je&&q.je.length&&window.StudyJE), fsOn=!!(q.fs&&q.fs.rows&&q.fs.rows.length&&window.StudyFS);
     if(jeOn) h+=StudyJE.html();
     if(fsOn) h+=StudyFS.html();
-    h+='<textarea id="tbAns" class="tb-ans'+(jeOn||fsOn?' tb-ans-sm':'')+'" maxlength="15000" placeholder="'+(jeOn||fsOn?'Other working (optional). Saved on this device.':'Work it out here. Saved on this device (shared with Textbook Exercises).')+'" aria-label="Your working"></textarea>';
+    h+='<textarea id="tbAns" class="tb-ans'+(jeOn||fsOn?' tb-ans-sm':'')+'" maxlength="15000" placeholder="'+(jeOn||fsOn?'Other working (optional). Saved on this device.':'Work it out here. Saved on this device (shared with the textbook in My PDF sets).')+'" aria-label="Your working"></textarea>';
     if(!done&&q.checks.length) h+='<div id="tbChecks">'+StudySosChecks.html(q.checks)+'<div class="tb-row" id="tbQuick" hidden><span class="count">All correct.</span><button class="btn primary" id="tbGotQuick" type="button">Mark as got it</button></div></div>';
     if(!shown) h+='<div class="tb-row"><button class="btn primary" id="tbShow" type="button">Show solution</button></div>';
     else { h+='<div class="explain"><b class="v">Solution</b><div class="sos-body">'+StudySosMd(q.solution)+'</div></div>';

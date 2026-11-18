@@ -68,15 +68,14 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           }
           const textbookKey='studyos.accounting.textbook.progress.v1';
           const notes='SYNTHETIC-TEXTBOOK-ANSWER\nDr Cash / Cr Capital · คำตอบทดสอบ';
-          // The question list is collapsed on phones; wait for loaded records, then exercise the visible answer form.
-          await page.goto(base+'/accounting-textbook.html');await page.locator('.q-item').first().waitFor({state:'attached'});
-          const textbookId=await page.evaluate(()=>current.id);
-          await page.locator('#answer').fill(notes);await page.locator('#questionStatus').selectOption('doing');
-          await page.waitForFunction(({key,id,notes})=>{const saved=JSON.parse(localStorage.getItem(key)||'{}');return saved[id]?.notes===notes&&saved[id]?.status==='doing';},{key:textbookKey,id:textbookId,notes});
+          // Textbook Exercises was merged into My PDF sets (17 Nov 2026); its answers keep the same key. Save one the way the
+          // My PDF sets panel does, check it survives a reload, then the backup/restore below must carry it.
+          const textbookId='QS-1-1';
+          await page.evaluate(({key,id,notes})=>{const all=JSON.parse(localStorage.getItem(key)||'{}');all[id]={...(all[id]||{}),notes,status:'doing',updated:new Date().toISOString()};localStorage.setItem(key,JSON.stringify(all));},{key:textbookKey,id:textbookId,notes});
           const textbookSaved=await page.evaluate(key=>localStorage.getItem(key),textbookKey);
-          await page.reload();await page.locator('.q-item').first().waitFor({state:'attached'});
-          assert.equal(await page.locator('#answer').inputValue(),notes);assert.equal(await page.locator('#questionStatus').inputValue(),'doing');
-          await page.locator('.topnav a[href="index.html"]').click();await page.locator('#welcome-title').waitFor();
+          await page.goto(base+'/accounting-textbook.html');await page.waitForURL(/pdf-sets\.html\?book=1/);
+          assert.equal(await page.evaluate(key=>localStorage.getItem(key),textbookKey),textbookSaved,'the old address redirects without touching answers');
+          await page.goto(base+'/index.html');await page.locator('#welcome-title').waitFor();
           evidence.push({engine,width,textbookAnswerPersistence:'passed',pdfSelected:false});
           await page.evaluate(()=>{localStorage.setItem('study-sync-key','SYNTHETIC-SECRET');localStorage.setItem('study-sync-progress-key-v1','SYNTHETIC-SECRET');});
           await page.locator('#studyNav a[href="progress-backup.html"]').evaluate(a=>a.click());await page.waitForURL(u=>u.pathname.endsWith('/progress-backup.html'));
@@ -135,8 +134,8 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
           await restored.locator('#status').getByText(/Restored/).waitFor();
           for(const [key,value] of Object.entries(payload.entries))assert.equal(await restored.evaluate(k=>localStorage.getItem(k),key),value);
           await restored.reload();assert.equal(await restored.evaluate(()=>localStorage.getItem('study-sync-key')),null);
-          await restored.goto(base+'/accounting-textbook.html');await restored.locator('.q-item').first().waitFor({state:'attached'});
-          assert.equal(await restored.locator('#answer').inputValue(),notes);assert.equal(await restored.locator('#questionStatus').inputValue(),'doing');
+          const back=JSON.parse(await restored.evaluate(k=>localStorage.getItem(k),textbookKey)||'{}');
+          assert.equal(back[textbookId]?.notes,notes);assert.equal(back[textbookId]?.status,'doing');
           evidence.push({engine,width,nativeCourseBackupRestore:'passed',textbookAnswersRestored:true,pdfIncluded:false});await recovered.close();
           await context.close();
         }

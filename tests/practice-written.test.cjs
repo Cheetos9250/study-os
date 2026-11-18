@@ -11,5 +11,4 @@ test('shared renderer escapes HTML and renders tables',()=>{
   delete globalThis.StudySosMd; require('../scripts/textbook-sos-render.js');
   const h=globalThis.StudySosMd('<b>x</b>\n\n| A | B |\n|---|---|\n| y | 1,200 |');
   assert.doesNotMatch(h,/<b>x<\/b>/); assert.match(h,/&lt;b&gt;/); assert.match(h,/<td class="n">1,200<\/td>/);
-  assert.match(R('accounting-textbook.html'),/const sosMd=window\.StudySosMd;/);
 });

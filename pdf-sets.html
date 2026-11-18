@@ -41,6 +41,7 @@ h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px)}
 .ps-viewer canvas{display:block;width:100%;height:auto;margin:0 0 8px;border-radius:6px;background:#fff}
 .ps-sheet{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
 @media (max-width:900px){.ps-sheet{position:static;max-height:none}}
+.ps-fb{border-radius:10px;padding:8px 10px;font-size:14px;border:1px solid var(--line)}.ps-fb[data-result=correct]{border-color:#1f7448}.ps-fb[data-result=incorrect]{border-color:#c21f2f}.ps-fb p{margin:4px 0 0;font-size:13px;opacity:.85}
 .ps-ex{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 14px}.ps-ex #exTitle{flex:1;min-width:160px}.ps-ex a.ps-btn{text-decoration:none}
 .ps-mc{display:grid;gap:8px;margin:0 0 14px}.ps-mc .ps-set{min-height:44px}.ps-mc small,.ps-mcnote{font-size:13px;opacity:.75}
 .ps-jump{display:none}@media (max-width:900px){.ps-jump{display:inline-flex}}
@@ -73,7 +74,7 @@ input[type=file]{display:none}
  <button class="ps-btn ps-primary" id="addBtn" type="button">＋ Add PDF</button>
  <label class="ps-note" for="course">Subject</label>
  <select id="course" class="ps-btn" aria-label="Subject for new PDFs"><option value="eco">Economics</option><option value="math">Mathematics</option><option value="acc">Accounting</option><option value="other">Other</option></select>
- <input type="file" id="file" accept="application/pdf,.pdf" multiple>
+ <input type="file" id="file" accept="application/pdf,.pdf" multiple aria-label="Choose PDF files to add">
  <span class="ps-err" id="err" role="alert"></span>
 </div>
 <section class="ps-sets" id="sets" aria-label="Your PDF sets"></section>
@@ -96,7 +97,8 @@ input[type=file]{display:none}
        <div class="ps-bar"><button class="ps-btn" type="button" id="exAddJe">+ Journal table</button><button class="ps-btn" type="button" id="exAddFs">+ Statement table</button></div>
        <label class="ps-note" for="exAnswer">My answer / working for this exercise</label>
        <textarea id="exAnswer" class="ps-notes" maxlength="15000" placeholder="Calculations, explanations, true/false answers…"></textarea>
-       <div class="ps-bar"><button class="ps-btn" type="button" id="exPrev">← Previous</button><button class="ps-btn" type="button" id="exNext">Next →</button><a class="ps-btn" id="exOpen" href="accounting-textbook.html">Textbook Exercises</a></div>
+       <div class="ps-bar"><button class="ps-btn" type="button" id="exPrev">← Previous</button><button class="ps-btn" type="button" id="exNext">Next →</button><a class="ps-btn" id="exMcq" href="acc.html?tab=prac" hidden>Multiple-choice practice</a></div>
+       <div class="ps-check" id="exCheckBox" hidden><div class="ps-bar"><button class="ps-btn" type="button" id="exCheck">Check final answer</button><button class="ps-btn" type="button" id="exShow">Show answer</button></div><p class="ps-mcnote" id="exCheckHint"></p><div class="ps-fb" id="exFeedback" role="status" hidden></div></div>
       </section>
      </div>
      <div id="exMBox" hidden></div>
@@ -221,7 +223,12 @@ async function openExercise(id){
   $('exPanel').hidden=false; $('exTitle').textContent=item.id.replace(/-/,' ')+' · '+clean(item.title);
   $('exStatus').value=['new','doing','done'].includes(rec.status)?rec.status:'new';
   $('exAnswer').value=typeof rec.notes==='string'?rec.notes:'';
-  $('exOpen').href='accounting-textbook.html?q='+encodeURIComponent(id);
+  /* final-answer check for the questions with a reviewed answer (moved here from Textbook Exercises) */
+  /* textbook-style multiple-choice practice for this exercise (scripts/acc-textbook-mcq.js), as on the old Textbook Exercises page */
+  const mc=(window.ACC_TB_MCQ||[]).filter(m=>m.ref===id); $('exMcq').hidden=!mc.length; if(mc.length) $('exMcq').href='acc.html?tab=prac&q='+encodeURIComponent(mc[0].id);
+  const A=window.StudyAccountingCheck,can=!!(A&&A.supports(id)); $('exCheckBox').hidden=!can; $('exFeedback').hidden=true;
+  if(can) $('exCheckHint').textContent='Checks the final answer only, e.g. '+A.describe(id).example+'. Put it on the last line: Final answer: '+A.describe(id).example;
+  window.StudyLast&&StudyLast.mark({href:'pdf-sets.html?book=1&q='+encodeURIComponent(id),title:'Accounting · Textbook',sub:item.id.replace(/-/,' ')+' · '+clean(item.title),course:'acc'});
   const showJe=tb.je||Array.isArray(rec.bje), showFs=tb.fs||Array.isArray(rec.bfs);
   $('exHint').textContent=(showJe||showFs)?'Tables keep a running Debit = Credit / total check. The book\'s answers are not built in; the rewritten version of this exercise in Practice is checked.':'';
   $('pjeBox').hidden=!showJe; $('pfsBox').hidden=!showFs; $('exAddJe').hidden=showJe; $('exAddFs').hidden=showFs;
@@ -309,6 +316,19 @@ $('exAnswer').addEventListener('input',()=>{ clearTimeout(exTimer); exTimer=setT
 $('exAnswer').addEventListener('blur',()=>{ if(exTimer) exFlush(); });
 addEventListener('pagehide',()=>{ if(exTimer) exFlush(); if(exJe) exJe.flush(); if(exFs) exFs.flush(); });
 $('exPrev').onclick=()=>exStep(-1); $('exNext').onclick=()=>exStep(1);
+function exShowResult(r){ const b=$('exFeedback'); b.hidden=false; b.dataset.result=r.status; b.innerHTML='<b>'+esc(r.message)+'</b>'+[r.explanation,r.source].filter(Boolean).map(t=>'<p>'+esc(t)+'</p>').join(''); }
+$('exCheck').onclick=()=>{ if(!exCur||!window.StudyAccountingCheck) return; if(exTimer) exFlush(); exShowResult(StudyAccountingCheck.check(exCur.id,$('exAnswer').value)); };
+$('exShow').onclick=()=>{ if(!exCur||!window.StudyAccountingCheck) return; exShowResult(StudyAccountingCheck.solution(exCur.id)); };
+$('exAnswer').addEventListener('input',()=>{ $('exFeedback').hidden=true; });
+/* links from Practice, Lessons, Today, search and the old Textbook Exercises page: ?book=1[&q=QS-6-1 | &ch=5] */
+(async()=>{ const u=new URLSearchParams(location.search); if(!u.get('book')) return;
+  for(let i=0;i<50&&!data.sets[BOOK_ID];i++) await new Promise(r=>setTimeout(r,100));
+  if(!data.sets[BOOK_ID]){ $('err').textContent='Add the accounting textbook PDF (1,210 pages) with Add PDF to open its exercises.'; return; }
+  await select(BOOK_ID); const ix=await loadIndex(); exKind='w'; renderMc();
+  const q=u.get('q'),ch=u.get('ch'),list=exList();
+  const item=q?list.find(i=>i.id===q):ch?list.find(i=>i.chapter===ch):null;
+  if(item){ await new Promise(r=>setTimeout(r,300)); goPage(item.pdfPage); openExercise(item.id); }
+})();
 $('exAddJe').onclick=()=>{ if(!exCur) return; tbPatch(exCur.id,r=>{ if(!Array.isArray(r.bje)) r.bje=[]; }); openExercise(exCur.id); };
 $('exAddFs').onclick=()=>{ if(!exCur) return; tbPatch(exCur.id,r=>{ if(!Array.isArray(r.bfs)) r.bfs=[]; }); openExercise(exCur.id); };
 $('exW').onclick=()=>{ exKind='w'; renderMc(); }; $('exM').onclick=()=>{ exKind='m'; renderMc(); };
@@ -329,6 +349,10 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
   renderSets(); const first=Object.keys(data.sets)[0]; if(first){ if(document.readyState==='complete') select(first); else addEventListener('load',()=>select(first)); } })();
 </script>
 <script src="scripts/pdf-mcq.js?v=2"></script>
+<script src="scripts/accounting-answer-check.js?v=20261117"></script>
+<script src="scripts/acc-textbook-mcq.js?v=1"></script>
+<script src="scripts/study-calc.js?v=2"></script>
+<script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/je-grid.js?v=4"></script>
 <script src="scripts/fs-grid.js?v=3"></script>
 <script src="scripts/study-today.js?v=2"></script>

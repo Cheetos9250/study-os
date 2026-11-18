@@ -372,7 +372,7 @@ function renderPlan(){
   const c=t.course?course(t.course):null,done=t.kind==='chapter'?t.done:!!doneToday[t.id];let acts='';
   if(t.kind==='quiz')acts='<a class="main" href="'+link(t.top,'prac')+'&review=1">Start review</a>';
   else if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
-  else if(c&&t.kind==='chapter')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="accounting-textbook.html?ch='+t.cat.slice(1)+'">Textbook</a>':'');
+  else if(c&&t.kind==='chapter')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="pdf-sets.html?book=1&ch='+t.cat.slice(1)+'">Textbook</a>':'');
   else if(c)acts='<a class="main" href="'+link(c,'prac')+'">Practice</a>';
   return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
   :'<p class="empty">Nothing planned. Free time? Go to Practice.</p>';

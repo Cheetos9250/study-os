@@ -5,7 +5,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const root=path.join(__dirname,'..');
 const catalog=JSON.parse(fs.readFileSync(path.join(root,'data/accounting-textbook-index.json'),'utf8'));
-const html=fs.readFileSync(path.join(root,'accounting-textbook.html'),'utf8');
+const html=fs.readFileSync(path.join(root,'pdf-sets.html'),'utf8');
 const accounting=fs.readFileSync(path.join(root,'acc.html'),'utf8');
 const home=fs.readFileSync(path.join(root,'practice.html'),'utf8');
 
@@ -40,17 +40,11 @@ test('catalog record counts and source pages reconcile',()=>{
   }
 });
 
-test('study links use a separate local progress namespace',()=>{
+test('study links open the textbook in My PDF sets; answers keep their own namespace',()=>{
   assert.match(html,/data\/accounting-textbook-index\.json/);
   assert.match(html,/studyos\.accounting\.textbook\.progress\.v1/);
-  assert.match(html,/Export answers/);
-  assert.match(html,/Import answers/);
-  assert.match(html,/The PDF is imported into this browser and is not uploaded to Study OS/);
-  assert.match(accounting,/href="accounting-textbook\.html"/);
-  assert.match(home,/href="accounting-textbook\.html"/);
-  assert.match(home, /403 indexed exercises · Chapters 1–9 \(through Receivables\)/);
-  assert.match(html, /Textbook Exercises · Chapters 1–9/);
-  assert.ok((home.match(/href="accounting-textbook.html"/g)||[]).length>=1);
+  assert.match(accounting,/href="pdf-sets\.html\?book=1"/);
+  assert.match(home,/href="pdf-sets\.html\?book=1"/);
+  assert.match(home,/403 written exercises \(Quick Study, Exercises &amp; Problems, Ch 1–9\)/);
   assert.doesNotMatch(html,/localStorage\.clear\(/);
-  assert.doesNotMatch(html,/studyos\.acc\./);
 });

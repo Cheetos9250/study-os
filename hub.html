@@ -148,7 +148,7 @@ function chapters(c,now){
  if(!D||!s){$('#view').className='list';$('#view').innerHTML='<p class="status'+(errors.includes(c.key)?' err':'')+'">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p>';return;}
  const rows=D.cats.map(([id,label])=>{
   const p=s.per[id],ex=examFor(c.key,id,now),acc=T.accuracy(p);
-  const book=c.key==='acc'&&/^c\d+$/.test(id)?'<a href="accounting-textbook.html?ch='+id.slice(1)+'">Textbook</a>':'';
+  const book=c.key==='acc'&&/^c\d+$/.test(id)?'<a href="pdf-sets.html?book=1&amp;ch='+id.slice(1)+'">Textbook</a>':'';
   return '<div class="card chap"><h3>'+esc(label)+(ex?' <span class="tagx">'+esc(ex.title)+' · '+(ex.days===0?'today':ex.days+'d')+'</span>':'')+'</h3>'
    +'<div class="meta">'+(document.documentElement.classList.contains('focus')?'':'<span class="due">Due <b>'+p.due+'</b></span><span>Cards <b>'+p.seen+'/'+p.cards+'</b></span>')+'<span>Quiz <b>'+(p.quiz?(p.answered?Math.round(acc*100)+'%':'–'):'–')+'</b></span></div>'
    +'<div class="acts">'+(document.documentElement.classList.contains('focus')?'<a class="main" href="'+link(c,'prac',id)+'">Practice</a>':'<a class="main" href="'+link(c,'sum',id)+'">Lesson</a><a href="'+link(c,'cards',id)+'">Cards</a><a href="'+link(c,'prac',id)+'">Practice</a>')+book+noteBtn(c.key+':'+id)+'</div>'+noteBox(c.key+':'+id)+'</div>';

@@ -4,9 +4,9 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8'),nav=read('scripts/study-nav.js');
 test('navigation (Today · Flashcards · Practice · Lessons · Calendar) reaches every main destination',()=>{
  for(const h of ['index.html','flashcards.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html'])assert.match(nav,new RegExp("href:'"+h.replace('.','\\.')+"'"),h);
- for(const f of ['index.html','flashcards.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html','accounting-textbook.html','acc.html','eco.html','math.html','eng.html','zh.html'])assert.match(read(f),/scripts\/study-nav\.js/,f);
+ for(const f of ['index.html','flashcards.html','practice.html','hub.html','calendar.html','progress-backup.html','progress-restore.html','pdf-sets.html','acc.html','eco.html','math.html','eng.html','zh.html'])assert.match(read(f),/scripts\/study-nav\.js/,f);
  const practice=read('practice.html');
- for(const h of ['accounting-textbook.html','vocabloom/'])assert.ok(practice.includes('href="'+h),h);
+ for(const h of ['pdf-sets.html?book=1','vocabloom/'])assert.ok(practice.includes('href="'+h),h);
  assert.match(read('flashcards.html'),/T\.LANGS\.map/);assert.match(read('flashcards.html'),/l\.app/);
  const T=require('../scripts/study-today.js');assert.deepEqual(T.LANGS.map(l=>l.app),['vocabloom/?lang=en','vocabloom/?lang=zh']);
  assert.match(html,/T\.LANGS\[1\]\.app/);

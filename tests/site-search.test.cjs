@@ -9,7 +9,7 @@ test('index covers questions, cards, summaries, notes and textbook; links open t
  const types=new Set(idx.map(x=>x.type));for(const t of ['q','card','sum','note','tb'])assert.ok(types.has(t),t);
  assert.equal(S.search(idx,'accounting equation')[0].href,'acc.html?tab=prac&q=0');
  assert.match(S.search(idx,'fob shipping')[0].href,/^acc\.html\?tab=prac&cat=c5$/);
- assert.equal(S.search(idx,'credit card sales').find(x=>x.type==='tb').href,'accounting-textbook.html?q=QS-9-2');
+ assert.equal(S.search(idx,'credit card sales').find(x=>x.type==='tb').href,'pdf-sets.html?book=1&q=QS-9-2');
  assert.ok(S.search(idx,'income statement').some(x=>x.href==='acc.html?tab=prac&q=tbw-QS-9-26'));
  assert.ok(S.search(idx,'kerr').some(x=>x.href==='acc.html?tab=prac&q=tb-QS-5-1'));
  assert.ok(S.search(idx,'what is an asset').some(x=>x.href==='acc.html?tab=prac&q=n-abc'));

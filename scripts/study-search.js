@@ -32,7 +32,7 @@
   }
   for(const m of (src.accMcq||[]))if(m&&m.id&&m.q)add('q','acc',m.q,'Accounting · textbook style '+(m.ref||''),'acc.html?tab=prac&q='+enc(m.id));
   for(const it of (src.written||[]))if(it&&it.id)add('q','acc',it.title||it.id,'Accounting · written · '+it.id+' · '+plain(it.prompt).slice(0,90),'acc.html?tab=prac&q='+enc('tbw-'+it.id));
-  for(const it of (src.textbook||[]))if(it&&it.id&&!it.sectionOnly)add('tb','acc',it.id+' '+(it.title||''),'Textbook exercises · Ch'+(it.chapter||''),'accounting-textbook.html?q='+enc(it.id));
+  for(const it of (src.textbook||[]))if(it&&it.id&&!it.sectionOnly)add('tb','acc',it.id+' '+(it.title||''),'Textbook exercises · Ch'+(it.chapter||''),'pdf-sets.html?book=1&q='+enc(it.id));
   for(const [key,v] of Object.entries(src.notes||{})){
    const m=/^([a-z]+):([A-Za-z0-9_-]+)$/.exec(key);if(!m||!v||typeof v.text!=='string'||!v.text.trim())continue;
    const k=m[1],D=(src.courses||{})[k],lab=D&&(D.cats||[]).find(c=>c[0]===m[2]);
