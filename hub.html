@@ -110,9 +110,9 @@ button.danger{color:var(--red)}
 <div id="view" class="list"><p class="status">Loading…</p></div>
 </main>
 </div>
-<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
-<script src="scripts/study-nav.js?v=8"></script>
+<script src="scripts/study-nav.js?v=10"></script>
 <script>
 (function(){
 'use strict';
@@ -179,7 +179,7 @@ window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
 addEventListener('studycloud:applied',()=>{if(noteTimer)return;try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}render();});
 render();
-Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();})
+Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();})
  .then(html=>{data[c.key]=T.parseCourseData(html);}).catch(()=>{errors.push(c.key);}))).then(render);
 })();
 </script>

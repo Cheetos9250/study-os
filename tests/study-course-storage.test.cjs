@@ -1,4 +1,5 @@
 'use strict';
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const core=require('../scripts/study-course-storage.js'),backup=require('../scripts/study-progress-backup.js');
 const origin='https://cheetos9250.github.io';
@@ -29,7 +30,7 @@ test('invalid writes cannot touch credentials or create a pending secret',()=>{
 test('all course writes use the guard while existing sync callbacks remain present',()=>{
  const fs=require('node:fs'),path=require('node:path');
  for(const course of ['acc','eco','math','eng','zh']){
-  const html=fs.readFileSync(path.join(__dirname,'../'+course+'.html'),'utf8');
+  const html=__cs.read(path.join(__dirname,'../'+course+'.html'),'utf8');
   assert.match(html,/study-course-storage\.js/);assert.match(html,/study-progress-backup\.js/);assert.match(html,/study-course-save\.css/);
   assert.match(html,/progressWrites\.write\(KEY,JSON\.stringify\(store\)\); window\.__xs&&window\.__xs\.dirty\(\)/);
   assert.match(html,/progressWrites\.write\(D\.markKey\+'-srs'/);assert.match(html,/progressWrites\.write\(D\.markKey\+'-typ'/);

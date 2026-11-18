@@ -10,13 +10,13 @@
  const SETTINGS_KEY='studyos.today.v1';
  // Vocabulary decks (no exams or chapters plan); used for due counts only.
  const LANGS=Object.freeze([
-  {key:'eng',page:'eng.html',app:'vocabloom/?lang=en',mark:'eng-vocab-v1',name:'English'},
-  {key:'zh',page:'zh.html',app:'vocabloom/?lang=zh',mark:'zh-vocab-v1',name:'Chinese'}
+  {key:'eng',page:'eng.html',data:'data/courses/eng.js',app:'vocabloom/?lang=en',mark:'eng-vocab-v1',name:'English'},
+  {key:'zh',page:'zh.html',data:'data/courses/zh.js',app:'vocabloom/?lang=zh',mark:'zh-vocab-v1',name:'Chinese'}
  ]);
  const COURSES=Object.freeze([
-  {key:'acc',page:'acc.html',mark:'acc-flashcards-v1',name:'Accounting',full:'ACC'},
-  {key:'eco',page:'eco.html',mark:'econ-flashcards-v1',name:'Economics',full:'ECO'},
-  {key:'math',page:'math.html',mark:'math-flashcards-v1',name:'Math',full:'MATH'}
+  {key:'acc',page:'acc.html',data:'data/courses/acc.js',mark:'acc-flashcards-v1',name:'Accounting',full:'ACC'},
+  {key:'eco',page:'eco.html',data:'data/courses/eco.js',mark:'econ-flashcards-v1',name:'Economics',full:'ECO'},
+  {key:'math',page:'math.html',data:'data/courses/math.js',mark:'math-flashcards-v1',name:'Math',full:'MATH'}
  ]);
  // Scopes marked unconfirmed are assumptions until the learner edits them.
  const DEFAULT_EXAMS=Object.freeze([

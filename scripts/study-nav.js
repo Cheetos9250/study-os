@@ -13,6 +13,7 @@
  var MORE=[
   {href:'grades.html',label:'Grades',icon:'grades'},
  {href:'stats.html',label:'Stats',icon:'stats'},
+  {href:'tutor.html',label:'AI tutor',icon:'tutor'},
   {href:'progress-backup.html',label:'Back up',icon:'backup'},
   {href:'progress-restore.html',label:'Restore',icon:'restore'}
  ];
@@ -20,7 +21,7 @@
  // Course pages show one mode (?tab=cards|sum|prac); highlight the matching section.
  var mode=(typeof URLSearchParams==='function'?new URLSearchParams(location.search).get('tab'):'')||'cards';
  var course=/^(acc|eco|math|eng|zh)\.html$/.test(file)?({cards:'cards',sum:'lessons',prac:'practice'}[mode]||'cards'):'';
- var active=course||{'':'today','index.html':'today','flashcards.html':'cards','practice.html':'practice','accounting-textbook.html':'practice','pdf-sets.html':'practice','hub.html':'lessons','calendar.html':'calendar','today.html':'calendar','grades.html':''}[file]||'';
+ var active=course||{'':'today','index.html':'today','flashcards.html':'cards','practice.html':'practice','accounting-textbook.html':'practice','pdf-sets.html':'practice','hub.html':'lessons','calendar.html':'calendar','today.html':'calendar','grades.html':'','classroom.html':'today'}[file]||'';
  /* Line icons, 24px grid, 1.8 stroke. */
  var ICONS={
   today:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>',
@@ -30,6 +31,7 @@
   calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
   more:'<circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/>',
   search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20.5 20.5"/>',
+  tutor:'<path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5A1.5 1.5 0 0 1 19 17h-7l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/><path d="M9 11.2h.01M12 11.2h.01M15 11.2h.01"/>',
   stats:'<path d="M4 19.5h16"/><path d="M4 15l4.5-4.5 3.5 3 7-7.5"/><path d="M15 6h4v4"/>',
   grades:'<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
   backup:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/>',
@@ -55,7 +57,7 @@
  +'#studyNav .sn-more{display:none}'
  +'@media(min-width:900px){'
  +' html.sn-on body{padding-left:224px!important}'
- +' #studyNav{left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
+ +' #studyNav{overflow-y:auto;overscroll-behavior:contain;left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
  +' #studyNav .sn-brand{font:700 25px/1 "Kaisei Decol",serif;padding:4px 12px 22px;min-height:0;margin-right:54px}'
  +' #studyNav .sn-brand b{color:var(--sn-on);font-weight:700;margin-left:.25em}'
  /* Safari rubber-band scrolling moves fixed elements; extend the sidebar colour above and below so no gap shows */
@@ -166,7 +168,7 @@
  var navSrc=(document.currentScript&&document.currentScript.src)||'';
  function openSearch(q){
   if(window.StudySearch){window.StudySearch.open(q);return;}
-  var sc=document.createElement('script');sc.src=navSrc?new URL('study-search.js?v=1',navSrc).href:'scripts/study-search.js?v=1';
+  var sc=document.createElement('script');sc.src=navSrc?new URL('study-search.js?v=2',navSrc).href:'scripts/study-search.js?v=2';
   sc.onload=function(){if(window.StudySearch)window.StudySearch.open(q);};document.head.appendChild(sc);
  }
  document.addEventListener('keydown',function(e){

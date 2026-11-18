@@ -233,7 +233,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
   <button class="primary" type="submit">Add</button>
  </form>
  <div id="tasks" role="list"></div>
- <div class="toolbar" style="margin:4px 0 0"><button type="button" class="moreBtn" id="moreBtn" hidden>Show more</button><label class="show-done"><input type="checkbox" id="fDone" style="min-height:0;width:20px;height:20px"> Show done</label></div>
+ <div class="toolbar" style="margin:4px 0 0"><button type="button" class="moreBtn" id="moreBtn" hidden>Show more</button><a class="moreBtn" href="classroom.html" style="display:inline-flex;align-items:center;min-height:44px;text-decoration:none">Import from Classroom</a><label class="show-done"><input type="checkbox" id="fDone" style="min-height:0;width:20px;height:20px"> Show done</label></div>
 </section>
 
 <h2>Subjects</h2>
@@ -243,9 +243,9 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
-<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
-<script src="scripts/study-nav.js?v=8"></script>
+<script src="scripts/study-nav.js?v=10"></script>
 <script>
 (function(){
 'use strict';
@@ -388,7 +388,7 @@ function renderTasks(){
  const list=st.tasks.filter(t=>showDone||!t.done).sort((a,b)=>a.date.localeCompare(b.date)||PRI[a.pri]-PRI[b.pri]);
  const shown=list.slice(0,limit);$('#moreBtn').hidden=list.length<=limit;
  $('#tasks').innerHTML=shown.length?shown.map(t=>{const l=leftLabel(t.date);
-  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+esc(t.title)+'</span><span class="meta"><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span></span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);min-height:44px;min-width:40px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';}).join(''):'<p class="empty">No tasks.</p>';
+  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+(/^https:\/\/classroom\.google\.com\//.test(t.link||'')?'<a href="'+esc(t.link)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(t.title)+'</a>':esc(t.title))+'</span><span class="meta"><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span></span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);min-height:44px;min-width:40px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';}).join(''):'<p class="empty">No tasks.</p>';
 }
 $('#tasks').addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.id;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;save();renderAll();}});
 $('#tasks').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t&&confirm('Delete "'+t.title+'"?')){st.tasks=st.tasks.filter(x=>x.id!==id);save();renderAll();}});
@@ -508,8 +508,8 @@ function renderContinue(){
 }
 function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderContinue();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
 renderAll();
-Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
-Promise.all(T.LANGS.map(l=>fetch(l.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});
+Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
+Promise.all(T.LANGS.map(l=>fetch(l.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){compute();renderAll();}});
 addEventListener('studycloud:applied',()=>{st=load();st.tasks=Array.isArray(st.tasks)?st.tasks:[];st.covers=st.covers&&typeof st.covers==='object'&&!Array.isArray(st.covers)?st.covers:{};paintImages();compute();renderAll();});
 paintImages();

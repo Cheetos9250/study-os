@@ -1,5 +1,6 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const root=path.join(__dirname,'..'),read=f=>fs.readFileSync(path.join(root,f),'utf8');
+const root=path.join(__dirname,'..'),read=f=>__cs.read(path.join(root,f),'utf8');
 const M=require('../scripts/study-course-mode.js');
 test('one mode per course page, chosen by ?tab (default Flashcards)',()=>{
  assert.equal(M.pick('?tab=sum'),'sum');assert.equal(M.pick('?tab=prac&cat=c6'),'prac');assert.equal(M.pick(''),'cards');assert.equal(M.pick('?tab=evil'),'cards');

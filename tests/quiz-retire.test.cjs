@@ -1,7 +1,8 @@
+const __cs=require('./course-source.cjs');
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const R=require('../scripts/study-review.js');const DAY=86400000;
-const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
+const read=f=>__cs.read(path.join(__dirname,'..',f),'utf8');
 test('a question retires after 4 correct answers in a row and comes back only when its 30/90-day review is due',()=>{
   const now=Date.UTC(2026,10,16,5);const store={ans:{q:1},ats:{q:now},rv:{}};
   let t=now;for(let i=0;i<3;i++){R.record(store,'q',true,t);t=store.rv.q[1];}

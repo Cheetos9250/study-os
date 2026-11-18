@@ -1,5 +1,6 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert'),fs=require('fs'),path=require('path');
-const R=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const R=p=>__cs.read(path.join(__dirname,'..',p),'utf8');
 const COURSES=['acc','eco','math','eng','zh'];
 const visible=s=>s.split('\n').filter(l=>l.length<20000&&!/^const (D|EMBQ)/.test(l)).join('\n');
 test('course pages load cards/questions only from data/ (Notion retired)',()=>{

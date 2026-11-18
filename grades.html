@@ -161,9 +161,9 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 </main>
 </div>
 <script src="scripts/study-grades.js?v=2"></script>
-<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
-<script src="scripts/study-nav.js?v=8"></script>
+<script src="scripts/study-nav.js?v=10"></script>
 <script>
 (function(){
 'use strict';
@@ -216,7 +216,7 @@ function courseKey(name){const n=String(name).toLowerCase();return /account|à¸šà
 function weakest(key){
  const C=T&&T.COURSES.find(x=>x.key===key);if(!C)return null;
  if(WEAK[key]!==undefined)return WEAK[key];
- if(!LOADING[key]){LOADING[key]=fetch(C.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{
+ if(!LOADING[key]){LOADING[key]=fetch(C.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{
    const D=T.parseCourseData(h),s=T.summarize(D,localStorage.getItem(C.mark+'-srs'),localStorage.getItem('study-'+key),Date.now());
    const per=Object.values(s.per).filter(p=>p.quiz>0),tried=per.filter(p=>p.answered>=2).sort((a,b)=>a.correct/a.answered-b.correct/b.answered||b.answered-a.answered);
    WEAK[key]={C,p:tried[0]||per.sort((a,b)=>(b.quiz-b.answered)-(a.quiz-a.answered))[0]||null,tried:!!tried[0]};

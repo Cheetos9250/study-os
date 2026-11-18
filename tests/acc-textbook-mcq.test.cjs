@@ -1,5 +1,6 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert'),fs=require('fs'),path=require('path'),vm=require('vm');
-const R=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const R=p=>__cs.read(path.join(__dirname,'..',p),'utf8');
 const ctx={window:{}};vm.runInNewContext(R('scripts/acc-textbook-mcq.js'),ctx);const Q=ctx.window.ACC_TB_MCQ;
 const index=JSON.parse(R('data/accounting-textbook-index.json')).items.map(i=>i.id);
 test('textbook-style MCQs: English, 4 distinct options, stable unique ids, refs exist in the textbook index',()=>{
@@ -10,7 +11,7 @@ test('textbook-style MCQs: English, 4 distinct options, stable unique ids, refs 
   for(const c of ['c5','c6','c7','c8','c9']) assert.ok(Q.some(q=>q.cat===c),c);
 });
 test('accounting practice includes them in the main pool and supports ?q= deep links',()=>{
-  const s=R('acc.html'); assert.match(s,/scripts\/acc-textbook-mcq\.js/); assert.match(s,/window\.ACC_TB_MCQ\|\|\[\]\)\.forEach/);
+  const s=R('acc.html'); assert.match(s,/scripts\/acc-textbook-mcq\.js/); assert.match(s,/mcq:\{list:'ACC_TB_MCQ',seed:1501,tb:true\}/); assert.match(s,/\(OPT\.mcq&&window\[OPT\.mcq\.list\]\|\|\[\]\)\.forEach/);
   assert.match(s,/get\('q'\)/); assert.match(s,/Textbook style/);
 });
 test('textbook exercises (My PDF sets) link each exercise to its multiple-choice question',()=>{

@@ -1,4 +1,5 @@
 'use strict';
+const __cs=require('../../tests/course-source.cjs');
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {readFileSync}=require('node:fs');
@@ -6,7 +7,7 @@ const {join}=require('node:path');
 const vm=require('node:vm');
 
 const root=join(__dirname,'../..');
-const text=path=>readFileSync(join(root,path),'utf8');
+const text=path=>__cs.read(join(root,path),'utf8');
 const subjects=['acc.html','eco.html','math.html','eng.html','zh.html'];
 const originalApi='https://study-api.kasidit09022550.workers.dev';
 const futureApi='https://example-progress-worker.invalid';

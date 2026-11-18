@@ -11,7 +11,7 @@ const CACHE = VERSION + '-files';
 const CORE = [
   './', 'index.html', 'flashcards.html', 'practice.html', 'hub.html', 'calendar.html', 'grades.html', 'stats.html',
   'acc.html', 'eco.html', 'math.html', 'eng.html', 'zh.html', 'excel.html',
-  'pdf-sets.html', 'progress-backup.html', 'progress-restore.html', 'vocabloom/index.html',
+  'pdf-sets.html', 'tutor.html', 'classroom.html', 'progress-backup.html', 'progress-restore.html', 'vocabloom/index.html',
   'manifest.webmanifest', 'data/quiz.json', 'data/cards.json', 'data/accounting-textbook-index.json',
   'data/textbook-sos/ch5.json', 'data/textbook-sos/ch6.json', 'data/textbook-sos/ch7.json',
   'data/textbook-sos/ch8.json', 'data/textbook-sos/ch9.json'

@@ -1,3 +1,4 @@
+const __cs=require('./course-source.cjs');
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const F=require('../scripts/fs-grid.js'),root=path.join(__dirname,'..');
@@ -21,7 +22,7 @@ test('checks totals by name and amount, other amounts anywhere; explains mistake
 });
 test('every statement solution checks as correct against itself',()=>{
  let n=0;
- for(const ch of [5,6,7,8,9])for(const it of JSON.parse(fs.readFileSync(path.join(root,'data/textbook-sos/ch'+ch+'.json'),'utf8'))){
+ for(const ch of [5,6,7,8,9])for(const it of JSON.parse(__cs.read(path.join(root,'data/textbook-sos/ch'+ch+'.json'),'utf8'))){
   const a=F.parse(it.solution);if(!a.rows.length)continue;n++;
   const rows=a.rows.map(r=>[r.label,r.amts.length>1?String(r.amts[0]):(r.total?'':String(r.amts[0])),r.amts.length>1?String(r.amts[1]):(r.total?String(r.amts[0]):'')]);
   assert.ok(F.check(rows,a).all,it.id);
@@ -29,7 +30,7 @@ test('every statement solution checks as correct against itself',()=>{
  assert.ok(n>=15,'statement questions: '+n);
 });
 test('acc.html shows the statement table and stores rows as fs in the textbook record (validated on restore)',()=>{
- const s=fs.readFileSync(path.join(root,'acc.html'),'utf8');
+ const s=__cs.read(path.join(root,'acc.html'),'utf8');
  assert.match(s,/<script src="scripts\/fs-grid\.js\?v=\d+"><\/script>/);
  assert.match(s,/fs:window\.StudyFS\?StudyFS\.parse\(it\.solution\|\|''\)/);assert.match(s,/rec\.fs=rows/);
  const R=require('../scripts/study-progress-restore.js');
@@ -44,8 +45,8 @@ test('balance sheet: net receivables may be typed as its parts; title says Balan
  assert.ok(F.check([['Cash','11600',''],['Accounts receivable','58400',''],['Less allowance','(3,150)',''],['Prepaid rent','1500',''],['Total current assets','','68350']],a).all);
  assert.ok(F.check([['Cash','11600',''],['Accounts receivable, net','55250',''],['Prepaid rent','1500',''],['Total current assets','','68350']],a).all);
  assert.equal(F.check([['Cash','11600',''],['Total current assets','','68,000']],a).all,false);
- assert.match(fs.readFileSync(path.join(root,'scripts/fs-grid.js'),'utf8'),/'Balance sheet · '\+x/);
+ assert.match(__cs.read(path.join(root,'scripts/fs-grid.js'),'utf8'),/'Balance sheet · '\+x/);
 });
 test('"All correct" for the number checks stays hidden until the numbers are checked',()=>{
- assert.match(fs.readFileSync(path.join(root,'acc.html'),'utf8'),/\.tb-row\[hidden\]\{display:none\}/);
+ assert.match(__cs.read(path.join(root,'acc.html'),'utf8'),/\.tb-row\[hidden\]\{display:none\}/);
 });

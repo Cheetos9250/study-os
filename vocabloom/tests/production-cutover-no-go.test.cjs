@@ -1,4 +1,5 @@
 'use strict';
+const __cs=require('../../tests/course-source.cjs');
 /**
  * Phase 6 NO-GO guardrail. A deliberate Production cutover must explicitly
  * change this test and its reviewed policy. Never silently point the study
@@ -9,7 +10,7 @@ const assert=require('node:assert/strict');
 const {readFileSync}=require('node:fs');
 const {join}=require('node:path');
 const ROOT=join(__dirname,'../..');
-const read=path=>readFileSync(join(ROOT,path),'utf8');
+const read=path=>__cs.read(join(ROOT,path),'utf8');
 const ORIGINAL='https://study-api.kasidit09022550.workers.dev';
 const STAGING='https://study-api-cas-staging-only.kasidit09022550.workers.dev';
 const SUBJECTS=['acc','eco','math','eng','zh'];

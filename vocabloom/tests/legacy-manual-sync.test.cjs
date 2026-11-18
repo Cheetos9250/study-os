@@ -1,4 +1,5 @@
 'use strict';
+const __cs=require('../../tests/course-source.cjs');
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -78,7 +79,7 @@ function fixture(html,{hasKey=true,allow=true,putOK=true,versioned=false,etagMod
  get button(){return button},remote:()=>JSON.parse(JSON.stringify(cloudState)),async flush(){await new Promise(resolve=>setImmediate(resolve))}};
 }
 for(const filename of pages){
- const content=fs.readFileSync(path.join(root,filename),'utf8');
+ const content=__cs.read(path.join(root,filename),'utf8');
  test(filename+' keeps existing scores locally and sends no automatic Cloudflare progress writes',async()=>{
   const f=fixture(content);
   await f.flush();
@@ -116,7 +117,7 @@ for(const filename of pages){
 
 
 for(const filename of pages){
- const content=fs.readFileSync(path.join(root,filename),'utf8');
+ const content=__cs.read(path.join(root,filename),'utf8');
  test(filename+' performs ETag/If-Match manual sync when backend supports revisions',async()=>{
   const f=fixture(content,{versioned:true});
   await f.flush();await f.context.window.__xs.sync(true);
@@ -143,7 +144,7 @@ for(const filename of pages){
 }
 
 for(const filename of pages){
- const content=fs.readFileSync(path.join(root,filename),'utf8');
+ const content=__cs.read(path.join(root,filename),'utf8');
  test(filename+' syncs with compression-safe application revision even when ETag is weak',async()=>{
   const f=fixture(content,{versioned:true,etagMode:'weak+custom'});
   await f.flush();await f.context.window.__xs.sync(true);
