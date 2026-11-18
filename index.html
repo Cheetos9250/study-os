@@ -113,6 +113,18 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .cont .cd{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:112px;max-width:42%;padding-left:14px;border-left:2.5px solid var(--ink);text-align:center}
 .cont .cd .n{font:700 46px/1 var(--num,serif);font-variant-numeric:tabular-nums}.cont .cd.hot .n{color:var(--red)}
 .cont .cd .l{font-size:12.5px;font-weight:700;line-height:1.3;margin-top:4px}
+/* WordNest daily goal (scripts/study-wordnest.js) */
+.wng{display:flex;align-items:center;gap:14px;margin:12px 0 0;padding:12px 18px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel);color:inherit;text-decoration:none;min-height:44px}
+.wng[hidden]{display:none}.wng:focus-visible{outline:3px solid var(--focus,#2f6bff);outline-offset:3px}
+.wng .wt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.wng .k{font:900 12px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--acc-t,var(--red))}
+.wng b{font:700 18px/1.25 var(--num,serif)}.wng .q{font-size:14px;line-height:1.4;color:var(--muted)}
+.wng .bar{height:10px;border:2px solid var(--ink);border-radius:99px;background:var(--panel-2);overflow:hidden;margin-top:4px;max-width:420px}
+.wng .bar i{display:block;height:100%;background:var(--acc)}
+.wng .wdue{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:96px;padding-left:14px;border-left:2.5px solid var(--ink);text-align:center}
+.wng .wdue .n{font:700 40px/1 var(--num,serif);font-variant-numeric:tabular-nums}.wng .wdue .l{font-size:12.5px;font-weight:700;margin-top:4px}
+.wng.met .k::after{content:" ✓"}
+@media(max-width:420px){.wng{padding:12px 14px}.wng .wdue{min-width:76px}.wng .wdue .n{font-size:32px}}
 @media(max-width:420px){.cont{padding:12px 14px}.cont .cd{min-width:86px}.cont .cd .n{font-size:38px}}
 .bk .acts{margin:0;flex-basis:100%;padding-left:36px}.bk .bk-miss{display:block;margin-top:2px;font-weight:700}.bk .bk-msg{flex-basis:100%;margin:0;padding-left:36px;font-size:14px;font-weight:700;color:var(--green,#1f7448)}.bk .bk-msg.bad{color:var(--red,#c21f2f)}.bk .acts a[aria-disabled=true]{opacity:.5;pointer-events:none}
 /* wide screens: the reminder sits in the empty space beside the title */
@@ -210,6 +222,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <div class="chips scoreboard" id="chips" aria-label="Scoreboard"></div>
 <main>
 <a class="cont" id="continue" hidden></a>
+<a class="wng" id="wordGoal" hidden></a>
 <h2>Today</h2>
 <div class="classes" id="classes" aria-label="Classes today"></div>
 <section class="top">
@@ -244,7 +257,8 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=3"></script>
-<script src="scripts/study-cloud.js?v=4"></script>
+<script src="scripts/study-cloud.js?v=5"></script>
+<script src="scripts/study-wordnest.js?v=1"></script>
 <script src="scripts/study-nav.js?v=11"></script>
 <script>
 (function(){
@@ -506,7 +520,22 @@ function renderContinue(){
  el.innerHTML='<span class="ct"><span class="k">Continue</span><b>'+esc(L.title)+'</b>'+(L.sub?'<span class="q">'+esc(L.sub)+'</span>':'')+'<span class="w">'+esc(ago(L.t))+' →</span></span>'
   +(ne?'<span class="cd'+(ne.d<=3?' hot':'')+'" aria-hidden="true"><span class="n">'+(ne.d===0?'Today':ne.d)+'</span><span class="l">'+(ne.d===0?'':ne.d===1?'day to ':'days to ')+esc(ne.title)+'</span></span>':'');
 }
-function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderContinue();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
+/* ---------- WordNest daily goal: answers today vs the WordNest goal, and words due (EN + 中文) ---------- */
+function renderWordGoal(){
+ const el=$('#wordGoal');if(!el)return;
+ const g=window.StudyWordNest&&StudyWordNest.read();
+ if(!g||!g.started){el.hidden=true;return;}
+ const pct=Math.min(100,Math.round(g.done/g.goal*100)),left=Math.max(0,g.goal-g.done);
+ el.hidden=false;el.classList.toggle('met',g.met);
+ el.href=g.dueZh>g.dueEn?'vocabloom/?lang=zh':'vocabloom/?lang=en';
+ const parts=[];if(g.dueEn)parts.push(g.dueEn+' English');if(g.dueZh)parts.push(g.dueZh+' Chinese');
+ el.setAttribute('aria-label','WordNest: '+g.done+' of '+g.goal+' words reviewed today'+(g.met?', goal met':'')+'. '+g.due+' words due.');
+ el.innerHTML='<span class="wt"><span class="k">WordNest'+(g.met?' · goal met':' · daily goal')+'</span><b>'+g.done+' / '+g.goal+' words today</b>'
+  +'<span class="q">'+(g.met?'Done for today. Extra reviews still help.':left+' more to reach your goal.')+(parts.length?' Due now: '+esc(parts.join(' · '))+'.':' Nothing due.')+'</span>'
+  +'<span class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></span></span>'
+  +'<span class="wdue" aria-hidden="true"><span class="n">'+g.due+'</span><span class="l">due '+(g.due===1?'word':'words')+' →</span></span>';
+}
+function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderContinue();renderWordGoal();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
 renderAll();
 Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
 Promise.all(T.LANGS.map(l=>fetch(l.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});
