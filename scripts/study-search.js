@@ -41,6 +41,10 @@
   return out;
  }
  const RANK={note:0,q:1,tb:2,sum:3,card:4};
+ /* tags written in notes, e.g. #ออกสอบชัวร์ #สูตรลัด #จุดหลอก → [[tag, notes using it]] most used first (TASK 24) */
+ function tags(notes){const m={};for(const v of Object.values(notes||{})){if(!v||typeof v.text!=='string')continue;
+   const seen=new Set();for(const t of v.text.match(/#[^\s#.,;:!?()\[\]{}"'“”]+/gu)||[]){const k=t.normalize('NFKC');if(k.length<2||/^#\d+$/.test(k)||seen.has(k))continue;seen.add(k);m[k]=(m[k]||0)+1;}}
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,30);}
  /* Every word must appear; title matches first, then notes, questions, textbook, summaries, cards. */
  function search(index,query,limit){
   const words=fold(query).split(/\s+/).filter(w=>w.length>0);if(!words.length)return [];
@@ -51,7 +55,7 @@
   return hits.slice(0,limit||40).map(h=>h[1]);
  }
  /* ---------- browser: load data once, then a dialog ---------- */
- let index=null,loading=null;
+ let index=null,loading=null,noteCache={};
  function parseCourse(html){const m=/^const D = (\{.*\});\s*$/m.exec(String(html||''));if(!m)return null;try{return JSON.parse(m[1]);}catch(e){return null;}}
  const getJ=u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null);
  const getT=u=>fetch(u,{cache:'no-cache'}).then(r=>r.ok?r.text():'').catch(()=>'');
@@ -68,7 +72,7 @@
    loadScript('scripts/acc-textbook-mcq.js?v=1')
   ]).then(r=>{
    const q=r[COURSES.length],w=r[COURSES.length+1],tb=r[COURSES.length+2];
-   let notes={};try{notes=JSON.parse(localStorage.getItem('studyos.notes.v1')||'{}')||{};}catch(e){}
+   let notes={};try{notes=JSON.parse(localStorage.getItem('studyos.notes.v1')||'{}')||{};}catch(e){}noteCache=notes;
    index=buildIndex({courses,quizRows:q&&q.rows||[],written:w.flatMap(x=>Array.isArray(x)?x:[]),textbook:tb&&tb.items||[],accMcq:window.ACC_TB_MCQ||[],notes});
    return index;
   });
@@ -83,6 +87,7 @@
  +'#ssDlg .ss-x{min-width:46px;min-height:46px;border:2px solid var(--f);border-radius:6px;background:var(--b);color:var(--f);font:700 15px inherit;cursor:pointer}'
  +'#ssDlg .ss-st{padding:8px 14px;font-size:13px;color:var(--m);margin:0}'
  +'#ssDlg ul{list-style:none;margin:0;padding:0 6px 8px;overflow:auto}'
+ +'#ssDlg .ss-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 8px}#ssDlg .ss-tags span{font-size:13px;color:var(--m);width:100%}#ssDlg .ss-tags button{min-height:40px;padding:0 12px;border:2px solid var(--f);border-radius:999px;background:var(--b);color:var(--f);font:700 14px inherit;font-family:inherit;cursor:pointer}#ssDlg .ss-tags button i{font-style:normal;color:var(--m);font-weight:500}'
  +'#ssDlg li a{display:block;padding:10px 10px;border-radius:6px;color:inherit;text-decoration:none;min-height:44px}#ssDlg li a:hover,#ssDlg li a:focus-visible{background:rgba(127,127,127,.16);outline:none}'
  +'#ssDlg li b{display:block;font-size:15px;line-height:1.35}#ssDlg li span{display:block;font-size:13px;color:var(--m);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
  +'#ssDlg li i{font-style:normal;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--f);border-radius:4px;padding:0 5px;margin-right:6px}';
@@ -108,11 +113,13 @@
  function say(t){if(dlg)dlg.querySelector('.ss-st').textContent=t;}
  function run(){
   if(!dlg||!index)return;const q=dlg.querySelector('#ssQ').value.trim(),list=dlg.querySelector('#ssList');
-  if(!q){list.innerHTML='';say(index.length+' items · type to search');return;}
+  if(!q){const tg=tags(noteCache);list.innerHTML=tg.length?'<li class="ss-tags"><span>Your tags</span>'+tg.map(([t,n])=>'<button type="button" data-tag="'+esc(t)+'">'+esc(t)+' <i>'+n+'</i></button>').join('')+'</li>':'';
+   list.querySelectorAll('[data-tag]').forEach(b=>b.onclick=()=>{const i=dlg.querySelector('#ssQ');i.value=b.dataset.tag;i.focus();run();});
+   say(index.length+' items · type to search'+(tg.length?' or pick a tag':'')+' · Ctrl+K / ⌘K opens search');return;}
   const r=search(index,q,40);
   say(r.length?(r.length>=40?'Top 40 results':r.length+' result'+(r.length>1?'s':'')):'No results');
   list.innerHTML=r.map(it=>'<li><a href="'+esc(it.href)+'"><b><i>'+esc(TYPE[it.type])+'</i>'+esc(it.title)+'</b><span>'+esc(it.sub)+'</span></a></li>').join('');
  }
  function close(){if(dlg)dlg.hidden=true;if(prev&&prev.focus)try{prev.focus();}catch(e){}}
- return {buildIndex,search,open,close,load,parseCourse};
+ return {buildIndex,search,open,close,load,parseCourse,tags};
 });

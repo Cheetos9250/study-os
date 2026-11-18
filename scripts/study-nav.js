@@ -40,6 +40,7 @@
   unfold:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9 4.5v15M13 9.5l2.5 2.5L13 14.5"/>',
   sync:'<path d="M7 18.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 9.2 4.7 4.7 0 0 0 7 18.5z"/>',
   auto:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/>',
+  warm:'<path d="M6 3.5h9l3 3v14H6z"/><path d="M15 3.5v3h3M9 11h6M9 14.5h6M9 18h4"/>',
   dark:'<path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>',
   light:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>'
  };
@@ -47,6 +48,7 @@
  var css=''
  +'#studyNav{--sn-bg:#fff;--sn-fg:#111;--sn-mute:#474747;--sn-line:#111;--sn-hi:#efefed;--sn-on:var(--acc-t,var(--acc,#d43a2a));--sn-pill:#111;--sn-pill-ink:#fff;font-family:"Zen Maru Gothic","Mali",system-ui,-apple-system,sans-serif;position:fixed;z-index:70;background:var(--sn-bg);color:var(--sn-fg);box-sizing:border-box}'
  +'@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #studyNav{--sn-bg:#0e0e0f;--sn-fg:#f0f0ee;--sn-mute:#a9a9a6;--sn-line:#f0f0ee;--sn-hi:#232325;--sn-on:var(--acc,#ff8a7a);--sn-pill:#f0f0ee;--sn-pill-ink:#0e0e0f}}'
+ +':root.warm #studyNav{--sn-bg:#fbf4e4;--sn-fg:#3a2e22;--sn-mute:#6b5a45;--sn-line:#3a2e22;--sn-hi:#f1e6cd;--sn-pill:#3a2e22;--sn-pill-ink:#fbf4e4}'
  +':root[data-theme="dark"] #studyNav{--sn-bg:#0e0e0f;--sn-fg:#f0f0ee;--sn-mute:#a9a9a6;--sn-line:#f0f0ee;--sn-hi:#232325;--sn-on:var(--acc,#ff8a7a);--sn-pill:#f0f0ee;--sn-pill-ink:#0e0e0f}'
  +'#studyNav a,#studyNav button{color:inherit;text-decoration:none;font:inherit;background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:8px;min-height:44px;box-sizing:border-box}'
  +'#studyNav a:focus-visible,#studyNav button:focus-visible{outline:3px solid #2f6bff;outline-offset:2px}'
@@ -169,10 +171,12 @@
  var navSrc=(document.currentScript&&document.currentScript.src)||'';
  function openSearch(q){
   if(window.StudySearch){window.StudySearch.open(q);return;}
-  var sc=document.createElement('script');sc.src=navSrc?new URL('study-search.js?v=2',navSrc).href:'scripts/study-search.js?v=2';
+  var sc=document.createElement('script');sc.src=navSrc?new URL('study-search.js?v=3',navSrc).href:'scripts/study-search.js?v=3';
   sc.onload=function(){if(window.StudySearch)window.StudySearch.open(q);};document.head.appendChild(sc);
  }
  document.addEventListener('keydown',function(e){
+  /* Ctrl+K / ⌘K opens search from anywhere, even while typing (TASK 24); / opens it when no text field has focus */
+  if((e.key==='k'||e.key==='K')&&(e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey){e.preventDefault();openSearch();return;}
   if(e.key!=='/'||e.metaKey||e.ctrlKey||e.altKey)return;var a=document.activeElement;
   if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return;e.preventDefault();openSearch();
  });

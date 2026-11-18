@@ -32,7 +32,7 @@ test('the engine is shared: course differences come from options, not from cours
   assert.doesNotMatch(e,/\(missed\|\|unansOnly\)/);
   assert.match(e,/const EMBQ_ROWS=typeof EMBQ!=='undefined'/);
   assert.equal(R('acc.html').includes('written:[5,6,7,8,9]'),true);
-  for(const c of ['eco','math','eng','zh']) assert.doesNotMatch(R(c+'.html'),/written:/,c);
+  for(const c of ['eco','eng','zh']) assert.doesNotMatch(R(c+'.html'),/written:/,c);
 });
 test('extra accounting sets keep their ids and seeds (saved answers and option order depend on them)',()=>{
   const ctx={window:{}};vm.runInNewContext(R('data/courses/acc-extra.js'),ctx);const X=ctx.window.StudyCourseExtra;

@@ -1,0 +1,1 @@
+- **Math written practice**: 30 calculation problems (10 each for Ch5 financial maths, Ch6 sets and Venn diagrams, Ch7 probability and statistics) on Math → Practice → **Written**, with a working box, number checks and a step-by-step solution, using the course methods (360-day ordinary interest, 7% tax, average daily balance, population SD, quartile position r(N+1)/4).

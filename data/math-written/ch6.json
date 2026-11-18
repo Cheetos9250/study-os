@@ -1,0 +1,198 @@
+[
+ {
+  "id": "MATH6-1",
+  "title": "Two-set Venn diagram",
+  "prompt": "In a group of 120 students, 70 take Accounting, 45 take Economics and 25 take both.\n- How many take only Accounting?\n- How many take at least one of the two?\n- How many take neither?",
+  "solution": "Draw two circles. Put 25 in the overlap.\n\nOnly Accounting = 70 − 25 = **45**; only Economics = 45 − 25 = 20.\n\nn(A ∪ B) = 70 + 45 − 25 = **90**.\n\nNeither = 120 − 90 = **30**.",
+  "checks": [
+   [
+    "Only Accounting",
+    45
+   ],
+   [
+    "At least one",
+    90
+   ],
+   [
+    "Neither",
+    30
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-2",
+  "title": "Survey with two sets",
+  "prompt": "In a group of 200 students, 124 take coffee, 96 take tea and 48 take both.\n- How many take only coffee?\n- How many take at least one of the two?\n- How many take neither?",
+  "solution": "Draw two circles. Put 48 in the overlap.\n\nOnly coffee = 124 − 48 = **76**; only tea = 96 − 48 = 48.\n\nn(A ∪ B) = 124 + 96 − 48 = **172**.\n\nNeither = 200 − 172 = **28**.",
+  "checks": [
+   [
+    "Only coffee",
+    76
+   ],
+   [
+    "At least one",
+    172
+   ],
+   [
+    "Neither",
+    28
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-3",
+  "title": "Three-set Venn diagram",
+  "prompt": "Of 120 people surveyed: 60 read news (N), 50 watch TV (T), 40 listen to radio (R); 20 do N and T, 15 do N and R, 10 do T and R, and 5 do all three.\n- How many use at least one?\n- How many use none?\n- How many use only N?",
+  "solution": "Start from the centre: all three = 5.\n\nN∩T only = 20−5 = 15; N∩R only = 15−5 = 10; T∩R only = 10−5 = 5.\n\nOnly N = 60 − 15 − 10 − 5 = **30**.\n\nn(N∪T∪R) = 60+50+40−20−15−10+5 = **110**; none = 120 − 110 = **10**.",
+  "checks": [
+   [
+    "At least one",
+    110
+   ],
+   [
+    "None",
+    10
+   ],
+   [
+    "Only N",
+    30
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-4",
+  "title": "Counting subsets",
+  "prompt": "Let S = {a, b, c, d, e, f}.\n- How many subsets does S have?\n- How many proper subsets?\n- How many subsets have exactly 2 elements?",
+  "solution": "n = 6, so there are 2⁶ = **64** subsets.\n\nProper subsets exclude S itself: 64 − 1 = **63**.\n\nTwo-element subsets: C(6,2) = 6×5 ÷ 2 = **15**.",
+  "checks": [
+   [
+    "Subsets",
+    64
+   ],
+   [
+    "Proper subsets",
+    63
+   ],
+   [
+    "2-element subsets",
+    15
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-5",
+  "title": "Set operations",
+  "prompt": "U = {1, 2, 3, …, 12}, A = {multiples of 2}, B = {multiples of 3}.\n- List A ∩ B.\n- Find n(A ∪ B).\n- Find n((A ∪ B)′).",
+  "solution": "A = {2,4,6,8,10,12} (6 elements), B = {3,6,9,12} (4 elements).\n\nA ∩ B = **{6, 12}** (2 elements).\n\nn(A ∪ B) = 6 + 4 − 2 = **8**.\n\nn((A ∪ B)′) = 12 − 8 = **4** (the numbers 1, 5, 7, 11).",
+  "checks": [
+   [
+    "n(A ∩ B)",
+    2
+   ],
+   [
+    "n(A ∪ B)",
+    8
+   ],
+   [
+    "n((A ∪ B)′)",
+    4
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-6",
+  "title": "Finding the overlap",
+  "prompt": "n(A) = 38, n(B) = 27 and n(A ∪ B) = 52.\n- Find n(A ∩ B).\n- Find n(A only).\n- Find n(B only).",
+  "solution": "n(A ∩ B) = n(A) + n(B) − n(A ∪ B) = 38 + 27 − 52 = **13**.\n\nA only = 38 − 13 = **25**; B only = 27 − 13 = **14**.",
+  "checks": [
+   [
+    "n(A ∩ B)",
+    13
+   ],
+   [
+    "A only",
+    25
+   ],
+   [
+    "B only",
+    14
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-7",
+  "title": "Reading a three-set diagram",
+  "prompt": "A Venn diagram of clubs S, M and D shows: only S = 12, only M = 9, only D = 7, S and M only = 4, S and D only = 3, M and D only = 5, all three = 2, outside all circles = 8.\n- How many students in total?\n- n(S)?\n- How many are in exactly one club?",
+  "solution": "Total = 12+9+7+4+3+5+2+8 = **50**.\n\nn(S) = 12 + 4 + 3 + 2 = **21**.\n\nExactly one club = 12 + 9 + 7 = **28**.",
+  "checks": [
+   [
+    "Total students",
+    50
+   ],
+   [
+    "n(S)",
+    21
+   ],
+   [
+    "Exactly one club",
+    28
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-8",
+  "title": "De Morgan's law",
+  "prompt": "U has 80 elements, n(A′) = 35, n(B′) = 50 and n(A′ ∩ B′) = 20.\n- Find n(A ∪ B).\n- Find n(A).\n- Find n(B).",
+  "solution": "By De Morgan, (A ∪ B)′ = A′ ∩ B′, so n(A ∪ B) = 80 − 20 = **60**.\n\nn(A) = 80 − 35 = **45**; n(B) = 80 − 50 = **30**.",
+  "checks": [
+   [
+    "n(A ∪ B)",
+    60
+   ],
+   [
+    "n(A)",
+    45
+   ],
+   [
+    "n(B)",
+    30
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-9",
+  "title": "Sports survey",
+  "prompt": "In a group of 150 students, 82 take football, 61 take basketball and 30 take both.\n- How many take only football?\n- How many take at least one of the two?\n- How many take neither?",
+  "solution": "Draw two circles. Put 30 in the overlap.\n\nOnly football = 82 − 30 = **52**; only basketball = 61 − 30 = 31.\n\nn(A ∪ B) = 82 + 61 − 30 = **113**.\n\nNeither = 150 − 113 = **37**.",
+  "checks": [
+   [
+    "Only football",
+    52
+   ],
+   [
+    "At least one",
+    113
+   ],
+   [
+    "Neither",
+    37
+   ]
+  ]
+ },
+ {
+  "id": "MATH6-10",
+  "title": "Cartesian product",
+  "prompt": "A = {1, 2, 3} and B = {x, y}.\n- How many ordered pairs are in A × B?\n- How many subsets does A × B have?",
+  "solution": "n(A × B) = n(A) × n(B) = 3 × 2 = **6**: (1,x), (1,y), (2,x), (2,y), (3,x), (3,y).\n\nSubsets of a 6-element set: 2⁶ = **64**.",
+  "checks": [
+   [
+    "n(A × B)",
+    6
+   ],
+   [
+    "Subsets of A × B",
+    64
+   ]
+  ]
+ }
+]

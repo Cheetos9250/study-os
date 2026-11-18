@@ -51,7 +51,7 @@ Prefer the existing `study-acc` store. A new key must follow the backup and rest
 
 ### 4. Math: written calculation practice (Thai: โจทย์คณิตแบบเขียนตอบ)
 
-Status: todo
+Status: done (#174)
 
 `math.html` already has 62 MCQs for Ch5–7 (`scripts/math-practice-mcq.js`). Add 10 written calculation problems per chapter (financial maths). Each problem gets a worked solution and number-check boxes, the same way `acc.html` shows written exercises (`StudySosChecks` in `scripts/textbook-sos-render.js`).
 
@@ -224,13 +224,13 @@ Rain / white-noise sound during Pomodoro (generated in the browser, no downloads
 
 ### 24. Ctrl+K and tags (Thai: ค้นหาด่วนและแท็ก)
 
-Status: todo
+Status: done (#174)
 
 Ctrl+K / Cmd+K opens search; tags such as `#ออกสอบชัวร์`, `#สูตรลัด`, `#จุดหลอก` in notes are searchable.
 
 ### 25. Warm paper theme and read-aloud (Thai: ธีมถนอมสายตาและอ่านออกเสียง)
 
-Status: todo
+Status: done (#174)
 
 A warm paper colour theme for night reading, and a button that reads a lesson summary aloud (browser speech).
 
@@ -275,3 +275,37 @@ In "By subject and chapter": a **Practice weakest** button on chapters under 70%
 Status: done (#173)
 
 Switch the charts between 7 days, 30 days and all time; an editable weekly target (questions, Pomodoro minutes) on **This week** with a progress bar. The target is stored with `qgoal` in `studyos.home.v1` (validated on restore).
+
+---
+
+## H. Today page ideas, 18 Nov 2026 (Thai: ไอเดียหน้า Today)
+
+Already in place before this list: offline use (service worker, task 7), JSON back up / restore (Back up, Restore in the nav), exam countdowns, pinned formulas (task 15).
+
+### 32. Study time per subject on Today (Thai: เวลาอ่านแยกวิชา)
+
+Status: done (#174)
+
+### 33. Session log after a Pomodoro (Thai: บันทึกหลังจบรอบ)
+
+Status: done (#174)
+
+### 34. Formulas drawer (Thai: แผงสูตรด่วน)
+
+Status: done (#174)
+
+### 35. Quick words during breaks (Thai: ทวนศัพท์ตอนพัก)
+
+Status: done (#174)
+
+### 36. Keyboard shortcuts on Today (Thai: คีย์ลัด)
+
+Status: done (#174)
+
+### 37. Exam colours: amber under 14 days, red under 5 (Thai: สีเตือนวันสอบ)
+
+Status: done (#174)
+
+### 38. Repeating tasks (Thai: งานที่ทำซ้ำ)
+
+Status: done (#174)
