@@ -81,9 +81,9 @@ async function paint(){
      +'<div class="mk-row" style="margin-top:6px"><a class="b" href="'+c.page+'?tab=prac&q='+m.i+'">Redo</a><a class="b" href="'+ask(c.key,m.q,m.a)+'">Ask AI why</a></div></div>').join('')
     +(by[id].length>60?'<p class="muted">'+(by[id].length-60)+' more · use Redo all.</p>':'')+'</details>').join('')
     :'<p class="muted" style="margin:0">Nothing wrong right now. 🎉</p>')
-   +'<p class="muted" style="margin:10px 0 0">Extra sets and written answers: <a href="'+c.page+'?tab=prac&cram=1">Cram Mode</a></p></section>';}
+   +'<div class="mk-row" style="margin-top:10px"><span class="muted">Extra sets and written answers:</span><a class="b" href="'+c.page+'?tab=prac&cram=1">Cram Mode</a></div></section>';}
  if(sub==='all'||sub==='acc'){const w=J.weak(read(J.KEY),5);
-  h+='<section class="panel"><h2>Journal entries <span class="muted">· JE Drill</span></h2>'+(w.length?w.map(t=>'<div class="mn-q"><p><b>'+esc(t.title)+'</b> <span class="muted">· '+t.right+' of '+t.tries+' right</span></p><a class="b" href="je-drill.html?t='+esc(t.id)+'">Practise</a></div>').join(''):'<p class="muted" style="margin:0">No weak entry types yet. <a href="je-drill.html">Start a drill</a></p>')+'</section>';}
+  h+='<section class="panel"><h2>Journal entries <span class="muted">· JE Drill</span></h2>'+(w.length?w.map(t=>'<div class="mn-q"><p><b>'+esc(t.title)+'</b> <span class="muted">· '+t.right+' of '+t.tries+' right</span></p><a class="b" href="je-drill.html?t='+esc(t.id)+'">Practise</a></div>').join(''):'<div class="mk-row"><span class="muted">No weak entry types yet.</span><a class="b" href="je-drill.html">Start a drill</a></div>')+'</section>';}
  $('#app').innerHTML=(sub==='all'?'<p class="muted">'+total+' question'+(total===1?'':'s')+' to fix in all.</p>':'')+h;
 }
 chips();paint();
