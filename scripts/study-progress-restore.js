@@ -137,6 +137,18 @@
             throw new Error("Invalid Pomodoro history");
         }
       }
+    } else if (key === "studyos.jedrill.v1") {
+      if (!object(value.days) || (value.tpl !== undefined && !object(value.tpl))) throw new Error("Invalid JE Drill score");
+      for (var jd of Object.keys(value.days)) {
+        var jv = value.days[jd];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(jd) || !object(jv) || !Number.isInteger(jv.a) || !Number.isInteger(jv.c) || jv.a < 0 || jv.c < 0 || jv.c > jv.a || jv.a > 10000)
+          throw new Error("Invalid JE Drill score");
+      }
+      for (var jt of Object.keys(value.tpl || {})) {
+        var tv = value.tpl[jt];
+        if (!/^[a-z0-9]{2,12}$/.test(jt) || !Array.isArray(tv) || tv.length !== 2 || !tv.every(function (n) { return Number.isInteger(n) && n >= 0; }) || tv[1] > tv[0])
+          throw new Error("Invalid JE Drill score");
+      }
     } else if (key === "studyos.excel.v1") {
       if ((value.done !== undefined && !object(value.done)) || (value.ans !== undefined && !object(value.ans)))
         throw new Error("Invalid Excel lesson progress");
