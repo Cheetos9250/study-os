@@ -99,7 +99,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .show-done{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;color:var(--muted);margin-left:auto}
 
 </style>
-<link rel="stylesheet" href="assets/study-world.css?v=8">
+<link rel="stylesheet" href="assets/study-world.css?v=9">
 <style>
 .bk{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:18px 0 0;padding:12px 14px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel)}
 .bk svg{width:22px;height:22px;flex:none}
@@ -213,7 +213,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 }
 @media(max-width:420px){.sb{padding:12px 14px 14px;min-height:110px}}
 </style>
-<script src="scripts/study-theme.js?v=5"></script>
+<script src="scripts/study-theme.js?v=6"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
@@ -250,6 +250,10 @@ a.sb:hover{background:var(--dots),var(--panel)}
   <div class="pmeta"><select id="pSub" aria-label="Subject for this Pomodoro"><option value="">Any subject</option><option value="acc">Accounting</option><option value="eco">Economics</option><option value="math">Math</option><option value="excel">Excel</option><option value="eng">English</option><option value="zh">Chinese</option></select><select id="pSound" aria-label="Background sound"><option value="off">Sound off</option><option value="rain">Rain</option><option value="white">White noise</option><option value="brown">Brown noise</option></select></div>
  </div>
 </section>
+<div class="tx-row" id="txRow" aria-label="Quick tools"></div>
+<div class="tx-card" id="sessionLog" hidden></div>
+<div class="tx-card" id="quickWords" hidden></div>
+<div class="tx-card" id="studyTime"></div>
 
 <h2>Exams <a class="sec-link" href="calendar.html">Edit →</a></h2>
 <div class="exams" id="exams"></div>
@@ -260,6 +264,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
   <input class="grow" id="tTitle" placeholder="Add a task" maxlength="80" required aria-label="Task">
   <input type="date" id="tDate" aria-label="Due date" required>
   <select id="tPri" aria-label="Priority"><option>High</option><option selected>Medium</option><option>Low</option></select>
+  <select id="tRep" aria-label="Repeat"><option value="">No repeat</option><option value="d">Daily</option><option value="w">Weekly</option></select>
   <button class="primary" type="submit">Add</button>
  </form>
  <div id="tasks" role="list"></div>
@@ -273,12 +278,13 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-stats.js?v=1"></script>
 <script src="scripts/study-motivation.js?v=1"></script>
+<script src="scripts/study-today-extras.js?v=1"></script>
 <script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=5"></script>
 <script src="scripts/study-wordnest.js?v=2"></script>
-<script src="scripts/study-nav.js?v=11"></script>
+<script src="scripts/study-nav.js?v=12"></script>
 <script>
 (function(){
 'use strict';
@@ -369,8 +375,8 @@ function stop(){clearInterval(tick);tick=null;endAt=0;$('#pStart').textContent='
 const POMOLOG='studyos.pomolog.v1';
 function logPomo(end,m,sub){if(m!==25||!end)return;try{const o=JSON.parse(read(POMOLOG)||'{}')||{};if(o.lastEnd===end)return;const d=T.dayKey(end);o.days=o.days&&typeof o.days==='object'?o.days:{};o.days[d]=(+o.days[d]||0)+m;
  if(sub){o.bySub=o.bySub&&typeof o.bySub==='object'?o.bySub:{};const b=o.bySub[d]&&typeof o.bySub[d]==='object'?o.bySub[d]:{};b[sub]=(+b[sub]||0)+m;o.bySub[d]=b;}o.lastEnd=end;localStorage.setItem(POMOLOG,JSON.stringify(o));}catch{}}
-function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){const m=mins;logPomo(endAt,m,psub);left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}window.StudyNav&&StudyNav.timesUp&&StudyNav.timesUp(m);return;}showClock();}
-function run(){tick=setInterval(step,500);$('#pStart').textContent='pause';if(mins===25)Sound.start(soundPick());step();}
+function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){const m=mins;logPomo(endAt,m,psub);if(m===25&&window.StudyTodayX)StudyTodayX.sessionDone(psub,endAt);left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}window.StudyNav&&StudyNav.timesUp&&StudyNav.timesUp(m);return;}showClock();}
+function run(){tick=setInterval(step,500);$('#pStart').textContent='pause';if(mins===25)Sound.start(soundPick());else if(window.StudyTodayX)StudyTodayX.breakStarted();step();}
 $('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();savePomo();showClock();$('#pStart').textContent='resume';return;}
  if(left<=0)left=mins*60;endAt=Date.now()+left*1000;savePomo();run();};
 function setMode(m){stop();mins=m;left=m*60;savePomo();showClock();paintTabs();}
@@ -434,7 +440,7 @@ function renderPlan(){
 }
 function renderExams(){
  const up=upcoming();
- $('#exams').innerHTML=up.length?up.map(e=>{const c=course(e.course);return '<div class="exam'+(e.d<=3?' urgent':e.d<=7?' soon':'')+(c?' t-'+c.key:'')+'"><div class="n">'+(e.d===0?'Today':e.d+'<small>'+(e.d===1?'day':'days')+'</small>')+'</div><div><p><b>'+esc(e.title)+'</b></p><p class="when">'+esc(shortDay(e.date))+'</p></div>'+(c?'<span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>':'')+'</div>';}).join(''):'<p class="empty">No upcoming exams.</p>';
+ $('#exams').innerHTML=up.length?up.map(e=>{const c=course(e.course);return '<div class="exam'+(e.d<5?' urgent':e.d<14?' soon':'')+(c?' t-'+c.key:'')+'"><div class="n">'+(e.d===0?'Today':e.d+'<small>'+(e.d===1?'day':'days')+'</small>')+'</div><div><p><b>'+esc(e.title)+'</b></p><p class="when">'+esc(shortDay(e.date))+'</p></div>'+(c?'<span class="jersey sm" aria-hidden="true">'+esc(c.full)+'</span>':'')+'</div>';}).join(''):'<p class="empty">No upcoming exams.</p>';
 }
 let limit=8;
 function renderTasks(){
@@ -442,13 +448,16 @@ function renderTasks(){
  const list=st.tasks.filter(t=>showDone||!t.done).sort((a,b)=>a.date.localeCompare(b.date)||PRI[a.pri]-PRI[b.pri]);
  const shown=list.slice(0,limit);$('#moreBtn').hidden=list.length<=limit;
  $('#tasks').innerHTML=shown.length?shown.map(t=>{const l=leftLabel(t.date);
-  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+(/^https:\/\/classroom\.google\.com\//.test(t.link||'')?'<a href="'+esc(t.link)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(t.title)+'</a>':esc(t.title))+'</span><span class="meta"><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span></span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);min-height:44px;min-width:40px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';}).join(''):'<p class="empty">No tasks.</p>';
+  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+(/^https:\/\/classroom\.google\.com\//.test(t.link||'')?'<a href="'+esc(t.link)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(t.title)+'</a>':esc(t.title))+(t.rep?' <span title="Repeats '+(t.rep==='d'?'daily':'weekly')+'" aria-label="repeats '+(t.rep==='d'?'daily':'weekly')+'">↻</span>':'')+'</span><span class="meta"><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span></span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);min-height:44px;min-width:40px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';}).join(''):'<p class="empty">No tasks.</p>';
 }
-$('#tasks').addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.id;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;save();renderAll();}});
+$('#tasks').addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.id;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;
+ /* repeating task: ticking it adds the next one (daily or weekly), once */
+ if(t.done&&(t.rep==='d'||t.rep==='w')&&window.StudyTodayX){const nd=StudyTodayX.nextDate(t.date,t.rep,today),nid=String(t.id).replace(/~\d{4}-\d{2}-\d{2}$/,'')+'~'+nd;if(nd&&!st.tasks.some(x=>x.id===nid)){const n=Object.assign({},t,{id:nid,date:nd,done:false});st.tasks.push(n);}}
+ save();renderAll();}});
 $('#tasks').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t&&confirm('Delete "'+t.title+'"?')){st.tasks=st.tasks.filter(x=>x.id!==id);save();renderAll();}});
 $('#taskForm').onsubmit=e=>{e.preventDefault();const title=$('#tTitle').value.trim(),date=$('#tDate').value;if(!title||!date)return;
  const m=/(บัญชี|acc)/i.test(title)?'acc':/(เศรษฐ|eco)/i.test(title)?'eco':/(คณิต|math)/i.test(title)?'math':undefined;
- const t={id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),title:title.slice(0,80),date,pri:$('#tPri').value,done:false};if(m)t.course=m;
+ const t={id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),title:title.slice(0,80),date,pri:$('#tPri').value,done:false};if(m)t.course=m;if($('#tRep').value)t.rep=$('#tRep').value;
  st.tasks.push(t);save();$('#tTitle').value='';renderAll();};
 $('#fDone').addEventListener('change',()=>{limit=8;renderTasks();});
 $('#moreBtn').onclick=()=>{limit+=8;renderTasks();};

@@ -36,3 +36,5 @@ body .sec h2{border-left-color:var(--accent)}
    (sidebar "Cloud sync" button or ?sync=1). Nothing is removed from the page or from storage. */
 body #sync{display:none!important}
 html:not(.show-sync) .cloud-sync-bar{display:none!important}
+/* warm paper theme (scripts/study-theme.js adds .warm with data-theme=light) */
+:root.warm{--paper:#f6eedb;--surface:#fbf4e4;--ink:#3a2e22;--muted:#6b5a45;--line:#e0d2b2;--accent-soft:#efe3c8}

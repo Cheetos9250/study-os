@@ -1,0 +1,3 @@
+- **Search**: Ctrl+K (⌘K on Mac/iPad keyboards) opens search from anywhere. Write tags such as `#ออกสอบชัวร์`, `#สูตรลัด` or `#จุดหลอก` in your notes; they appear as buttons when the search box is empty.
+- **Theme: Warm paper**: tap the theme button (Auto → Dark → Light → Warm paper) for a cream, low-glare look for night reading.
+- **Read aloud**: on a subject's Lessons page, 🔊 Read aloud reads the summaries on screen (Thai or English voice per section).

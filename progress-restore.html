@@ -42,7 +42,7 @@
     button:disabled{opacity:.5;cursor:not-allowed}
     #preview{padding-left:22px;font-size:14px;overflow-wrap:anywhere}
 </style>
-<script src="scripts/study-theme.js?v=5"></script>
+<script src="scripts/study-theme.js?v=6"></script>
 </head>
 <body>
 <main>
@@ -88,6 +88,7 @@
     if (key === "studyos.pdfsets.v1") return "PDF practice answers";
     if (key === "studyos.excel.v1") return "Excel lesson progress";
     if (key === "studyos.pomolog.v1") return "Pomodoro history";
+    if (key === "studyos.jedrill.v1") return "JE Drill score";
     var courses = {acc:"Accounting",eco:"Economics",math:"Mathematics",eng:"English",zh:"Chinese"};
     if (key.startsWith("study-")) return courses[key.slice(6)] + " quiz history";
     var prefix = key.replace(/-(srs|typ)$/, "");
@@ -143,6 +144,6 @@
   });
 })();
 </script>
-<script src="scripts/study-nav.js?v=11"></script>
+<script src="scripts/study-nav.js?v=12"></script>
 </body>
 </html>

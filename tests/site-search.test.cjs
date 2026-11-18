@@ -19,6 +19,6 @@ test('index covers questions, cards, summaries, notes and textbook; links open t
 test('nav opens search lazily (button, More item, / key); search only reads study data',()=>{
  const n=read('scripts/study-nav.js');
  assert.match(n,/class="sn-find"/);assert.match(n,/class="sn-find-m"/);
- assert.match(n,/new URL\('study-search\.js\?v=2',navSrc\)/);assert.match(n,/if\(e\.key!=='\/'\|\|e\.metaKey/);
+ assert.match(n,/new URL\('study-search\.js\?v=3',navSrc\)/);assert.match(n,/if\(e\.key!=='\/'\|\|e\.metaKey/);
  assert.doesNotMatch(read('scripts/study-search.js'),/localStorage\.(setItem|removeItem)/);
 });

@@ -11,11 +11,12 @@ const CACHE = VERSION + '-files';
 const CORE = [
   './', 'index.html', 'flashcards.html', 'practice.html', 'hub.html', 'calendar.html', 'grades.html', 'stats.html',
   'acc.html', 'eco.html', 'math.html', 'eng.html', 'zh.html', 'excel.html',
-  'pdf-sets.html', 'tutor.html', 'classroom.html', 'progress-backup.html', 'progress-restore.html', 'mock.html',
+  'pdf-sets.html', 'tutor.html', 'classroom.html', 'progress-backup.html', 'progress-restore.html', 'mock.html', 'je-drill.html', 'mistakes.html',
   'vocabloom/', 'vocabloom/index.html', 'vocabloom/study-decks.json',
   'manifest.webmanifest', 'data/quiz.json', 'data/cards.json', 'data/accounting-textbook-index.json',
   'data/textbook-sos/ch5.json', 'data/textbook-sos/ch6.json', 'data/textbook-sos/ch7.json',
-  'data/textbook-sos/ch8.json', 'data/textbook-sos/ch9.json'
+  'data/textbook-sos/ch8.json', 'data/textbook-sos/ch9.json',
+  'data/math-written/ch5.json', 'data/math-written/ch6.json', 'data/math-written/ch7.json'
 ];
 const SKIP = /\/data\/config\.json$/;
 const FILE = /\.(html|js|css|json|webmanifest|png|svg|ico|jpg|jpeg|gif|webp|woff2?)$/i;

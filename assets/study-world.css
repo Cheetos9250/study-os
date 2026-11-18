@@ -24,6 +24,8 @@
  /* hub.html legacy names */
  --purple:var(--acc);--deep:var(--acc);--greenbg:var(--low);--lav:var(--acc-soft);--white:var(--panel);--redbg:var(--hi);--orangebg:var(--med);--shadow:none;
 }
+:root.warm{--bg:#efe6d2;--panel:#fbf4e4;--panel-2:#f1e6cd;--text:#3a2e22;--muted:#6b5a45;--line:#3a2e22;--line-soft:#e0d2b2;--line-strong:#3a2e22;--ink:#3a2e22;--paper:#f6eedb;--halftone:#c9b894;--blue-soft:#efe4cb}
+:root.warm body{background-color:var(--paper)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
  color-scheme:dark;
  --bg:#0e0e0f;--panel:#171718;--panel-2:#1f1f21;--text:#f0f0ee;--muted:#a9a9a6;--line:#f0f0ee;--line-soft:#333335;--line-strong:#f0f0ee;

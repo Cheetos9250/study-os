@@ -181,9 +181,9 @@ function tbSaveJe(id,rows){ try{ const raw=localStorage.getItem(TBP_KEY); const 
 let jeCtl=null;
 function tbSave(id,text){ try{ const raw=localStorage.getItem(TBP_KEY); const p=raw?JSON.parse(raw):{}; if(!p||typeof p!=='object'||Array.isArray(p)) return; if(String((p[id]||{}).notes||'')===text) return; p[id]={...(p[id]||{}),notes:text,updated:new Date().toISOString()}; localStorage.setItem(TBP_KEY,JSON.stringify(p)); }catch(e){} }
 (async()=>{ let added=0;
-  for(const ch of (OPT.written||[])){ try{ const r=await fetch('data/textbook-sos/ch'+ch+'.json',{cache:'no-cache'}); if(!r.ok) continue; const list=await r.json();
+  for(const ch of (OPT.written||[])){ try{ const r=await fetch((OPT.writtenDir||'data/textbook-sos/ch')+ch+'.json',{cache:'no-cache'}); if(!r.ok) continue; const list=await r.json();
     for(const it of (Array.isArray(list)?list:[])){ if(!it||typeof it.id!=='string'||!it.prompt) continue; const id='tbw-'+it.id; if(QS.some(q=>q.id===id)) continue;
-      QS.push({id,cat:'c'+ch,q:it.title||it.id,opts:['I got it','I missed it'],order:[0,1],right:0,exp:'',open:true,src:it.id,prompt:it.prompt,solution:it.solution||'',checks:Array.isArray(it.checks)?it.checks:[],je:window.StudyJE?StudyJE.parse(it.solution||''):[],fs:window.StudyFS?StudyFS.parse(it.solution||''):{title:'',rows:[]},tb:it.id.replace('-',' ')+' · written'}); added++; } }catch(e){} }
+      QS.push({id,cat:'c'+ch,q:it.title||it.id,opts:['I got it','I missed it'],order:[0,1],right:0,exp:'',open:true,src:it.id,prompt:it.prompt,solution:it.solution||'',checks:Array.isArray(it.checks)?it.checks:[],je:window.StudyJE?StudyJE.parse(it.solution||''):[],fs:window.StudyFS?StudyFS.parse(it.solution||''):{title:'',rows:[]},tb:OPT.writtenDir?it.id.replace(/^[A-Z]+(\d+)-(\d+)$/,'Ch$1 · Problem $2'):it.id.replace('-',' ')+' · written',wtag:OPT.writtenTag}); added++; } }catch(e){} }
   if(added){ const cur=deck[qpos]&&deck[qpos].id; buildDeck(); if(cur&&!qJump){ const i=deck.findIndex(x=>x.id===cur); if(i>=0) qpos=i; } renderQ(); }
 })();
 const QTYPE_KEY='studyos.'+D.key+'.qtype';
@@ -209,6 +209,11 @@ function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):nu
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
   else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
+/* "Ask AI why" (owner idea, 18 Nov 2026): a link to tutor.html with the question, the options, my answer and the right one.
+   Nothing is sent until Send is tapped there (the tutor uses the owner's own key). */
+function askPrompt(q,mine){ const L='ABCDEFGH',o=q.opts.map((t,i)=>L[i]+') '+String(t).replace(/\*\*/g,'')).join('\n'),x=t=>String(t==null?'':t).replace(/\*\*/g,'');
+  return 'Practice question: '+x(q.q)+'\n'+o+'\n\n'+(q.opts[mine]!==undefined?'My answer: '+L[mine]+') '+x(q.opts[mine])+'\n':'')+'Correct answer: '+L[q.right]+') '+x(q.opts[q.right])+'\n\nExplain why the correct answer is right'+(q.opts[mine]!==undefined&&mine!==q.right?' and why mine is wrong':'')+', step by step. Then give me one similar question to try.'; }
+function askAI(q,mine){ return '<div style="margin-top:8px"><a class="btn" style="min-height:44px;display:inline-flex;align-items:center" href="tutor.html?course='+encodeURIComponent(D.key)+'&cat='+encodeURIComponent(q.cat)+'&q='+encodeURIComponent(askPrompt(q,mine).slice(0,6000))+'">Ask AI why</a></div>'; }
 /* Cram Mode (?tab=prac&cram=1): one read-only page of the questions to fix before the exam — answered wrong now,
    or back in review box 0 — each with its right answer and explanation. Never changes answers. */
 const CRAM=/[?&]cram=1\b/.test(location.search);
@@ -224,7 +229,7 @@ function renderCram(box){
   h+='<ol class="cram-list">'+list.map(({q,wrong})=>{ const right=q.opts[q.right],mine=store.ans[q.id];
     return '<li class="qcard"><div class="qmeta"><span>'+esc(catLabel(q.cat))+'</span>'+(wrong?'<b class="cram-tag">Wrong</b>':'<b class="cram-tag soft">Review</b>')+'</div>'
      +(q.case?'<div class="qcase" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:8px 12px;margin:6px 0;font-size:14px">'+(q.md&&window.StudySosMd?StudySosMd(q.case):rich(q.case))+'</div>':'')
-     +'<p class="qtext">'+rich(q.q)+'</p><div class="explain good"><b class="v">Answer: '+rich(right)+'</b>'+(wrong&&q.opts[mine]!==undefined?'<div class="cram-mine">You chose: '+rich(q.opts[mine])+'</div>':'')+(q.exp?rich(q.exp):'')+'</div></li>'; }).join('')+'</ol>';
+     +'<p class="qtext">'+rich(q.q)+'</p><div class="explain good"><b class="v">Answer: '+rich(right)+'</b>'+(wrong&&q.opts[mine]!==undefined?'<div class="cram-mine">You chose: '+rich(q.opts[mine])+'</div>':'')+(q.exp?rich(q.exp):'')+askAI(q,wrong?mine:undefined)+'</div></li>'; }).join('')+'</ol>';
   box.innerHTML=h;
 }
 function renderQ(){
@@ -251,14 +256,14 @@ function renderQ(){
   if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
   window.StudyLast&&StudyLast.mark({href:D.key+'.html?tab=prac&q='+encodeURIComponent(q.id),title:D.title+' · Practice',sub:'Q '+(qpos+1)+' · '+q.q,course:D.key});
   h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
-  if(q.tb) h+='<div class="qsrc" style="font-size:12px;opacity:.7;margin:4px 0">Textbook style · '+esc(q.tb)+'</div>';
+  if(q.tb) h+='<div class="qsrc" style="font-size:12px;opacity:.7;margin:4px 0">'+esc(q.wtag||'Textbook style')+' · '+esc(q.tb)+'</div>';
   if(q.case) h+='<div class="qcase" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;line-height:1.55;overflow-wrap:anywhere">'+(q.md&&window.StudySosMd?StudySosMd(q.case):rich(q.case))+'</div>';
   if(q.open){ const shown=done||tbReveal.has(q.id);
     h+='<p class="qtext"><b>'+esc(q.q)+'</b></p><div class="qcase sos-body" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:10px 12px;margin:8px 0 10px;font-size:15px">'+StudySosMd(q.prompt)+'</div>';
     const jeOn=!!(q.je&&q.je.length&&window.StudyJE), fsOn=!!(q.fs&&q.fs.rows&&q.fs.rows.length&&window.StudyFS);
     if(jeOn) h+=StudyJE.html();
     if(fsOn) h+=StudyFS.html();
-    h+='<textarea id="tbAns" class="tb-ans'+(jeOn||fsOn?' tb-ans-sm':'')+'" maxlength="15000" placeholder="'+(jeOn||fsOn?'Other working (optional). Saved on this device.':'Work it out here. Saved on this device (shared with the textbook in My PDF sets).')+'" aria-label="Your working"></textarea>';
+    h+='<textarea id="tbAns" class="tb-ans'+(jeOn||fsOn?' tb-ans-sm':'')+'" maxlength="15000" placeholder="'+(jeOn||fsOn?'Other working (optional). Saved on this device.':(OPT.writtenDir?'Work it out here. Saved on this device.':'Work it out here. Saved on this device (shared with the textbook in My PDF sets).'))+'" aria-label="Your working"></textarea>';
     if(!done&&q.checks.length) h+='<div id="tbChecks">'+StudySosChecks.html(q.checks)+'<div class="tb-row" id="tbQuick" hidden><span class="count">All correct.</span><button class="btn primary" id="tbGotQuick" type="button">Mark as got it</button></div></div>';
     if(!shown) h+='<div class="tb-row"><button class="btn primary" id="tbShow" type="button">Show solution</button></div>';
     else { h+='<div class="explain"><b class="v">Solution</b><div class="sos-body">'+StudySosMd(q.solution)+'</div></div>';
@@ -268,7 +273,7 @@ function renderQ(){
   q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
     h+='<button type="button" class="'+cls+'" data-oi="'+oi+'" '+(done?'disabled':'')+'><span class="k">'+'ABCD'[k]+'</span><span>'+rich(q.opts[oi])+'</span></button>'; });
   h+='</div>';
-  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+'</div>'; }
+  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+(ok?'':askAI(q,ch))+'</div>'; }
   }
   h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
   h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined||reviewFresh(x)?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';

@@ -56,7 +56,7 @@
       for (var t of (value.tasks || [])) {
         if (!object(t) || typeof t.id !== "string" || typeof t.title !== "string" || t.title.length > 80 ||
             !/^\d{4}-\d{2}-\d{2}$/.test(String(t.date)) || !["High", "Medium", "Low"].includes(t.pri) ||
-            (t.done !== undefined && typeof t.done !== "boolean"))
+            (t.done !== undefined && typeof t.done !== "boolean") || (t.rep !== undefined && t.rep !== "d" && t.rep !== "w"))
           throw new Error("Invalid home dashboard task");
         if ((t.link !== undefined && (typeof t.link !== "string" || t.link.length > 500 || !/^https:\/\/classroom\.google\.com\/[^\s"'<>]*$/.test(t.link))) ||
             (t.src !== undefined && t.src !== "classroom"))
@@ -121,6 +121,14 @@
       for (var pd of Object.keys(value.days))
         if (!/^\d{4}-\d{2}-\d{2}$/.test(pd) || !Number.isFinite(value.days[pd]) || value.days[pd] < 0 || value.days[pd] > 1440)
           throw new Error("Invalid Pomodoro history");
+      if (value.logs !== undefined) {
+        if (!object(value.logs)) throw new Error("Invalid Pomodoro history");
+        for (var ld of Object.keys(value.logs)) {
+          var ll = value.logs[ld];
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(ld) || !Array.isArray(ll) || ll.length > 40 || !ll.every(function (x) { return object(x) && Number.isFinite(x.t) && typeof x.n === "string" && x.n.length <= 200 && (x.s === undefined || /^[a-z]{2,8}$/.test(x.s)); }))
+            throw new Error("Invalid Pomodoro history");
+        }
+      }
       if (value.bySub !== undefined) {
         if (!object(value.bySub)) throw new Error("Invalid Pomodoro history");
         for (var bd of Object.keys(value.bySub)) {
@@ -128,6 +136,18 @@
           if (!/^\d{4}-\d{2}-\d{2}$/.test(bd) || !object(bs) || !Object.keys(bs).every(function (k) { return /^[a-z]{2,8}$/.test(k) && Number.isFinite(bs[k]) && bs[k] >= 0 && bs[k] <= 1440; }))
             throw new Error("Invalid Pomodoro history");
         }
+      }
+    } else if (key === "studyos.jedrill.v1") {
+      if (!object(value.days) || (value.tpl !== undefined && !object(value.tpl))) throw new Error("Invalid JE Drill score");
+      for (var jd of Object.keys(value.days)) {
+        var jv = value.days[jd];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(jd) || !object(jv) || !Number.isInteger(jv.a) || !Number.isInteger(jv.c) || jv.a < 0 || jv.c < 0 || jv.c > jv.a || jv.a > 10000)
+          throw new Error("Invalid JE Drill score");
+      }
+      for (var jt of Object.keys(value.tpl || {})) {
+        var tv = value.tpl[jt];
+        if (!/^[a-z0-9]{2,12}$/.test(jt) || !Array.isArray(tv) || tv.length !== 2 || !tv.every(function (n) { return Number.isInteger(n) && n >= 0; }) || tv[1] > tv[0])
+          throw new Error("Invalid JE Drill score");
       }
     } else if (key === "studyos.excel.v1") {
       if ((value.done !== undefined && !object(value.done)) || (value.ans !== undefined && !object(value.ans)))

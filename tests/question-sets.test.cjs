@@ -23,7 +23,7 @@ test('engine: sets never hide Review due, Missed, deep links or Cram Mode; pages
   const e=R('scripts/study-course-engine.js');
   assert.match(e,/const setsOn=\(\)=>!!window\.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;/);
   assert.match(e,/\(!SM\|\|q\.open\|\|\(!SM\.hidden\.has\(String\(q\.id\)\)&&okSet\.has\(String\(q\.id\)\)\)\)/);
-  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=1"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=3"/);
+  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=1"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=\d+"/);
 });
 test('deep links never untick a chapter the engine already selected from ?cat=',()=>{
   const src=R('scripts/study-course-nav.js');
