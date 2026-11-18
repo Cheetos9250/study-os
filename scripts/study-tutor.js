@@ -71,7 +71,7 @@
  function reply(provider,status,j){
   const err=j&&(j.error&&(j.error.message||j.error.status||j.error.code)||j.message);
   if(status<200||status>=299){
-   const hint=status===401||status===403?' Check the API key.':status===404?' Check the model name.':status===429?' Rate limit or free quota reached; wait a minute or check your plan.':'';
+   const hint=status===401||status===403?' Check the API key.':status===404?' Check the model name.':status===429?' Free quota reached for now; wait a minute (per-minute limit) or try again tomorrow (daily limit).':status>=500?' Google\'s servers are busy; try again in a minute.':'';
    throw new Error('The AI service answered '+status+(err?': '+clean(err,300):'')+'.'+hint);
   }
   let t='';
@@ -105,5 +105,43 @@
   if(ids.includes('gemini-flash-latest'))return 'gemini-flash-latest';
   return ids.find(id=>/flash/.test(id)&&!/(lite|image|tts|live|audio|embed|thinking|exp)/.test(id))||'';
  }
- return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl,pickModel};
+ /* A different model to answer with when the current one is busy (503) or its free quota is used up (429):
+    each model has its own quota. Prefers another plain Flash, then Flash-Lite, newest first. */
+ function backupModel(provider,ids,current){
+  if(provider!=='gemini')return '';
+  ids=(ids||[]).map(String).filter(id=>id!==current);
+  const ver=(id,re)=>{const m=re.exec(id);return m?parseFloat(m[1]):-1;};
+  const flash=/^gemini-(\d+(?:\.\d+)?)-flash$/,lite=/^gemini-(\d+(?:\.\d+)?)-flash-lite$/;
+  const by=re=>ids.filter(id=>ver(id,re)>=0).sort((a,b)=>ver(b,re)-ver(a,re));
+  return by(flash)[0]||(ids.includes('gemini-flash-latest')?'gemini-flash-latest':'')||by(lite)[0]||(ids.includes('gemini-flash-lite-latest')?'gemini-flash-lite-latest':'');
+ }
+ /* quick actions: prompts in Thai so answers come back in Thai */
+ function quick(kind,o){
+  o=o||{};const where=o.topic?'เรื่อง '+o.topic:o.chapter?'บท '+o.chapter+(o.course?' วิชา '+o.course:''):(o.course?'วิชา '+o.course:'เรื่องที่ผมกำลังเรียน');
+  const n=Math.min(20,Math.max(1,parseInt(o.n,10)||5));
+  if(kind==='explain')return 'อธิบาย'+where+'ให้เข้าใจง่าย ๆ: ประเด็นหลัก สูตรหรือหลักการที่ต้องจำ และตัวอย่างสั้น ๆ 1 ข้อ';
+  if(kind==='quiz')return 'ตั้งคำถามปรนัย 4 ตัวเลือกจาก'+where+' ทีละข้อ รวม '+n+' ข้อ ถามข้อเดียวแล้วรอผมตอบก่อน แล้วค่อยเฉลยพร้อมเหตุผลและถามข้อต่อไป';
+  if(kind==='summary')return 'สรุป'+where+'เป็นข้อ ๆ สั้น ๆ สำหรับทบทวนก่อนสอบ ใส่สูตรและคำศัพท์สำคัญ (English) ไม่เกิน 1 หน้า';
+  if(kind==='example')return 'ยกโจทย์ตัวอย่างแบบที่ออกสอบจาก'+where+' 1 ข้อ แล้วเฉลยละเอียดทีละขั้น';
+  if(kind==='check')return 'ช่วยตรวจคำตอบ/วิธีทำของผม บอกว่าถูกหรือผิดตรงขั้นไหน และวิธีแก้'+(o.topic?':\n'+o.topic:' (ผมจะส่งให้ในข้อความนี้หรือรูปที่แนบ)');
+  if(kind==='mistakes')return 'จุดที่นักศึกษามักทำผิดใน'+where+' มีอะไรบ้าง บอกวิธีจำหรือวิธีเช็กคำตอบให้ไม่พลาด';
+  if(kind==='plan'){const ex=(o.exams||[]).map(e=>'- '+e.name+': '+e.date+' (อีก '+e.days+' วัน)').join('\n');
+   return 'ช่วยจัดแผนอ่านหนังสือรายวันจนถึงวันสอบ ให้เหมาะกับเวลาที่เหลือ บอกว่าวันไหนควรอ่านบทไหนและทำแบบฝึกหัดอะไร'+(ex?'\nวันสอบของผม:\n'+ex:'');}
+  return '';
+ }
+ /* typed commands in the chat box: /quiz 10 inventory, /explain, /summary, /example, /check <working>, /mistakes, /plan, /new, /help */
+ const COMMANDS=[['/explain','[topic]','Explain the chapter (or a topic)'],['/quiz','[number] [topic]','Multiple-choice quiz, one question at a time'],
+  ['/summary','[topic]','Short summary to review before the exam'],['/example','[topic]','One exam-style problem, solved step by step'],
+  ['/check','<your working>','Check your answer or working (or attach a photo)'],['/mistakes','[topic]','Common mistakes and how to avoid them'],
+  ['/plan','','Daily study plan to your exams (uses Calendar exam dates)'],['/new','','Start a new chat'],['/help','','Show these commands']];
+ function command(text){
+  const m=/^\/([a-z]+)\b\s*([\s\S]*)$/i.exec(String(text||'').trim());if(!m)return null;
+  const name=m[1].toLowerCase(),rest=m[2].trim();
+  if(name==='new'||name==='help')return {action:name};
+  if(name==='quiz'){const k=/^(\d{1,2})\b\s*([\s\S]*)$/.exec(rest);return {kind:'quiz',n:k?k[1]:'',topic:k?k[2].trim():rest};}
+  if(['explain','summary','example','check','mistakes','plan'].includes(name))return {kind:name,topic:rest};
+  return {action:'unknown',name};
+ }
+ function help(){return '**Commands** (type in the box, then Send)\n\n| Command | What it does |\n|---|---|\n'+COMMANDS.map(c=>'| '+c[0]+(c[1]?' '+c[1]:'')+' | '+c[2]+' |').join('\n')+'\n\nPick a subject and chapter first so the tutor reads your course notes. Example: /quiz 10 inventory';}
+ return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,COMMANDS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl,pickModel,backupModel,quick,command,help};
 });

@@ -12,7 +12,7 @@ test('the page retries once after a Gemini 404 with the picked model and saves i
   const h=R('tutor.html');
   assert.match(h,/if\(out\.status===404&&cfg\.provider==='gemini'\)\{const m=await newestModel\(\);/);
   assert.match(h,/cfg\.gemini\.model=m;saveCfg\(\);/);
-  assert.match(h,/A\.pickModel\(cfg\.provider,A\.models\(cfg\.provider,await res\.json\(\)\)\)/);
+  assert.match(h,/async function newestModel\(\)\{return A\.pickModel\(cfg\.provider,await modelIds\(\)\);\}/);
 });
 test('the sidebar scrolls when the menu is taller than the screen, without a sideways scrollbar',()=>{
   const n=R('scripts/study-nav.js');

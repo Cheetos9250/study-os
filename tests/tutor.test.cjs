@@ -15,7 +15,7 @@ test('Gemini request: key in a header (never the URL), system prompt, photo as i
   const b=JSON.parse(r.init.body);assert.equal(b.systemInstruction.parts[0].text,'SYS');
   assert.deepEqual(b.contents.map(x=>x.role),['user','model']);assert.equal(b.contents[0].parts[0].inline_data.data,'AAAA');
   assert.equal(A.reply('gemini',200,{candidates:[{content:{parts:[{text:'A'},{text:'B'}]}}]}),'AB');
-  assert.throws(()=>A.reply('gemini',429,{error:{message:'quota'}}),/429: quota\. Rate limit/);
+  assert.throws(()=>A.reply('gemini',429,{error:{message:'quota'}}),/429: quota\. Free quota reached/);
   assert.throws(()=>A.request(A.normalize({}),'S',[]),/API key/);
 });
 test('Hermes / OpenAI-compatible request: bearer key, system message first, reasoning tags removed',()=>{
