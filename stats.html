@@ -42,6 +42,12 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 .meter{height:8px;border-radius:4px;background:var(--line-soft);overflow:hidden}.meter i{display:block;height:100%;background:var(--ink);border-radius:4px}
 .ch .pc{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
 .note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,var(--hc));grid-auto-columns:var(--hc);gap:3px;--hc:13px;overflow-x:auto;padding:4px 0 6px}
+.heat i{display:block;width:var(--hc);height:var(--hc);border-radius:3px;background:var(--line-soft);outline:none}.heat i.l1{background:color-mix(in srgb,var(--acc) 30%,var(--panel))}.heat i.l2{background:color-mix(in srgb,var(--acc) 55%,var(--panel))}.heat i.l3{background:color-mix(in srgb,var(--acc) 78%,var(--panel))}.heat i.l4{background:var(--acc)}.heat i.fut{background:transparent}
+.heat i:focus-visible{outline:2px solid var(--ink);outline-offset:1px}.heat-key{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);margin-top:4px}.heat-key i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.wk{width:100%;border-collapse:collapse;font-size:14px}.wk th,.wk td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line-soft)}.wk td.n{text-align:right;font-variant-numeric:tabular-nums}.wk .up{color:var(--ok,#1c7c4a);font-weight:700}.wk .down{color:var(--red,#c21f2f);font-weight:700}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.bdg{border:2px solid var(--ink);border-radius:var(--r);padding:10px 12px;background:var(--panel);display:grid;gap:2px}.bdg .ic{font-size:26px;line-height:1}.bdg b{font-size:14px}.bdg span{font-size:12.5px;color:var(--muted)}
+.bdg.off{border-style:dashed;opacity:.62}.bdg.off .ic{filter:grayscale(1)}.bdg .pg{height:6px;border-radius:3px;background:var(--line-soft);overflow:hidden;margin-top:4px}.bdg .pg i{display:block;height:100%;background:var(--ink)}
 @media(max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:420px){.ch{grid-template-columns:minmax(0,1fr) 70px 62px}.tile .n{font-size:34px}}
 </style>
@@ -56,12 +62,17 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 <section class="panel" aria-labelledby="qh"><h3 id="qh">Questions answered</h3><p class="sub">Last 30 days · each question counts on the day you last answered it</p><div class="chart" id="qChart"></div></section>
 <section class="panel" aria-labelledby="wh"><h3 id="wh">WordNest words</h3><p class="sub" id="wsub">Last 30 days · English and Chinese answers in WordNest</p><div class="chart" id="wChart"></div></section>
 <section class="panel" aria-labelledby="ph"><h3 id="ph">Pomodoro minutes</h3><p class="sub">Last 30 days · finished 25-minute sessions</p><div class="chart" id="pChart"></div></section>
+<section class="panel" aria-labelledby="hh"><h3 id="hh">Study heatmap</h3><p class="sub" id="hsub">Questions answered and WordNest words per day</p><div id="heat"></div></section>
+<section class="panel" aria-labelledby="kh"><h3 id="kh">This week</h3><p class="sub" id="ksub">Monday to today, against the same days last week</p><div id="week"></div></section>
+<section class="panel" aria-labelledby="bh"><h3 id="bh">Badges</h3><p class="sub" id="bsub">Earned from what you have already done</p><div id="badges" class="badges"></div></section>
 <h2>By subject and chapter</h2>
 <section class="panel"><ul class="subj" id="subj"><li class="note">Loading…</li></ul></section>
 </main>
 </div>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-stats.js?v=1"></script>
+<script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-motivation.js?v=1"></script>
 <script src="scripts/study-wordnest.js?v=2"></script>
 <script src="scripts/study-nav.js?v=11"></script>
 <script>
@@ -112,6 +123,30 @@ function chart(el,map,unit){
 function charts(){chart($('#qChart'),answered,'questions');chart($('#wChart'),words,'words');chart($('#pChart'),pomo,'minutes');}
 if(wn)$('#wsub').textContent='Last 30 days · English and Chinese answers in WordNest · goal '+wn.goal+' a day'+(wn.streak?' · '+wn.streak+'-day goal streak':'');
 tiles(null);charts();
+/* heatmap, this week, badges (scripts/study-motivation.js) */
+(function(){const M=window.StudyMotivation;if(!M)return;
+ const per={},raw={};T.COURSES.forEach(c=>{raw[c.key]=read('study-'+c.key);per[c.key]=S.answersPerDay([raw[c.key]]);});
+ let home={};try{home=JSON.parse(read('studyos.home.v1')||'{}')||{};}catch(e){}
+ const g=M.goal(home.qgoal),weeks=innerWidth<520?17:26,h=M.heatmap([answered,words],now,weeks);
+ $('#hsub').textContent='Questions answered and WordNest words per day · last '+weeks+' weeks · '+h.active+' active day'+(h.active===1?'':'s');
+ $('#heat').innerHTML='<div class="heat" role="img" aria-label="Study heatmap: '+h.active+' active days, '+h.total+' answers in the last '+weeks+' weeks">'
+  +h.cells.map(c=>c.level<0?'<i class="fut"></i>':'<i class="l'+c.level+'" title="'+esc(fmtDay(c.d)+': '+c.n)+'"></i>').join('')+'</div>'
+  +'<div class="heat-key" aria-hidden="true">Less <i style="background:var(--line-soft)"></i><i class="l1" style="background:color-mix(in srgb,var(--acc) 30%,var(--panel))"></i><i style="background:color-mix(in srgb,var(--acc) 55%,var(--panel))"></i><i style="background:color-mix(in srgb,var(--acc) 78%,var(--panel))"></i><i style="background:var(--acc)"></i> More</div>';
+ const hs=$('#heat .heat');if(hs)hs.scrollLeft=hs.scrollWidth;
+ const NAME={};T.COURSES.forEach(c=>NAME[c.key]=c.name);NAME.words='WordNest words';NAME.pomo='Pomodoro minutes';
+ const wk=M.weekly(Object.assign({},per,{words,pomo}),now);
+ $('#ksub').textContent='Monday to today ('+wk.days+' day'+(wk.days===1?'':'s')+'), against the same days last week';
+ $('#week').innerHTML='<table class="wk"><thead><tr><th>What</th><th class="n">This week</th><th class="n">Last week</th><th class="n">Change</th></tr></thead><tbody>'
+  +wk.rows.map(r=>{const d=r.now-r.before;return '<tr><td>'+esc(NAME[r.key]||r.key)+(NAME[r.key]&&T.COURSES.some(c=>c.key===r.key)?' questions':'')+'</td><td class="n">'+r.now+'</td><td class="n">'+r.before+'</td><td class="n '+(d>0?'up':d<0?'down':'')+'">'+(d>0?'+':'')+d+'</td></tr>';}).join('')+'</tbody></table>'
+  +'<p class="note">'+(()=>{const q=wk.rows.filter(r=>per[r.key]),qn=q.reduce((n,r)=>n+r.now,0),qb=q.reduce((n,r)=>n+r.before,0),quiet=q.filter(r=>!r.now).map(r=>NAME[r.key]);
+    return (qn>qb?'More practice than last week. ':qn<qb?'Less practice than last week so far. ':'')+(quiet.length?'Not practised this week: '+quiet.join(', ')+'. ':'')+'Counts each question on the day you last answered it.';})()+'</p>';
+ const byCourse={};let total=0,retired=0;T.COURSES.forEach(c=>{let n=0;try{const st=JSON.parse(raw[c.key]||'{}');n=Object.keys((st&&st.ans)||{}).length;}catch(e){}byCourse[c.key]=n;total+=n;if(window.StudyReview)retired+=StudyReview.retiredRaw(raw[c.key],now);});
+ const pomoMin=Object.values(pomo).reduce((a,b)=>a+b,0),wordsN=Object.values(words).reduce((a,b)=>a+b,0),goalDays=Object.keys(answered).filter(d=>answered[d]>=g).length;
+ const list=M.badges({total,byCourse,bestStreak:M.bestStreak([answered,pomo,ticks,words]),goalDays,retired,pomoMin,words:wordsN}),got=list.filter(b=>b.got).length;
+ $('#bsub').textContent=got+' of '+list.length+' earned · from what you have already done';
+ $('#badges').innerHTML=list.map(b=>'<div class="bdg'+(b.got?'':' off')+'" role="group" aria-label="'+esc(b.title+(b.got?', earned':', '+b.have+' of '+b.need))+'"><span class="ic" aria-hidden="true">'+b.icon+'</span><b>'+esc(b.title)+'</b><span>'+esc(b.desc)+'</span>'
+  +(b.got?'<span>Earned ✓</span>':'<span>'+b.have+' / '+b.need+'</span><span class="pg" aria-hidden="true"><i style="width:'+Math.round(b.have/b.need*100)+'%"></i></span>')+'</div>').join('');
+})();
 /* drawn at the real width so axis text keeps its size on a phone */
 let rw=innerWidth,rt=null;addEventListener('resize',()=>{if(innerWidth===rw)return;rw=innerWidth;clearTimeout(rt);rt=setTimeout(charts,150);});
 /* subject and chapter accuracy: course data loaded like Practice does */

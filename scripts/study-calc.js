@@ -1,6 +1,6 @@
 /* Practice calculator: a floating calculator for quiz pages (?tab=prac) and the textbook exercises.
    Pure arithmetic, no eval: numbers, + − × ÷, ^, %, brackets, unary minus.
-   Reads and writes no storage. */
+   History (the tape): the last 30 calculations, kept on this device in studyos.calc.v1 (not backed up). */
 (function(){
  'use strict';
  /* ---------- maths (also exported for tests) ---------- */
@@ -61,6 +61,15 @@
  +'#calc .c-res.err{font-size:18px;color:#c21f2f}'
  +'#calc .c-tape{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px}'
  +'#calc .c-tape button{border:1.5px solid var(--c-ink);border-radius:4px;background:var(--c-paper);color:var(--c-ink);font-weight:700;font-size:12px;font-family:inherit;padding:2px 7px;min-height:28px;cursor:pointer;font-variant-numeric:tabular-nums}'
+ +'#calc .c-hb{min-height:40px;padding:0 10px;border:2px solid var(--c-ink);border-radius:6px;background:var(--c-paper);color:var(--c-ink);font-weight:700;font-size:13px;font-family:inherit;cursor:pointer}'
+ +'#calc .c-hb[aria-pressed="true"]{background:var(--c-ink);color:var(--c-paper)}'
+ +'#calc .c-hist{max-height:268px;overflow-y:auto;padding:6px 10px 10px;display:grid;gap:4px}'
+ +'#calc .c-hist[hidden]{display:none}'
+ +'#calc .c-hist .h{display:flex;justify-content:space-between;gap:10px;text-align:left;min-height:40px;padding:4px 8px;border:1.5px solid var(--c-ink);border-radius:5px;background:var(--c-paper);color:var(--c-ink);font-family:inherit;font-size:13px;cursor:pointer;font-variant-numeric:tabular-nums}'
+ +'#calc .c-hist .h span{color:var(--c-mute);overflow-wrap:anywhere}#calc .c-hist .h b{white-space:nowrap}'
+ +'#calc .c-hist .e{font-size:13px;color:var(--c-mute);text-align:center;padding:16px 4px}'
+ +'#calc .c-hist .clr{justify-self:end;min-height:36px;padding:0 10px;border:1.5px solid var(--c-ink);border-radius:5px;background:var(--c-paper);color:#c21f2f;font-weight:700;font-family:inherit;cursor:pointer}'
+ +'#calc .c-keys[hidden]{display:none}'
  +'#calc .c-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px}'
  +'#calc .c-keys button{min-height:48px;border:2px solid var(--c-ink);border-radius:6px;background:var(--c-key);color:var(--c-ink);font-weight:900;font-size:18px;font-family:inherit;cursor:pointer;touch-action:manipulation}'
  +'#calc .c-keys button:active{transform:translateY(1px)}'
@@ -72,7 +81,13 @@
  var ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v3M8 18h.01M12 18h.01"/></svg>';
  var X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
  var KEYS=[['C','fn','clear'],['⌫','fn','back'],['%','fn'],['÷','op','/'],['7'],['8'],['9'],['×','op','*'],['4'],['5'],['6'],['−','op','-'],['1'],['2'],['3'],['+','op','+'],['( )','fn','paren'],['0'],['.'],['=','eq','eq']];
- var expr='',last=null,tape=[],panel,exp,res,tp,btn;
+ var HK='studyos.calc.v1',MAXH=30;
+ function readHist(){try{var o=JSON.parse(localStorage.getItem(HK)||'[]');return Array.isArray(o)?o.filter(function(x){return x&&typeof x.e==='string'&&typeof x.v==='number'&&isFinite(x.v);}).slice(0,MAXH):[];}catch(e){return [];}}
+ function writeHist(){try{localStorage.setItem(HK,JSON.stringify(hist.slice(0,MAXH)));}catch(e){}}
+ var hist=readHist(),expr='',last=null,tape=hist.slice(0,4).map(function(x){return x.v;}),panel,exp,res,tp,btn,hl,keys;
+ function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+ function paintHist(){hl.innerHTML=hist.length?hist.map(function(x,i){return '<button type="button" class="h" data-h="'+i+'" title="Use this result"><span>'+esc(x.e)+' =</span><b>'+fmt(x.v)+'</b></button>';}).join('')+'<button type="button" class="clr">Clear history</button>':'<p class="e">No calculations yet. Results you get with = are kept here on this device.</p>';}
+ function use(v){expr+=(/[0-9.)%]$/.test(expr)?'*':'')+(v<0?'('+v+')':String(v));show();}
  function show(){exp.textContent=expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−')||' ';
   if(!expr){res.textContent=last===null?'0':fmt(last);res.classList.remove('err');return;}
   try{var v=evaluate(expr);res.textContent=fmt(v);res.classList.remove('err');}catch(e){res.textContent=fmt(last===null?0:last);res.classList.remove('err');}}
@@ -80,7 +95,7 @@
  function press(k){
   if(k==='clear'){expr='';last=null;show();return;}
   if(k==='back'){expr=expr.slice(0,-1);show();return;}
-  if(k==='eq'){if(!expr)return;try{var v=evaluate(expr);last=v;tape.unshift(v);tape=tape.slice(0,4);expr='';paintTape();show();res.textContent=fmt(v);}catch(e){res.textContent=e.message==='not a number'?'Cannot divide by zero':'Check the expression';res.classList.add('err');}return;}
+  if(k==='eq'){if(!expr)return;try{var v=evaluate(expr);last=v;tape.unshift(v);tape=tape.slice(0,4);hist.unshift({e:expr.replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−'),v:v,t:Date.now()});hist=hist.slice(0,MAXH);writeHist();if(!hl.hidden)paintHist();expr='';paintTape();show();res.textContent=fmt(v);}catch(e){res.textContent=e.message==='not a number'?'Cannot divide by zero':'Check the expression';res.classList.add('err');}return;}
   if(k==='paren'){var open=(expr.match(/\(/g)||[]).length-(expr.match(/\)/g)||[]).length;k=(open>0&&/[0-9.)%]$/.test(expr))?')':'(';if(k==='('&&/[0-9.)%]$/.test(expr))expr+='*';}
   if(k==='neg'){var m=expr.match(/(\d*\.?\d+%?)$/);if(m){var s=expr.slice(0,expr.length-m[1].length);expr=(/\(-$/.test(s)?s.slice(0,-2)+m[1]:s+'(-'+m[1]);}else if(!expr&&last!==null){expr=String(-last);}else expr+='(-';show();return;}
   if(!expr&&last!==null&&/^[+\-*/^%]$/.test(k))expr=String(last);
@@ -94,18 +109,20 @@
   var st=document.createElement('style');st.id='calcCss';st.textContent=CSS;document.head.appendChild(st);
   btn=document.createElement('button');btn.type='button';btn.id='calcBtn';btn.setAttribute('aria-controls','calc');btn.setAttribute('aria-expanded','false');btn.innerHTML=ICON+'<span>Calc</span>';
   panel=document.createElement('div');panel.id='calc';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Calculator');
-  panel.innerHTML='<div class="c-head"><b>Calculator</b><small>drag to move</small><button type="button" class="c-x" aria-label="Close calculator">'+X+'</button></div>'
+  panel.innerHTML='<div class="c-head"><b>Calculator</b><small>drag to move</small><button type="button" class="c-hb" aria-pressed="false">History</button><button type="button" class="c-x" aria-label="Close calculator">'+X+'</button></div>'
    +'<div class="c-scr"><div class="c-exp" aria-live="polite"></div><div class="c-res" role="status">0</div><div class="c-tape" aria-label="Recent results"></div></div>'
-   +'<div class="c-keys">'+KEYS.map(function(k){return '<button type="button" class="'+(k[1]||'')+'" data-k="'+(k[2]||k[0])+'"'+(k[0]==='⌫'?' aria-label="Delete last"':k[0]==='C'?' aria-label="Clear"':k[0]==='( )'?' aria-label="Brackets"':'')+'>'+k[0]+'</button>';}).join('')+'</div>';
+   +'<div class="c-hist" hidden aria-label="Calculation history"></div><div class="c-keys">'+KEYS.map(function(k){return '<button type="button" class="'+(k[1]||'')+'" data-k="'+(k[2]||k[0])+'"'+(k[0]==='⌫'?' aria-label="Delete last"':k[0]==='C'?' aria-label="Clear"':k[0]==='( )'?' aria-label="Brackets"':'')+'>'+k[0]+'</button>';}).join('')+'</div>';
   document.body.appendChild(panel);document.body.appendChild(btn);
-  exp=panel.querySelector('.c-exp');res=panel.querySelector('.c-res');tp=panel.querySelector('.c-tape');
+  exp=panel.querySelector('.c-exp');res=panel.querySelector('.c-res');tp=panel.querySelector('.c-tape');hl=panel.querySelector('.c-hist');keys=panel.querySelector('.c-keys');paintTape();
+  var hb=panel.querySelector('.c-hb');hb.onclick=function(){var on=hl.hidden;hl.hidden=!on;keys.hidden=on;hb.setAttribute('aria-pressed',String(on));if(on)paintHist();};
+  hl.addEventListener('click',function(e){if(e.target.closest('.clr')){if(!confirm('Clear the calculator history on this device?'))return;hist=[];tape=[];writeHist();paintHist();paintTape();return;}var b=e.target.closest('[data-h]');if(!b)return;use(hist[+b.dataset.h].v);hl.hidden=true;keys.hidden=false;hb.setAttribute('aria-pressed','false');});
   /* sit to the left of the quiz Notes button when there is one */
   /* read the size after the first paint, so it does not force an extra layout of the long page while loading */
   requestAnimationFrame(function(){setTimeout(function(){var nb=document.getElementById('qnBtn');if(nb)document.documentElement.style.setProperty('--calc-right',(nb.offsetWidth+28)+'px');},0);});
   btn.onclick=function(){setOpen(panel.hidden);};
   panel.querySelector('.c-x').onclick=function(){setOpen(false);};
   panel.querySelector('.c-keys').addEventListener('click',function(e){var b=e.target.closest('button');if(b)press(b.dataset.k);});
-  tp.addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(!b)return;var v=tape[+b.dataset.t];expr+=(/[0-9.)%]$/.test(expr)?'*':'')+(v<0?'('+v+')':String(v));show();});
+  tp.addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(!b)return;use(tape[+b.dataset.t]);});
   res.addEventListener('dblclick',function(){if(navigator.clipboard)navigator.clipboard.writeText(res.textContent.replace(/,/g,'')).catch(function(){});});
   /* keyboard, only while the calculator is open and no text field has focus */
   document.addEventListener('keydown',function(e){if(panel.hidden)return;var t=e.target;if(t&&(t.tagName==='TEXTAREA'||t.tagName==='INPUT'||t.tagName==='SELECT'||t.isContentEditable))return;

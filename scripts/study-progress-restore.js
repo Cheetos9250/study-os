@@ -63,6 +63,8 @@
           throw new Error("Invalid home dashboard task link");
       }
       if (value.focus !== undefined && !object(value.focus)) throw new Error("Invalid home dashboard checklist");
+      if (value.qgoal !== undefined && (!Number.isInteger(value.qgoal) || value.qgoal < 1 || value.qgoal > 200))
+        throw new Error("Invalid daily practice goal");
       var jpeg = { test: function (v) { return /^data:image\/(jpeg|gif|png);base64,[A-Za-z0-9+\/=]+$/.test(v) || /^https:\/\/[^\s"'()\\<>]{4,1990}$/.test(v); } };
       if (value.avatar !== undefined && (typeof value.avatar !== "string" || !jpeg.test(value.avatar)))
         throw new Error("Invalid home dashboard avatar");

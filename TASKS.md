@@ -149,3 +149,93 @@ Status: needs owner (#102 closed 17 Nov 2026 at the owner's request; #68 still w
 
 - PR #102 (progress Worker deploy workflow) is already on `main`. Close it after confirming with the owner.
 - PR #68 (79 worked textbook answers) is waiting for the owner to decide whether to release or close it.
+
+---
+
+## F. Owner wishlist, 18 Nov 2026 (Thai: รายการที่อยากได้)
+
+The owner asked for these in three rounds. Round 1 helps the finals (Accounting 26 Nov, Economics 27 Nov); do it first.
+
+### Round 1 · before the exams
+
+### 14. Cram Mode (Thai: โหมดอัดก่อนสอบ)
+
+Status: done (#171)
+
+One page per subject for the last 24 hours before an exam: the questions answered wrong (and low review boxes), each with its right answer and explanation, plus the pinned formulas and the note cards (task 16). Read-only; never changes answers.
+
+### 15. Pinned formulas (Thai: ปักหมุดสูตร)
+
+Status: done (#171)
+
+Pin formulas and journal-entry rules per subject, shown at the top of Practice and on Cram Mode. Store them in the backed-up, synced notes (`studyos.notes.v1`, key `<course>:pins`); no new storage key.
+
+### 16. Note cards from `question :: answer` (Thai: โน้ตเป็นบัตรคำ)
+
+Status: done (#171)
+
+Lines written as `question :: answer` in the chapter notes become flip cards inside the Notes panel and on Cram Mode. Notes are not changed.
+
+### 17. Calculator tape (Thai: เครื่องคิดเลขมีประวัติ)
+
+Status: done (#171)
+
+The floating calculator keeps a history of calculations (tap one to reuse the result). Device-only convenience; not backed up.
+
+### 18. PDF resume page (Thai: PDF จำหน้าที่อ่านค้าง)
+
+Status: done (#171)
+
+My PDF sets opens each PDF at the page last viewed on this device.
+
+### Round 2 · motivation
+
+### 19. Daily goal bar on Today (Thai: หลอดเป้าหมายรายวัน)
+
+Status: done (#171)
+
+A small daily goal (e.g. 5 practice questions + 10 WordNest words) with a progress bar that fills as you study. #169 added a WordNest daily goal; extend it to practice questions.
+
+### 20. Study heatmap (Thai: ปฏิทินความสม่ำเสมอ)
+
+Status: done (#171)
+
+GitHub-style coloured squares on Stats: questions answered per day for the last months.
+
+### 21. Badges and milestones (Thai: เหรียญรางวัล)
+
+Status: done (#171)
+
+Unlock badges, e.g. first 100 accounting questions, a 7-day streak, a full chapter retired. Computed from existing data where possible.
+
+### 22. Weekly summary (Thai: สรุปรายสัปดาห์)
+
+Status: done (#171)
+
+On Stats: this week's questions, accuracy change per subject, and chapters that did not improve.
+
+### Round 3 · extras
+
+### 23. Pomodoro sounds and per-subject time (Thai: เสียงฝนและเวลาแยกวิชา)
+
+Status: todo
+
+Rain / white-noise sound during Pomodoro (generated in the browser, no downloads), and minutes per subject in Stats.
+
+### 24. Ctrl+K and tags (Thai: ค้นหาด่วนและแท็ก)
+
+Status: todo
+
+Ctrl+K / Cmd+K opens search; tags such as `#ออกสอบชัวร์`, `#สูตรลัด`, `#จุดหลอก` in notes are searchable.
+
+### 25. Warm paper theme and read-aloud (Thai: ธีมถนอมสายตาและอ่านออกเสียง)
+
+Status: todo
+
+A warm paper colour theme for night reading, and a button that reads a lesson summary aloud (browser speech).
+
+### 26. Share a quiz set (Thai: แชร์ชุดควิซ)
+
+Status: needs owner
+
+Share self-made question sets by link or QR. Needs a decision on what may leave the device (no personal data in links or in the repo).

@@ -1,0 +1,4 @@
+- **Today → Practice daily goal**: questions answered today against your goal (tap **Goal** to switch 5/10/20/30/50), with a goal streak. Saved with your tasks, so it is backed up and synced.
+- **Stats → Study heatmap**: GitHub-style squares for questions and WordNest words per day (last 26 weeks; 17 on phones).
+- **Stats → This week**: each subject, WordNest words and Pomodoro minutes, Monday to today against the same days last week.
+- **Stats → Badges**: 12 badges such as Bookkeeper (100 accounting questions), One full week (7-day streak) and Goal getter, with progress on the locked ones.
