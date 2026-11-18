@@ -22,9 +22,9 @@
  const css=document.createElement('style');
  css.textContent=''
  +'.wn-switch{display:flex;gap:6px;margin:0 0 14px}'
- +'.wn-switch a{flex:1;text-align:center;text-decoration:none;font-weight:700;font-size:13px;padding:8px 6px;border-radius:10px;border:1px solid var(--line);color:inherit;min-height:40px;display:flex;align-items:center;justify-content:center}'
+ +'.wn-switch a{flex:1;text-align:center;text-decoration:none;font-weight:700;font-size:13px;padding:8px 6px;border-radius:10px;border:1px solid var(--line);color:inherit;min-height:44px;display:flex;align-items:center;justify-content:center}'
  +'.wn-switch a[aria-current=page]{background:var(--purple,#5b53d7);border-color:var(--purple,#5b53d7);color:#fff}'
- +'.wn-back{display:flex;align-items:center;gap:8px;min-height:40px;font-size:13px;font-weight:700;text-decoration:none;color:inherit;opacity:.75;margin:0 0 10px}'
+ +'.wn-back{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;font-weight:700;text-decoration:none;color:inherit;opacity:.75;margin:0 0 10px}'
  +'.u-subjects{display:none!important}'
  +'.wn-zh .main-nav [data-page]:not([data-page=studymerge]),.wn-zh .mobile-nav [data-page]:not([data-page=studymerge]),.wn-zh .sidebar-settings,.wn-zh .sidebar-target{display:none!important}';
  document.head.appendChild(css);
