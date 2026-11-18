@@ -1,0 +1,1 @@
+- WordNest now uses the same ink-manga look and theme (Auto / Dark / Light from Study OS) as the rest of the site. Layout, words and saved progress are unchanged.
