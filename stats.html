@@ -59,9 +59,9 @@ details.tbl table{border-collapse:collapse;width:100%;max-width:360px}details.tb
 <section class="panel"><ul class="subj" id="subj"><li class="note">Loading…</li></ul></section>
 </main>
 </div>
-<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-stats.js?v=1"></script>
-<script src="scripts/study-nav.js?v=8"></script>
+<script src="scripts/study-nav.js?v=9"></script>
 <script>
 (function(){
 'use strict';
@@ -112,7 +112,7 @@ tiles(null);charts();
 let rw=innerWidth,rt=null;addEventListener('resize',()=>{if(innerWidth===rw)return;rw=innerWidth;clearTimeout(rt);rt=setTimeout(charts,150);});
 /* subject and chapter accuracy: course data loaded like Practice does */
 const data={};
-Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{
+Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{
  let A=0,C=0;
  const rows=T.COURSES.filter(c=>data[c.key]).map(c=>{
   const s=T.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now),per=Object.values(s.per).filter(p=>p.quiz>0);

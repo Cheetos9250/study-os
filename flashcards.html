@@ -122,9 +122,9 @@ h1{margin:8px 0 0}
 <section class="grid" id="langs" aria-label="Language flashcards"></section>
 </main>
 </div>
-<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
-<script src="scripts/study-nav.js?v=8"></script>
+<script src="scripts/study-nav.js?v=9"></script>
 <script>
 (function(){
 'use strict';
@@ -151,8 +151,8 @@ function render(){
  $('#langs').innerHTML=T.LANGS.map(l=>box(LANGICON[l.key],l.name,langData[l.key]?T.summarize(langData[l.key],read(l.mark+'-srs'),null,now):null,'<a class="main" href="'+l.app+'">Open WordNest</a>',false)).join('').replace(/class="pc"/g,'class="pc strip"');
 }
 render();
-Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);
-Promise.all(T.LANGS.map(l=>fetch(l.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
+Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{failed.push(c.key);}))).then(render);
+Promise.all(T.LANGS.map(l=>fetch(l.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
 addEventListener('studycloud:applied',()=>render());
 })();

@@ -1,8 +1,9 @@
+const __cs=require('./course-source.cjs');
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const S=require('../scripts/study-search.js'),root=path.join(__dirname,'..'),read=f=>fs.readFileSync(path.join(root,f),'utf8');
+const S=require('../scripts/study-search.js'),root=path.join(__dirname,'..'),read=f=>__cs.read(path.join(root,f),'utf8');
 test('index covers questions, cards, summaries, notes and textbook; links open the item',()=>{
- const acc=S.parseCourse(read('acc.html'));assert.ok(acc&&acc.quiz.length>10);
+ const acc=S.parseCourse(read('data/courses/acc.js'));assert.match(read('scripts/study-search.js'),/getT\('data\/courses\/'\+k\+'\.js'\)/);assert.ok(acc&&acc.quiz.length>10);
  const idx=S.buildIndex({courses:{acc},notes:{'acc:c5':{text:'Remember FOB shipping point'}},
   textbook:[{id:'QS-9-2',title:'Credit card sales',chapter:9}],written:[{id:'QS-9-26',title:'Preparing an income statement',prompt:'x'}],
   accMcq:[{id:'tb-QS-5-1',ref:'QS-5-1',q:'Kerr Co. buys merchandise'}],quizRows:[{Subject:'Accounting',Status:'Verified',Chapter:acc.cats[0][1],Question:'What is an asset?',Correct:'A resource',page_id:'abc'}]});
@@ -18,6 +19,6 @@ test('index covers questions, cards, summaries, notes and textbook; links open t
 test('nav opens search lazily (button, More item, / key); search only reads study data',()=>{
  const n=read('scripts/study-nav.js');
  assert.match(n,/class="sn-find"/);assert.match(n,/class="sn-find-m"/);
- assert.match(n,/new URL\('study-search\.js\?v=1',navSrc\)/);assert.match(n,/if\(e\.key!=='\/'\|\|e\.metaKey/);
+ assert.match(n,/new URL\('study-search\.js\?v=2',navSrc\)/);assert.match(n,/if\(e\.key!=='\/'\|\|e\.metaKey/);
  assert.doesNotMatch(read('scripts/study-search.js'),/localStorage\.(setItem|removeItem)/);
 });

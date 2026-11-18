@@ -1,4 +1,5 @@
 'use strict';
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const T=require('../scripts/study-today.js');
 const root=path.join(__dirname,'..');
@@ -9,11 +10,11 @@ const D={cats:[['c6','06 Inventory'],['c8','08 Cash'],['c9','09 Receivables']],
 
 test('real course pages expose parseable data with the expected progress keys',()=>{
  for(const c of T.COURSES){
-  const html=fs.readFileSync(path.join(root,c.page),'utf8'),d=T.parseCourseData(html);
+  const html=__cs.read(path.join(root,c.page),'utf8'),d=T.parseCourseData(html);
   assert.equal(d.markKey,c.mark);assert.ok(d.cards.length>0&&d.quiz.length>0);
   for(const q of d.quiz)assert.ok(Number.isInteger(q[3]),'quiz answer index');
  }
- for(const e of T.DEFAULT_EXAMS){if(e.course==='other'){assert.equal(e.cats.length,0);continue;}const d=T.parseCourseData(fs.readFileSync(path.join(root,T.COURSES.find(c=>c.key===e.course).page),'utf8'));
+ for(const e of T.DEFAULT_EXAMS){if(e.course==='other'){assert.equal(e.cats.length,0);continue;}const d=T.parseCourseData(__cs.read(path.join(root,T.COURSES.find(c=>c.key===e.course).page),'utf8'));
   for(const id of e.cats)assert.ok(d.cats.some(x=>x[0]===id),e.id+' scope '+id);}
 });
 test('Monday quiz defaults to cost flow (ch6) and bank reconciliation (ch8)',()=>{
@@ -71,9 +72,9 @@ test('weak spots require two answers and sort by lowest accuracy',()=>{
  const w=T.weakSpots({acc:s});assert.equal(w.length,1);assert.equal(w[0].label,'06 Inventory');assert.equal(w[0].acc,0);
 });
 test('today page is read-only for course progress and linked from home',()=>{
- const html=fs.readFileSync(path.join(root,'calendar.html'),'utf8');
+ const html=__cs.read(path.join(root,'calendar.html'),'utf8');
  assert.match(html,/scripts\/study-today\.js/);assert.doesNotMatch(html,/removeItem|localStorage\.clear/);
  const writes=[...html.matchAll(/localStorage\.setItem\(([^,]+),/g)].map(m=>m[1]);assert.deepEqual(writes,['T.SETTINGS_KEY']);
  assert.doesNotMatch(html,/workers\.dev|notion/i);
- assert.match(fs.readFileSync(path.join(root,'index.html'),'utf8'),/href="calendar\.html"/);
+ assert.match(__cs.read(path.join(root,'index.html'),'utf8'),/href="calendar\.html"/);
 });

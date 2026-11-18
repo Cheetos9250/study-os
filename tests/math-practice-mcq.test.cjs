@@ -1,5 +1,6 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert'),fs=require('fs'),path=require('path'),vm=require('vm');
-const R=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const R=p=>__cs.read(path.join(__dirname,'..',p),'utf8');
 const ctx={window:{}};vm.runInNewContext(R('scripts/math-practice-mcq.js'),ctx);const Q=ctx.window.MATH_PRACTICE_MCQ;
 test('math chapters 5–7 practice: English MCQs, stable unique ids, 4 distinct options',()=>{
   assert.ok(Q.length>=60); assert.equal(new Set(Q.map(q=>q.id)).size,Q.length);

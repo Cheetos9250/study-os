@@ -1,7 +1,8 @@
+const __cs=require('./course-source.cjs');
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const T=require('../scripts/study-today.js');
-const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
+const read=f=>__cs.read(path.join(__dirname,'..',f),'utf8');
 const at=d=>Date.parse(d+'T03:00:00Z');
 test('on an exam day the plan still schedules a chapter for the next exam, with how many days are left',()=>{
   const D=T.parseCourseData(read('acc.html'));const now=at('2026-11-16'),sum={acc:T.summarize(D,null,null,now)};

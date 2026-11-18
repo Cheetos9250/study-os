@@ -1,7 +1,8 @@
+const __cs=require('./course-source.cjs');
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const R=require('../scripts/study-review.js');const DAY=86400000;
-const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
+const read=f=>__cs.read(path.join(__dirname,'..',f),'utf8');
 test('wrong answers come back tomorrow; each correct answer waits longer, capped at 90 days',()=>{
   const now=Date.UTC(2026,10,16,5);const sod=R.sod(now);
   assert.deepEqual(R.next(undefined,false,now),[0,sod+DAY]);

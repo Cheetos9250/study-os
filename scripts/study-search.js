@@ -61,7 +61,7 @@
   if(loading)return loading;
   const courses={};
   loading=Promise.all([
-   ...COURSES.map(([k])=>getT(k+'.html').then(h=>{courses[k]=parseCourse(h);})),
+   ...COURSES.map(([k])=>getT('data/courses/'+k+'.js').then(h=>{courses[k]=parseCourse(h);})),
    getJ('data/quiz.json'),
    Promise.all([5,6,7,8,9].map(n=>getJ('data/textbook-sos/ch'+n+'.json'))),
    getJ('data/accounting-textbook-index.json'),

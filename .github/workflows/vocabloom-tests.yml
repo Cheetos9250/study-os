@@ -6,6 +6,8 @@ on:
       - "vocabloom/**"
       - "index.html"
       - "acc.html"
+      - "scripts/study-course-engine.js"
+      - "data/courses/**"
       - "eco.html"
       - "math.html"
       - "eng.html"

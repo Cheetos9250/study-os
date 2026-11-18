@@ -1,7 +1,8 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert'),fs=require('fs');
 for(const f of ['acc','eco','math','eng','zh']){
  test(f+'.html automatic sync is opt-in and CAS-guarded',()=>{
-  const s=fs.readFileSync(__dirname+'/../'+f+'.html','utf8');
+  const s=__cs.read(__dirname+'/../'+f+'.html','utf8');
   assert.match(s,/AUTOK='study-sync-auto-v1'/);
   assert.match(s,/autoOn\(\)\?'Auto sync is on'/);
   assert.match(s,/if\(auto&&!revision\)throw/,'refuses Worker without ETag');

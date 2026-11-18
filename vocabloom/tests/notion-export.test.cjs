@@ -1,11 +1,12 @@
 'use strict';
+const __cs=require('../../tests/course-source.cjs');
 /* No Notion network calls or user credentials. */
 const fs=require('node:fs');
 const path=require('node:path');
 const assert=require('node:assert/strict');
 const {test}=require('node:test');
 const root=path.join(__dirname,'../..');
-const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const read=p=>__cs.read(path.join(root,p),'utf8');
 const cards=JSON.parse(read('data/cards.json'));
 const quiz=JSON.parse(read('data/quiz.json'));
 const app=read('vocabloom/index.html');

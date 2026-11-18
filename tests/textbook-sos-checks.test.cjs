@@ -1,5 +1,6 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert'),fs=require('fs'),path=require('path');
-const R=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const R=p=>__cs.read(path.join(__dirname,'..',p),'utf8');
 delete globalThis.StudySosChecks; require('../scripts/textbook-sos-render.js'); const C=globalThis.StudySosChecks;
 test('number parser accepts $, commas, brackets and %',()=>{
   assert.equal(C.parse('$1,234.50'),1234.5); assert.equal(C.parse('(45)'),-45); assert.equal(C.parse('36%'),36); assert.equal(C.parse(' 7980 '),7980);

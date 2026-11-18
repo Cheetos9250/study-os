@@ -1,0 +1,3 @@
+- Course pages (acc, eco, math, eng, zh) now share one engine, `scripts/study-course-engine.js`, and load their data from `data/courses/`. acc.html goes from 600 KB to 16 KB, and Today, Practice, Flashcards, Lessons, Calendar, Grades, Stats and search download only the course data file instead of the whole course page. Storage keys and formats are unchanged.
+- Fixed: on Accounting practice, an empty filter (for example **Missed** with nothing missed) stopped the page with an error instead of saying "No questions match this filter".
+- Accounting deep links (`?q=`) no longer jump back to the linked question after you move on and background data finishes loading (same rule as Economics and Math).

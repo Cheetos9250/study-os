@@ -1,5 +1,6 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert'),fs=require('fs'),path=require('path');
-const R=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const R=p=>__cs.read(path.join(__dirname,'..',p),'utf8');
 test('accounting practice includes the written textbook exercises, self-marked, sharing working with the textbook page',()=>{
   const s=R('acc.html');
   assert.match(s,/scripts\/textbook-sos-render\.js/); assert.match(s,/data\/textbook-sos\/ch'\+ch\+'\.json/);

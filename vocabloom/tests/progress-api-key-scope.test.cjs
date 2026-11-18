@@ -1,11 +1,12 @@
 'use strict';
+const __cs=require('../../tests/course-source.cjs');
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {readFileSync}=require('node:fs');
 const {join}=require('node:path');
 const vm=require('node:vm');
 const ROOT=join(__dirname,'../..');
-const read=path=>readFileSync(join(ROOT,path),'utf8');
+const read=path=>__cs.read(join(ROOT,path),'utf8');
 const ORIGINAL='https://study-api.kasidit09022550.workers.dev';
 const FUTURE='https://example-progress-worker.invalid';
 const OLD_KEY='OLD_CONTENT_WORKER_SECRET_SHOULD_NOT_LEAK';

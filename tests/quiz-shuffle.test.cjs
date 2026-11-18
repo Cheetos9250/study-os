@@ -1,5 +1,6 @@
+const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
+const read=f=>__cs.read(path.join(__dirname,'..',f),'utf8');
 test('quiz pages can shuffle the question order without touching saved answers',()=>{
  for(const f of ['acc.html','eco.html','math.html']){
   const s=read(f);

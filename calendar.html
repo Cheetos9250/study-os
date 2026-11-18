@@ -153,9 +153,9 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 </section>
 </main>
 </div>
-<script src="scripts/study-today.js?v=2"></script>
+<script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=4"></script>
-<script src="scripts/study-nav.js?v=8"></script>
+<script src="scripts/study-nav.js?v=9"></script>
 <script>
 (function(){
 'use strict';
@@ -260,7 +260,7 @@ function renderLead(){
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-go]');if(b){const t=document.getElementById(b.dataset.go);if(t)t.click();}});
 function render(){renderLead();const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id||d.dataset.cid);renderCal();renderWeek();renderExams();open.forEach(id=>{openExam(id);const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;});}
 render();
-Promise.all(T.COURSES.map(c=>fetch(c.page,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
+Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){settings=T.loadSettings(read(T.SETTINGS_KEY));render();}});
 addEventListener('studycloud:applied',()=>{settings=T.loadSettings(read(T.SETTINGS_KEY));render();});
 })();

@@ -3,9 +3,9 @@ name: Study OS practice keeps its place
 on:
   push:
     branches: [main]
-    paths: ["acc.html", "eco.html", "math.html", "tests/practice-keep-position*.cjs", ".github/workflows/practice-position.yml"]
+    paths: ["acc.html", "eco.html", "math.html", "scripts/study-course-engine.js", "data/courses/**", "tests/practice-keep-position*.cjs", ".github/workflows/practice-position.yml"]
   pull_request:
-    paths: ["acc.html", "eco.html", "math.html", "tests/practice-keep-position*.cjs", ".github/workflows/practice-position.yml"]
+    paths: ["acc.html", "eco.html", "math.html", "scripts/study-course-engine.js", "data/courses/**", "tests/practice-keep-position*.cjs", ".github/workflows/practice-position.yml"]
   workflow_dispatch:
 
 concurrency:

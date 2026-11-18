@@ -1,4 +1,5 @@
 'use strict';
+const __cs=require('../../tests/course-source.cjs');
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {readFileSync,readdirSync}=require('node:fs');
@@ -6,7 +7,7 @@ const {join}=require('node:path');
 
 const ROOT=join(__dirname,'../..');
 const SUBJECTS=['acc','eco','math','eng','zh'];
-const read=path=>readFileSync(join(ROOT,path),'utf8');
+const read=path=>__cs.read(join(ROOT,path),'utf8');
 function published(){
  return [
   ...readdirSync(ROOT).filter(x=>x.endsWith('.html')),

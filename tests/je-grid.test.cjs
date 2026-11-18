@@ -1,3 +1,4 @@
+const __cs=require('./course-source.cjs');
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const JE=require('../scripts/je-grid.js');
@@ -21,7 +22,7 @@ test('checks lines in any order, loose account names, and explains mistakes',()=
 });
 test('every textbook solution with a journal table parses and balances',()=>{
  let n=0;
- for(const ch of [5,6,7,8,9])for(const it of JSON.parse(fs.readFileSync(path.join(root,'data/textbook-sos/ch'+ch+'.json'),'utf8'))){
+ for(const ch of [5,6,7,8,9])for(const it of JSON.parse(__cs.read(path.join(root,'data/textbook-sos/ch'+ch+'.json'),'utf8'))){
   const a=JE.parse(it.solution);if(!a.length)continue;n++;
   const t=JE.totals(a.map(x=>['',x.acct,String(x.dr||''),String(x.cr||'')]));
   assert.equal(t.dr,t.cr,it.id+' balances');
@@ -42,7 +43,7 @@ test('suggestion list is in chart-of-accounts order (assets, liabilities, equity
  assert.equal(sub[pos('R. Vale, Capital')].cat,'Equity');
 });
 test('acc.html uses the grid for journal questions and stores rows in the textbook record (validated on restore)',()=>{
- const s=fs.readFileSync(path.join(root,'acc.html'),'utf8');
+ const s=__cs.read(path.join(root,'acc.html'),'utf8');
  assert.match(s,/<script src="scripts\/je-grid\.js\?v=\d+"><\/script>/);
  assert.match(s,/je:window\.StudyJE\?StudyJE\.parse\(it\.solution\|\|''\):\[\]/);
  assert.match(s,/rec\.je=rows/);

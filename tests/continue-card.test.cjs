@@ -1,6 +1,7 @@
+const __cs=require('./course-source.cjs');
 "use strict";
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const root=path.join(__dirname,'..'),read=f=>fs.readFileSync(path.join(root,f),'utf8');
+const root=path.join(__dirname,'..'),read=f=>__cs.read(path.join(root,f),'utf8');
 const L=require('../scripts/study-last.js');
 test('last place: only plain site links are kept; not study data, so not backed up',()=>{
  const m=new Map();global.localStorage={getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,v)};

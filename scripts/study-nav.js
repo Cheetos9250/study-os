@@ -166,7 +166,7 @@
  var navSrc=(document.currentScript&&document.currentScript.src)||'';
  function openSearch(q){
   if(window.StudySearch){window.StudySearch.open(q);return;}
-  var sc=document.createElement('script');sc.src=navSrc?new URL('study-search.js?v=1',navSrc).href:'scripts/study-search.js?v=1';
+  var sc=document.createElement('script');sc.src=navSrc?new URL('study-search.js?v=2',navSrc).href:'scripts/study-search.js?v=2';
   sc.onload=function(){if(window.StudySearch)window.StudySearch.open(q);};document.head.appendChild(sc);
  }
  document.addEventListener('keydown',function(e){
