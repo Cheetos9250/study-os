@@ -24,7 +24,7 @@
 .b{font:700 15px var(--ui);min-height:44px;padding:0 16px;border-radius:var(--r-s);border:2.5px solid var(--ink);background:var(--panel);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 .b:hover{background:var(--panel-2)}.b.primary{background:var(--ink);color:var(--accent-ink)}.b.primary:hover{background:var(--acc);color:var(--acc-ink)}.b:disabled{opacity:.5;cursor:default}
 .panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:14px 16px;margin:12px 0}
-.panel h3{margin:0 0 6px;font-size:17px}
+.panel h2{margin:0 0 8px;font-size:20px}
 .note{font-size:13.5px;color:var(--muted);margin:6px 0 0;line-height:1.55}.note b{color:var(--text)}
 .inl{display:flex;gap:8px;flex-wrap:wrap}.inl>input{flex:1 1 260px}
 input[type=text]{font:500 16px var(--ui);color:var(--text);background:var(--panel);border:2px solid var(--ink);border-radius:var(--r-s);min-height:44px;padding:0 10px;min-width:0}
@@ -47,7 +47,7 @@ ol.steps{margin:6px 0 0;padding-left:22px;font-size:14px;line-height:1.6}ol.step
 <h1>Classroom import</h1>
 <p class="note">Bring Google Classroom assignments into <a href="index.html#tasks">Today's tasks</a> with their due dates. Read-only: nothing is changed in Classroom.</p>
 <section class="panel" id="setup" aria-labelledby="sh">
- <h3 id="sh">1 · Your Google OAuth client ID</h3>
+ <h2 id="sh">1 · Your Google OAuth client ID</h2>
  <div class="inl"><input type="text" id="cid" autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="OAuth client ID" placeholder="1234567890-abc….apps.googleusercontent.com"><button type="button" class="b" id="saveCid">Save</button></div>
  <p class="status" id="cidMsg" role="status"></p>
  <details id="how"><summary class="note" style="min-height:40px;display:flex;align-items:center;cursor:pointer"><b>How to make one (once, about 10 minutes)</b></summary>
@@ -61,12 +61,12 @@ ol.steps{margin:6px 0 0;padding-left:22px;font-size:14px;line-height:1.6}ol.step
  <p class="note">If Google says the app is blocked, your university may not allow outside apps for its accounts; ask its IT team, or use a personal Gmail account that is in the same classes.</p></details>
 </section>
 <section class="panel" aria-labelledby="ch">
- <h3 id="ch">2 · Read your assignments</h3>
+ <h2 id="ch">2 · Read your assignments</h2>
  <div class="btnrow"><button type="button" class="b primary" id="connect" disabled>Sign in with Google and load</button><span class="sp"></span></div>
  <p class="status" id="msg" role="status"></p>
 </section>
 <section class="panel" id="res" hidden aria-labelledby="rh">
- <h3 id="rh">3 · Choose what goes into Today</h3>
+ <h2 id="rh">3 · Choose what goes into Today</h2>
  <div class="btnrow"><button type="button" class="b" id="pickDue">Select upcoming</button><button type="button" class="b" id="pickNone">Select none</button><span class="sp"></span><button type="button" class="b primary" id="add">Add to Today</button></div>
  <ul class="list" id="list"></ul>
  <p class="status" id="addMsg" role="status"></p>

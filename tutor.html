@@ -29,7 +29,7 @@
 .ctx{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.ctx label{display:grid;gap:4px;font-size:13px;font-weight:700;color:var(--muted);flex:1 1 180px;min-width:0}
 select,input[type=text],input[type=password],input[type=url],textarea{font:500 16px var(--ui);color:var(--text);background:var(--panel);border:2px solid var(--ink);border-radius:var(--r-s);min-height:44px;padding:0 10px;width:100%;min-width:0}
 textarea{padding:10px;line-height:1.5;resize:vertical}
-.set{display:grid;gap:12px}.set .row{display:grid;gap:4px;font-size:13px;font-weight:700}.set .row span.h{font-weight:500;color:var(--muted)}
+.set{display:grid;gap:12px}.set .field{display:grid;gap:4px;font-size:13px;font-weight:700}.set .field span.h{font-weight:500;color:var(--muted)}
 .prov{display:flex;gap:8px;flex-wrap:wrap}.prov label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:2px solid var(--ink);border-radius:var(--r-s);font-weight:700;font-size:14px;cursor:pointer}
 .prov input{width:18px;height:18px;accent-color:var(--acc)}
 .inl{display:flex;gap:8px}.inl>input{flex:1}
@@ -57,13 +57,13 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 <div class="page">
 <div class="head"><h1>AI tutor</h1><button type="button" class="b" id="newChat">New chat</button><button type="button" class="b" id="setBtn" aria-expanded="false" aria-controls="settings">Settings</button></div>
 <section class="panel set" id="settings" hidden aria-labelledby="setH">
- <h3 id="setH" style="margin:0">Settings</h3>
- <div class="row">AI service<div class="prov" role="radiogroup" aria-label="AI service">
+ <h2 id="setH" style="margin:0;font-size:20px">Settings</h2>
+ <div class="field">AI service<div class="prov" role="radiogroup" aria-label="AI service">
   <label><input type="radio" name="prov" value="gemini"> Gemini</label>
   <label><input type="radio" name="prov" value="openai"> Hermes / OpenAI-compatible</label></div></div>
- <label class="row" id="baseRow">API base URL<input type="url" id="base" autocomplete="off" spellcheck="false" inputmode="url"><span class="h" id="baseHelp">OpenRouter: https://openrouter.ai/api/v1 · Nous Research: its own base URL</span></label>
- <div class="row"><label for="model">Model</label><div class="inl"><input type="text" id="model" list="modelList" autocomplete="off" spellcheck="false" autocapitalize="off"><button type="button" class="b" id="loadModels">List models</button></div><datalist id="modelList"></datalist><span class="h" id="modelHelp"></span></div>
- <div class="row"><label for="key">API key</label><div class="inl"><input type="password" id="key" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Paste your own key"><button type="button" class="b" id="showKey" aria-pressed="false">Show</button></div><span class="h" id="keyHelp"></span></div>
+ <label class="field" id="baseRow">API base URL<input type="url" id="base" autocomplete="off" spellcheck="false" inputmode="url"><span class="h" id="baseHelp">OpenRouter: https://openrouter.ai/api/v1 · Nous Research: its own base URL</span></label>
+ <div class="field"><label for="model">Model</label><div class="inl"><input type="text" id="model" list="modelList" autocomplete="off" spellcheck="false" autocapitalize="off"><button type="button" class="b" id="loadModels">List models</button></div><datalist id="modelList"></datalist><span class="h" id="modelHelp"></span></div>
+ <div class="field"><label for="key">API key</label><div class="inl"><input type="password" id="key" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Paste your own key"><button type="button" class="b" id="showKey" aria-pressed="false">Show</button></div><span class="h" id="keyHelp"></span></div>
  <label class="chk"><input type="checkbox" id="remember"> Remember the key on this device</label>
  <p class="note">The key stays in this browser only: it is <b>not</b> backed up, synced or sent anywhere except the AI service you pick. Your messages go to that service (Google or the API you set), so don't send personal data. Free Gemini keys may let Google use your messages to improve its products.</p>
  <div class="inl"><button type="button" class="b primary" id="saveSet">Save</button><button type="button" class="b" id="forget">Remove key</button></div>
