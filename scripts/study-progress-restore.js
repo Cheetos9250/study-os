@@ -58,6 +58,9 @@
             !/^\d{4}-\d{2}-\d{2}$/.test(String(t.date)) || !["High", "Medium", "Low"].includes(t.pri) ||
             (t.done !== undefined && typeof t.done !== "boolean"))
           throw new Error("Invalid home dashboard task");
+        if ((t.link !== undefined && (typeof t.link !== "string" || t.link.length > 500 || !/^https:\/\/classroom\.google\.com\/[^\s"'<>]*$/.test(t.link))) ||
+            (t.src !== undefined && t.src !== "classroom"))
+          throw new Error("Invalid home dashboard task link");
       }
       if (value.focus !== undefined && !object(value.focus)) throw new Error("Invalid home dashboard checklist");
       var jpeg = { test: function (v) { return /^data:image\/(jpeg|gif|png);base64,[A-Za-z0-9+\/=]+$/.test(v) || /^https:\/\/[^\s"'()\\<>]{4,1990}$/.test(v); } };

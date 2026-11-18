@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — import Google Classroom work into Today">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Classroom import — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=8">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 110px max(18px,env(safe-area-inset-left))}
+.b{font:700 15px var(--ui);min-height:44px;padding:0 16px;border-radius:var(--r-s);border:2.5px solid var(--ink);background:var(--panel);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.b:hover{background:var(--panel-2)}.b.primary{background:var(--ink);color:var(--accent-ink)}.b.primary:hover{background:var(--acc);color:var(--acc-ink)}.b:disabled{opacity:.5;cursor:default}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:14px 16px;margin:12px 0}
+.panel h3{margin:0 0 6px;font-size:17px}
+.note{font-size:13.5px;color:var(--muted);margin:6px 0 0;line-height:1.55}.note b{color:var(--text)}
+.inl{display:flex;gap:8px;flex-wrap:wrap}.inl>input{flex:1 1 260px}
+input[type=text]{font:500 16px var(--ui);color:var(--text);background:var(--panel);border:2px solid var(--ink);border-radius:var(--r-s);min-height:44px;padding:0 10px;min-width:0}
+ol.steps{margin:6px 0 0;padding-left:22px;font-size:14px;line-height:1.6}ol.steps code{font-size:13px;overflow-wrap:anywhere}
+.status{font-size:14px;font-weight:700;margin:8px 0 0}.status.err{color:var(--red,#c21f2f)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 8px}.btnrow .sp{flex:1}
+.list{list-style:none;margin:0;padding:0}.list li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;border-top:2px solid var(--line-soft,#ddd);padding:8px 0;min-height:56px}
+.list li:first-child{border-top:0}.list input{width:22px;height:22px;accent-color:var(--acc)}
+.list .t{font-weight:700;font-size:15px;overflow-wrap:anywhere}.list .s{font-size:13px;color:var(--muted)}
+.list .tag{color:var(--text);background:var(--panel);font-size:12px;font-weight:900;border:2px solid var(--ink);border-radius:var(--r-s);padding:2px 8px;white-space:nowrap}
+.list .tag.done{background:var(--panel-2)}.list .tag.has{background:var(--acc-soft)}
+.list a{color:var(--link);font-size:13px;font-weight:700}
+@media(max-width:899px){.page{padding-bottom:calc(140px + env(safe-area-inset-bottom))}}
+</style>
+<script src="scripts/study-theme.js?v=5"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+</head>
+<body>
+<div class="page">
+<h1>Classroom import</h1>
+<p class="note">Bring Google Classroom assignments into <a href="index.html#tasks">Today's tasks</a> with their due dates. Read-only: nothing is changed in Classroom.</p>
+<section class="panel" id="setup" aria-labelledby="sh">
+ <h3 id="sh">1 · Your Google OAuth client ID</h3>
+ <div class="inl"><input type="text" id="cid" autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="OAuth client ID" placeholder="1234567890-abc….apps.googleusercontent.com"><button type="button" class="b" id="saveCid">Save</button></div>
+ <p class="status" id="cidMsg" role="status"></p>
+ <details id="how"><summary class="note" style="min-height:40px;display:flex;align-items:center;cursor:pointer"><b>How to make one (once, about 10 minutes)</b></summary>
+ <ol class="steps">
+  <li>Open <b>console.cloud.google.com</b> with the Google account you use for Classroom and create a project (any name).</li>
+  <li><b>APIs &amp; Services → Library</b>: enable <b>Google Classroom API</b>.</li>
+  <li><b>OAuth consent screen</b>: User type <b>External</b> (or Internal if your university allows it), add your own email under <b>Test users</b>.</li>
+  <li><b>Credentials → Create credentials → OAuth client ID</b>: type <b>Web application</b>, Authorized JavaScript origins: <code id="origin"></code></li>
+  <li>Copy the <b>Client ID</b> (it ends in <code>.apps.googleusercontent.com</code>) and paste it above. It is a public id, not a password; it is saved on this device only.</li>
+ </ol>
+ <p class="note">If Google says the app is blocked, your university may not allow outside apps for its accounts; ask its IT team, or use a personal Gmail account that is in the same classes.</p></details>
+</section>
+<section class="panel" aria-labelledby="ch">
+ <h3 id="ch">2 · Read your assignments</h3>
+ <div class="btnrow"><button type="button" class="b primary" id="connect" disabled>Sign in with Google and load</button><span class="sp"></span></div>
+ <p class="status" id="msg" role="status"></p>
+</section>
+<section class="panel" id="res" hidden aria-labelledby="rh">
+ <h3 id="rh">3 · Choose what goes into Today</h3>
+ <div class="btnrow"><button type="button" class="b" id="pickDue">Select upcoming</button><button type="button" class="b" id="pickNone">Select none</button><span class="sp"></span><button type="button" class="b primary" id="add">Add to Today</button></div>
+ <ul class="list" id="list"></ul>
+ <p class="status" id="addMsg" role="status"></p>
+</section>
+</div>
+<script src="scripts/study-classroom.js?v=1"></script>
+<script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=4"></script>
+<script src="scripts/study-nav.js?v=10"></script>
+<script>
+(function(){
+'use strict';
+const C=window.StudyClassroom,$=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const say=(sel,t,err)=>{const e=$(sel);e.textContent=t;e.classList.toggle('err',!!err);};
+function getSet(){try{const o=JSON.parse(localStorage.getItem(C.KEY)||'{}');return o&&typeof o==='object'?o:{};}catch(e){return {};}}
+let set=getSet(),token='',rows=[];
+$('#origin').textContent=location.origin;
+$('#cid').value=set.clientId||'';$('#connect').disabled=!C.clientId(set.clientId);
+if(C.clientId(set.clientId))$('#how').open=false;else $('#how').open=true;
+$('#saveCid').onclick=()=>{const id=C.clientId($('#cid').value);if(!id){say('#cidMsg','That does not look like a client ID (it ends in .apps.googleusercontent.com)',true);return;}
+ set=Object.assign(getSet(),{clientId:id});try{localStorage.setItem(C.KEY,JSON.stringify(set));say('#cidMsg','Saved on this device');}catch(e){say('#cidMsg','Could not save on this device',true);}
+ $('#connect').disabled=false;token='';};
+function gis(){return new Promise((ok,no)=>{if(window.google&&google.accounts&&google.accounts.oauth2)return ok();
+ const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=()=>ok();s.onerror=()=>no(new Error('Could not load Google sign-in (offline?)'));document.head.appendChild(s);});}
+function signIn(){return new Promise((ok,no)=>{const c=google.accounts.oauth2.initTokenClient({client_id:set.clientId,scope:C.SCOPES,
+ callback:r=>r&&r.access_token?ok(r.access_token):no(new Error(r&&(r.error_description||r.error)||'Sign-in was cancelled')),
+ error_callback:e=>no(new Error(e&&e.type==='popup_closed'?'Sign-in window was closed':e&&e.message||'Sign-in failed'))});c.requestAccessToken({prompt:token?'':'consent'});});}
+async function get(path,params){const out=[];let page='';
+ for(let i=0;i<6;i++){const u=new URL(C.API+path);Object.entries(params||{}).forEach(([k,v])=>[].concat(v).forEach(x=>u.searchParams.append(k,x)));if(page)u.searchParams.set('pageToken',page);
+  const r=await fetch(u,{headers:{Authorization:'Bearer '+token}});const j=await r.json().catch(()=>({}));
+  if(r.status===401){token='';throw new Error('Google sign-in expired; tap the button again');}
+  if(!r.ok)throw new Error('Classroom answered '+r.status+(j.error&&j.error.message?': '+j.error.message:''));
+  const key=Object.keys(j).find(k=>Array.isArray(j[k]));if(key)out.push(...j[key]);page=j.nextPageToken||'';if(!page)break;}
+ return out;}
+$('#connect').onclick=async()=>{const btn=$('#connect');btn.disabled=true;
+ try{say('#msg','Opening Google sign-in…');await gis();if(!token)token=await signIn();
+  say('#msg','Reading your classes…');const courses=await get('/courses',{studentId:'me',courseStates:'ACTIVE',pageSize:50});
+  const works={},subs={};let n=0;
+  for(const c of courses){say('#msg','Reading '+(++n)+' of '+courses.length+': '+c.name+'…');
+   try{works[c.id]=await get('/courses/'+encodeURIComponent(c.id)+'/courseWork',{courseWorkStates:'PUBLISHED',pageSize:100});}catch(e){works[c.id]=[];}
+   try{for(const s of await get('/courses/'+encodeURIComponent(c.id)+'/courseWork/-/studentSubmissions',{userId:'me',pageSize:100}))subs[s.courseWorkId]=s;}catch(e){}}
+  const today=C.localDay(Date.now());rows=C.rows(courses,works,subs,today);
+  set=Object.assign(getSet(),{lastRead:new Date().toISOString()});try{localStorage.setItem(C.KEY,JSON.stringify(set));}catch(e){}
+  say('#msg',courses.length+' classes · '+rows.length+' assignments');paint();}
+ catch(e){say('#msg',String(e.message||e),true);}
+ btn.disabled=false;};
+function have(){try{const h=JSON.parse(localStorage.getItem(C.HOME)||'{}');return new Set((Array.isArray(h.tasks)?h.tasks:[]).map(t=>t&&t.id));}catch(e){return new Set();}}
+function paint(){const has=have();$('#res').hidden=false;
+ $('#list').innerHTML=rows.length?rows.map((r,i)=>'<li><input type="checkbox" data-i="'+i+'" aria-label="Add '+esc(r.title)+'"'+(r.pick?' checked':'')+'><div><div class="t">'+esc(r.work)+'</div><div class="s">'+esc(r.course)+' · '+(r.date?'due '+esc(r.date)+(r.time?' '+esc(r.time):''):'no due date')+(r.link?' · <a href="'+esc(r.link)+'" target="_blank" rel="noopener">Open in Classroom</a>':'')+'</div></div>'
+  +(r.done?'<span class="tag done">Turned in</span>':has.has(r.id)?'<span class="tag has">In Today</span>':r.late?'<span class="tag">Late</span>':'<span></span>')+'</li>').join(''):'<li><div></div><div class="s">No assignments found in your active classes.</div><span></span></li>';
+ $('#list').querySelectorAll('input').forEach(b=>b.onchange=()=>{rows[+b.dataset.i].pick=b.checked;});}
+$('#pickDue').onclick=()=>{const today=C.localDay(Date.now());rows.forEach(r=>r.pick=!r.done&&!!r.date&&r.date>=today);paint();};
+$('#pickNone').onclick=()=>{rows.forEach(r=>r.pick=false);paint();};
+$('#add').onclick=()=>{const picked=rows.filter(r=>r.pick);if(!picked.length){say('#addMsg','Nothing selected',true);return;}
+ let h={};try{h=JSON.parse(localStorage.getItem(C.HOME)||'{}')||{};}catch(e){say('#addMsg','Today data could not be read; nothing was changed',true);return;}
+ if(typeof h!=='object'||Array.isArray(h)){say('#addMsg','Today data could not be read; nothing was changed',true);return;}
+ const m=C.merge(h.tasks,picked,C.localDay(Date.now()),Date.now());h.tasks=m.tasks;
+ try{localStorage.setItem(C.HOME,JSON.stringify(h));window.StudyCloud&&StudyCloud.dirty&&StudyCloud.dirty();}catch(e){say('#addMsg','Could not save (storage full?)',true);return;}
+ say('#addMsg','Added '+m.added+', updated '+m.updated+' · see Today');paint();};
+})();
+</script>
+</body>
+</html>

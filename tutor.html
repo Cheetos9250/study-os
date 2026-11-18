@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — AI tutor">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>AI tutor — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=8">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 110px max(18px,env(safe-area-inset-left))}
+.head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.head h1{flex:1;margin:0}
+.b{font:700 15px var(--ui);min-height:44px;padding:0 16px;border-radius:var(--r-s);border:2.5px solid var(--ink);background:var(--panel);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.b:hover{background:var(--panel-2)}.b.primary{background:var(--ink);color:var(--accent-ink)}.b.primary:hover{background:var(--acc);color:var(--acc-ink)}
+.b:disabled{opacity:.5;cursor:default}.b svg{width:20px;height:20px}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:14px 16px;margin:12px 0}
+.ctx{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.ctx label{display:grid;gap:4px;font-size:13px;font-weight:700;color:var(--muted);flex:1 1 180px;min-width:0}
+select,input[type=text],input[type=password],input[type=url],textarea{font:500 16px var(--ui);color:var(--text);background:var(--panel);border:2px solid var(--ink);border-radius:var(--r-s);min-height:44px;padding:0 10px;width:100%;min-width:0}
+textarea{padding:10px;line-height:1.5;resize:vertical}
+.set{display:grid;gap:12px}.set .row{display:grid;gap:4px;font-size:13px;font-weight:700}.set .row span.h{font-weight:500;color:var(--muted)}
+.prov{display:flex;gap:8px;flex-wrap:wrap}.prov label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:2px solid var(--ink);border-radius:var(--r-s);font-weight:700;font-size:14px;cursor:pointer}
+.prov input{width:18px;height:18px;accent-color:var(--acc)}
+.inl{display:flex;gap:8px}.inl>input{flex:1}
+.chk{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;min-height:44px}.chk input{width:20px;height:20px}
+.note{font-size:13px;color:var(--muted);margin:0}.note b{color:var(--text)}
+.status{font-size:14px;font-weight:700}.status.err{color:var(--red,#c21f2f)}
+#log{display:grid;gap:12px;margin:14px 0}
+.msg{border:var(--bw) solid var(--ink);border-radius:var(--r);padding:10px 14px;max-width:100%;overflow-wrap:anywhere;font-size:16px;line-height:1.6}
+.msg.u{background:var(--acc-soft);justify-self:end;max-width:min(100%,640px);white-space:pre-wrap}
+.msg.a{background:var(--panel)}.msg.a p{margin:0 0 8px}.msg.a p:last-child{margin:0}.msg.a h4{margin:10px 0 6px;font-size:16px}.msg.a ul,.msg.a ol{margin:4px 0 8px;padding-left:22px}
+.msg.e{background:var(--panel);border-style:dashed;color:var(--red,#c21f2f);font-weight:700}
+.msg img{display:block;max-width:220px;max-height:220px;border-radius:6px;border:2px solid var(--ink);margin-bottom:6px}
+.msg .who{display:block;font-size:12px;font-weight:900;color:var(--muted);margin-bottom:2px;letter-spacing:.04em;text-transform:uppercase}
+.sos-tbl{overflow-x:auto;margin:6px 0}.sos-tbl table{border-collapse:collapse;font-size:14px}.sos-tbl th,.sos-tbl td{border:1px solid var(--line-soft,rgba(127,127,127,.35));padding:5px 8px;text-align:left}.sos-tbl th{background:var(--panel-2);white-space:nowrap}.sos-tbl td.n,.sos-tbl th.n{text-align:right;font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);font-size:15px;text-align:center;padding:24px 8px;border:2px dashed var(--line-soft,#ccc);border-radius:var(--r)}
+.compose{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));background:var(--paper);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:10px;display:grid;gap:8px}
+.compose .btnrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.compose .btnrow .sp{flex:1}
+.thumb{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}.thumb img{width:44px;height:44px;object-fit:cover;border-radius:6px;border:2px solid var(--ink)}
+@media(max-width:899px){.compose{bottom:calc(86px + env(safe-area-inset-bottom))}.page{padding-bottom:200px}}
+</style>
+<script src="scripts/study-theme.js?v=5"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+</head>
+<body>
+<div class="page">
+<div class="head"><h1>AI tutor</h1><button type="button" class="b" id="newChat">New chat</button><button type="button" class="b" id="setBtn" aria-expanded="false" aria-controls="settings">Settings</button></div>
+<section class="panel set" id="settings" hidden aria-labelledby="setH">
+ <h3 id="setH" style="margin:0">Settings</h3>
+ <div class="row">AI service<div class="prov" role="radiogroup" aria-label="AI service">
+  <label><input type="radio" name="prov" value="gemini"> Gemini</label>
+  <label><input type="radio" name="prov" value="openai"> Hermes / OpenAI-compatible</label></div></div>
+ <label class="row" id="baseRow">API base URL<input type="url" id="base" autocomplete="off" spellcheck="false" inputmode="url"><span class="h" id="baseHelp">OpenRouter: https://openrouter.ai/api/v1 · Nous Research: its own base URL</span></label>
+ <div class="row"><label for="model">Model</label><div class="inl"><input type="text" id="model" list="modelList" autocomplete="off" spellcheck="false" autocapitalize="off"><button type="button" class="b" id="loadModels">List models</button></div><datalist id="modelList"></datalist><span class="h" id="modelHelp"></span></div>
+ <div class="row"><label for="key">API key</label><div class="inl"><input type="password" id="key" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Paste your own key"><button type="button" class="b" id="showKey" aria-pressed="false">Show</button></div><span class="h" id="keyHelp"></span></div>
+ <label class="chk"><input type="checkbox" id="remember"> Remember the key on this device</label>
+ <p class="note">The key stays in this browser only: it is <b>not</b> backed up, synced or sent anywhere except the AI service you pick. Your messages go to that service (Google or the API you set), so don't send personal data. Free Gemini keys may let Google use your messages to improve its products.</p>
+ <div class="inl"><button type="button" class="b primary" id="saveSet">Save</button><button type="button" class="b" id="forget">Remove key</button></div>
+ <p class="status" id="setMsg" role="status"></p>
+</section>
+<section class="panel ctx" aria-label="What you're studying">
+ <label>Subject<select id="course"><option value="">General</option></select></label>
+ <label>Chapter<select id="cat" disabled><option value="">All chapters</option></select></label>
+</section>
+<main id="log" aria-live="polite"></main>
+<form class="compose" id="form" autocomplete="off">
+ <label for="q" class="note">Ask a question, paste your working, or add a photo of the problem.</label>
+ <textarea id="q" rows="3" maxlength="8000" placeholder="e.g. Why is Accounts Receivable debited here?"></textarea>
+ <div class="btnrow">
+  <input type="file" id="photo" accept="image/*" hidden>
+  <button type="button" class="b" id="photoBtn" aria-label="Add a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Photo</button>
+  <span class="thumb" id="thumb" hidden></span>
+  <span class="sp"></span>
+  <span class="status" id="state" role="status"></span>
+  <button type="submit" class="b primary" id="send">Send</button>
+ </div>
+</form>
+</div>
+<script src="scripts/textbook-sos-render.js?v=1"></script>
+<script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-tutor.js?v=1"></script>
+<script src="scripts/study-nav.js?v=10"></script>
+<script>
+(function(){
+'use strict';
+const A=window.StudyTutor,T=window.StudyToday,$=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const md=t=>window.StudySosMd?StudySosMd(t):'<p>'+esc(t).replace(/\n/g,'<br>')+'</p>';
+function getL(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function getS(k){try{return sessionStorage.getItem(k);}catch(e){return null;}}
+let cfg=A.normalize((()=>{try{return JSON.parse(getL(A.KEY)||'{}');}catch(e){return {};}})());
+/* a key kept for this visit only (remember off) */
+try{const s=JSON.parse(getS(A.SKEY)||'null');if(s&&s.p&&cfg[s.p]&&!cfg[s.p].key)cfg[s.p].key=String(s.k||'');}catch(e){}
+let chat=(()=>{try{const c=JSON.parse(getS(A.CHAT)||'[]');return Array.isArray(c)?c.filter(m=>m&&(m.role==='user'||m.role==='assistant')&&typeof m.text==='string'):[];}catch(e){return [];}})();
+let image=null,busy=false;const data={};
+function saveChat(){try{sessionStorage.setItem(A.CHAT,JSON.stringify(chat.slice(-A.MAX_TURNS).map(m=>({role:m.role,text:m.text,img:!!m.image}))));}catch(e){}}
+function saveCfg(){
+ const keep=JSON.parse(JSON.stringify(cfg));
+ try{sessionStorage.removeItem(A.SKEY);}catch(e){}
+ if(!cfg.remember){for(const p in A.PROVIDERS){if(cfg[p].key&&p===cfg.provider){try{sessionStorage.setItem(A.SKEY,JSON.stringify({p,k:cfg[p].key}));}catch(e){}}keep[p].key='';}}
+ try{localStorage.setItem(A.KEY,JSON.stringify(keep));return true;}catch(e){return false;}
+}
+/* ---------- settings ---------- */
+const setBox=$('#settings');
+function paintSet(){
+ const p=cfg.provider,c=cfg[p],P=A.PROVIDERS[p];
+ document.querySelectorAll('input[name=prov]').forEach(r=>r.checked=r.value===p);
+ $('#baseRow').hidden=p!=='openai';$('#base').value=c.base;$('#model').value=c.model;$('#key').value=c.key;$('#remember').checked=cfg.remember;
+ $('#keyHelp').textContent=P.keyHelp;$('#modelHelp').textContent='Default: '+P.model+(p==='openai'?' (Hermes on OpenRouter)':'');
+ $('#modelList').innerHTML='';
+}
+function readSet(){const p=cfg.provider;cfg[p].model=$('#model').value.trim()||A.PROVIDERS[p].model;cfg[p].key=$('#key').value.trim();
+ if(p==='openai'){const b=A.baseUrl($('#base').value);if(!b){say('#setMsg','The base URL must start with https://',true);return false;}cfg[p].base=b;}
+ cfg.remember=$('#remember').checked;return true;}
+function say(sel,t,err){const e=$(sel);e.textContent=t;e.classList.toggle('err',!!err);}
+function openSet(on){setBox.hidden=!on;$('#setBtn').setAttribute('aria-expanded',on);if(on){paintSet();$('#key').value?$('#model').focus({preventScroll:true}):$('#key').focus({preventScroll:true});}}
+$('#setBtn').onclick=()=>openSet(setBox.hidden);
+document.querySelectorAll('input[name=prov]').forEach(r=>r.onchange=()=>{readSet();cfg.provider=r.value;paintSet();say('#setMsg','');});
+$('#showKey').onclick=e=>{const k=$('#key'),on=k.type==='password';k.type=on?'text':'password';e.currentTarget.textContent=on?'Hide':'Show';e.currentTarget.setAttribute('aria-pressed',on);};
+$('#saveSet').onclick=()=>{if(!readSet())return;if(saveCfg()){const k=!!cfg[cfg.provider].key;say('#setMsg',k?'':'Saved · add a key to start');paintState();if(k){openSet(false);say('#state','Settings saved');$('#q').focus({preventScroll:true});}}else say('#setMsg','Could not save on this device',true);};
+$('#forget').onclick=()=>{for(const p in A.PROVIDERS)cfg[p].key='';saveCfg();paintSet();paintState();say('#setMsg','Key removed from this device');};
+$('#loadModels').onclick=async()=>{if(!readSet())return;const r=A.modelsRequest(cfg);say('#setMsg','Loading models…');
+ try{const res=await fetch(r.url,r.init);const j=await res.json().catch(()=>({}));if(!res.ok)throw new Error(res.status+(j&&j.error&&j.error.message?': '+j.error.message:''));
+  let ids=A.models(cfg.provider,j);if(cfg.provider==='openai'&&ids.some(x=>/hermes/i.test(x)))ids=ids.filter(x=>/hermes/i.test(x)).concat(ids.filter(x=>!/hermes/i.test(x)));
+  $('#modelList').innerHTML=ids.slice(0,300).map(x=>'<option value="'+esc(x)+'">').join('');
+  say('#setMsg',ids.length+' models · tap the Model box to pick one'+(cfg.provider==='openai'&&ids.some(x=>/hermes/i.test(x))?' (Hermes models first)':''));}
+ catch(e){say('#setMsg','Could not list models ('+String(e.message||e).slice(0,160)+')',true);}};
+/* ---------- subject and chapter ---------- */
+const COURSES=(T?T.COURSES:[]);
+$('#course').insertAdjacentHTML('beforeend',COURSES.map(c=>'<option value="'+c.key+'">'+esc(c.name)+'</option>').join(''));
+async function loadCourse(key){if(!key||data[key])return data[key];const c=COURSES.find(x=>x.key===key);if(!c)return null;
+ try{const r=await fetch(c.data,{cache:'no-cache'});data[key]=r.ok?T.parseCourseData(await r.text()):null;}catch(e){data[key]=null;}return data[key];}
+async function paintCats(sel){const key=$('#course').value,D=await loadCourse(key),cat=$('#cat');
+ cat.innerHTML='<option value="">All chapters</option>'+(D&&D.cats||[]).map(c=>'<option value="'+esc(c[0])+'">'+esc(c[1])+'</option>').join('');
+ cat.disabled=!D;if(sel&&D&&D.cats.some(c=>c[0]===sel))cat.value=sel;}
+$('#course').onchange=()=>{paintCats();try{sessionStorage.setItem('studyos.tutor.ctx',JSON.stringify({c:$('#course').value,k:''}));}catch(e){}};
+$('#cat').onchange=()=>{try{sessionStorage.setItem('studyos.tutor.ctx',JSON.stringify({c:$('#course').value,k:$('#cat').value}));}catch(e){}};
+/* ---------- chat ---------- */
+function paintState(){const ready=!!cfg[cfg.provider].key;$('#send').disabled=busy||!ready;
+ say('#state',busy?'Thinking…':ready?'':'Add your API key in Settings',false);}
+function paintLog(){const log=$('#log');
+ if(!chat.length){log.innerHTML='<div class="empty">Pick a subject and chapter so the tutor reads your course notes, then ask anything.<br>It explains step by step, checks your working and makes journal-entry tables.</div>';return;}
+ log.innerHTML=chat.map((m,i)=>m.role==='user'
+  ?'<div class="msg u"><span class="who">You</span>'+(m.image?'<img src="data:'+esc(m.image.mime)+';base64,'+m.image.data+'" alt="Your photo">':m.img?'<i>(photo)</i><br>':'')+esc(m.text)+'</div>'
+  :m.error?'<div class="msg e">'+esc(m.text)+' <button type="button" class="b" data-retry="'+i+'">Try again</button></div>'
+  :'<div class="msg a"><span class="who">Tutor</span>'+md(m.text)+'</div>').join('');
+ const r=log.querySelector('[data-retry]');if(r)r.onclick=()=>{chat=chat.filter(m=>!m.error);ask();};
+}
+async function ask(){
+ if(busy)return;const c=cfg[cfg.provider];if(!c.key){openSet(true);return;}
+ busy=true;paintState();
+ const key=$('#course').value,D=key?await loadCourse(key):null,catSel=$('#cat').value;
+ const course=key?(COURSES.find(x=>x.key===key)||{}).name:'',chapter=catSel&&D?((D.cats||[]).find(x=>x[0]===catSel)||[,''])[1]:'';
+ const sys=A.system({course:course&&D?D.title||course:course,chapter,notes:D?A.notes(D,catSel):''});
+ const msgs=chat.filter(m=>!m.error);let ctl=null,timer=null;
+ try{const r=A.request(cfg,sys,msgs);ctl=new AbortController();timer=setTimeout(()=>ctl.abort(),120000);r.init.signal=ctl.signal;
+  const res=await fetch(r.url,r.init);const j=await res.json().catch(()=>null);
+  chat.push({role:'assistant',text:A.reply(cfg.provider,res.status,j||{})});}
+ catch(e){chat.push({role:'assistant',error:true,text:e&&e.name==='AbortError'?'No answer after 2 minutes.':(e&&e.message&&/fetch|network|load failed/i.test(e.message)?'Could not reach the AI service (offline, or the base URL is wrong).':String(e&&e.message||e))});}
+ clearTimeout(timer);busy=false;saveChat();paintLog();paintState();
+ const last=$('#log').lastElementChild;if(last)last.scrollIntoView({block:'start',behavior:'smooth'});
+}
+$('#form').onsubmit=e=>{e.preventDefault();const t=$('#q').value.trim();if(!t&&!image)return;if(busy)return;
+ if(!cfg[cfg.provider].key){openSet(true);say('#setMsg','Add your API key first',true);return;}
+ chat=chat.filter(m=>!m.error);chat.push({role:'user',text:t||'Please help me with this problem.',image});
+ $('#q').value='';dropPhoto();paintLog();ask();};
+$('#q').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();$('#form').requestSubmit();}});
+$('#newChat').onclick=()=>{if(chat.length&&!confirm('Start a new chat? This chat is cleared.'))return;chat=[];saveChat();paintLog();};
+/* photo: scaled to at most 1600 px, sent as JPEG; kept only for this chat */
+$('#photoBtn').onclick=()=>$('#photo').click();
+$('#photo').onchange=()=>{const f=$('#photo').files[0];$('#photo').value='';if(!f)return;const url=URL.createObjectURL(f),img=new Image();
+ img.onload=()=>{const s=Math.min(1,1600/Math.max(img.width,img.height)),cv=document.createElement('canvas');cv.width=Math.round(img.width*s);cv.height=Math.round(img.height*s);
+  cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);const d=cv.toDataURL('image/jpeg',.85);
+  image={mime:'image/jpeg',data:d.split(',')[1]};$('#thumb').innerHTML='<img alt="Photo to send" src="'+d+'"><button type="button" class="b" id="dropPhoto">Remove</button>';$('#thumb').hidden=false;$('#dropPhoto').onclick=dropPhoto;};
+ img.onerror=()=>{URL.revokeObjectURL(url);say('#state','That file is not a photo this browser can read',true);};img.src=url;};
+function dropPhoto(){image=null;$('#thumb').hidden=true;$('#thumb').innerHTML='';}
+/* deep link: tutor.html?course=acc&cat=c5&q=<question text> fills the box; nothing is sent until you tap Send */
+(async function(){const u=new URLSearchParams(location.search);let ctx={};try{ctx=JSON.parse(getS('studyos.tutor.ctx')||'{}')||{};}catch(e){}
+ const c=u.get('course')||ctx.c||'';if(COURSES.some(x=>x.key===c))$('#course').value=c;
+ await paintCats(u.get('cat')||ctx.k||'');
+ const q=u.get('q');if(q)$('#q').value=q.slice(0,8000);
+ if(!cfg[cfg.provider].key)openSet(true);})();
+paintLog();paintState();
+})();
+</script>
+</body>
+</html>
