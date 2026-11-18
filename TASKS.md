@@ -160,31 +160,31 @@ The owner asked for these in three rounds. Round 1 helps the finals (Accounting 
 
 ### 14. Cram Mode (Thai: โหมดอัดก่อนสอบ)
 
-Status: todo
+Status: done (#171)
 
 One page per subject for the last 24 hours before an exam: the questions answered wrong (and low review boxes), each with its right answer and explanation, plus the pinned formulas and the note cards (task 16). Read-only; never changes answers.
 
 ### 15. Pinned formulas (Thai: ปักหมุดสูตร)
 
-Status: todo
+Status: done (#171)
 
 Pin formulas and journal-entry rules per subject, shown at the top of Practice and on Cram Mode. Store them in the backed-up, synced notes (`studyos.notes.v1`, key `<course>:pins`); no new storage key.
 
 ### 16. Note cards from `question :: answer` (Thai: โน้ตเป็นบัตรคำ)
 
-Status: todo
+Status: done (#171)
 
 Lines written as `question :: answer` in the chapter notes become flip cards inside the Notes panel and on Cram Mode. Notes are not changed.
 
 ### 17. Calculator tape (Thai: เครื่องคิดเลขมีประวัติ)
 
-Status: todo
+Status: done (#171)
 
 The floating calculator keeps a history of calculations (tap one to reuse the result). Device-only convenience; not backed up.
 
 ### 18. PDF resume page (Thai: PDF จำหน้าที่อ่านค้าง)
 
-Status: todo
+Status: done (#171)
 
 My PDF sets opens each PDF at the page last viewed on this device.
 
