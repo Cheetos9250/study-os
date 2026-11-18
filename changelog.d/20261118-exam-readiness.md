@@ -1,0 +1,2 @@
+- **Stats → Exam readiness**: for each subject, a bar of right / wrong / not done across the question bank, your pace over the last 7 days, the days it takes to finish at that pace, and how many a day finish it before the exam (On track / Behind), with a Practice link.
+- TASKS.md: Stats ideas added as tasks 27–31.

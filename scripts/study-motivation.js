@@ -53,5 +53,17 @@
  /* longest run of active days in a {day: n} map */
  function bestStreak(maps){const days=new Set();maps.forEach(m=>Object.keys(m||{}).forEach(d=>{if(Number(m[d])>0)days.add(d);}));
   let best=0,run=0,prev=null;[...days].sort().forEach(d=>{const t=Date.parse(d+'T00:00:00Z');run=prev!==null&&t-prev===DAY?run+1:1;prev=t;if(run>best)best=run;});return best;}
- return {DAY,GOALS,DEFAULT_GOAL,dayKey,goal,nextGoal,goalStreak,heatmap,weekly,badges,bestStreak};
+ /* exam readiness for one subject (TASK 28):
+    total = questions in the bank, answered/right = unique questions answered / answered right now,
+    pace = answers in the last 7 days ÷ 7, examDays = days left (null if no exam ahead). */
+ function readiness(x){
+  const total=Math.max(0,x.total|0),answered=Math.min(total,Math.max(0,x.answered|0)),right=Math.min(answered,Math.max(0,x.right|0)),left=total-answered;
+  const pace=Math.max(0,Number(x.last7)||0)/7,daysToFinish=left===0?0:pace>0?Math.ceil(left/pace):null;
+  const examDays=Number.isFinite(x.examDays)&&x.examDays>=0?x.examDays:null;
+  const needPerDay=examDays===null||left===0?null:Math.ceil(left/Math.max(1,examDays));
+  return {total,answered,right,left,pctDone:total?Math.round(answered/total*100):0,pctRight:total?Math.round(right/total*100):0,
+   accuracy:answered?Math.round(right/answered*100):null,pace:Math.round(pace*10)/10,daysToFinish,examDays,needPerDay,
+   onTrack:left===0||(examDays!==null&&daysToFinish!==null&&daysToFinish<=Math.max(1,examDays))};
+ }
+ return {DAY,GOALS,DEFAULT_GOAL,dayKey,goal,nextGoal,goalStreak,heatmap,weekly,badges,bestStreak,readiness};
 });
