@@ -166,8 +166,9 @@ html.nb-lock,html.nb-lock body{overflow:hidden}
 </div>
 <script src="scripts/study-review.js?v=2"></script>
 <script src="scripts/study-today.js?v=3"></script>
-<script src="scripts/study-cloud.js?v=4"></script>
-<script src="scripts/study-pins.js?v=1"></script>
+<script src="scripts/study-cloud.js?v=5"></script>
+<script src="scripts/study-note-images.js?v=1"></script>
+<script src="scripts/study-pins.js?v=2"></script>
 <script src="scripts/study-nav.js?v=12"></script>
 <script>
 (function(){
@@ -214,10 +215,12 @@ const KEY='studyos.notes.v1',$=s=>document.querySelector(s),box=$('#nb'),ta=$('#
 let book='general',timer=null;
 function all(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch{return {};}}
 const count=t=>t.length.toLocaleString('en-US')+' characters';
-function load(){const n=all()['practice:'+book];ta.value=n&&typeof n.text==='string'?n.text:'';st.classList.remove('err');st.textContent=ta.value?'Saved · '+count(ta.value):'Saved on this device';}
+/* pictures in the notebook page (paste or Add image), synced with it */
+let ni=null;if(window.StudyNoteImages){ni=document.createElement('div');ni.className='nb-img';ni.style.borderTop='2px solid var(--line-soft,#ddd)';ta.insertAdjacentElement('afterend',ni);StudyNoteImages.mount(ni,()=>'practice:'+book,ta);}
+function load(){if(ni)StudyNoteImages.refresh(ni);const n=all()['practice:'+book];ta.value=n&&typeof n.text==='string'?n.text:'';st.classList.remove('err');st.textContent=ta.value?'Saved · '+count(ta.value):'Saved on this device';}
 /* re-read before every write so notes written on the Lessons page (or another tab) are kept */
 function save(){clearTimeout(timer);timer=null;const notes=all(),k='practice:'+book,text=ta.value.slice(0,100000);
- if(text.trim())notes[k]={text,updated:new Date().toISOString()};else delete notes[k];
+ const nn=(window.StudyNoteImages?window.StudyNoteImages.withText:function(o,t,u){var im=o&&Array.isArray(o.imgs)&&o.imgs.length?o.imgs:null;if(!String(t).trim()&&!im)return null;var n={text:t,updated:u};if(im)n.imgs=im;return n;})(notes[k],text,new Date().toISOString());if(nn)notes[k]=nn;else delete notes[k]; /* keeps the note's pictures */
  try{localStorage.setItem(KEY,JSON.stringify(notes));st.classList.remove('err');st.textContent='Saved · '+count(text);window.StudyCloud&&StudyCloud.dirty();}
  catch{st.classList.add('err');st.textContent='Not saved: storage is full';}}
 ta.addEventListener('input',()=>{st.classList.remove('err');st.textContent='Saving…';clearTimeout(timer);timer=setTimeout(save,500);});

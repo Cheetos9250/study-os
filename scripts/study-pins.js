@@ -30,7 +30,7 @@
  function all(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch(e){return {};}}
  function pinText(c){const n=all()[c+':pins'];return n&&typeof n.text==='string'?n.text:'';}
  function savePins(c,text){const notes=all(),k=c+':pins';text=String(text).slice(0,MAX);
-  if(text.trim())notes[k]={text,updated:new Date().toISOString()};else delete notes[k];
+  const nn=(root.StudyNoteImages?root.StudyNoteImages.withText:function(o,t,u){var im=o&&Array.isArray(o.imgs)&&o.imgs.length?o.imgs:null;if(!String(t).trim()&&!im)return null;var n={text:t,updated:u};if(im)n.imgs=im;return n;})(notes[k],text,new Date().toISOString());if(nn)notes[k]=nn;else delete notes[k];
   localStorage.setItem(KEY,JSON.stringify(notes));if(root.StudyCloud&&root.StudyCloud.dirty)root.StudyCloud.dirty();}
  function courseCards(c,labelOf){const notes=all(),out=[];
   for(const k of Object.keys(notes)){if(!k.startsWith(c+':')||k===c+':pins')continue;const n=notes[k];if(!n||typeof n.text!=='string')continue;

@@ -326,7 +326,9 @@
       if (d.showModal && !d.open) d.showModal(); else d.setAttribute('open', '');
     });
   }
-  root.StudyCloud = { open: open, syncAll: syncAll, dirty: dirty, label: label, onStatus: function (f) { listeners.push(f); }, mergeCourse: mergeCourse, mergeToday: mergeToday };
+  /* for scripts/study-note-images.js: the Worker address and key, only when sync is set up on this device */
+  function creds() { return cfg().then(function () { return api && key() ? { api: api, key: key() } : null; }); }
+  root.StudyCloud = { creds: creds, open: open, syncAll: syncAll, dirty: dirty, label: label, onStatus: function (f) { listeners.push(f); }, mergeCourse: mergeCourse, mergeToday: mergeToday };
   /* automatic: on open, when the page comes back, every 5 minutes, and before the page is hidden after a change */
   cfg().then(function () {
     if (!api || !key() || !autoOn()) return;
