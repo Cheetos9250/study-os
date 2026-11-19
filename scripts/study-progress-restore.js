@@ -96,7 +96,9 @@
       for (var nk of Object.keys(value)) {
         var note = value[nk];
         if (!/^[a-z]+:[A-Za-z0-9_-]+$/.test(nk) || !object(note) || typeof note.text !== "string" ||
-            (note.updated !== undefined && typeof note.updated !== "string"))
+            (note.updated !== undefined && typeof note.updated !== "string") ||
+            (note.imgs !== undefined && (!Array.isArray(note.imgs) || note.imgs.length > 40 ||
+              !note.imgs.every(function (x) { return typeof x === "string" && /^[a-f0-9]{32}$/.test(x); }))))
           throw new Error("Invalid lesson notes");
       }
     } else if (key === "studyos.pdfsets.v1") {
