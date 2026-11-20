@@ -170,6 +170,14 @@ if(OPT.mcq&&OPT.mcq.cat&&(window[OPT.mcq.list]||[]).some(q=>q.cat===OPT.mcq.cat[
   const idx=q.opts.map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   const o={id:q.id,cat:q.cat,q:q.q,opts:q.opts,exp:q.exp,order:idx,right:0,case:q.case||''}; if(OPT.mcq.md) o.md=true; if(OPT.mcq.tb&&q.ref) o.tb=q.ref.replace(/-/,' '); QS.push(o); });
 let qJump=new URLSearchParams(location.search).get('q');
+/* Fresh problems (acc, scripts/acc-generator.js): random-number questions made in the browser. Nothing stored for them:
+   answers of earlier visits are dropped on load, so at most one batch (OPT.gen.n) of gen-* ids ever sits in study-<course>. */
+function genLoad(){ if(!OPT.gen||!window.StudyAccGen) return;
+  for(const k of ['ans','ats','rv']){ const o=store[k]; if(o&&typeof o==='object') Object.keys(o).forEach(id=>{ if(/^gen-/.test(id)) delete o[id]; }); }
+  for(let i=QS.length-1;i>=0;i--) if(QS[i].gen) QS.splice(i,1);
+  if(!CATS.some(c=>c[0]==='g')) CATS.push(['g','Fresh problems']);
+  StudyAccGen.make((Date.now()%2147483000)+1,OPT.gen.n||30).forEach(q=>QS.push(q)); }
+genLoad();
 /* textbook written exercises (data/textbook-sos/chN.json): full problem, working box, solution, self-marked */
 const TBP_KEY='studyos.accounting.textbook.progress.v1'; const tbReveal=new Set(); let tbTimer=null;
 function tbNotes(id){ try{ const p=JSON.parse(localStorage.getItem(TBP_KEY)||'{}'); return (p&&p[id]&&typeof p[id].notes==='string')?p[id].notes:''; }catch(e){ return ''; } }
@@ -197,7 +205,7 @@ let qset=(()=>{try{const v=sessionStorage.getItem('studyos.'+D.key+'.qset');retu
 const setsOn=()=>!!window.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;
 function setsRow(){
   if(!setsOn())return '';
-  const SM=StudyQSets.build(QS),one=qcats.size===1?[...qcats][0]:null;
+  const SM=StudyQSets.build(QS.filter(q=>!q.gen)),one=qcats.size===1?[...qcats][0]:null;
   if(one&&SM.sets[one]){const pr=StudyQSets.progress(SM.sets[one],store),cur=qset==='auto'?pr.current:qset;
     return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px">'+pr.sets.map((x,k)=>'<button class="chip" type="button" data-qset="'+k+'" aria-pressed="'+(qset!=='all'&&cur===k)+'"'+(x.open?'':' disabled title="Opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of set '+k+' is mastered"')+'>Set '+(k+1)+(x.done?' ✓':x.open?'':' 🔒')+'<span class="n">'+x.mastered+'/'+x.n+'</span></button>').join('')
      +'<button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All</button></div>'
@@ -205,7 +213,7 @@ function setsRow(){
   return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px"><button class="chip" type="button" data-qset="auto" aria-pressed="'+(qset!=='all')+'">Current set of each chapter</button><button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All questions</button></div>'
    +'<div class="count" style="margin:-2px 0 10px">Each chapter has up to 3 sets of at most 100 questions; pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
 }
-function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS):null, okSet=SM?StudyQSets.allowed(SM,store,qset):null; deck=QS.filter(q=>typeOk(q)&&(!SM||q.open||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
   else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
@@ -219,7 +227,7 @@ function askAI(q,mine){ return '<div style="margin-top:8px"><a class="btn" style
 const CRAM=/[?&]cram=1\b/.test(location.search);
 function cramList(){
   const rv=store.rv||{};
-  return QS.filter(q=>!q.open&&(!qcats.size||qcats.has(q.cat))&&store.ans[q.id]!==undefined&&(store.ans[q.id]!==q.right||(Array.isArray(rv[q.id])&&rv[q.id][0]===0)))
+  return QS.filter(q=>!q.open&&!q.gen&&(!qcats.size||qcats.has(q.cat))&&store.ans[q.id]!==undefined&&(store.ans[q.id]!==q.right||(Array.isArray(rv[q.id])&&rv[q.id][0]===0)))
     .map(q=>({q,wrong:store.ans[q.id]!==q.right})).sort((a,b)=>(b.wrong-a.wrong)||CATS.findIndex(c=>c[0]===a.q.cat)-CATS.findIndex(c=>c[0]===b.q.cat));
 }
 function renderCram(box){
@@ -239,7 +247,7 @@ function renderQ(){
       b.setAttribute('aria-pressed', id==='all'?!qcats.size:qcats.has(id));
       const inCat=id==='all'?[]:QS.filter(q=>q.cat===id), mastered=inCat.length&&inCat.every(retired);
       if(mastered) b.title='Mastered: every question here is retired';
-      b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'||q.cat===id)).length+'</span>';
+      b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'?!q.gen:q.cat===id)).length+'</span>';
       b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qJump=null; buildDeck();renderQ(); };
       box.appendChild(b); });
   })($('#qCats'));
@@ -250,7 +258,7 @@ function renderQ(){
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
   h+=setsRow();
   if(OPT.written) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
-  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
+  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
@@ -299,6 +307,7 @@ function wireQ(){
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;qJump=null;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;qJump=null;buildDeck();renderQ()};
   const rt=$('#retBtn'); if(rt) rt.onclick=()=>{showRetired=!showRetired;qpos=0;buildDeck();renderQ()};
+  const gb=$('#genBtn'); if(gb) gb.onclick=()=>{genLoad();qJump=null;qpos=0;save();buildDeck();renderQ()};
   const sh=$('#shufBtn'); if(sh) sh.onclick=()=>{shuffleOn=!shuffleOn;buildDeck();renderQ()};
   const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rv={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
