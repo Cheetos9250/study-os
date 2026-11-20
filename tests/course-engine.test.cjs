@@ -37,6 +37,6 @@ test('the engine is shared: course differences come from options, not from cours
 test('extra accounting sets keep their ids and seeds (saved answers and option order depend on them)',()=>{
   const ctx={window:{}};vm.runInNewContext(R('data/courses/acc-extra.js'),ctx);const X=ctx.window.StudyCourseExtra;
   assert.deepEqual(X.sets.map(s=>[s.pre,s.from,s.seed,s.rows.length,!!s.case]),
-    [['err-',1,701,20,false],['c8x-',1,801,16,false],['err-b',1,901,20,false],['err-b',21,1001,80,false],['brc-',1,1201,48,true],['x7-',1,1301,10,false],['x9-',1,1401,10,false],['pe-',1,1601,100,false],['ps-',1,1701,278,true]]);
+    [['err-',1,701,20,false],['c8x-',1,801,16,false],['err-b',1,901,20,false],['err-b',21,1001,80,false],['brc-',1,1201,48,true],['x7-',1,1301,10,false],['x9-',1,1401,10,false],['pe-',1,1601,100,false],['ps-',1,1701,278,true],['gd-',1,1801,285,true]]);
   assert.ok(X.hide.length>=80);
 });

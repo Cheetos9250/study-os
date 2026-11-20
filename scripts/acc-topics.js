@@ -33,6 +33,16 @@
     for(const [name,re] of rules) if(re.test(t)) return name;
     return 'Other';
   }
-  const API={ topics:cat=>[...new Set((T[cat]||[]).map(r=>r[0]))].concat(T[cat]?['Other']:[]), of:topicOf, has:cat=>!!T[cat] };
+  /* Final 1201101 study guide (owner, 20 Nov 2026): 'out' = not in the guide, 'in' = in it, '' = not an exam chapter.
+     The guide covers perpetual merchandising, FIFO and weighted average, AIS, cash/fraud/internal control and receivables. */
+  const OUT=/\blifo\b|last-in|retail (inventory )?method|gross profit method|specific identification|plant asset|depreciation|land improvement|\b(fire|flood)\b[^.]*inventory|inventory[^.]*\b(fire|flood)\b/;
+  function guideOf(q){
+    const c=q&&q.cat; if(!/^c[5-9]$/.test(c||'')) return '';
+    const t=(String(q.q||'')+' '+String(q.case||'')+' '+String((q.opts&&q.opts[q.right])||'')).toLowerCase();
+    if(OUT.test(t)) return 'out';
+    if(/\bperiodic\b/.test(t)&&!/weighted|average/.test(t)) return 'out';
+    return 'in';
+  }
+  const API={ guide:guideOf, topics:cat=>[...new Set((T[cat]||[]).map(r=>r[0]))].concat(T[cat]?['Other']:[]), of:topicOf, has:cat=>!!T[cat] };
   if(typeof module!=='undefined'&&module.exports) module.exports=API; else root.StudyAccTopics=API;
 })(typeof window!=='undefined'?window:globalThis);

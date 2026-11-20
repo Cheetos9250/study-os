@@ -66,6 +66,14 @@
    "seed": 1701,
    "count": 278,
    "case": true
+  },
+  {
+   "label": "GUIDE_EXAM_300 (20 Nov 2026)",
+   "pre": "gd-",
+   "from": 1,
+   "seed": 1801,
+   "case": true,
+   "count": 285
   }
  ],
  "hideElsewhere": [
