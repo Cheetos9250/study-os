@@ -204,6 +204,16 @@ URL_CATS.forEach(id=>qcats.add(id));
 /* question sets (scripts/study-qsets.js): repeats hidden, ≤100 questions a set, 3 sets a chapter, the next set opens at 90% mastered.
    Not applied to Review due, Missed, deep links (?q=) or Cram Mode, so nothing you need to redo is ever hidden. */
 let qset=(()=>{try{const v=sessionStorage.getItem('studyos.'+D.key+'.qset');return v==='all'?'all':/^[0-9]$/.test(v||'')?+v:'auto';}catch(e){return 'auto';}})();
+/* topic filter (scripts/acc-topics.js, acc only): with exactly one chapter chosen, narrow the questions to a topic. Nothing is stored. */
+let qtopic='';
+const topicOf=q=>window.StudyAccTopics?StudyAccTopics.of(q):'';
+const topicOn=()=>!!window.StudyAccTopics&&qcats.size===1&&StudyAccTopics.has([...qcats][0])&&!CRAM;
+function topicRow(){
+  if(!topicOn())return '';
+  const one=[...qcats][0],SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null,pool=QS.filter(q=>q.cat===one&&!q.gen&&typeOk(q)&&(!SM||q.open||!SM.hidden.has(String(q.id))));
+  const chip=(v,l,n)=>'<button class="chip" type="button" data-qtopic="'+esc(v)+'" aria-pressed="'+(qtopic===v)+'">'+esc(l)+'<span class="n">'+n+'</span></button>';
+  return '<div class="row qtopics" role="group" aria-label="Topic" style="margin-bottom:8px">'+chip('','All topics',pool.length)+StudyAccTopics.topics(one).map(t=>[t,pool.filter(q=>topicOf(q)===t).length]).filter(x=>x[1]).map(x=>chip(x[0],x[0],x[1])).join('')+'</div>'+(qtopic?'<div class="count" style="margin:-2px 0 10px">Topic view shows every set of this chapter.</div>':'');
+}
 const setsOn=()=>!!window.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;
 function setsRow(){
   if(!setsOn())return '';
@@ -215,7 +225,7 @@ function setsRow(){
   return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px"><button class="chip" type="button" data-qset="auto" aria-pressed="'+(qset!=='all')+'">Current set of each chapter</button><button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All questions</button></div>'
    +'<div class="count" style="margin:-2px 0 10px">Each chapter has up to 3 sets of at most 100 questions; pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
 }
-function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,qtopic?'all':qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!qtopic||topicOf(q)===qtopic)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
   else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
@@ -250,7 +260,7 @@ function renderQ(){
       const inCat=id==='all'?[]:QS.filter(q=>q.cat===id), mastered=inCat.length&&inCat.every(retired);
       if(mastered) b.title='Mastered: every question here is retired';
       b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'?!q.gen:q.cat===id)).length+'</span>';
-      b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qJump=null; buildDeck();renderQ(); };
+      b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qtopic=''; qJump=null; buildDeck();renderQ(); };
       box.appendChild(b); });
   })($('#qCats'));
   if(CRAM){ renderCram($('#qBody')); return; }
@@ -258,7 +268,7 @@ function renderQ(){
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+=setsRow();
+  h+=setsRow()+topicRow();
   if(OPT.written) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
   h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
@@ -303,6 +313,7 @@ function renderQ(){
   wireQ();
 }
 function wireQ(){
+  document.querySelectorAll('#qBody [data-qtopic]').forEach(b=>b.onclick=()=>{ qtopic=b.dataset.qtopic||''; qJump=null; buildDeck(); renderQ(); });
   document.querySelectorAll('#qBody [data-qset]').forEach(b=>b.onclick=()=>{ const v=b.dataset.qset; qset=v==='all'?'all':v==='auto'?'auto':+v; try{sessionStorage.setItem('studyos.'+D.key+'.qset',String(qset));}catch(e){} buildDeck(); renderQ(); });
   document.querySelectorAll('#qBody .qtype').forEach(b=>b.onclick=()=>{ qtype=b.dataset.qtype; try{sessionStorage.setItem(QTYPE_KEY,qtype);}catch(e){} qJump=null; buildDeck(); renderQ(); });
   const rb=$('#revBtn'); if(rb) rb.onclick=()=>{reviewOnly=!reviewOnly;qJump=null;reviewStart=Date.now();qpos=0;buildDeck();renderQ()};
