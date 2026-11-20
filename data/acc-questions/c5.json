@@ -1,0 +1,7 @@
+[
+ {"id":"17","row":["c5","What does the term 2/10, n/30 mean?",["Pay within 10 days for a 2% discount","Pay within 2 days for a 10% discount","Pay at day 30 for a 2% discount","Get a 10% discount if paid within 2 days"],0,"Without the discount, the full amount is due within 30 days."]},
+ {"id":"18","row":["c5","Freight-in causes what?",["Inventory cost increases","It is a selling expense","Sales decrease","COGS decreases immediately"],0,"It is a cost of bringing the goods in."]},
+ {"id":"19","row":["c5","Under the perpetual system, what must also be recorded at each sale?",["Dr COGS / Cr Inventory","Dr Inventory / Cr COGS","Dr Sales / Cr Cash","Nothing more"],0,"Cost of goods sold is recorded with every sale."]},
+ {"id":"20","row":["c5","Gross profit =",["Net sales − COGS","Net sales − Expenses","Sales + COGS","COGS − Sales"],0,"It is before operating expenses."]},
+ {"id":"21","row":["c5","Which is excluded from the acid-test ratio?",["Inventory","Cash","Short-term investments","Current receivables"],0,"Quick assets exclude inventory."]}
+]

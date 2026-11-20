@@ -1,0 +1,7 @@
+[
+ {"id":"8","row":["c3","Prepaid insurance of 2,400 covers 24 months. How much is expensed per month?",["100","200","2,400","24"],0,"2,400 ÷ 24 = 100"]},
+ {"id":"9","row":["c3","Equipment costs 26,000, residual value is 8,000 and useful life is 48 months. What is monthly straight-line depreciation?",["375","542","750","18,000"],0,"(26,000 − 8,000) ÷ 48 = 375 · 542 = forgot to subtract residual value · 18,000 = not yet divided by the number of months"]},
+ {"id":"10","row":["c3","An accrued revenue adjustment is recorded with?",["Dr A/R / Cr Revenue","Dr Cash / Cr Revenue","Dr Revenue / Cr A/R","Dr Unearned / Cr Revenue"],0,"The service was performed but cash has not been received."]},
+ {"id":"11","row":["c3","Accumulated depreciation is what type of account?",["Contra asset","Expense","Liability","Equity"],0,"It is deducted from the asset on the statement of financial position."]},
+ {"id":"12","row":["c3","A 6,000 loan at 6% per year has 1 month of interest unpaid. What is accrued interest?",["30","360","300","3"],0,"6,000 × 6% × 1/12 = 30 · 360 = a full year of interest · 300 and 3 = misplaced decimal"]}
+]

@@ -1,0 +1,59 @@
+{
+ "accHeader": "/* Accounting course data for acc.html (cards, summaries, quiz).\n   Loaded by the course page before scripts/study-course-engine.js; other pages read the D line as JSON.\n   Keep \"const D = {...};\" on one line: Today, Lessons, Grades, Calendar and search parse it. */",
+ "extraHeader": "/* Extra accounting practice sets for acc.html, read by scripts/study-course-engine.js.\n   Question ids are \"<pre><n>\" with n counted from \"from\"; never reorder or remove rows (saved answers use the ids).\n   Each row: [chapter id, question, [options], right option index, explanation, optional case text].\n   hide: near-duplicate questions kept out of practice (owner, 16 Nov 2026: at most 6 similar questions; answers stay saved). */",
+ "sets": [
+  {
+   "label": "ERR_QUIZ",
+   "pre": "err-",
+   "from": 1,
+   "seed": 701,
+   "count": 20
+  },
+  {
+   "label": "CH8_QUIZ",
+   "pre": "c8x-",
+   "from": 1,
+   "seed": 801,
+   "count": 16
+  },
+  {
+   "label": "BANKERR_QUIZ",
+   "pre": "err-b",
+   "from": 1,
+   "seed": 901,
+   "count": 20
+  },
+  {
+   "label": "BANKERR2_QUIZ",
+   "pre": "err-b",
+   "from": 21,
+   "seed": 1001,
+   "count": 80
+  },
+  {
+   "label": "BRC_QUIZ",
+   "pre": "brc-",
+   "from": 1,
+   "seed": 1201,
+   "case": true,
+   "count": 48
+  },
+  {
+   "label": "c7 extra (18 Nov 2026)",
+   "pre": "x7-",
+   "from": 1,
+   "seed": 1301,
+   "count": 10
+  },
+  {
+   "label": "c9 extra (18 Nov 2026)",
+   "pre": "x9-",
+   "from": 1,
+   "seed": 1401,
+   "count": 10
+  }
+ ],
+ "hideElsewhere": [
+  "n-410f0298412581b593dec6050adca49e"
+ ]
+}

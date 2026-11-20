@@ -1,0 +1,7 @@
+[
+ {"id":"13","row":["c4","Which account is a temporary account?",["Withdrawals","Cash","Capital","Land"],0,"Withdrawals is closed to Capital each period."]},
+ {"id":"14","row":["c4","Revenues are 20,000 and expenses are 15,000. What is left in Income Summary?",["Cr 5,000","Dr 5,000","Cr 35,000","0"],0,"Net income of 5,000 is a credit balance."]},
+ {"id":"15","row":["c4","Which accounts appear on the post-closing trial balance?",["Permanent accounts only","Temporary accounts only","All accounts","Revenue accounts only"],0,"After closing, temporary accounts have a zero balance."]},
+ {"id":"16","row":["c4","Current ratio =",["CA ÷ CL","CL ÷ CA","CA − CL","Quick ÷ CL"],0,"It measures short-term liquidity."]},
+ {"id":"err-17","row":["c4","Prepaid insurance of $600 expired, but the adjusting entry was omitted. Effect on the financial statements?",["Expenses understated, net income and assets overstated","Expenses overstated, net income understated","Liabilities understated","No effect until next year"],0,"Missing Dr Insurance Expense / Cr Prepaid Insurance leaves expenses too low and Prepaid Insurance (an asset) too high."]}
+]
