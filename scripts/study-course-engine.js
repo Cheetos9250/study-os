@@ -155,6 +155,8 @@ const XTRA=window.StudyCourseExtra||{}, OPT=window.StudyCourseOpts||{};
 (XTRA.sets||[]).forEach(set=>set.rows.forEach((q,i)=>{ let s=(i+set.seed)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
   const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   const o={id:set.pre+(i+set.from),cat:q[0],q:q[1],opts:q[2],exp:q[4],order:idx,right:q[3]}; if(set.case) o.case=q[5]||''; QS.push(o); }));
+/* chapters that exist only in an extra set (acc: c10 Plant assets, from the 20 Nov practice exam) get a chip too */
+Object.entries(OPT.extraCats||{}).forEach(([id,l])=>{ if(QS.some(q=>q.cat===id)&&!CATS.some(c=>c[0]===id)) CATS.push([id,String(l)]); });
 /* near-duplicate questions hidden (answers stay saved) */
 const QHIDE=new Set(XTRA.hide||[]);
 /* quiz review (spaced repetition) */
