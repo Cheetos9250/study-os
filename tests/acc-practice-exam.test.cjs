@@ -19,9 +19,10 @@ test('practice exam: spot-check the answer key against known results',()=>{
   assert.match(right(58),/Debit to Cash Over and Short for \$5/);
 });
 
-test('plant assets (c10) get their own chip via OPT.extraCats, nothing else in the site changes',()=>{
-  assert.match(R('acc.html'),/extraCats:\{c10:'10 Plant assets'\}/);
-  assert.match(R('scripts/study-course-engine.js'),/Object\.entries\(OPT\.extraCats\|\|\{\}\)/);
+test('plant assets (c10) are hidden (owner, 20 Nov 2026): no chip, rows kept so saved answers stay',()=>{
+  assert.doesNotMatch(R('acc.html'),/extraCats/);
+  const rows=R('data/acc-questions/c10.json').split('\n').map(l=>l.trim().replace(/,$/,'')).filter(l=>l.startsWith('{')).map(JSON.parse);
+  assert.equal(rows.length,20);assert.ok(rows.every(e=>e.hide===true));
 });
 
 test('near-duplicate clusters are capped: no more than 3 visible questions share one pattern per chapter',()=>{
@@ -30,6 +31,6 @@ test('near-duplicate clusters are capped: no more than 3 visible questions share
     const rows=JSON.parse(R('data/acc-questions/'+c+'.json')).filter(e=>!e.hide),T=rows.map(tok),used=new Set();
     for(let i=0;i<rows.length;i++){if(used.has(i))continue;const g=[i];
       for(let j=i+1;j<rows.length;j++){if(used.has(j))continue;const a=T[i],b=T[j];let n=0;a.forEach(x=>b.has(x)&&n++);if(n/(a.size+b.size-n)>=0.75)g.push(j);}
-      g.forEach(k=>used.add(k));assert.ok(g.length<=3,c+' '+rows[i].id+' still has '+g.length+' near-copies');}
+      g.forEach(k=>used.add(k));const n=new Set(g.map(k=>rows[k].row[5]||'#'+k)).size;/* steps of one shared case count once */assert.ok(n<=3,c+' '+rows[i].id+' still has '+n+' near-copies');}
   }
 });

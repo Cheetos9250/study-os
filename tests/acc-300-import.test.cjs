@@ -38,7 +38,7 @@ test('topic filter: at least 95% of Ch5-9 practice questions get a topic, every 
 test('engine and acc.html wire the topic filter; other courses stay unchanged',()=>{
   const e=fs.readFileSync(path.join(ROOT,'scripts/study-course-engine.js'),'utf8'),h=fs.readFileSync(path.join(ROOT,'acc.html'),'utf8');
   assert.match(e,/data-qtopic/); assert.match(e,/topicOn=\(\)=>!!window\.StudyAccTopics&&qcats\.size===1/);
-  assert.match(e,/\(!qtopic\|\|topicOf\(q\)===qtopic\)/); assert.match(h,/acc-topics\.js\?v=1/);
+  assert.match(e,/\(!qtopic\|\|topicOf\(q\)===qtopic\)/); assert.match(h,/acc-topics\.js\?v=2/);
   for(const c of ['eco','math','eng','zh']) assert.doesNotMatch(fs.readFileSync(path.join(ROOT,c+'.html'),'utf8'),/acc-topics/);
   assert.doesNotMatch(e,/localStorage\.setItem\([^)]*qtopic/);
 });
