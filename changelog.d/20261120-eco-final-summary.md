@@ -1,0 +1,1 @@
+- Economics summary: added final-exam sections (GDP what counts, GDP vs GNP and exchange rate, business cycle, labor market, inflation causes and winners/losers, AD slope, AS ranges and stagflation, fiscal tools and supply-side) from the owner's cheat sheet. Cards and questions unchanged.
