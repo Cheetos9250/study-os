@@ -51,6 +51,13 @@
    "from": 1,
    "seed": 1401,
    "count": 10
+  },
+  {
+   "label": "PRACTICE_EXAM_100 (20 Nov 2026)",
+   "pre": "pe-",
+   "from": 1,
+   "seed": 1601,
+   "count": 100
   }
  ],
  "hideElsewhere": [
