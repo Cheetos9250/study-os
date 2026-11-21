@@ -201,7 +201,7 @@ let qtype=(()=>{if(!OPT.written)return 'all';try{const u=new URLSearchParams(loc
 const typeOk=q=>qtype==='all'||(qtype==='written'?!!q.open:!q.open);
 let qcats=new Set(), missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
 URL_CATS.forEach(id=>qcats.add(id));
-/* question sets (scripts/study-qsets.js): repeats hidden, ≤100 questions a set, 3 sets a chapter, the next set opens at 90% mastered.
+/* question sets (scripts/study-qsets.js): repeats hidden, 50 questions a set, the next set opens at 90% mastered.
    Not applied to Review due, Missed, deep links (?q=) or Cram Mode, so nothing you need to redo is ever hidden. */
 let qset=(()=>{try{const v=sessionStorage.getItem('studyos.'+D.key+'.qset');return v==='all'?'all':/^[0-9]$/.test(v||'')?+v:'auto';}catch(e){return 'auto';}})();
 /* topic filter (scripts/acc-topics.js, acc only): with exactly one chapter chosen, narrow the questions to a topic. Nothing is stored. */
@@ -232,7 +232,7 @@ function setsRow(){
      +'<button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All</button></div>'
      +'<div class="count" style="margin:-2px 0 10px">Mastered = right twice in a row. The next set opens at '+Math.round(StudyQSets.UNLOCK*100)+'%.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';}
   return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px"><button class="chip" type="button" data-qset="auto" aria-pressed="'+(qset!=='all')+'">Current set of each chapter</button><button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All questions</button></div>'
-   +'<div class="count" style="margin:-2px 0 10px">Each chapter has up to 3 sets of at most 100 questions; pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
+   +'<div class="count" style="margin:-2px 0 10px">Each chapter is split into sets of 50 questions; pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
 }
 function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,(qtopic||qguide)?'all':qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!qtopic||topicOf(q)===qtopic)&&(!qguide||guideOf(q)===qguide)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }

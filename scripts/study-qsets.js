@@ -1,5 +1,5 @@
-/* Question sets per chapter (owner, 18 Nov 2026): no repeated questions, at most 100 and at least 10 questions in a set,
-   three sets per chapter (fewer when a chapter has under 30, more only when it has over 300). Set 1 is open; the next set opens when 90% of the current set is
+/* Question sets per chapter (owner, 18 Nov 2026): no repeated questions, 50 questions in a set,
+   50 questions a set (owner, 21 Nov 2026; a leftover under 10 joins the last set). Set 1 is open; the next set opens when 90% of the current set is
    "mastered" — answered right at least twice in a row (review box ≥ 2 in study-<course>.rv).
    Pure functions; the course engine uses them to filter the deck. Nothing is stored: answers stay where they are,
    and hidden repeats keep their saved answers. */
@@ -9,7 +9,7 @@
  if(root)root.StudyQSets=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const MAX=100,MIN=10,SETS=3,MASTER_BOX=2,UNLOCK=0.9;
+ const MAX=50,MIN=10,SETS=0,MASTER_BOX=2,UNLOCK=0.9;
  /* same question = same words, ignoring case, spaces, punctuation and option order */
  function norm(t){return String(t||'').toLowerCase().normalize('NFKC').replace(/\*\*/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();}
  /* qs: [{id, cat, q, open}] in practice order → {hidden:Set(ids), sets:{cat:[[ids]…]}, setOf:{id:index}} */
@@ -18,8 +18,9 @@
   for(const q of qs||[]){if(!q||q.open)continue;const k=q.cat+'|'+norm(q.q);
    if(seen[k]!==undefined){hidden.add(String(q.id));continue;}seen[k]=q.id;(byCat[q.cat]=byCat[q.cat]||[]).push(String(q.id));}
   const sets={},setOf={};
-  for(const cat of Object.keys(byCat)){const ids=byCat[cat],size=Math.min(MAX,Math.max(MIN,Math.ceil(ids.length/SETS))),list=[];
+  for(const cat of Object.keys(byCat)){const ids=byCat[cat],size=MAX,list=[];
    for(let i=0;i<ids.length;i+=size)list.push(ids.slice(i,i+size));
+   if(list.length>1&&list[list.length-1].length<MIN)list[list.length-2]=list[list.length-2].concat(list.pop());
    sets[cat]=list;list.forEach((s,k)=>s.forEach(id=>{setOf[id]=k;}));}
   return {hidden,sets,setOf};
  }
