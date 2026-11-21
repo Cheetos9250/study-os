@@ -1,5 +1,5 @@
 /* Question sets per chapter (owner, 18 Nov 2026): no repeated questions, at most 50 (owner, 21 Nov 2026) and at least 10 questions in a set,
-   sets of 50 per chapter (one set when a chapter has 50 or fewer; a tail under 10 joins the set before it). Set 1 is open; the next set opens when 90% of the current set is
+   sets of 50 per chapter (one set when a chapter has 50 or fewer). Set 1 is open; the next set opens when 90% of the current set is
    "mastered" — answered right at least twice in a row (review box ≥ 2 in study-<course>.rv).
    Pure functions; the course engine uses them to filter the deck. Nothing is stored: answers stay where they are,
    and hidden repeats keep their saved answers. */
@@ -20,7 +20,6 @@
   const sets={},setOf={};
   for(const cat of Object.keys(byCat)){const ids=byCat[cat],size=MAX,list=[];
    for(let i=0;i<ids.length;i+=size)list.push(ids.slice(i,i+size));
-   if(list.length>1&&list[list.length-1].length<MIN)list[list.length-2]=list[list.length-2].concat(list.pop());
    sets[cat]=list;list.forEach((s,k)=>s.forEach(id=>{setOf[id]=k;}));}
   return {hidden,sets,setOf};
  }

@@ -6,10 +6,10 @@ test('repeats are hidden by normalised text within a chapter; written items are 
   const qs=[{id:1,cat:'c1',q:'What is **COGS**?'},{id:2,cat:'c1',q:'what is cogs'},{id:3,cat:'c2',q:'What is COGS?'},{id:4,cat:'c1',q:'x',open:true}];
   const m=Q.build(qs);assert.deepEqual([...m.hidden],['2']);assert.deepEqual(m.sets,{c1:[['1']],c2:[['3']]});
 });
-test('set sizes: 50 a set, one set when 50 or fewer, a tail under 10 joins the set before',()=>{
+test('set sizes: 50 a set, one set when 50 or fewer, the rest is a new set, however small',()=>{
   const size=n=>Q.build(mk(n)).sets.c1.map(s=>s.length);
   assert.deepEqual(size(5),[5]);assert.deepEqual(size(25),[25]);assert.deepEqual(size(50),[50]);assert.deepEqual(size(120),[50,50,20]);
-  assert.deepEqual(size(213),[50,50,50,50,13]);assert.deepEqual(size(205),[50,50,50,55]);assert.deepEqual(size(330),[50,50,50,50,50,50,30]);
+  assert.deepEqual(size(213),[50,50,50,50,13]);assert.deepEqual(size(205),[50,50,50,50,5]);assert.deepEqual(size(330),[50,50,50,50,50,50,30]);
 });
 test('progress: set 1 open; the next opens when 90% is mastered (right twice in a row)',()=>{
   const m=Q.build(mk(120)),sets=m.sets.c1,store={rv:{}};
