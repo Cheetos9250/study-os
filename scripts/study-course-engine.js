@@ -163,6 +163,10 @@ const QHIDE=new Set(XTRA.hide||[]);
 let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showRetired=false;
 const retired=q=>!!(window.StudyReview&&StudyReview.isRetired(store,q.id,reviewStart));
 const retChip=()=>{const n=QS.filter(retired).length;return n?'<button class="chip" id="retBtn" aria-pressed="'+showRetired+'" type="button" title="Answered right 4 times in a row; back for review in 30–90 days">Retired<span class="n">'+n+'</span></button>':'';};
+/* Difficulty tag (owner, 21 Nov 2026): from my own answers, no new storage. Wrong now or review box 0 = Hard, box 1 = Medium, box 2+ = Easy; unanswered = no tag. acc/eco/math only (where StudyQSets is loaded). */
+function diffTag(q){ if(!window.StudyQSets||q.open||q.gen||store.ans[q.id]===undefined)return ''; const r=(store.rv||{})[q.id], box=Array.isArray(r)?+r[0]||0:(store.ans[q.id]===q.right?1:0);
+  const lv=store.ans[q.id]!==q.right||box<1?['Hard','#e5484d']:box<2?['Medium','#d9a400']:['Easy','#2f9e5b'];
+  return '<span class="dtag" data-diff="'+lv[0].toLowerCase()+'" title="Difficulty from your answers" style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:2px 9px;border-radius:999px;border:1.5px solid '+lv[1]+';font-size:12px;font-weight:700;line-height:1.5"><i style="width:9px;height:9px;border-radius:50%;background:'+lv[1]+';display:inline-block"></i>'+lv[0]+'</span>'; }
 let redoAt=0,redoIds=new Set(); /* Start again (owner, 21 Nov 2026): in memory only; old answers stay until each question is answered again */
 const reviewFresh=x=>(reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart)||(redoAt>0&&redoIds.has(String(x.id))&&((store.ats||{})[x.id]||0)<redoAt);
 const setDone=()=>setsOn()&&qcats.size===1&&qset!=='all'&&deck.length>0&&deck.every(x=>!x.open&&store.ans[x.id]!==undefined&&!reviewFresh(x));
@@ -288,7 +292,7 @@ function renderQ(){
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
   window.StudyLast&&StudyLast.mark({href:D.key+'.html?tab=prac&q='+encodeURIComponent(q.id),title:D.title+' · Practice',sub:'Q '+(qpos+1)+' · '+q.q,course:D.key});
-  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
+  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span>'+diffTag(q)+'</div>';
   if(q.tb) h+='<div class="qsrc" style="font-size:12px;opacity:.7;margin:4px 0">'+esc(q.wtag||'Textbook style')+' · '+esc(q.tb)+'</div>';
   if(q.case) h+='<div class="qcase" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;line-height:1.55;overflow-wrap:anywhere">'+(q.md&&window.StudySosMd?StudySosMd(q.case):rich(q.case))+'</div>';
   if(q.open){ const shown=done||tbReveal.has(q.id);

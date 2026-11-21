@@ -1,0 +1,1 @@
+Practice (acc/eco/math): each answered question shows a difficulty tag next to Q: red Hard (wrong now), yellow Medium (right once), green Easy (right twice in a row). From your own answers; nothing new is stored.
