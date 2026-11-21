@@ -6,18 +6,18 @@ test('repeats are hidden by normalised text within a chapter; written items are 
   const qs=[{id:1,cat:'c1',q:'What is **COGS**?'},{id:2,cat:'c1',q:'what is cogs'},{id:3,cat:'c2',q:'What is COGS?'},{id:4,cat:'c1',q:'x',open:true}];
   const m=Q.build(qs);assert.deepEqual([...m.hidden],['2']);assert.deepEqual(m.sets,{c1:[['1']],c2:[['3']]});
 });
-test('set sizes: 3 sets, 10 to 50 each (more sets over 150)',()=>{
+test('set sizes: 50 a set, one set when 50 or fewer, a tail under 10 joins the set before',()=>{
   const size=n=>Q.build(mk(n)).sets.c1.map(s=>s.length);
-  assert.deepEqual(size(5),[5]);assert.deepEqual(size(25),[10,10,5]);assert.deepEqual(size(150),[50,50,50]);assert.deepEqual(size(213),[50,50,50,50,13]);
-  assert.deepEqual(size(228),[50,50,50,50,28]);assert.deepEqual(size(330),[50,50,50,50,50,50,30]);
+  assert.deepEqual(size(5),[5]);assert.deepEqual(size(25),[25]);assert.deepEqual(size(50),[50]);assert.deepEqual(size(120),[50,50,20]);
+  assert.deepEqual(size(213),[50,50,50,50,13]);assert.deepEqual(size(205),[50,50,50,55]);assert.deepEqual(size(330),[50,50,50,50,50,50,30]);
 });
 test('progress: set 1 open; the next opens when 90% is mastered (right twice in a row)',()=>{
-  const m=Q.build(mk(30)),sets=m.sets.c1,store={rv:{}};
+  const m=Q.build(mk(120)),sets=m.sets.c1,store={rv:{}};
   let p=Q.progress(sets,store);assert.deepEqual(p.sets.map(x=>x.open),[true,false,false]);assert.equal(p.current,0);
-  sets[0].slice(0,9).forEach(id=>store.rv[id]=[2,0]);p=Q.progress(sets,store);assert.equal(p.sets[0].done,true);assert.equal(p.current,1);assert.deepEqual(p.sets.map(x=>x.open),[true,true,false]);
+  sets[0].slice(0,45).forEach(id=>store.rv[id]=[2,0]);p=Q.progress(sets,store);assert.equal(p.sets[0].done,true);assert.equal(p.current,1);assert.deepEqual(p.sets.map(x=>x.open),[true,true,false]);
   store.rv[sets[1][0]]=[1,0];assert.equal(Q.progress(sets,store).sets[1].mastered,0,'box 1 is right once only');
   assert.deepEqual([...Q.allowed(m,store,'auto')],sets[1]);assert.deepEqual([...Q.allowed(m,store,2)],sets[1],'a locked set falls back to the current one');
-  assert.equal(Q.allowed(m,store,'all').size,30);
+  assert.equal(Q.allowed(m,store,'all').size,120);
 });
 test('engine: sets never hide Review due, Missed, deep links or Cram Mode; pages load the script first',()=>{
   const e=R('scripts/study-course-engine.js');
