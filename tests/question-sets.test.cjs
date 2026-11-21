@@ -1,4 +1,4 @@
-/* Question sets: repeats hidden, 10–100 questions a set, 3 sets a chapter, next set opens at 90% mastered (box ≥ 2). */
+/* Question sets: repeats hidden, 10–50 questions a set, 3 sets a chapter (more over 150), next set opens at 90% mastered (box ≥ 2). */
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const Q=require('../scripts/study-qsets.js'),R=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const mk=(n,cat='c1',pre='q')=>[...Array(n)].map((_,i)=>({id:pre+i,cat,q:'Question number '+pre+i}));
@@ -6,10 +6,10 @@ test('repeats are hidden by normalised text within a chapter; written items are 
   const qs=[{id:1,cat:'c1',q:'What is **COGS**?'},{id:2,cat:'c1',q:'what is cogs'},{id:3,cat:'c2',q:'What is COGS?'},{id:4,cat:'c1',q:'x',open:true}];
   const m=Q.build(qs);assert.deepEqual([...m.hidden],['2']);assert.deepEqual(m.sets,{c1:[['1']],c2:[['3']]});
 });
-test('set sizes: 3 sets, 10 to 100 each',()=>{
+test('set sizes: 3 sets, 10 to 50 each (more sets over 150)',()=>{
   const size=n=>Q.build(mk(n)).sets.c1.map(s=>s.length);
-  assert.deepEqual(size(5),[5]);assert.deepEqual(size(25),[10,10,5]);assert.deepEqual(size(150),[50,50,50]);
-  assert.deepEqual(size(228),[76,76,76]);assert.deepEqual(size(330),[100,100,100,30]);
+  assert.deepEqual(size(5),[5]);assert.deepEqual(size(25),[10,10,5]);assert.deepEqual(size(150),[50,50,50]);assert.deepEqual(size(213),[50,50,50,50,13]);
+  assert.deepEqual(size(228),[50,50,50,50,28]);assert.deepEqual(size(330),[50,50,50,50,50,50,30]);
 });
 test('progress: set 1 open; the next opens when 90% is mastered (right twice in a row)',()=>{
   const m=Q.build(mk(30)),sets=m.sets.c1,store={rv:{}};
@@ -23,7 +23,7 @@ test('engine: sets never hide Review due, Missed, deep links or Cram Mode; pages
   const e=R('scripts/study-course-engine.js');
   assert.match(e,/const setsOn=\(\)=>!!window\.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;/);
   assert.match(e,/\(!SM\|\|q\.open\|\|q\.gen\|\|\(!SM\.hidden\.has\(String\(q\.id\)\)&&okSet\.has\(String\(q\.id\)\)\)\)/);
-  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=1"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=\d+"/);
+  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=2"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=\d+"/);
 });
 test('deep links never untick a chapter the engine already selected from ?cat=',()=>{
   const src=R('scripts/study-course-nav.js');
