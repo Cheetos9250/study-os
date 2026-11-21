@@ -6,5 +6,5 @@ test('accounting practice can show multiple choice and written questions separat
   assert.match(s,/deck=QS\.filter\(q=>typeOk\(q\)&&/);
   assert.match(s,/const QTYPE_KEY='studyos\.'\+D\.key\+'\.qtype';/); assert.match(s,/sessionStorage\.setItem\(QTYPE_KEY,qtype\)/); assert.match(s,/if\(OPT\.written&&!SLIM_ROWS\) h\+='<div class=\"row\" role=\"group\" aria-label=\"Question type\"/);
   assert.doesNotMatch(s,/localStorage\.setItem\(QTYPE_KEY/); // session only: no new backed-up key
-  assert.match(s,/u\.get\('q'\)\?'all'/); // deep links always find their question
+  assert.match(s,/typeOk=q=>\(!q\.open\|\|\(qJump!==null/); // a ?q= link still finds its written question
 });

@@ -199,8 +199,8 @@ function tbSave(id,text){ try{ const raw=localStorage.getItem(TBP_KEY); const p=
 /* owner, 21 Nov 2026: the practice view shows only the set chips and the tool row; topic, exam-guide and type rows are hidden (code kept), written questions are off unless ?type=written */
 const SLIM_ROWS=true;
 const QTYPE_KEY='studyos.'+D.key+'.qtype';
-let qtype=(()=>{if(!OPT.written)return 'all';try{const u=new URLSearchParams(location.search);const v=u.get('type')||(u.get('q')?'all':'mcq');return v==='mcq'||v==='written'?v:'all';}catch(e){return 'all';}})();
-const typeOk=q=>qtype==='all'||(qtype==='written'?!!q.open:!q.open);
+let qtype='mcq'; /* written questions are hidden from Practice (owner, 21 Nov 2026) */
+const typeOk=q=>(!q.open||(qJump!==null&&String(q.id)===String(qJump))); /* written questions stay out of Practice (owner, 21 Nov 2026); a ?q= link to one still opens it */
 let qcats=new Set(), missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
 URL_CATS.forEach(id=>qcats.add(id));
 /* question sets (scripts/study-qsets.js): repeats hidden, ≤50 questions a set, 3 sets a chapter, the next set opens at 90% mastered.
