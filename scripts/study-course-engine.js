@@ -163,7 +163,9 @@ const QHIDE=new Set(XTRA.hide||[]);
 let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showRetired=false;
 const retired=q=>!!(window.StudyReview&&StudyReview.isRetired(store,q.id,reviewStart));
 const retChip=()=>{const n=QS.filter(retired).length;return n?'<button class="chip" id="retBtn" aria-pressed="'+showRetired+'" type="button" title="Answered right 4 times in a row; back for review in 30–90 days">Retired<span class="n">'+n+'</span></button>':'';};
-const reviewFresh=x=>reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart;
+let redoAt=0,redoIds=new Set(); /* Start again (owner, 21 Nov 2026): in memory only; old answers stay until each question is answered again */
+const reviewFresh=x=>(reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart)||(redoAt>0&&redoIds.has(String(x.id))&&((store.ats||{})[x.id]||0)<redoAt);
+const setDone=()=>setsOn()&&qcats.size===1&&qset!=='all'&&deck.length>0&&deck.every(x=>!x.open&&store.ans[x.id]!==undefined&&!reviewFresh(x));
 const revChip=()=>'<button class="chip" id="revBtn" aria-pressed="'+reviewOnly+'" type="button">Review due<span class="n">'+(window.StudyReview?QS.filter(q=>StudyReview.isDue(store,q.id,Date.now())).length:0)+'</span></button>';
 for(let i=QS.length-1;i>=0;i--) if(QHIDE.has(String(QS[i].id))) QS.splice(i,1);
 /* the course's own practice set (acc: scripts/acc-textbook-mcq.js, eco: eco-practice-mcq.js, math: math-practice-mcq.js) */
@@ -281,7 +283,7 @@ function renderQ(){
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
   h+=setsRow()+(SLIM_ROWS?'':topicRow()+guideRow());
   if(OPT.written&&!SLIM_ROWS) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
-  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
+  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button>'+(setDone()?'<button class="chip" id="againBtn" type="button" aria-pressed="true">Start again</button>':'')+'<button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
@@ -328,6 +330,7 @@ function wireQ(){
   document.querySelectorAll('#qBody [data-qtopic]').forEach(b=>b.onclick=()=>{ qtopic=b.dataset.qtopic||''; qJump=null; buildDeck(); renderQ(); });
   document.querySelectorAll('#qBody [data-qset]').forEach(b=>b.onclick=()=>{ const v=b.dataset.qset; qset=v==='all'?'all':v==='auto'?'auto':+v; try{sessionStorage.setItem('studyos.'+D.key+'.qset',String(qset));}catch(e){} buildDeck(); renderQ(); });
   document.querySelectorAll('#qBody .qtype').forEach(b=>b.onclick=()=>{ qtype=b.dataset.qtype; try{sessionStorage.setItem(QTYPE_KEY,qtype);}catch(e){} qJump=null; buildDeck(); renderQ(); });
+  const ab=$('#againBtn'); if(ab) ab.onclick=()=>{redoIds=new Set(deck.map(x=>String(x.id)));redoAt=Date.now();shuffleOn=true;qJump=null;buildDeck();renderQ()};
   const rb=$('#revBtn'); if(rb) rb.onclick=()=>{reviewOnly=!reviewOnly;qJump=null;reviewStart=Date.now();qpos=0;buildDeck();renderQ()};
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;qJump=null;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;qJump=null;buildDeck();renderQ()};
