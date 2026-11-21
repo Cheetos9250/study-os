@@ -196,8 +196,10 @@ function tbSave(id,text){ try{ const raw=localStorage.getItem(TBP_KEY); const p=
       QS.push({id,cat:'c'+ch,q:it.title||it.id,opts:['I got it','I missed it'],order:[0,1],right:0,exp:'',open:true,src:it.id,prompt:it.prompt,solution:it.solution||'',checks:Array.isArray(it.checks)?it.checks:[],je:window.StudyJE?StudyJE.parse(it.solution||''):[],fs:window.StudyFS?StudyFS.parse(it.solution||''):{title:'',rows:[]},tb:OPT.writtenDir?it.id.replace(/^[A-Z]+(\d+)-(\d+)$/,'Ch$1 · Problem $2'):it.id.replace('-',' ')+' · written',wtag:OPT.writtenTag}); added++; } }catch(e){} }
   if(added){ const cur=deck[qpos]&&deck[qpos].id; buildDeck(); if(cur&&!qJump){ const i=deck.findIndex(x=>x.id===cur); if(i>=0) qpos=i; } renderQ(); }
 })();
+/* owner, 21 Nov 2026: the practice view shows only the set chips and the tool row; topic, exam-guide and type rows are hidden (code kept), written questions are off unless ?type=written */
+const SLIM_ROWS=true;
 const QTYPE_KEY='studyos.'+D.key+'.qtype';
-let qtype=(()=>{if(!OPT.written)return 'all';try{const u=new URLSearchParams(location.search);const v=u.get('type')||(u.get('q')?'all':sessionStorage.getItem(QTYPE_KEY));return v==='mcq'||v==='written'?v:'all';}catch(e){return 'all';}})();
+let qtype=(()=>{if(!OPT.written)return 'all';try{const u=new URLSearchParams(location.search);const v=u.get('type')||(u.get('q')?'all':'mcq');return v==='mcq'||v==='written'?v:'all';}catch(e){return 'all';}})();
 const typeOk=q=>qtype==='all'||(qtype==='written'?!!q.open:!q.open);
 let qcats=new Set(), missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
 URL_CATS.forEach(id=>qcats.add(id));
@@ -277,8 +279,8 @@ function renderQ(){
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+=setsRow()+topicRow()+guideRow();
-  if(OPT.written) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
+  h+=setsRow()+(SLIM_ROWS?'':topicRow()+guideRow());
+  if(OPT.written&&!SLIM_ROWS) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
   h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
   if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);

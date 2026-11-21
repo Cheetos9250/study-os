@@ -1,0 +1,1 @@
+Practice view (acc/eco/math): only the set chips and the tool row (Review due, Missed, Unanswered, Shuffle, Clear answers) are shown. Topic, exam-guide and question-type rows are hidden; written questions are off by default (a ?type=written link still works).
