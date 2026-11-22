@@ -1,0 +1,1 @@
+- Every page now uses the e-ink desk display look like Today: light-grey screen, ink lines, M PLUS Rounded 1c, the menu as a dark bezel, inverted dark mode. Course pages keep a muted green/red for right and wrong answers.
