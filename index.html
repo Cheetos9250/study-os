@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — today, tasks, exams">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -213,21 +213,25 @@ a.sb:hover{background:var(--dots),var(--panel)}
 }
 @media(max-width:420px){.sb{padding:12px 14px 14px;min-height:110px}}
 </style>
+<link rel="stylesheet" href="assets/study-eink.css?v=1">
 <script src="scripts/study-theme.js?v=6"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
-<div class="cover" id="cover" role="img" aria-label="Cover">
- <div class="cover-tools"><button type="button" id="coverPick" data-img="cover">Change cover</button></div>
-</div>
 <div class="page">
 <div class="headrow">
 <header class="head">
- <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 24 32 12l28 12-28 12z" fill="var(--panel)" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M16 30v12c0 4 7 9 16 9s16-5 16-9V30" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M54 27v15" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M50 46l4-5 4 5-4 5z" fill="currentColor"/><path d="M20 40l4 4M26 43l4 3M34 43l4-2M40 41l4-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
  <div><h1 id="welcome-title">Study</h1><p class="date" id="today">Study OS</p></div>
 </header>
 <div class="bk" id="backupNudge" role="status" hidden></div>
 </div>
+<section class="hero" aria-label="Next exam and cover">
+<div class="hx" id="heroExam"></div>
+<div class="cover" id="cover">
+ <div class="cover-tools"><button type="button" id="coverPick" data-img="cover">Change cover</button></div>
+ <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 24 32 12l28 12-28 12z" fill="var(--panel)" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M16 30v12c0 4 7 9 16 9s16-5 16-9V30" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M54 27v15" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M50 46l4-5 4 5-4 5z" fill="currentColor"/><path d="M20 40l4 4M26 43l4 3M34 43l4-2M40 41l4-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+</div>
+</section>
 <div class="chips scoreboard" id="chips" aria-label="Scoreboard"></div>
 <main>
 <a class="cont" id="continue" hidden></a>
@@ -244,6 +248,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <section class="top">
  <div class="box" id="planBox" aria-label="Today's plan"><p class="empty">Loading…</p></div>
  <div class="pomo" aria-label="Pomodoro timer">
+  <div class="mascot" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" shape-rendering="crispEdges"><path d="M18 14h26v34H18z"/><path d="M22 14v34"/><path d="M16 19h4M16 25h4M16 31h4M16 37h4M16 43h4"/><path d="M28 24h2M38 24h2"/><path d="M30 31h6"/><path d="M44 34l10-10 3 3-10 10-4 1z"/><path d="M24 48v6M38 48v6M22 54h4M36 54h4"/><path d="M12 10l2 2M50 8l-2 3"/></svg><span class="bubble" id="pBubble">One focus block at a time.</span></div>
   <div class="tabs" role="group" aria-label="Mode"><button class="tab" type="button" data-m="25" aria-pressed="true">pomodoro</button><button class="tab" type="button" data-m="5" aria-pressed="false">short break</button><button class="tab" type="button" data-m="15" aria-pressed="false">long break</button></div>
   <div class="clock" id="clock" role="timer" aria-live="off">25:00</div>
   <div class="pbtn"><button type="button" id="pStart">start</button><button type="button" class="ghost" id="pReset" aria-label="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button></div>
@@ -396,6 +401,26 @@ const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):
 function leftLabel(iso){const d=T.daysUntil(iso,now);return d<0?{t:(-d)+'d late',c:'late'}:d===0?{t:'Today',c:'today'}:{t:d+'d left',c:''};}
 const PRI={High:0,Medium:1,Low:2};
 function upcoming(){return settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d||a.date.localeCompare(b.date));}
+/* next class in the coming 7 days (today: only ones not started yet) */
+function nextClass(){
+ if(!settings.timetable.length)return null;
+ const d=new Date(now+7*3600000),hm=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
+ for(let i=0;i<8;i++){const iso=T.dayKey(now+i*86400000),list=T.classesOn(settings.timetable,iso).filter(x=>!x.skip&&(i>0||x.start>hm));
+  if(list.length){const p=parts(iso);return {x:list[0],when:i===0?'Today':i===1?'Tomorrow':DAYS[dowOf(iso)].slice(0,3)+' '+p.d+' '+MO[p.m].slice(0,3)};}}
+ return null;
+}
+/* readiness for an exam: questions answered right in its chapters out of all questions there */
+function readiness(e){const s=summaries[e.course];if(!s||!e.cats.length)return null;let q=0,r=0;for(const id of e.cats){const x=s.per[id];if(x){q+=x.quiz;r+=x.correct;}}return q?Math.round(r/q*100):null;}
+let heroClock=0;
+function renderHero(ne){
+ const el=$('#heroExam');clearInterval(heroClock);
+ if(!ne){const paint=()=>{const d=new Date(Date.now()+7*3600000);el.innerHTML='<div class="hx-clock">'+String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0')+'</div><p class="hx-m">No exams coming up · <a href="calendar.html">Add one in Calendar</a></p>';};paint();heroClock=setInterval(paint,30000);return;}
+ const c=course(ne.course),r=readiness(ne),rest=upcoming().slice(1,3),seg=r==null?0:Math.round(r/20);
+ el.innerHTML='<a class="hx-top" href="#exams"><span class="hx-n">'+(ne.d===0?'0':ne.d)+'</span><span class="hx-t"><span>'+(ne.d===0?'Exam today':ne.d===1?'day to':'days to')+'</span><b>'+esc(ne.title)+'</b></span></a>'
+  +'<p class="hx-m">'+esc(DAYS[dowOf(ne.date)].slice(0,3)+' '+shortDay(ne.date))+(c?' · '+esc(c.name):'')+(ne.cats.length&&c&&data[c.key]?' · '+ne.cats.length+' chapter'+(ne.cats.length>1?'s':''):'')+'</p>'
+  +(r==null?'':'<div class="hx-r"><span class="k">Ready</span><span class="meter" role="img" aria-label="Ready '+r+'%: questions right in the exam chapters">'+[1,2,3,4,5].map(i=>'<i class="'+(i<=seg?'on':'')+(i===seg?' here':'')+'"></i>').join('')+'</span><b>'+r+'%</b></div>')
+  +(rest.length?'<p class="hx-next">Then '+rest.map(e=>'<b>'+esc((course(e.course)||{}).name||e.title)+'</b> '+e.d+'d').join(' · ')+'</p>':'');
+}
 function renderChips(){
  const dueTotal=Object.values(summaries).reduce((n,s)=>n+(s?s.reviewNow:0),0);
  const open=st.tasks.filter(t=>!t.done),late=open.filter(t=>t.date<today).length,ne=upcoming()[0];
@@ -405,8 +430,11 @@ function renderChips(){
  const qd=T.COURSES.map(c=>({c,n:window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0})).sort((a,b)=>b.n-a.n),quizDue=qd.reduce((n,x)=>n+x.n,0),qTop=qd[0];
  const cells=['<a class="sb" href="'+(quizDue?link(qTop.c,'prac')+'&review=1':dueTotal&&!FOCUS?link(top,'cards'):'practice.html')+'"><span class="n">'+quizDue+'</span><span class="l">Quiz review</span><span class="s">'+(quizDue?esc(qTop.c.name)+' has '+qTop.n+(dueTotal&&!FOCUS?' · '+dueTotal+' cards due':''):dueTotal&&!FOCUS?dueTotal+' cards due':'All caught up')+'</span></a>',
   '<a class="sb'+(late?' alert':'')+'" href="#tasks"><span class="n">'+open.length+'</span><span class="l">Tasks</span><span class="s">'+(late?late+' late':open.length?'Open':'Nothing open')+'</span></a>'];
- if(ne){const c=course(ne.course);cells.push('<a class="sb next'+(ne.d<=3?' alert':'')+'" href="#exams" aria-label="Next exam: '+esc(ne.title)+'"><span class="bub"><span class="fx">'+esc(ne.title)+(ne.d===0?'':' in')+'</span><span class="n">'+(ne.d===0?'Today!':ne.d+'<small>'+(ne.d===1?'day':'days')+'</small>'+(ne.d<=3?'!':''))+'</span></span><span class="s">'+esc(shortDay(ne.date))+(c?' · '+esc(c.name):'')+'</span></a>');}
- else cells.push('<a class="sb next" href="calendar.html"><span class="bub"><span class="fx">No exams coming up</span></span><span class="s">Add one in Calendar</span></a>');
+ /* the next exam is the hero (renderHero); the third cell is the next class from the timetable */
+ const nc=nextClass();
+ cells.push(nc?'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="w">'+esc(nc.when)+' · '+nc.x.start+'</span><span class="nm">'+esc(nc.x.name)+'</span>'+(nc.x.code?'<span class="s">'+esc(nc.x.code)+'</span>':'')+'</a>'
+  :'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="nm">'+(settings.timetable.length?'None this week':'No timetable')+'</span><span class="s">'+(settings.timetable.length?'Open Calendar':'Import it in Calendar')+'</span></a>');
+ renderHero(ne);
  const chips=cells;
  $('#chips').innerHTML=chips.join('');
 }
