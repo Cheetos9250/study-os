@@ -68,7 +68,7 @@ test('Ask AI why links on wrong answers: course engine, Cram Mode, mock exam, Mi
  const en=rd('scripts/study-course-engine.js');
  assert.match(en,/\(ok\?'':askAI\(q,ch\)\)/);assert.match(en,/askAI\(q,wrong\?mine:undefined\)/);
  assert.match(en,/href="tutor\.html\?course='\+encodeURIComponent\(D\.key\)/);
- for(const f of ['acc','eco','math','eng','zh'])assert.match(rd(f+'.html'),/study-course-engine\.js\?v=12/);
+ for(const f of ['acc','eco','math','eng','zh'])assert.match(rd(f+'.html'),/study-course-engine\.js\?v=13/);
  assert.match(rd('mock.html'),/Ask AI why<\/a>/);assert.match(rd('mistakes.html'),/Ask AI why<\/a>/);
  /* the prompt is built from the question data, never sends anything by itself */
  const fn=en.match(/function askPrompt\(q,mine\)\{[\s\S]*?; \}\n/)[0]+'return askPrompt;';
