@@ -209,7 +209,7 @@ let qtype='mcq'; /* written questions are hidden from Practice (owner, 21 Nov 20
 const typeOk=q=>(!q.open||(qJump!==null&&String(q.id)===String(qJump))); /* written questions stay out of Practice (owner, 21 Nov 2026); a ?q= link to one still opens it */
 let qcats=new Set(), missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
 URL_CATS.forEach(id=>qcats.add(id));
-/* question sets (scripts/study-qsets.js): repeats hidden, ≤50 questions a set, 3 sets a chapter, the next set opens at 90% mastered.
+/* question sets (scripts/study-qsets.js): repeats hidden, ≤50 questions a set, 3 sets a chapter, the next set opens at 90% answered right.
    Not applied to Review due, Missed, deep links (?q=) or Cram Mode, so nothing you need to redo is ever hidden. */
 let qset=(()=>{try{const v=sessionStorage.getItem('studyos.'+D.key+'.qset');return v==='all'?'all':/^[0-9]$/.test(v||'')?+v:'auto';}catch(e){return 'auto';}})();
 /* topic filter (scripts/acc-topics.js, acc only): with exactly one chapter chosen, narrow the questions to a topic. Nothing is stored. */
@@ -236,9 +236,9 @@ function setsRow(){
   if(!setsOn())return '';
   const SM=StudyQSets.build(QS.filter(q=>!q.gen)),one=qcats.size===1?[...qcats][0]:null;
   if(one&&SM.sets[one]){const pr=StudyQSets.progress(SM.sets[one],store),cur=qset==='auto'?pr.current:qset;
-    return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px">'+pr.sets.map((x,k)=>'<button class="chip" type="button" data-qset="'+k+'" aria-pressed="'+(qset!=='all'&&cur===k)+'"'+(x.open?'':' disabled title="Opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of set '+k+' is mastered"')+'>Set '+(k+1)+(x.done?' ✓':x.open?'':' 🔒')+'<span class="n">'+x.mastered+'/'+x.n+'</span></button>').join('')
+    return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px">'+pr.sets.map((x,k)=>'<button class="chip" type="button" data-qset="'+k+'" aria-pressed="'+(qset!=='all'&&cur===k)+'"'+(x.open?'':' disabled title="Opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of set '+k+' is answered right"')+'>Set '+(k+1)+(x.done?' ✓':x.open?'':' 🔒')+'<span class="n">'+x.right+'/'+x.n+'</span></button>').join('')
      +'<button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All</button></div>'
-     +'<div class="count" style="margin:-2px 0 10px">Mastered = right twice in a row. The next set opens at '+Math.round(StudyQSets.UNLOCK*100)+'%.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';}
+     +'<div class="count" style="margin:-2px 0 10px">The next set opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of this set is answered right.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';}
   return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px"><button class="chip" type="button" data-qset="auto" aria-pressed="'+(qset!=='all')+'">Current set of each chapter</button><button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All questions</button></div>'
    +'<div class="count" style="margin:-2px 0 10px">Each chapter has sets of 50 questions (one set when it has 50 or fewer); pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
 }

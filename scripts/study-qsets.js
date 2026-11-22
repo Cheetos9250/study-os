@@ -1,6 +1,6 @@
 /* Question sets per chapter (owner, 18 Nov 2026): no repeated questions, at most 50 (owner, 21 Nov 2026) and at least 10 questions in a set,
    sets of 50 per chapter (one set when a chapter has 50 or fewer). Set 1 is open; the next set opens when 90% of the current set is
-   "mastered" — answered right at least twice in a row (review box ≥ 2 in study-<course>.rv).
+   answered right (owner, 22 Nov 2026; before: mastered = right twice in a row). Right = review box ≥ 1 in study-<course>.rv (box 0 = wrong now).
    Pure functions; the course engine uses them to filter the deck. Nothing is stored: answers stay where they are,
    and hidden repeats keep their saved answers. */
 (function(root,factory){
@@ -9,7 +9,7 @@
  if(root)root.StudyQSets=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const MAX=50,MIN=10,SETS=3,MASTER_BOX=2,UNLOCK=0.9;
+ const MAX=50,MIN=10,SETS=3,MASTER_BOX=2,RIGHT_BOX=1,UNLOCK=0.9;
  /* same question = same words, ignoring case, spaces, punctuation and option order */
  function norm(t){return String(t||'').toLowerCase().normalize('NFKC').replace(/\*\*/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();}
  /* qs: [{id, cat, q, open}] in practice order → {hidden:Set(ids), sets:{cat:[[ids]…]}, setOf:{id:index}} */
@@ -24,11 +24,12 @@
   return {hidden,sets,setOf};
  }
  function mastered(store,id){const r=store&&store.rv&&store.rv[id];return Array.isArray(r)&&Number(r[0])>=MASTER_BOX;}
- /* per chapter: each set's size, mastered count, done flag, open flag; current = first open set not done (or the last) */
+ function right(store,id){const r=store&&store.rv&&store.rv[id];return Array.isArray(r)&&Number(r[0])>=RIGHT_BOX;}
+ /* per chapter: each set's size, right count, mastered count, done flag, open flag; current = first open set not done (or the last) */
  function progress(sets,store){
   const out=[];let open=true;
-  for(const ids of sets||[]){const m=ids.filter(id=>mastered(store,id)).length,done=ids.length>0&&m/ids.length>=UNLOCK;
-   out.push({n:ids.length,mastered:m,done,open});open=open&&done;}
+  for(const ids of sets||[]){const m=ids.filter(id=>mastered(store,id)).length,rt=ids.filter(id=>right(store,id)).length,done=ids.length>0&&rt/ids.length>=UNLOCK;
+   out.push({n:ids.length,mastered:m,right:rt,done,open});open=open&&done;}
   let current=out.findIndex(s=>s.open&&!s.done);if(current<0)current=Math.max(0,out.length-1);
   return {sets:out,current};
  }
@@ -40,5 +41,5 @@
    ks.forEach(k=>(list[k]||[]).forEach(id=>ok.add(id)));}
   return ok;
  }
- return {MAX,MIN,SETS,MASTER_BOX,UNLOCK,norm,build,mastered,progress,allowed};
+ return {MAX,MIN,SETS,MASTER_BOX,RIGHT_BOX,UNLOCK,norm,build,mastered,right,progress,allowed};
 });

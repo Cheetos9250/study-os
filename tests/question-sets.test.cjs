@@ -1,4 +1,4 @@
-/* Question sets: repeats hidden, 10–50 questions a set, 3 sets a chapter (more over 150), next set opens at 90% mastered (box ≥ 2). */
+/* Question sets: repeats hidden, 10–50 questions a set, 3 sets a chapter (more over 150), next set opens at 90% answered right (box ≥ 1). */
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const Q=require('../scripts/study-qsets.js'),R=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const mk=(n,cat='c1',pre='q')=>[...Array(n)].map((_,i)=>({id:pre+i,cat,q:'Question number '+pre+i}));
@@ -23,7 +23,7 @@ test('engine: sets never hide Review due, Missed, deep links or Cram Mode; pages
   const e=R('scripts/study-course-engine.js');
   assert.match(e,/const setsOn=\(\)=>!!window\.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;/);
   assert.match(e,/\(!SM\|\|q\.open\|\|q\.gen\|\|\(!SM\.hidden\.has\(String\(q\.id\)\)&&okSet\.has\(String\(q\.id\)\)\)\)/);
-  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=2"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=\d+"/);
+  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=3"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=\d+"/);
 });
 test('deep links never untick a chapter the engine already selected from ?cat=',()=>{
   const src=R('scripts/study-course-nav.js');
