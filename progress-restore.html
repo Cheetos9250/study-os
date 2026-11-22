@@ -89,6 +89,7 @@
     if (key === "studyos.excel.v1") return "Excel lesson progress";
     if (key === "studyos.pomolog.v1") return "Pomodoro history";
     if (key === "studyos.jedrill.v1") return "JE Drill score";
+    if (key === "studyos.desk.v1") return "Desk display events and settings";
     var courses = {acc:"Accounting",eco:"Economics",math:"Mathematics",eng:"English",zh:"Chinese"};
     if (key.startsWith("study-")) return courses[key.slice(6)] + " quiz history";
     var prefix = key.replace(/-(srs|typ)$/, "");

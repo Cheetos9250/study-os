@@ -13,6 +13,7 @@
  var MORE=[
   {href:'grades.html',label:'Grades',icon:'grades'},
  {href:'stats.html',label:'Stats',icon:'stats'},
+  {href:'desk.html',label:'Desk display',icon:'desk'},
   {href:'tutor.html',label:'AI tutor',icon:'tutor'},
   {href:'progress-backup.html',label:'Back up',icon:'backup'},
   {href:'progress-restore.html',label:'Restore',icon:'restore'}
@@ -33,6 +34,7 @@
   search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20.5 20.5"/>',
   tutor:'<path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5A1.5 1.5 0 0 1 19 17h-7l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/><path d="M9 11.2h.01M12 11.2h.01M15 11.2h.01"/>',
   stats:'<path d="M4 19.5h16"/><path d="M4 15l4.5-4.5 3.5 3 7-7.5"/><path d="M15 6h4v4"/>',
+  desk:'<rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M9 20h6M12 16.5V20"/>',
   grades:'<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
   backup:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/>',
   restore:'<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4.5 17.5v2h15v-2"/>',
