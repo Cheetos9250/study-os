@@ -92,6 +92,24 @@
         ],
         "createdAt": "2026-11-15T06:52:26.948Z",
         "reason": "notebook tabs are a segmented control with flush buttons by design"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "assets/study-eink.css"
+        ],
+        "createdAt": "2026-11-22T05:15:52.660Z",
+        "reason": "agent: false positive, L129 is the checkbox tick drawn with border-left+border-bottom rotated 45deg on a 10x5px ::after, not a card accent"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "assets/study-eink.css"
+        ],
+        "createdAt": "2026-11-22T05:15:52.667Z",
+        "reason": "agent: false positive, L129 is the checkbox tick drawn with border-left+border-bottom rotated 45deg on a 10x5px ::after, not a card accent"
       }
     ]
   }
