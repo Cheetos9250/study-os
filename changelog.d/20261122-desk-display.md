@@ -1,0 +1,5 @@
+## 2026-11-22 (Desk display)
+- New page `desk.html` (nav → More → Desk display): a 5-page desk display for an iPad or phone, installable as its own Home Screen app (`desk.webmanifest`, start page `desk.html`). Pages: Home (clock, outside temperature, PM2.5, upcoming), Air quality (list of places), Calendar (month + agenda, add/edit/delete own events, **Move** steps the selected day), Study (today's classes, exam countdown, open tasks), Weather (today, 3-day forecast, cat). Buttons **Update** and **Next**; swipe, arrow keys and 1-5 also work. Optional auto-rotate and keep-screen-on in the gear settings.
+- Exams, tasks and the timetable are read from the existing `studyos.today.v1` / `studyos.home.v1` (read only). Own events, city, air-quality list and options live in the new key `studyos.desk.v1` (backed up, validated on restore, not cloud-synced yet). `studyos.desk.cache.v1` keeps the last weather answer for offline use (not backed up).
+- Weather and PM2.5 come from Open-Meteo (no key; only coordinates are sent). PM2.5 bands follow the Thai 24 h scale. Default place Sathorn, Bangkok; change it and the list in settings.
+- Tests: tests/desk-display.test.cjs.

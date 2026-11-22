@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;display=swap">
+<meta name="description" content="Study OS Desk — clock, weather, air quality, calendar">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="desk.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Desk">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Desk — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=1">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--ui);-webkit-text-size-adjust:100%;overscroll-behavior:none}
+button{font:inherit;color:inherit;cursor:pointer}
+#screen{position:fixed;inset:0;container-type:size;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#frame{--u:min(1cqw,1.3333cqh);position:absolute;inset:max(.4cqw,3px);display:flex;flex-direction:column;border:calc(var(--u)*.9) solid var(--line);border-radius:calc(var(--u)*1.2);background:var(--panel);overflow:hidden}
+@media(max-aspect-ratio:1/1){#frame{--u:1.18cqw}}
+/* ---- header bar ---- */
+#bar{flex:none;display:flex;align-items:center;gap:calc(var(--u)*2);height:calc(var(--u)*10);padding:0 calc(var(--u)*3);background:var(--ink);color:var(--paper)}
+#barL{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:calc(var(--u)*.7)}
+#barTitle{font:700 calc(var(--u)*4.2)/1 var(--num);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stale{font:700 calc(var(--u)*2)/1 var(--ui);opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{flex:none;display:inline-flex;align-items:center;gap:calc(var(--u)*1.2);height:calc(var(--u)*6.4);min-width:44px;padding:0 calc(var(--u)*2.6);border:0;border-radius:999px;background:var(--paper);color:var(--ink);font:900 calc(var(--u)*3.1)/1 var(--ui)}
+.pill:active{transform:scale(.96)}
+.pill svg{width:calc(var(--u)*3);height:calc(var(--u)*3);fill:currentColor}
+#dots{flex:1 1 0;display:flex;justify-content:flex-end;gap:calc(var(--u)*1.3)}
+#dots i{width:calc(var(--u)*2);height:calc(var(--u)*2);min-width:8px;min-height:8px;border:2px solid var(--paper);border-radius:50%;opacity:.8}
+#dots i.on{background:var(--paper);opacity:1}
+@media(max-aspect-ratio:1/1){#barTitle{font-size:calc(var(--u)*5)}.pill{height:calc(var(--u)*7.6);font-size:calc(var(--u)*3.6)}#dots{display:none}}
+/* ---- pages ---- */
+.pg{flex:1;min-height:0;display:none;position:relative}
+.pg.on{display:flex}
+.num{font-family:var(--num);font-weight:700;font-feature-settings:"tnum"}
+.muted{color:var(--muted)}
+.box{min-width:0;min-height:0;position:relative}
+.lbl{font:900 calc(var(--u)*2.9)/1.2 var(--ui)}
+.val{font:700 calc(var(--u)*3.3)/1.3 var(--ui)}
+svg.ic{display:block;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+/* ---- 0 home ---- */
+#p0{flex-direction:column}
+#clockBox{flex:none;height:calc(var(--u)*29);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*1);border-bottom:calc(var(--u)*.5) solid var(--line)}
+#time{font-size:calc(var(--u)*17);line-height:1;letter-spacing:calc(var(--u)*-.4)}
+#wxLine{display:flex;align-items:center;gap:calc(var(--u)*1.6);font:700 calc(var(--u)*3.5)/1.2 var(--ui)}
+#wxLine svg{width:calc(var(--u)*5.6);height:calc(var(--u)*5.6)}
+#homeRow{flex:1;min-height:0;display:flex}
+#pmCard{flex:1.05;min-width:0;padding:calc(var(--u)*2.4) calc(var(--u)*3);display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;column-gap:calc(var(--u)*2);border-right:calc(var(--u)*.5) solid var(--line)}
+#pmCard .where{grid-column:1/3;display:flex;align-items:center;gap:calc(var(--u)*1.2);font:900 calc(var(--u)*3)/1.2 var(--ui)}
+#pmCard .where svg{width:calc(var(--u)*3.6);height:calc(var(--u)*3.6);flex:none}
+#pmBadge{display:inline-block;align-self:start;margin-top:calc(var(--u)*1);padding:calc(var(--u)*.7) calc(var(--u)*2);border-radius:999px;background:var(--ink);color:var(--paper);font:900 calc(var(--u)*2.8)/1.2 var(--ui);max-width:100%}
+#pmNum{align-self:center;justify-self:end;font-size:calc(var(--u)*15);line-height:1}
+.pmUnit{font:700 calc(var(--u)*2.6)/1.3 var(--ui);color:var(--muted)}
+#pmBars{grid-column:1/3;display:flex;align-items:flex-end;gap:calc(var(--u)*1.4);height:calc(var(--u)*5.5)}
+#pmBars b{flex:1;border:calc(var(--u)*.45) solid var(--line);border-radius:calc(var(--u)*1.4);min-height:calc(var(--u)*1.2);background:repeating-linear-gradient(-45deg,var(--halftone) 0 1.5px,transparent 1.5px 5px);position:relative}
+#pmBars b.now::after{content:"";position:absolute;left:50%;top:calc(var(--u)*-2.2);transform:translateX(-50%);border:calc(var(--u)*1) solid transparent;border-top:calc(var(--u)*1.4) solid var(--ink);border-bottom:0}
+#upBox{flex:1;min-width:0;padding:calc(var(--u)*2.4) calc(var(--u)*3);display:flex;flex-direction:column;gap:calc(var(--u)*1);overflow:hidden}
+.sech{display:flex;align-items:center;gap:calc(var(--u)*1.6);font:900 calc(var(--u)*3)/1.2 var(--ui)}
+.sech::after{content:"";flex:1;border-top:2px dotted var(--halftone)}
+.ev{display:flex;gap:calc(var(--u)*1.6);align-items:baseline;min-width:0;font:700 calc(var(--u)*3.3)/1.3 var(--ui)}
+.ev .t{flex:none;color:var(--muted);font-size:calc(var(--u)*2.8)}
+.ev .n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev .k{flex:none;font:900 calc(var(--u)*2.2)/1 var(--ui);padding:calc(var(--u)*.5) calc(var(--u)*1.1);border:2px solid var(--line);border-radius:calc(var(--u)*.8)}
+.ev .k.late{background:var(--hi);color:var(--hi-t);border-color:var(--hi-t)}
+.dh{font:900 calc(var(--u)*2.9)/1.2 var(--ui);margin-top:calc(var(--u)*.8);display:flex;gap:calc(var(--u)*1.4);align-items:center}
+.dh::after{content:"";flex:1;border-top:2px dotted var(--halftone)}
+.empty{color:var(--muted);font:700 calc(var(--u)*3)/1.4 var(--ui);padding:calc(var(--u)*1) 0}
+/* ---- 1 air ---- */
+#p1{flex-direction:column;padding:calc(var(--u)*1.2) calc(var(--u)*3)}
+#aqList{flex:1;min-height:0;display:flex;flex-direction:column}
+.aqr{flex:1;min-height:0;display:flex;align-items:center;gap:calc(var(--u)*2.4);border-bottom:2px dotted var(--halftone)}
+.aqr:last-child{border-bottom:0}
+.aqv{flex:none;width:calc(var(--u)*11);text-align:center;border:calc(var(--u)*.5) solid var(--line);border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*.4) 0;font:700 calc(var(--u)*3.8)/1.25 var(--num)}
+.aqv.na{color:var(--muted);border-style:dashed}
+.aqn{flex:1;min-width:0;font:700 calc(var(--u)*4.4)/1.2 var(--ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aql{flex:none;font:900 calc(var(--u)*2.7)/1.2 var(--ui);color:var(--muted);text-align:right}
+.aqf{flex:none;display:flex;justify-content:space-between;padding-top:calc(var(--u)*.8);font:700 calc(var(--u)*2.5)/1.2 var(--ui);color:var(--muted)}
+/* ---- 2 calendar ---- */
+#p2{flex-direction:row}
+#calBox{flex:1.35;min-width:0;padding:calc(var(--u)*1.6) calc(var(--u)*1.8);display:flex;flex-direction:column;border-right:calc(var(--u)*.5) solid var(--line)}
+#dowRow,#grid{display:grid;grid-template-columns:repeat(7,1fr)}
+#dowRow{font:900 calc(var(--u)*3)/1.4 var(--ui);text-align:center;padding-bottom:calc(var(--u)*.6)}
+#grid{flex:1;min-height:0;grid-auto-rows:1fr}
+.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.4);min-width:0;min-height:44px;border:0;background:none;border-radius:calc(var(--u)*1.6);font:700 calc(var(--u)*4)/1 var(--num);position:relative;padding:0}
+.cell.sun{background:repeating-linear-gradient(-45deg,var(--halftone) 0 1.5px,transparent 1.5px 4px)}
+.cell.sel{outline:calc(var(--u)*.55) solid var(--line);outline-offset:calc(var(--u)*-.55)}
+.cell.today{background:var(--ink);color:var(--paper)}
+.cell i{width:calc(var(--u)*1.4);height:calc(var(--u)*1.4);min-width:5px;min-height:5px;border-radius:50%;background:currentColor;visibility:hidden}
+.cell.has i{visibility:visible}
+#agBox{flex:1;min-width:0;padding:calc(var(--u)*2) calc(var(--u)*2.4);display:flex;flex-direction:column;gap:calc(var(--u)*.6);overflow:hidden}
+#agList{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:calc(var(--u)*.9)}
+#agFoot{flex:none;display:flex;align-items:center;gap:calc(var(--u)*1.6);font:700 calc(var(--u)*2.6)/1.2 var(--ui);color:var(--muted)}
+.add{flex:none;margin-left:auto;height:calc(var(--u)*6);min-width:44px;padding:0 calc(var(--u)*2.6);border:calc(var(--u)*.45) solid var(--line);border-radius:999px;background:var(--panel);font:900 calc(var(--u)*2.9)/1 var(--ui)}
+.agrow{display:flex;gap:calc(var(--u)*1.4);align-items:baseline;min-width:0;padding:0;border:0;background:none;text-align:left;font:700 calc(var(--u)*3.3)/1.3 var(--ui)}
+.agrow::before{content:"";flex:none;width:calc(var(--u)*1.5);height:calc(var(--u)*1.5);border-radius:50%;background:var(--ink);align-self:center}
+.agrow.class::before{background:none;border:2px solid var(--ink)}
+.agrow .t{flex:none;color:var(--muted);font-size:calc(var(--u)*2.8)}
+.agrow .n{min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+@media(max-aspect-ratio:1/1){#homeRow{flex-direction:column}#pmCard{border-right:0;border-bottom:calc(var(--u)*.5) solid var(--line)}#clockBox{flex:.75;height:auto}#pmCard{flex:.7}#upBox{flex:1.1}#time{font-size:calc(var(--u)*24)}.fcd{font-size:calc(var(--u)*3)}.fcd svg{width:calc(var(--u)*7);height:calc(var(--u)*7)}#p2{flex-direction:column}#calBox{flex:none;height:62%;border-right:0;border-bottom:calc(var(--u)*.5) solid var(--line)}}
+/* ---- 3 study ---- */
+#p3{flex-direction:row}
+#clsBox,#cdBox{flex:1;min-width:0;padding:calc(var(--u)*2.2) calc(var(--u)*3);display:flex;flex-direction:column;gap:calc(var(--u)*1.4);overflow:hidden}
+#clsBox{border-right:calc(var(--u)*.5) solid var(--line)}
+.cls{display:flex;gap:calc(var(--u)*2);align-items:center;padding:calc(var(--u)*1) calc(var(--u)*1.6);border:calc(var(--u)*.45) solid var(--line);border-radius:calc(var(--u)*1.6)}
+.cls.now{background:var(--ink);color:var(--paper)}
+.cls.past{opacity:.45}
+.cls .t{flex:none;font:700 calc(var(--u)*3)/1.2 var(--num)}
+.cls .n{flex:1;min-width:0;font:700 calc(var(--u)*3.4)/1.25 var(--ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd{display:flex;align-items:center;gap:calc(var(--u)*2.2)}
+.cd .d{flex:none;min-width:calc(var(--u)*13);text-align:center;border:calc(var(--u)*.5) solid var(--line);border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*.6) calc(var(--u)*1);font:700 calc(var(--u)*6)/1.1 var(--num)}
+.cd .d small{display:block;font:900 calc(var(--u)*2.2)/1.1 var(--ui);color:var(--muted)}
+.cd .n{flex:1;min-width:0;font:700 calc(var(--u)*3.4)/1.25 var(--ui)}
+.cd .n small{display:block;font:700 calc(var(--u)*2.6)/1.2 var(--ui);color:var(--muted)}
+.stat{display:flex;gap:calc(var(--u)*1.6);align-items:baseline;font:700 calc(var(--u)*3.4)/1.3 var(--ui);margin-top:auto}
+.stat b{font:700 calc(var(--u)*6)/1 var(--num)}
+@media(max-aspect-ratio:1/1){#p3{flex-direction:column}#clsBox{border-right:0;border-bottom:calc(var(--u)*.5) solid var(--line)}}
+/* ---- 4 weather ---- */
+#p4{flex-direction:column}
+#wxTop{flex:1.5;min-height:0;display:flex}
+#wxMain{flex:1.1;min-width:0;padding:calc(var(--u)*2) calc(var(--u)*3);display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*1.2)}
+#wxBig{display:flex;align-items:center;gap:calc(var(--u)*3)}
+#wxBig svg{width:calc(var(--u)*17);height:calc(var(--u)*17);flex:none}
+#wxTemp{font-size:calc(var(--u)*17);line-height:1}
+#wxDesc{font:900 calc(var(--u)*4)/1.2 var(--ui)}
+#wxHL{font:700 calc(var(--u)*3.4)/1.2 var(--ui);color:var(--muted)}
+#wxIn{align-self:flex-start;padding:calc(var(--u)*1) calc(var(--u)*2.6);border:calc(var(--u)*.45) solid var(--line);border-radius:calc(var(--u)*2);font:700 calc(var(--u)*3.2)/1.2 var(--ui)}
+#catBox{flex:.9;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*1.2);padding:calc(var(--u)*1.4) calc(var(--u)*2)}
+#catBox svg{flex:1;min-height:0;width:100%;max-width:calc(var(--u)*30)}
+#bubble{position:relative;width:100%;padding:calc(var(--u)*1.2) calc(var(--u)*2.2);border:calc(var(--u)*.45) solid var(--line);border-radius:calc(var(--u)*2.4);text-align:center;font:700 calc(var(--u)*2.9)/1.25 var(--ui);background:var(--panel)}
+#fc{flex:1;min-height:0;display:flex;border-top:calc(var(--u)*.5) solid var(--line)}
+.fcd{flex:1;min-width:0;display:grid;grid-template-columns:1fr auto;align-content:center;padding:calc(var(--u)*1.4) calc(var(--u)*2.6);border-right:calc(var(--u)*.45) solid var(--line);font:700 calc(var(--u)*3.4)/1.45 var(--ui)}
+.fcd:last-child{border-right:0}
+.fcd .dn{font:900 calc(var(--u)*3.6)/1.3 var(--ui)}
+.fcd svg{grid-column:2;grid-row:1/4;align-self:center;width:calc(var(--u)*9);height:calc(var(--u)*9)}
+@media(max-aspect-ratio:1/1){#wxTop{flex-direction:column}#catBox{flex:none;height:46%}#fc{flex:none;height:22%}}
+/* ---- status, floating controls ---- */
+#gear,#home{position:fixed;z-index:5;display:grid;place-items:center;min-width:44px;min-height:44px;border:0;border-radius:50%;background:transparent;color:var(--muted);opacity:.0;transition:opacity .2s}
+#gear{right:6px;bottom:6px}#home{left:6px;bottom:6px;text-decoration:none}
+#screen:hover~#gear,#screen:hover~#home,#gear:focus-visible,#home:focus-visible,body.touch #gear,body.touch #home{opacity:.75}
+#gear svg,#home svg{width:22px;height:22px}
+/* ---- dialogs ---- */
+dialog{width:min(92vw,480px);max-height:88dvh;padding:0;border:3px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);font-family:var(--ui)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog form{display:flex;flex-direction:column;gap:12px;padding:18px}
+dialog h2{margin:0;font:700 22px/1.2 var(--num)}
+dialog label{display:flex;flex-direction:column;gap:4px;font:900 13px/1.2 var(--ui)}
+dialog input[type=text],dialog input[type=date],dialog input[type=time],dialog input[type=search],dialog select{min-height:44px;padding:0 10px;border:2px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);font:500 16px var(--ui)}
+dialog .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+dialog .row>*{flex:1;min-width:120px}
+dialog .btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+dialog .btn{min-height:44px;padding:0 18px;border:2px solid var(--line);border-radius:6px;background:var(--panel);font:900 14px var(--ui)}
+dialog .btn.main{background:var(--ink);color:var(--paper)}
+dialog .btn.warn{color:var(--red);border-color:var(--red)}
+dialog .hint{margin:0;font:500 13px/1.45 var(--ui);color:var(--muted)}
+.chk{flex-direction:row!important;align-items:center;gap:10px!important;font-weight:700!important;min-height:44px}
+.chk input{width:22px;height:22px;accent-color:var(--ink)}
+#cityRes{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+#cityRes button{width:100%;min-height:44px;padding:0 10px;text-align:left;border:2px solid var(--line-soft);border-radius:6px;background:var(--panel);font:700 14px var(--ui)}
+#aqEdit{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none;max-height:26dvh;overflow:auto}
+#aqEdit li{display:flex;align-items:center;gap:8px;font:700 14px var(--ui)}
+#aqEdit li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#aqEdit button{min-width:44px;min-height:44px;border:2px solid var(--line-soft);border-radius:6px;background:var(--panel)}
+</style>
+<script src="scripts/study-theme.js?v=6"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+</head>
+<body>
+<main id="screen" aria-label="Study OS desk display">
+ <div id="frame">
+  <header id="bar">
+   <div id="barL"><h1 id="barTitle" style="margin:0"></h1><div id="stale" aria-live="polite"></div></div>
+   <button id="bLeft" class="pill" type="button"></button>
+   <button id="bNext" class="pill" type="button" aria-label="Next page"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 0.5L9.2 5 1 9.5z"/></svg>Next</button>
+   <div id="dots" aria-hidden="true"></div>
+  </header>
+
+  <section id="p0" class="pg" aria-label="Home">
+   <div id="clockBox"><div id="time" class="num" aria-live="off">--:--</div><div id="wxLine"></div></div>
+   <div id="homeRow">
+    <div id="pmCard" class="box"></div>
+    <div id="upBox" class="box"></div>
+   </div>
+  </section>
+
+  <section id="p1" class="pg" aria-label="Air quality">
+   <div id="aqList"></div>
+  </section>
+
+  <section id="p2" class="pg" aria-label="Calendar">
+   <div id="calBox" class="box"><div id="dowRow"></div><div id="grid" role="grid"></div></div>
+   <div id="agBox" class="box"><div id="agList"></div><div id="agFoot"></div></div>
+  </section>
+
+  <section id="p3" class="pg" aria-label="Study">
+   <div id="clsBox" class="box"></div>
+   <div id="cdBox" class="box"></div>
+  </section>
+
+  <section id="p4" class="pg" aria-label="Weather">
+   <div id="wxTop"><div id="wxMain"></div><div id="catBox"></div></div>
+   <div id="fc"></div>
+  </section>
+ </div>
+</main>
+<a id="home" href="index.html" aria-label="Back to Study OS"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></a>
+<button id="gear" type="button" aria-label="Desk settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg></button>
+
+<dialog id="evDlg" aria-labelledby="evTitle">
+ <form method="dialog" id="evForm">
+  <h2 id="evTitle">New event</h2>
+  <label>Title<input type="text" id="evName" maxlength="80" required autocomplete="off"></label>
+  <div class="row">
+   <label>Date<input type="date" id="evDate" required></label>
+   <label>Time (optional)<input type="time" id="evTime"></label>
+  </div>
+  <div class="btns">
+   <button type="button" class="btn warn" id="evDel" hidden>Delete</button>
+   <button type="button" class="btn" id="evCancel">Cancel</button>
+   <button type="submit" class="btn main">Save</button>
+  </div>
+ </form>
+</dialog>
+
+<dialog id="setDlg" aria-labelledby="setTitle">
+ <form method="dialog" id="setForm">
+  <h2 id="setTitle">Desk settings</h2>
+  <label>Weather and home air quality: <b id="cityNow"></b>
+   <input type="search" id="citySearch" placeholder="Search a city or district" autocomplete="off">
+  </label>
+  <ul id="cityRes"></ul>
+  <label>Air quality list (up to 12)</label>
+  <ul id="aqEdit"></ul>
+  <div class="row">
+   <label>Add to list<input type="search" id="aqSearch" placeholder="Search a place" autocomplete="off"></label>
+  </div>
+  <ul id="aqRes" style="display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none"></ul>
+  <label>Rotate pages automatically
+   <select id="autoSel"><option value="0">Off</option><option value="15">Every 15 s</option><option value="30">Every 30 s</option><option value="60">Every 60 s</option></select>
+  </label>
+  <label class="chk"><input type="checkbox" id="awake"> Keep the screen on</label>
+  <p class="hint">Exams, tasks and classes come from Study OS on this device. Own events are saved on this device and included in Back up. Weather and PM2.5 are model data from Open-Meteo (CAMS), so they can differ from ground stations.</p>
+  <div class="btns">
+   <button type="button" class="btn" id="syncBtn">Cloud sync</button>
+   <button type="button" class="btn" id="studyThemeBtn">Theme</button>
+   <button type="button" class="btn" id="fsBtn">Full screen</button>
+   <button type="submit" class="btn main">Done</button>
+  </div>
+ </form>
+</dialog>
+
+<script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-cloud.js?v=5"></script>
+<script src="scripts/study-desk.js?v=1"></script>
+<script src="scripts/study-desk-ui.js?v=1"></script>
+</body>
+</html>
