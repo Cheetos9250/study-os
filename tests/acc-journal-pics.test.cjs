@@ -1,6 +1,7 @@
 const test=require('node:test'),assert=require('node:assert'),fs=require('fs'),path=require('path');
 const P=require('../scripts/acc-journal-pics.js');
 const rows={}; for(const c of ['c5','c7','c8','c9']) for(const r of JSON.parse(fs.readFileSync(path.join(__dirname,'../data/acc-questions/'+c+'.json'),'utf8'))) rows[r.id]=r;
+{ const g={window:{}}; new Function('window',fs.readFileSync(path.join(__dirname,'../scripts/acc-textbook-mcq.js'),'utf8'))(g.window); for(const x of g.window.ACC_TB_MCQ) rows[x.id]={id:x.id,row:[x.cat,x.q,x.opts,0,x.exp]}; }
 const NAME={sales:/sales journal/i,purchases:/purchases? journal/i,receipts:/cash receipts? journal/i,disbursements:/cash (disbursements?|payments?) journal/i};
 test('every picture file exists and is a valid svg',()=>{ for(const [k,[,f]] of Object.entries(P.FILES)){ const s=fs.readFileSync(path.join(__dirname,'..',f),'utf8'); assert.match(s,/^<svg[^>]*viewBox="0 0 680 \d+"/,k); assert.ok(!/Page\s*\d/.test(s),k+' has no page label'); } });
 test('listed questions exist, are visible and have a journal picture',()=>{ for(const m of [P.BEFORE,P.AFTER]) for(const [id,ks] of Object.entries(m)){ const r=rows[id]; assert.ok(r,'missing '+id); assert.ok(!r.hide,id+' is hidden'); for(const k of ks) assert.ok(P.FILES[k],id+' '+k); } });

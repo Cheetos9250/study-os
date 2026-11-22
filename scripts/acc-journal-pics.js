@@ -5,8 +5,8 @@
 (function(root){
   const FILES={sales:['Sales Journal','assets/journals/sales.svg'],purchases:['Purchases Journal','assets/journals/purchases.svg'],receipts:['Cash Receipts Journal','assets/journals/receipts.svg'],disbursements:['Cash Disbursements Journal','assets/journals/disbursements.svg']};
   const S='sales',P='purchases',R='receipts',D='disbursements';
-  const BEFORE={'28':[S],'x7-10':[S],'ps-114':[P],'ps-116':[S,R],'ps-118':[R],'ps-122':[D],'ps-123':[S],'ps-126':[P],'ps-130':[S],'ps-131':[S],'ps-132':[D],'ps-135':[P],'ps-136':[R],'ps-141':[P],'ps-143':[S],'ps-148':[R],'ps-149':[P],'ps-154':[R],'ps-155':[R],'ps-157':[R],'ps-160':[D],'ps-163':[R],'gd-134':[S],'gd-143':[D],'gd-144':[P],'gd-145':[S],'gd-147':[R],'gd-152':[P],'gd-164':[D],'gd-167':[R],'gd-169':[R],'gd-173':[S]};
-  const AFTER={'x7-4':[S],'x7-5':[R],'x7-6':[P],'x7-7':[D],'ps-113':[R],'ps-120':[D],'ps-129':[R],'ps-133':[R],'ps-140':[S],'ps-146':[D],'gd-126':[D],'gd-142':[S,R],'gd-150':[D],'gd-155':[R],'gd-162':[R],'gd-171':[D]};
+  const BEFORE={'tb-QS-7-6':[S],'tb-E-7-1a':[S],'tb-E-7-1b':[S],'tb-QS-7-7':[R],'tb-E-7-7':[D],'28':[S],'x7-10':[S],'ps-114':[P],'ps-116':[S,R],'ps-118':[R],'ps-122':[D],'ps-123':[S],'ps-126':[P],'ps-130':[S],'ps-131':[S],'ps-132':[D],'ps-135':[P],'ps-136':[R],'ps-141':[P],'ps-143':[S],'ps-148':[R],'ps-149':[P],'ps-154':[R],'ps-155':[R],'ps-157':[R],'ps-160':[D],'ps-163':[R],'gd-134':[S],'gd-143':[D],'gd-144':[P],'gd-145':[S],'gd-147':[R],'gd-152':[P],'gd-164':[D],'gd-167':[R],'gd-169':[R],'gd-173':[S]};
+  const AFTER={'tb-QS-7-5':[S],'tb-QS-7-9':[P],'tb-E-7-2':[D],'tb-E-7-8':[R],'x7-4':[S],'x7-5':[R],'x7-6':[P],'x7-7':[D],'ps-113':[R],'ps-120':[D],'ps-129':[R],'ps-133':[R],'ps-140':[S],'ps-146':[D],'gd-126':[D],'gd-142':[S,R],'gd-150':[D],'gd-155':[R],'gd-162':[R],'gd-171':[D]};
   function keys(id,when){ const m=when==='after'?AFTER:BEFORE; return m[String(id)]||[]; }
   function html(id,when){
     const k=keys(id,when); if(!k.length) return '';
