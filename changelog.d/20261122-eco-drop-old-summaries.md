@@ -1,0 +1,1 @@
+Economics: removed the five old short summary sections (GDP, Inflation & CPI, Unemployment, AD–AS, Growth & Development overviews) now that the full 5-chapter sections cover them. Cards, questions and the Money, Fiscal and Monetary sections are unchanged.
