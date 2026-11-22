@@ -313,7 +313,9 @@ function renderQ(){
   h+='</div>';
   if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+jpics(q,'after')+(ok?'':askAI(q,ch))+'</div>'; }
   }
-  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
+  const scrOn=!!window.StudyScratch&&!q.gen, scrId=D.key+':'+q.id;
+  if(scrOn&&StudyScratch.isOpen()) h+='<div id="scrBox"></div>';
+  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button>'+(scrOn?'<button class="btn" id="qscr" type="button" aria-pressed="'+StudyScratch.isOpen()+'">Scratchpad'+(StudyScratch.has(scrId)?' ✎':'')+'</button>':'')+'<button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
   h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined||reviewFresh(x)?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
   box.innerHTML=h;
   box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); window.StudyReview&&StudyReview.record(store,q.id,store.ans[q.id]===q.right,Date.now()); save(); renderQ(); });
@@ -327,6 +329,8 @@ function renderQ(){
     const gq=$('#tbGotQuick'); if(gq) gq.onclick=()=>mark(0);
     const g=$('#tbGot'); if(g) g.onclick=()=>mark(0); const m=$('#tbMiss'); if(m) m.onclick=()=>mark(1); }
   box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
+  { const sb=$('#qscr'); if(sb) sb.onclick=()=>{ StudyScratch.setOpen(!StudyScratch.isOpen()); renderQ(); };
+    const sx=$('#scrBox'); if(sx) StudyScratch.mount(sx,scrId,has=>{ const b=$('#qscr'); if(b) b.textContent='Scratchpad'+(has?' ✎':''); }); }
   const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};
   wireQ();
 }

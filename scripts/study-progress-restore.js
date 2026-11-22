@@ -151,6 +151,20 @@
         if (!/^[a-z0-9]{2,12}$/.test(jt) || !Array.isArray(tv) || tv.length !== 2 || !tv.every(function (n) { return Number.isInteger(n) && n >= 0; }) || tv[1] > tv[0])
           throw new Error("Invalid JE Drill score");
       }
+    } else if (key === "studyos.scratch.v1") {
+      var scBad = function () { throw new Error("Invalid scratchpad data"); };
+      var scIds = object(value) ? Object.keys(value) : scBad();
+      if (scIds.length > 600) scBad();
+      var scTotal = 0;
+      scIds.forEach(function (sid) {
+        var sl = value[sid];
+        if (!/^[a-z]{2,8}:[A-Za-z0-9_.\-]{1,60}$/.test(sid) || !Array.isArray(sl) || sl.length > 300) scBad();
+        sl.forEach(function (st) {
+          if (!Array.isArray(st) || st.length < 3 || st.length % 2 === 0 || st.length > 6000 || !st.every(function (n) { return typeof n === "number" && isFinite(n); }) || st[0] < 0.5 || st[0] > 40 || st.slice(1).some(function (n) { return n < -100 || n > 2000; })) scBad();
+          scTotal += st.length;
+        });
+        if (scTotal > 600 * 24000) scBad();
+      });
     } else if (key === "studyos.desk.v1") {
       var dkBad = function () { throw new Error("Invalid desk display data"); };
       var dkCity = function (c) {
