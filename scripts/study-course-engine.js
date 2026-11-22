@@ -269,6 +269,7 @@ function renderCram(box){
      +'<p class="qtext">'+rich(q.q)+'</p><div class="explain good"><b class="v">Answer: '+rich(right)+'</b>'+(wrong&&q.opts[mine]!==undefined?'<div class="cram-mine">You chose: '+rich(q.opts[mine])+'</div>':'')+(q.exp?rich(q.exp):'')+askAI(q,wrong?mine:undefined)+'</div></li>'; }).join('')+'</ol>';
   box.innerHTML=h;
 }
+const jpics=(q,when)=>window.AccJournalPics?AccJournalPics.html(q.id,when):'';
 function renderQ(){
   (function(box){ box.innerHTML='';
     [['all','All'],...CATS].forEach(([id,l])=>{
@@ -306,11 +307,11 @@ function renderQ(){
     else { h+='<div class="explain"><b class="v">Solution</b><div class="sos-body">'+StudySosMd(q.solution)+'</div></div>';
       h+= done ? '<div class="count" style="margin-top:8px">'+(ch===q.right?'Marked: got it':'Marked: missed · it will come back in Review due')+'</div>' : '<div class="tb-row"><span class="count">How did you do?</span><button class="btn" id="tbGot" type="button">I got it</button><button class="btn" id="tbMiss" type="button">I missed it</button></div>'; }
   } else {
-  h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
+  h+='<p class="qtext">'+rich(q.q)+'</p>'+jpics(q,'before')+'<div class="opts">';
   q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
     h+='<button type="button" class="'+cls+'" data-oi="'+oi+'" '+(done?'disabled':'')+'><span class="k">'+'ABCD'[k]+'</span><span>'+rich(q.opts[oi])+'</span></button>'; });
   h+='</div>';
-  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+(ok?'':askAI(q,ch))+'</div>'; }
+  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+jpics(q,'after')+(ok?'':askAI(q,ch))+'</div>'; }
   }
   h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
   h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined||reviewFresh(x)?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';

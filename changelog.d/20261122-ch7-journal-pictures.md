@@ -1,0 +1,1 @@
+- Practice (accounting, Ch7 AIS): 32 questions about the Sales, Purchases, Cash Receipts and Cash Disbursements journals show the teacher's slide table under the question. 16 more show it after you answer, because the journal is the answer. Tables are static pictures in `assets/journals/`, listed by question id in `scripts/acc-journal-pics.js`. Nothing new is stored.
