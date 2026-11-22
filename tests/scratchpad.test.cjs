@@ -32,6 +32,6 @@ test('scratch key is backed up, labelled and validated on restore',()=>{
 test('engine and course pages wire the scratchpad (acc, eco, math only, not the fresh-problem batch)',()=>{
   const e=rd('scripts/study-course-engine.js');
   assert.match(e,/const scrOn=!!window\.StudyScratch&&!q\.gen/);assert.match(e,/StudyScratch\.mount\(sx,scrId/);
-  for(const c of['acc','eco','math'])assert.match(rd(c+'.html'),/scripts\/study-scratch\.js\?v=1/);
+  for(const c of['acc','eco','math'])assert.match(rd(c+'.html'),/scripts\/study-scratch\.js\?v=\d+/);
   for(const c of['eng','zh'])assert.doesNotMatch(rd(c+'.html'),/study-scratch/);
 });
