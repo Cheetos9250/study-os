@@ -1,7 +1,7 @@
 import sys,os,json; sys.path.insert(0,os.path.dirname(__file__))
 from sos_lib import *
 
-JOURNALS="Special journals available: Sales journal (S), Purchases journal (P), Cash receipts journal (R), Cash payments journal (D) and General journal (G). Perpetual inventory."
+JOURNALS="Special journals available: Sales journal (S), Purchases journal (P), Cash receipts journal (R), Cash disbursements journal (D) and General journal (G). Perpetual inventory."
 
 add('QS-7-1','Accounting information system components',"""
 Match each item with the AIS component it belongs to: source document, input device, information processor, information storage, or output device.
@@ -249,7 +249,7 @@ Month-end: Dr Merchandise Inventory 7,330, Dr Office Supplies 260, Dr Store Supp
 """)
 check(3180+260+1940+185+2210,7775)
 
-add('E-7-7','Cash payments journal',f"""
+add('E-7-7','Cash disbursements journal',f"""
 {JOURNALS}
 Halo Gifts' July cash payments:
 - **Jul 3** Paid rent, $1,500 (check #401).
@@ -395,19 +395,19 @@ def p_purch_pay(id,co,mon,purch,pays,cashpays):
     lines='\n'.join(f'- **{mon} {d}** Bought {names[a]} on credit from {s}, ${f(x)}'+(' (terms 2/10, n/30).' if a=='inv' else ' (n/30).') for d,s,a,x in purch)
     lines+='\n'+'\n'.join(f'- **{mon} {d}** Paid {s} ${f(x)}'+(f' less {p}% discount.' if p else ' (discount period missed).') for d,s,x,p in pays)
     lines+='\n'+'\n'.join(f'- **{mon} {d}** Paid ${f(x)} — {a}.' for d,a,x in cashpays)
-    chk(id,('Cash payments journal — Cash Cr total',tc),('Schedule of accounts payable total',sum(bal.values())))
+    chk(id,('Cash disbursements journal — Cash Cr total',tc),('Schedule of accounts payable total',sum(bal.values())))
     add(id,'Special journals, subsidiary ledgers and schedule of accounts payable',f"""
 {co} uses a perpetual system. Its {mon} transactions:
 {lines}
 
-1. Record them in a purchases journal and a cash payments journal (checks start at #501).
-2. Total and prove the cash payments journal.
+1. Record them in a purchases journal and a cash disbursements journal (checks start at #501).
+2. Total and prove the cash disbursements journal.
 3. Prepare a schedule of accounts payable at month-end.
 """,f"""
 1. **Purchases journal**
 {T(['Date','Supplier','AP Cr','Inventory Dr','Office Supplies Dr','Store Supplies Dr'],*prow,['**Totals**','','**'+f(tap)+'**','**'+f(tinv)+'**','**'+f(tos)+'**','**'+f(tss)+'**'])}
 
-**Cash payments journal**
+**Cash disbursements journal**
 {T(['Date','Ck','Account debited','Cash Cr','Inventory Cr','Other Dr','AP Dr'],*drow,['**Totals**','','','**'+f(tc)+'**','**'+f(tic)+'**','**'+f(to)+'**','**'+f(tapd)+'**'])}
 
 2. Debits {f(to)} + {f(tapd)} = {f(to+tapd)}; credits {f(tc)} + {f(tic)} = {f(round(tc+tic,2))}. ✓
