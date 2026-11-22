@@ -3,3 +3,4 @@
 - Exams, tasks and the timetable are read from the existing `studyos.today.v1` / `studyos.home.v1` (read only). Own events, city, air-quality list and options live in the new key `studyos.desk.v1` (backed up, validated on restore, not cloud-synced yet). `studyos.desk.cache.v1` keeps the last weather answer for offline use (not backed up).
 - Weather and PM2.5 come from Open-Meteo (no key; only coordinates are sent). PM2.5 bands follow the Thai 24 h scale. Default place Sathorn, Bangkok; change it and the list in settings.
 - Tests: tests/desk-display.test.cjs.
+- Desk display font: rounded heavy sans (M PLUS Rounded 1c) for numbers, titles and text, like the reference device photos.

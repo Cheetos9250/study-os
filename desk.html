@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=M+PLUS+Rounded+1c:wght@700;800;900&amp;display=swap">
 <meta name="description" content="Study OS Desk — clock, weather, air quality, calendar">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -25,12 +25,12 @@
 html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--ui);-webkit-text-size-adjust:100%;overscroll-behavior:none}
 button{font:inherit;color:inherit;cursor:pointer}
 #screen{position:fixed;inset:0;container-type:size;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-#frame{--u:min(1cqw,1.3333cqh);position:absolute;inset:max(.4cqw,3px);display:flex;flex-direction:column;border:calc(var(--u)*.9) solid var(--line);border-radius:calc(var(--u)*1.2);background:var(--panel);overflow:hidden}
+#frame{--u:min(1cqw,1.3333cqh);--num:'M PLUS Rounded 1c','Zen Maru Gothic',system-ui,sans-serif;--ui:'M PLUS Rounded 1c','Zen Maru Gothic',system-ui,sans-serif;position:absolute;inset:max(.4cqw,3px);display:flex;flex-direction:column;border:calc(var(--u)*.9) solid var(--line);border-radius:calc(var(--u)*1.2);background:var(--panel);overflow:hidden}
 @media(max-aspect-ratio:1/1){#frame{--u:1.18cqw}}
 /* ---- header bar ---- */
 #bar{flex:none;display:flex;align-items:center;gap:calc(var(--u)*2);height:calc(var(--u)*10);padding:0 calc(var(--u)*3);background:var(--ink);color:var(--paper)}
 #barL{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:calc(var(--u)*.7)}
-#barTitle{font:700 calc(var(--u)*4.2)/1 var(--num);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#barTitle{font:800 calc(var(--u)*4.2)/1 var(--num);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #stale{font:700 calc(var(--u)*2)/1 var(--ui);opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pill{flex:none;display:inline-flex;align-items:center;gap:calc(var(--u)*1.2);height:calc(var(--u)*6.4);min-width:44px;padding:0 calc(var(--u)*2.6);border:0;border-radius:999px;background:var(--paper);color:var(--ink);font:900 calc(var(--u)*3.1)/1 var(--ui)}
 .pill:active{transform:scale(.96)}
@@ -42,7 +42,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* ---- pages ---- */
 .pg{flex:1;min-height:0;display:none;position:relative}
 .pg.on{display:flex}
-.num{font-family:var(--num);font-weight:700;font-feature-settings:"tnum"}
+.num{font-family:var(--num);font-weight:800;font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .box{min-width:0;min-height:0;position:relative}
 .lbl{font:900 calc(var(--u)*2.9)/1.2 var(--ui)}
@@ -80,7 +80,7 @@ svg.ic{display:block;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linec
 #aqList{flex:1;min-height:0;display:flex;flex-direction:column}
 .aqr{flex:1;min-height:0;display:flex;align-items:center;gap:calc(var(--u)*2.4);border-bottom:2px dotted var(--halftone)}
 .aqr:last-child{border-bottom:0}
-.aqv{flex:none;width:calc(var(--u)*11);text-align:center;border:calc(var(--u)*.5) solid var(--line);border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*.4) 0;font:700 calc(var(--u)*3.8)/1.25 var(--num)}
+.aqv{flex:none;width:calc(var(--u)*11);text-align:center;border:calc(var(--u)*.5) solid var(--line);border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*.4) 0;font:800 calc(var(--u)*3.8)/1.25 var(--num)}
 .aqv.na{color:var(--muted);border-style:dashed}
 .aqn{flex:1;min-width:0;font:700 calc(var(--u)*4.4)/1.2 var(--ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .aql{flex:none;font:900 calc(var(--u)*2.7)/1.2 var(--ui);color:var(--muted);text-align:right}
@@ -91,7 +91,7 @@ svg.ic{display:block;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linec
 #dowRow,#grid{display:grid;grid-template-columns:repeat(7,1fr)}
 #dowRow{font:900 calc(var(--u)*3)/1.4 var(--ui);text-align:center;padding-bottom:calc(var(--u)*.6)}
 #grid{flex:1;min-height:0;grid-auto-rows:1fr}
-.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.4);min-width:0;min-height:44px;border:0;background:none;border-radius:calc(var(--u)*1.6);font:700 calc(var(--u)*4)/1 var(--num);position:relative;padding:0}
+.cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.4);min-width:0;min-height:44px;border:0;background:none;border-radius:calc(var(--u)*1.6);font:800 calc(var(--u)*4)/1 var(--num);position:relative;padding:0}
 .cell.sun{background:repeating-linear-gradient(-45deg,var(--halftone) 0 1.5px,transparent 1.5px 4px)}
 .cell.sel{outline:calc(var(--u)*.55) solid var(--line);outline-offset:calc(var(--u)*-.55)}
 .cell.today{background:var(--ink);color:var(--paper)}
@@ -114,15 +114,15 @@ svg.ic{display:block;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linec
 .cls{display:flex;gap:calc(var(--u)*2);align-items:center;padding:calc(var(--u)*1) calc(var(--u)*1.6);border:calc(var(--u)*.45) solid var(--line);border-radius:calc(var(--u)*1.6)}
 .cls.now{background:var(--ink);color:var(--paper)}
 .cls.past{opacity:.45}
-.cls .t{flex:none;font:700 calc(var(--u)*3)/1.2 var(--num)}
+.cls .t{flex:none;font:800 calc(var(--u)*3)/1.2 var(--num)}
 .cls .n{flex:1;min-width:0;font:700 calc(var(--u)*3.4)/1.25 var(--ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cd{display:flex;align-items:center;gap:calc(var(--u)*2.2)}
-.cd .d{flex:none;min-width:calc(var(--u)*13);text-align:center;border:calc(var(--u)*.5) solid var(--line);border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*.6) calc(var(--u)*1);font:700 calc(var(--u)*6)/1.1 var(--num)}
+.cd .d{flex:none;min-width:calc(var(--u)*13);text-align:center;border:calc(var(--u)*.5) solid var(--line);border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*.6) calc(var(--u)*1);font:800 calc(var(--u)*6)/1.1 var(--num)}
 .cd .d small{display:block;font:900 calc(var(--u)*2.2)/1.1 var(--ui);color:var(--muted)}
 .cd .n{flex:1;min-width:0;font:700 calc(var(--u)*3.4)/1.25 var(--ui)}
 .cd .n small{display:block;font:700 calc(var(--u)*2.6)/1.2 var(--ui);color:var(--muted)}
 .stat{display:flex;gap:calc(var(--u)*1.6);align-items:baseline;font:700 calc(var(--u)*3.4)/1.3 var(--ui);margin-top:auto}
-.stat b{font:700 calc(var(--u)*6)/1 var(--num)}
+.stat b{font:800 calc(var(--u)*6)/1 var(--num)}
 @media(max-aspect-ratio:1/1){#p3{flex-direction:column}#clsBox{border-right:0;border-bottom:calc(var(--u)*.5) solid var(--line)}}
 /* ---- 4 weather ---- */
 #p4{flex-direction:column}
@@ -152,7 +152,7 @@ svg.ic{display:block;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linec
 dialog{width:min(92vw,480px);max-height:88dvh;padding:0;border:3px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);font-family:var(--ui)}
 dialog::backdrop{background:rgba(0,0,0,.5)}
 dialog form{display:flex;flex-direction:column;gap:12px;padding:18px}
-dialog h2{margin:0;font:700 22px/1.2 var(--num)}
+dialog h2{margin:0;font:800 22px/1.2 var(--num)}
 dialog label{display:flex;flex-direction:column;gap:4px;font:900 13px/1.2 var(--ui)}
 dialog input[type=text],dialog input[type=date],dialog input[type=time],dialog input[type=search],dialog select{min-height:44px;padding:0 10px;border:2px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);font:500 16px var(--ui)}
 dialog .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
