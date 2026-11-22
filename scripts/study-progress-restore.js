@@ -167,6 +167,8 @@
       if (value.aq !== undefined && (!Array.isArray(value.aq) || value.aq.length > 12 || !value.aq.every(dkCity))) dkBad();
       if (value.auto !== undefined && [0, 15, 30, 60].indexOf(value.auto) < 0) dkBad();
       if (value.awake !== undefined && typeof value.awake !== "boolean") dkBad();
+      if (value.pages !== undefined && (!Array.isArray(value.pages) || value.pages.length > 8 ||
+          !value.pages.every(function (id) { return ["home", "air", "cal", "study", "wx", "tasks", "week", "prog"].indexOf(id) >= 0; }))) dkBad();
     } else if (key === "studyos.excel.v1") {
       if ((value.done !== undefined && !object(value.done)) || (value.ans !== undefined && !object(value.ans)))
         throw new Error("Invalid Excel lesson progress");

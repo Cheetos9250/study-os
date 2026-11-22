@@ -4,3 +4,5 @@
 - Weather and PM2.5 come from Open-Meteo (no key; only coordinates are sent). PM2.5 bands follow the Thai 24 h scale. Default place Sathorn, Bangkok; change it and the list in settings.
 - Tests: tests/desk-display.test.cjs.
 - Desk display font: rounded heavy sans (M PLUS Rounded 1c) for numbers, titles and text, like the reference device photos.
+
+- Desk display: three more pages, off by default and switched on in settings: **Tasks** (tap to tick; writes only the tick back to `studyos.home.v1`, repeating tasks add their next one), **This week** (weekly timetable) and **Progress** (goal streak, today's questions and WordNest words, focus minutes). Settings has a checkbox per page; `studyos.desk.v1.pages` is validated on restore.

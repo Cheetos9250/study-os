@@ -143,6 +143,39 @@ svg.ic{display:block;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linec
 .fcd .dn{font:900 calc(var(--u)*3.6)/1.3 var(--ui)}
 .fcd svg{grid-column:2;grid-row:1/4;align-self:center;width:calc(var(--u)*9);height:calc(var(--u)*9)}
 @media(max-aspect-ratio:1/1){#wxTop{flex-direction:column}#catBox{flex:none;height:46%}#fc{flex:none;height:22%}}
+/* ---- 5 tasks / 6 week / 7 progress ---- */
+.hd{font:900 calc(var(--u)*3)/1.2 var(--ui);display:flex;align-items:center;gap:calc(var(--u)*1.6)}
+.hd::after{content:"";flex:1;border-top:2px dotted var(--halftone)}
+.big{font-family:var(--num);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.big small{font:800 calc(var(--u)*3.4)/1 var(--ui)}
+.seg{display:flex;gap:calc(var(--u)*1.2);width:100%}
+.seg b{flex:1;height:calc(var(--u)*4);border:calc(var(--u)*.45) solid var(--line);border-radius:calc(var(--u)*1.4)}
+.seg b.on{background:var(--ink)}
+.seg b.half{background:repeating-linear-gradient(-45deg,var(--halftone) 0 1.5px,transparent 1.5px 5px)}
+.row2{display:flex;align-items:center;gap:calc(var(--u)*2);font:800 calc(var(--u)*3.4)/1.3 var(--ui)}
+.tag{flex:none;font:900 calc(var(--u)*2.2)/1 var(--ui);padding:calc(var(--u)*.6) calc(var(--u)*1.3);border:2px solid var(--line);border-radius:calc(var(--u)*.9);color:inherit}
+.tag.late{background:var(--hi);color:var(--hi-t);border-color:var(--hi-t)}
+#tkBox{flex:1;min-width:0;padding:calc(var(--u)*2.4) calc(var(--u)*3);display:flex;flex-direction:column;gap:calc(var(--u)*1.2)}
+#tkList{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:calc(var(--u)*.6)}
+.tk{display:flex;align-items:center;gap:calc(var(--u)*2.2);min-height:44px;padding:calc(var(--u)*.8) 0;border:0;background:none;text-align:left;font:800 calc(var(--u)*3.4)/1.3 var(--ui);width:100%;color:inherit}
+.tk .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tk.done .n{text-decoration:line-through;color:var(--muted)}
+.bx{flex:none;width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);min-width:22px;min-height:22px;border:calc(var(--u)*.5) solid var(--line);border-radius:calc(var(--u)*1.1)}
+.tk.done .bx{background:var(--ink)}
+#tkFoot{flex:none;display:flex;align-items:baseline;gap:calc(var(--u)*2);font:800 calc(var(--u)*3.2)/1.2 var(--ui)}
+.tt{flex:1;min-width:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column}
+.tt>div{min-width:0;border-right:calc(var(--u)*.45) solid var(--line);padding:calc(var(--u)*1.4);display:flex;flex-direction:column;gap:calc(var(--u)*1.2);font:800 calc(var(--u)*2.8)/1.25 var(--ui);overflow:hidden}
+.tt>div:last-child{border-right:0}
+.tt .d{font:900 calc(var(--u)*3.4)/1 var(--ui);padding-bottom:calc(var(--u)*.8);border-bottom:2px dotted var(--halftone)}
+.tt .d.today{background:var(--ink);color:var(--paper);border-radius:calc(var(--u)*1);padding:calc(var(--u)*.8);border-bottom:0}
+.blk{overflow-wrap:anywhere;min-width:0;border:calc(var(--u)*.45) solid var(--line);border-radius:calc(var(--u)*1.2);padding:calc(var(--u)*1)}
+.blk small{display:block;font:700 calc(var(--u)*2.2)/1.2 var(--ui);color:var(--muted)}
+.blk.now{background:var(--ink);color:var(--paper)}.blk.now small{color:var(--paper);opacity:.8}
+.blk.off{opacity:.45;border-style:dashed}
+#prBox{flex:1;min-width:0;display:flex}
+#prBox>div{flex:1;min-width:0;padding:calc(var(--u)*2.4) calc(var(--u)*3);display:flex;flex-direction:column;gap:calc(var(--u)*1.8)}
+#prBox>div:first-child{border-right:calc(var(--u)*.5) solid var(--line)}
+@media(max-aspect-ratio:1/1){.tt{grid-auto-flow:row;grid-template-columns:1fr;grid-auto-rows:1fr}.tt>div{flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:calc(var(--u)*.45) solid var(--line)}.tt .d{border-bottom:0;min-width:calc(var(--u)*11)}.blk{flex:1;min-width:calc(var(--u)*24)}#prBox{flex-direction:column}#prBox>div:first-child{border-right:0;border-bottom:calc(var(--u)*.5) solid var(--line)}}
 /* ---- status, floating controls ---- */
 #gear,#home{position:fixed;z-index:5;display:grid;place-items:center;min-width:44px;min-height:44px;border:0;border-radius:50%;background:transparent;color:var(--muted);opacity:.0;transition:opacity .2s}
 #gear{right:6px;bottom:6px}#home{left:6px;bottom:6px;text-decoration:none}
@@ -210,6 +243,10 @@ dialog .hint{margin:0;font:500 13px/1.45 var(--ui);color:var(--muted)}
    <div id="wxTop"><div id="wxMain"></div><div id="catBox"></div></div>
    <div id="fc"></div>
   </section>
+
+  <section id="p5" class="pg" aria-label="Tasks"><div id="tkBox"></div></section>
+  <section id="p6" class="pg" aria-label="This week"><div id="wkBox" class="tt"></div></section>
+  <section id="p7" class="pg" aria-label="Progress"><div id="prBox"></div></section>
  </div>
 </main>
 <a id="home" href="index.html" aria-label="Back to Study OS"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></a>
@@ -234,6 +271,8 @@ dialog .hint{margin:0;font:500 13px/1.45 var(--ui);color:var(--muted)}
 <dialog id="setDlg" aria-labelledby="setTitle">
  <form method="dialog" id="setForm">
   <h2 id="setTitle">Desk settings</h2>
+  <label>Pages (at least one)</label>
+  <div id="pgSel" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2px 12px"></div>
   <label>Weather and home air quality: <b id="cityNow"></b>
    <input type="search" id="citySearch" placeholder="Search a city or district" autocomplete="off">
   </label>
@@ -260,7 +299,10 @@ dialog .hint{margin:0;font:500 13px/1.45 var(--ui);color:var(--muted)}
 
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=5"></script>
-<script src="scripts/study-desk.js?v=1"></script>
-<script src="scripts/study-desk-ui.js?v=1"></script>
+<script src="scripts/study-stats.js?v=1"></script>
+<script src="scripts/study-motivation.js?v=1"></script>
+<script src="scripts/study-wordnest.js?v=2"></script>
+<script src="scripts/study-desk.js?v=2"></script>
+<script src="scripts/study-desk-ui.js?v=2"></script>
 </body>
 </html>

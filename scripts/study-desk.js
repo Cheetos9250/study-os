@@ -26,6 +26,7 @@
     { name: 'Phuket', lat: 7.88, lon: 98.392 }
   ]);
   var AUTO_CHOICES = [0, 15, 30, 60];
+  var PAGE_IDS = ['home', 'air', 'cal', 'study', 'wx', 'tasks', 'week', 'prog'], DEFAULT_PAGES = ['home', 'air', 'cal', 'study', 'wx'];
   var ISO = /^(\d{4})-(\d{2})-(\d{2})$/, HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
   var pad = function (n) { return (n < 10 ? '0' : '') + n; };
 
@@ -60,6 +61,10 @@
       typeof e.title === 'string' && e.title.trim() && (e.time === '' || e.time === undefined || HHMM.test(e.time));
   }
   function cleanEvent(e) { return { id: e.id, date: e.date, title: e.title.trim().slice(0, 80), time: e.time || '' }; }
+  function pagesOf(list) {
+    var p = Array.isArray(list) ? PAGE_IDS.filter(function (id) { return list.indexOf(id) >= 0; }) : [];
+    return p.length ? p : DEFAULT_PAGES.slice();
+  }
   function normalizeState(raw) {
     var v = raw;
     if (typeof raw === 'string') { try { v = JSON.parse(raw); } catch (e) { v = null; } }
@@ -69,6 +74,7 @@
       events: Array.isArray(v.events) ? v.events.filter(eventOk).slice(0, 300).map(cleanEvent) : [],
       city: cityOk(v.city) ? cleanCity(v.city) : Object.assign({}, DEFAULT_CITY),
       aq: aq,
+      pages: pagesOf(v.pages),
       auto: AUTO_CHOICES.indexOf(v.auto) >= 0 ? v.auto : 0,
       awake: v.awake !== false
     };
@@ -113,6 +119,37 @@
     return cells;
   }
   function shiftMonth(y, m, n) { var t = y * 12 + (m - 1) + n; return { y: Math.floor(t / 12), m: (t % 12) + 1 }; }
+
+  /* ---------- tasks (studyos.home.v1): tick a task like Today does, repeating tasks add the next one ---------- */
+  function nextDate(date, rep, today) {
+    var step = rep === 'w' ? 7 : rep === 'd' ? 1 : 0; if (!step || !valid(date) || !valid(today)) return null;
+    var t = utc(date) + step * DAY, td = utc(today);
+    while (t < td) t += step * DAY;
+    var d = new Date(t); return ymd(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+  }
+  function tickTask(home, id, done, today) {
+    var h = Object.assign({}, home), tasks = (Array.isArray(home && home.tasks) ? home.tasks : []).map(function (t) { return t && t.id === id ? Object.assign({}, t, { done: !!done }) : t; });
+    var t = tasks.filter(function (x) { return x && x.id === id; })[0];
+    if (t && done && (t.rep === 'd' || t.rep === 'w')) {
+      var nd = nextDate(t.date, t.rep, today), nid = String(t.id).replace(/~\d{4}-\d{2}-\d{2}$/, '') + '~' + nd;
+      if (nd && !tasks.some(function (x) { return x && x.id === nid; })) tasks.push(Object.assign({}, t, { id: nid, date: nd, done: false }));
+    }
+    h.tasks = tasks; return h;
+  }
+  /* ---------- this week (Mon first, next week on Sundays): classes per day; Sat/Sun only when they have classes ---------- */
+  function dur(a, b) {
+    var m = (+b.slice(0, 2) * 60 + +b.slice(3)) - (+a.slice(0, 2) * 60 + +a.slice(3)), h = Math.round(m / 30) / 2;
+    return h >= 1 ? h + ' h' : m + ' min';
+  }
+  function weekGrid(tt, today) {
+    var d0 = dowOf(today), mon = addDays(today, d0 === 0 ? 1 : -(d0 - 1)), cols = [], i; /* Sunday looks ahead to next week */
+    for (i = 0; i < 7; i++) {
+      var iso = addDays(mon, i), dw = dowOf(iso);
+      var items = (tt || []).filter(function (c) { return c.day === dw; }).map(function (c) { return { start: c.start, end: c.end, name: c.name, skip: !!c.skip, len: dur(c.start, c.end) }; });
+      if (i < 5 || items.length) cols.push({ iso: iso, dow: dw, label: DOW[dw], today: iso === today, items: items });
+    }
+    return cols;
+  }
 
   /* ---------- air quality: PM2.5 (µg/m³) bands of the Thai Pollution Control Department, 24 h basis ---------- */
   var PM_BANDS = [
@@ -171,7 +208,7 @@
   }
 
   return {
-    KEY: KEY, DEFAULT_CITY: DEFAULT_CITY, DEFAULT_AQ: DEFAULT_AQ, AUTO_CHOICES: AUTO_CHOICES, PM_BANDS: PM_BANDS, DOW: DOW, MON: MON,
+    KEY: KEY, PAGE_IDS: PAGE_IDS, DEFAULT_PAGES: DEFAULT_PAGES, nextDate: nextDate, tickTask: tickTask, weekGrid: weekGrid, DEFAULT_CITY: DEFAULT_CITY, DEFAULT_AQ: DEFAULT_AQ, AUTO_CHOICES: AUTO_CHOICES, PM_BANDS: PM_BANDS, DOW: DOW, MON: MON,
     parts: parts, ymd: ymd, todayKey: todayKey, valid: valid, addDays: addDays, dowOf: dowOf, diffDays: diffDays,
     dayLabel: dayLabel, monthLabel: monthLabel, clock: clock, normalizeState: normalizeState, newId: newId,
     eventOk: eventOk, cityOk: cityOk, buildAgenda: buildAgenda, dotDates: dotDates, monthGrid: monthGrid, shiftMonth: shiftMonth,

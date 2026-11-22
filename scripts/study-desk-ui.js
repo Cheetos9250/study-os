@@ -1,6 +1,7 @@
 /* Study OS Desk display: rendering, weather/air fetch (Open-Meteo, no key), own events, settings.
-   Reads: studyos.today.v1 (exams, timetable) and studyos.home.v1 (tasks) - read only.
-   Writes: studyos.desk.v1 (own events, city, air-quality list, options; backed up) and
+   Reads: studyos.today.v1 (exams, timetable), studyos.home.v1 (tasks, goal), quiz answers, WordNest, Pomodoro log.
+   Writes: studyos.home.v1 (only ticking a task, through StudyDesk.tickTask; everything else in it is kept),
+           studyos.desk.v1 (own events, city, air-quality list, pages, options; backed up) and
            studyos.desk.cache.v1 (last weather/air answer so the page works offline; not backed up).
    Network: GET only, to api.open-meteo.com, air-quality-api.open-meteo.com and geocoding-api.open-meteo.com
    (no keys, nothing from the study data is ever sent; only the chosen coordinates). */
@@ -17,7 +18,7 @@
   var cache = (function () { try { var c = JSON.parse(rd(CK) || '{}'); return c && typeof c === 'object' ? c : {}; } catch (e) { return {}; } })();
   var page = 0, sel = D.todayKey(Date.now()), view = (function () { var p = D.parts(Date.now()); return { y: p.y, m: p.m }; })();
   var editing = null, lastMin = '', lastDay = '', refreshing = false, autoTimer = null, wl = null, status = '';
-  try { var sp = +sessionStorage.getItem('studyos.desk.page'); if (sp >= 0 && sp < 5) page = sp; } catch (e) {}
+  try { var sp = +sessionStorage.getItem('studyos.desk.page'); if (sp >= 0) page = sp; } catch (e) {}
 
   function saveState() { wr(D.KEY, JSON.stringify(S)); }
   function saveCache() { wr(CK, JSON.stringify(cache)); }
@@ -98,7 +99,12 @@
   function setStatus(s) { status = s; var e = $('#stale'); if (e) e.textContent = s; }
 
   /* ---------- pages ---------- */
-  var TITLES = ['', 'Air quality', '', 'Study', 'Weather'];
+  var recent = {};
+  function readHome() { try { var h = JSON.parse(rd(HOMEK) || '{}'); return h && typeof h === 'object' && !Array.isArray(h) ? h : {}; } catch (e) { return {}; } }
+  function tickTask(id, done) {
+    wr(HOMEK, JSON.stringify(D.tickTask(readHome(), id, done, D.todayKey(Date.now()))));
+    try { if (window.StudyCloud && window.StudyCloud.dirty) window.StudyCloud.dirty(); } catch (e) {}
+  }
   function dayWord(iso, today) { var n = D.diffDays(today, iso); return n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : D.dayLabel(iso); }
   function evRow(x) {
     var tag = x.kind === 'exam' ? '<span class="k">Exam</span>' : x.late ? '<span class="k late">Late</span>' : x.kind === 'task' ? '<span class="k">Due</span>' : '';
@@ -129,8 +135,8 @@
   }
 
   /* Hide the children of a box that run past its bottom edge (and a heading left alone at the end). */
-  function fitBox(box) {
-    var kids = Array.prototype.slice.call(box.children).slice(1), lim = box.clientHeight - 6, over = false;
+  function fitBox(box, all) {
+    var kids = Array.prototype.slice.call(box.children).slice(all ? 0 : 1), lim = box.clientHeight - 6, over = false;
     kids.forEach(function (k) { k.style.display = ''; });
     kids.forEach(function (k) { if (!over && k.offsetTop + k.offsetHeight > lim) over = true; if (over) k.style.display = 'none'; });
     for (var i = kids.length - 1; i >= 0; i--) { if (kids[i].style.display !== 'none') { if (kids[i].className === 'dh') kids[i].style.display = 'none'; break; } }
@@ -167,7 +173,7 @@
   }
   /* Hide agenda rows that do not fit, and say how many were hidden. */
   function fit() {
-    var list = $('#agList'); if (!list || page !== 2) return;
+    var list = $('#agList'); if (!list || cur().id !== 'cal') return;
     var kids = Array.prototype.slice.call(list.children), over = false, hidden = 0, lim = list.clientHeight;
     kids.forEach(function (k) { k.style.display = ''; });
     kids.forEach(function (k) {
@@ -219,19 +225,79 @@
     $('#fc').innerHTML = f;
   }
 
+  /* ---------- new pages: tasks, this week, progress ---------- */
+  function renderTasks() {
+    var today = D.todayKey(Date.now()), tasks = (readHome().tasks || []).filter(function (t) { return t && typeof t.title === 'string' && D.valid(t.date); });
+    var open = tasks.filter(function (t) { return !t.done; }), late = open.filter(function (t) { return t.date < today; }).length;
+    var rows = tasks.filter(function (t) { return !t.done || recent[t.id]; }).sort(function (a, b) { return (a.done ? 1 : 0) - (b.done ? 1 : 0) || a.date.localeCompare(b.date); });
+    var h = '<div class="hd">Open tasks · ' + open.length + '</div><div id="tkList">';
+    rows.forEach(function (t) {
+      var tag = t.done ? '' : t.date < today ? '<span class="tag late">Late</span>' : '<span class="tag">' + esc(t.date === today ? 'Today' : D.DOW[D.dowOf(t.date)] + ' ' + (+t.date.slice(8))) + '</span>';
+      h += '<button type="button" class="tk' + (t.done ? ' done' : '') + '" data-id="' + esc(t.id) + '" aria-pressed="' + (t.done ? 'true' : 'false') + '"><i class="bx"></i><span class="n">' + esc(t.title) + '</span>' + tag + '</button>';
+    });
+    if (!rows.length) h += '<div class="empty">No open tasks. Add them on Today in Study OS.</div>';
+    $('#tkBox').innerHTML = h + '</div><div id="tkFoot"><span class="big" style="font-size:calc(var(--u)*8)">' + open.length + '</span><span>to go' + (late ? ' · <b style="color:var(--red)">' + late + ' late</b>' : '') + '</span></div>';
+    fitBox($('#tkList'), true);
+  }
+  function renderWeek() {
+    var today = D.todayKey(Date.now()), p = D.parts(Date.now()), hm = pad(p.hh) + ':' + pad(p.mm), cols = D.weekGrid(T.loadSettings(rd(T.SETTINGS_KEY)).timetable, today), h = '';
+    var any = cols.some(function (c) { return c.items.length; });
+    cols.forEach(function (c) {
+      h += '<div><div class="d' + (c.today ? ' today' : '') + '">' + c.label + ' ' + (+c.iso.slice(8)) + '</div>';
+      c.items.forEach(function (x) {
+        var cls = x.skip ? ' off' : c.today && hm >= x.start && hm < x.end ? ' now' : '';
+        h += '<div class="blk' + cls + '"><b>' + x.start + '</b> ' + esc(x.name) + '<small>' + (cls === ' now' ? 'now · ' : '') + x.len + (x.skip ? ' · skipped' : '') + '</small></div>';
+      });
+      if (!c.items.length) h += '<div class="blk off">Free<small>no class</small></div>';
+      h += '</div>';
+    });
+    $('#wkBox').innerHTML = any ? h : '<div class="empty" style="padding:calc(var(--u)*3)">No timetable yet. Add it on the Calendar page of Study OS.</div>';
+  }
+  function bars(frac, n) {
+    var h = '';
+    for (var i = 0; i < n; i++) h += '<b class="' + (frac >= (i + 1) / n ? 'on' : frac > i / n ? 'half' : '') + '"></b>';
+    return '<div class="seg" role="img" aria-label="' + Math.round(frac * 100) + ' percent">' + h + '</div>';
+  }
+  function renderProg() {
+    var M = window.StudyMotivation, St = window.StudyStats, W = window.StudyWordNest;
+    if (!M || !St) { $('#prBox').innerHTML = '<div class="empty">Progress helpers did not load.</div>'; return; }
+    var home = readHome(), now = Date.now(), per = St.answersPerDay(T.COURSES.map(function (c) { return rd('study-' + c.key); }));
+    var today = M.dayKey(now), g = M.goal(home.qgoal), done = per[today] || 0, streak = M.goalStreak(per, g, now);
+    var week = St.lastDays(now, 7).map(function (d) { return '<b class="' + ((per[d] || 0) >= g ? 'on' : per[d] > 0 ? 'half' : '') + '"></b>'; }).join('');
+    var wg = W ? W.read(now) : null, pomo = St.pomoPerDay(rd('studyos.pomolog.v1'))[today] || 0;
+    $('#prBox').innerHTML = '<div><div class="hd">Goal streak</div><div class="big" style="font-size:calc(var(--u)*20)">' + streak + '<small> day' + (streak === 1 ? '' : 's') + '</small></div><div class="seg" role="img" aria-label="Last 7 days">' + week + '</div><div class="muted" style="font:700 calc(var(--u)*2.6)/1.3 var(--ui)">Last 7 days · filled = daily goal met</div></div>' +
+      '<div><div class="hd">Questions today</div><div class="row2"><span class="big" style="font-size:calc(var(--u)*9)">' + done + '</span><span>/ ' + g + ' goal</span></div>' + bars(Math.min(1, done / g), 4) +
+      (wg && wg.started ? '<div class="hd">Words today</div><div class="row2"><span class="big" style="font-size:calc(var(--u)*9)">' + wg.done + '</span><span>/ ' + wg.goal + ' WordNest</span></div>' + bars(Math.min(1, wg.done / wg.goal), 4) : '') +
+      '<div class="row2" style="margin-top:auto"><span class="tag">Focus</span><span>' + pomo + ' min today</span></div></div>';
+  }
+
+  var ALL = [
+    { id: 'home', sec: '#p0', label: 'Home', r: renderHome },
+    { id: 'air', sec: '#p1', label: 'Air quality', title: 'Air quality', r: renderAir },
+    { id: 'cal', sec: '#p2', label: 'Calendar', r: renderCal },
+    { id: 'study', sec: '#p3', label: 'Study', title: 'Study', r: renderStudy },
+    { id: 'wx', sec: '#p4', label: 'Weather', title: 'Weather', r: renderWeather },
+    { id: 'tasks', sec: '#p5', label: 'Tasks', title: 'Tasks', r: renderTasks },
+    { id: 'week', sec: '#p6', label: 'This week', title: 'This week', r: renderWeek },
+    { id: 'prog', sec: '#p7', label: 'Progress', title: 'Progress', r: renderProg }
+  ];
+  function pages() { var l = ALL.filter(function (p) { return S.pages.indexOf(p.id) >= 0; }); return l.length ? l : [ALL[0]]; }
+  function cur() { var l = pages(); return l[Math.min(Math.max(page, 0), l.length - 1)]; }
+
   function paint() {
-    var today = D.todayKey(Date.now());
-    $('#barTitle').textContent = page === 0 ? D.dayLabel(today) : page === 2 ? D.monthLabel(view.y, view.m) : TITLES[page];
-    var left = page === 2 ? 'Move' : 'Update';
+    var today = D.todayKey(Date.now()), c = cur();
+    $('#barTitle').textContent = c.id === 'home' ? D.dayLabel(today) : c.id === 'cal' ? D.monthLabel(view.y, view.m) : c.title;
+    var left = c.id === 'cal' ? 'Move' : 'Update';
     if ($('#bLeft').dataset.t !== left) { $('#bLeft').dataset.t = left; $('#bLeft').innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4.5"/></svg>' + left; }
-    $('#bLeft').setAttribute('aria-label', page === 2 ? 'Move to the next day' : 'Update weather and air quality');
-    [renderHome, renderAir, renderCal, renderStudy, renderWeather][page]();
+    $('#bLeft').setAttribute('aria-label', c.id === 'cal' ? 'Move to the next day' : 'Update weather and air quality');
+    c.r();
     $('#stale').textContent = status;
   }
   function show(i) {
-    page = (i + 5) % 5; try { sessionStorage.setItem('studyos.desk.page', String(page)); } catch (e) {}
-    document.querySelectorAll('.pg').forEach(function (s, k) { s.classList.toggle('on', k === page); });
-    $('#dots').innerHTML = [0, 1, 2, 3, 4].map(function (k) { return '<i' + (k === page ? ' class="on"' : '') + '></i>'; }).join('');
+    var n = pages().length; page = ((i % n) + n) % n; try { sessionStorage.setItem('studyos.desk.page', String(page)); } catch (e) {}
+    var c = cur();
+    ALL.forEach(function (p) { $(p.sec).classList.toggle('on', p === c); });
+    $('#dots').innerHTML = pages().map(function (p, k) { return '<i' + (k === page ? ' class="on"' : '') + '></i>'; }).join('');
     paint(); armAuto();
   }
   function armAuto() { clearInterval(autoTimer); if (S.auto) autoTimer = setInterval(function () { if (!document.querySelector('dialog[open]')) show(page + 1); }, S.auto * 1000); }
@@ -276,11 +342,19 @@
     $('#cityNow').textContent = S.city.name;
     $('#aqEdit').innerHTML = S.aq.map(function (c, i) { return '<li><span>' + esc(c.name) + '</span><button type="button" data-rm="' + i + '" aria-label="Remove ' + esc(c.name) + '">✕</button></li>'; }).join('');
     $('#autoSel').value = String(S.auto); $('#awake').checked = S.awake;
+    $('#pgSel').innerHTML = ALL.map(function (p) { return '<label class="chk"><input type="checkbox" data-pg="' + p.id + '"' + (S.pages.indexOf(p.id) >= 0 ? ' checked' : '') + '> ' + esc(p.label) + '</label>'; }).join('');
   }
   $('#gear').onclick = function () { paintSettings(); $('#citySearch').value = ''; $('#aqSearch').value = ''; $('#cityRes').innerHTML = ''; $('#aqRes').innerHTML = ''; $('#setDlg').showModal(); };
   $('#citySearch').addEventListener('input', function () { geocode(this.value, $('#cityRes'), function (c) { S.city = c; saveState(); paintSettings(); $('#citySearch').value = ''; refresh(true); }); });
   $('#aqSearch').addEventListener('input', function () { geocode(this.value, $('#aqRes'), function (c) { if (S.aq.length < 12) { S.aq.push(c); saveState(); paintSettings(); $('#aqSearch').value = ''; refresh(true); } }); });
   $('#aqEdit').addEventListener('click', function (e) { var b = e.target.closest('button[data-rm]'); if (!b) return; S.aq.splice(+b.dataset.rm, 1); saveState(); paintSettings(); refresh(true); });
+  $('#pgSel').addEventListener('change', function (e) {
+    var id = e.target.dataset && e.target.dataset.pg; if (!id) return;
+    var next = ALL.filter(function (p) { return p.id === id ? e.target.checked : S.pages.indexOf(p.id) >= 0; }).map(function (p) { return p.id; });
+    if (!next.length) { e.target.checked = true; return; }
+    var keep = cur().id; S.pages = next; saveState(); var k = pages().map(function (p) { return p.id; }).indexOf(keep);
+    page = k >= 0 ? k : 0; show(page);
+  });
   $('#autoSel').onchange = function () { S.auto = +this.value; saveState(); armAuto(); };
   $('#awake').onchange = function () { S.awake = this.checked; saveState(); if (S.awake) wake(); else if (wl) { wl.release().catch(function () {}); wl = null; } };
   $('#setForm').addEventListener('submit', function (e) { e.preventDefault(); $('#setDlg').close(); paint(); });
@@ -301,13 +375,17 @@
   function moveDay() {
     sel = D.addDays(sel, 1); var m = /^(\d{4})-(\d{2})/.exec(sel); view = { y: +m[1], m: +m[2] }; paint();
   }
-  $('#bLeft').onclick = function () { if (page === 2) moveDay(); else refresh(true); armAuto(); };
+  $('#bLeft').onclick = function () { if (cur().id === 'cal') moveDay(); else refresh(true); armAuto(); };
   $('#bNext').onclick = function () { show(page + 1); };
   $('#grid').addEventListener('click', function (e) { var b = e.target.closest('.cell'); if (!b) return; sel = b.dataset.d; paint(); armAuto(); });
   $('#agBox').addEventListener('click', function (e) {
     if (e.target.closest('#addEv')) { openEv(null); return; }
     var b = e.target.closest('[data-ev]'); if (!b) return;
     var ev = S.events.filter(function (x) { return x.id === b.dataset.ev; })[0]; if (ev) openEv(ev);
+  });
+  $('#tkBox').addEventListener('click', function (e) {
+    var b = e.target.closest('.tk'); if (!b) return;
+    var done = b.getAttribute('aria-pressed') !== 'true'; recent[b.dataset.id] = true; tickTask(b.dataset.id, done); paint();
   });
   var tx = null, ty = null;
   $('#frame').addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
@@ -320,9 +398,9 @@
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); show(page + 1); }
     else if (e.key === 'ArrowLeft') show(page - 1);
     else if (e.key === 'u' || e.key === 'U') refresh(true);
-    else if (/^[1-5]$/.test(e.key)) show(+e.key - 1);
+    else if (/^[1-8]$/.test(e.key) && +e.key <= pages().length) show(+e.key - 1);
   });
-  window.addEventListener('resize', function () { if (page === 2) fit(); if (page === 0) fitBox($('#upBox')); });
+  window.addEventListener('resize', function () { var id = cur().id; if (id === 'cal') fit(); if (id === 'home') fitBox($('#upBox')); if (id === 'tasks') fitBox($('#tkList'), true); });
   window.addEventListener('storage', function () { S = D.normalizeState(rd(D.KEY)); paint(); });
   window.addEventListener('studycloud:applied', paint);
   window.addEventListener('online', function () { refresh(true); });

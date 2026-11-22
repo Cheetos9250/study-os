@@ -110,7 +110,7 @@ test('desk page: English UI, own keys only, Open-Meteo only, separate manifest, 
   const m = JSON.parse(rd('desk.webmanifest'));
   assert.equal(m.start_url, './desk.html'); assert.equal(m.display, 'standalone'); assert.notEqual(m.id, JSON.parse(rd('manifest.webmanifest')).id);
   for (const i of m.icons) assert.ok(fs.existsSync(path.join(ROOT, i.src)), i.src);
-  assert.deepEqual([...ui.matchAll(/\bwr\(([^,]+),/g)].map(x => x[1]).sort(), ['CK', 'D.KEY']);
+  assert.deepEqual([...ui.matchAll(/\bwr\(([^,]+),/g)].map(x => x[1]).sort(), ['CK', 'D.KEY', 'HOMEK']);
   assert.equal((ui.match(/localStorage\.setItem/g) || []).length, 1); assert.match(ui, /var wr = function \(k, v\) \{ try \{ localStorage\.setItem\(k, v\)/);
   assert.doesNotMatch(ui, /localStorage\.removeItem|sessionStorage\.setItem\((?!'studyos\.desk\.page')/);
   const hosts = new Set([...(ui.match(/https:\/\/[a-z.-]+/g) || [])]);
@@ -119,5 +119,28 @@ test('desk page: English UI, own keys only, Open-Meteo only, separate manifest, 
   assert.doesNotMatch(pure, /localStorage|sessionStorage|fetch\(|document\./);
   assert.match(rd('sw.js'), /'desk\.html', 'desk\.webmanifest'/);
   assert.match(rd('scripts/study-nav.js'), /href:'desk\.html'/);
-  for (const id of ['p0', 'p1', 'p2', 'p3', 'p4', 'bLeft', 'bNext', 'evDlg', 'setDlg', 'grid', 'agList']) assert.match(html, new RegExp('id="' + id + '"'), id);
+  for (const id of ['p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'pgSel', 'bLeft', 'bNext', 'evDlg', 'setDlg', 'grid', 'agList']) assert.match(html, new RegExp('id="' + id + '"'), id);
+});
+
+test('tasks, week and progress pages: tick keeps the rest of studyos.home.v1, week grid, pages setting', () => {
+  const D = require('../scripts/study-desk.js');
+  const home = { cover: 'x', qgoal: 30, tasks: [{ id: 'a', title: 'A', date: '2026-11-20', done: false, rep: 'd' }, { id: 'b', title: 'B', date: '2026-11-25', done: false }] };
+  const t = D.tickTask(home, 'b', true, '2026-11-22');
+  assert.equal(t.cover, 'x'); assert.equal(t.qgoal, 30); assert.equal(t.tasks.find(x => x.id === 'b').done, true);
+  assert.equal(home.tasks[1].done, false, 'input not mutated');
+  const r = D.tickTask(home, 'a', true, '2026-11-22');
+  assert.equal(r.tasks.length, 3); assert.ok(r.tasks.some(x => /^a~/.test(x.id) && !x.done && x.date >= '2026-11-22'));
+  assert.equal(D.tickTask(r, 'b', false, '2026-11-22').tasks.find(x => x.id === 'b').done, false);
+  assert.deepEqual(D.normalizeState({}).pages, ['home', 'air', 'cal', 'study', 'wx']);
+  assert.deepEqual(D.normalizeState({ pages: ['prog', 'home', 'bogus'] }).pages, ['home', 'prog']);
+  assert.deepEqual(D.normalizeState({ pages: [] }).pages, ['home', 'air', 'cal', 'study', 'wx']);
+  const cols = D.weekGrid([], '2026-11-22');
+  assert.equal(cols.length, 5); assert.equal(cols[0].dow, 1); assert.equal(cols[0].iso, '2026-11-23', 'Sunday looks ahead');
+  assert.equal(D.weekGrid([], '2026-11-25')[0].iso, '2026-11-23');
+});
+
+test('pages setting is validated on restore', () => {
+  const src = rd('scripts/study-progress-restore.js');
+  assert.match(src, /value\.pages !== undefined/);
+  for (const id of ['tasks', 'week', 'prog']) assert.match(src, new RegExp('"' + id + '"'));
 });
