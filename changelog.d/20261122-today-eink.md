@@ -1,0 +1,1 @@
+- Today page: new e-ink desk display look (dark bezel, grey panels, M PLUS Rounded 1c). The top shows days to the next exam with a Ready % for its chapters; the clock comes back when no exam is left. New "Next class" card and a small mascot by the Pomodoro timer.

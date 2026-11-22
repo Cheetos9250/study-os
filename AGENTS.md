@@ -70,6 +70,7 @@ Shared scripts and styles:
 - `assets/study-unify.css`: gives course pages the site look.
 
 Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.md`): Kaisei Decol (headings/numbers), Zen Maru Gothic (body), Mali (Thai); ink black on white panels, 3px frames, pen hatching. The accent colour follows the Today cover image via `scripts/study-accent.js` (sessionStorage cache only). Course pages keep `assets/study-unify.css`.
+Today (`index.html`) is being moved to the **e-ink desk display** look (22 Nov 2026, owner request; other pages follow one PR at a time): `assets/study-eink.css` is loaded last on the page and re-tokens it — dark bezel, light-grey panels, ink lines, M PLUS Rounded 1c (Thai falls back to Mali), monochrome except the cover image; dark mode is the inverted screen. The hero is the next exam (days left, **Ready %** = questions right in the exam chapters out of all questions there, the next two exams), or a big clock when no exam is left; the third scoreboard cell is the next class from the timetable.
 
 ## localStorage keys (all backed up)
 
