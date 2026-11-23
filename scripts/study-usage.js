@@ -30,5 +30,8 @@
   }
   var api = { KEY: KEY, day: day, pageId: pageId, read: read, record: record, summary: summary };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  if (root && root.document) { root.StudyUsage = api; try { record(root.localStorage, pageId(root.location.pathname, root.location.search)); } catch (e) {} }
+  /* the backup and restore pages must leave storage untouched (CI checks it), so they are never counted */
+  var SKIP = { 'progress-backup': 1, 'progress-restore': 1 };
+  api.SKIP = SKIP;
+  if (root && root.document) { root.StudyUsage = api; try { var pid = pageId(root.location.pathname, root.location.search); if (!SKIP[pid]) record(root.localStorage, pid); } catch (e) {} }
 })(typeof window !== 'undefined' ? window : null);
