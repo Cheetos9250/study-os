@@ -1,0 +1,12 @@
+// Read-only Study OS MCP server for Gemini. Deployed ONLY by .github/workflows/deploy-gemini-mcp.yml.
+// Secrets MCP_READ_TOKEN and PROGRESS_SYNC_KEY are set by that workflow from GitHub secrets; never stored here.
+// Reads progress through a service binding to the progress Worker (GET only); it has no storage of its own.
+{
+  "name": "study-os-gemini-mcp",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": true,
+  "services": [
+    { "binding": "PROGRESS", "service": "vocabloom-progress-cas-prod" }
+  ]
+}

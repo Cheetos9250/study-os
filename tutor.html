@@ -34,6 +34,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 .prov input{width:18px;height:18px;accent-color:var(--acc)}
 .inl{display:flex;gap:8px}.inl>input{flex:1}
 .chk{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;min-height:44px}.chk input{width:20px;height:20px}
+.ctx .chk.live{display:flex;flex:0 0 auto;color:var(--text)}
 .note{font-size:13px;color:var(--muted);margin:0}.note b{color:var(--text)}
 .status{font-size:14px;font-weight:700}.status.err{color:var(--red,#c21f2f)}
 #log{display:grid;gap:12px;margin:14px 0}
@@ -75,6 +76,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 <section class="panel ctx" aria-label="What you're studying">
  <label>Subject<select id="course"><option value="">General</option></select></label>
  <label>Chapter<select id="cat" disabled><option value="">All chapters</option></select></label>
+ <label class="chk live"><input type="checkbox" id="live"> Use my live progress</label>
 </section>
 <main id="log" aria-live="polite"></main>
 <form class="compose" id="form" autocomplete="off">
@@ -93,7 +95,8 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 </div>
 <script src="scripts/textbook-sos-render.js?v=1"></script>
 <script src="scripts/study-today.js?v=3"></script>
-<script src="scripts/study-tutor.js?v=4"></script>
+<script src="scripts/study-gemini.js?v=1"></script>
+<script src="scripts/study-tutor.js?v=5"></script>
 <script src="scripts/study-nav.js?v=13"></script>
 <script>
 (function(){
@@ -150,6 +153,12 @@ async function paintCats(sel){const key=$('#course').value,D=await loadCourse(ke
  cat.disabled=!D;if(sel&&D&&D.cats.some(c=>c[0]===sel))cat.value=sel;}
 $('#course').onchange=()=>{paintCats();try{sessionStorage.setItem('studyos.tutor.ctx',JSON.stringify({c:$('#course').value,k:''}));}catch(e){}};
 $('#cat').onchange=()=>{try{sessionStorage.setItem('studyos.tutor.ctx',JSON.stringify({c:$('#course').value,k:$('#cat').value}));}catch(e){}};
+/* ---------- live progress (read-only): exams, chapter accuracy and wrong questions from this device, added to the system prompt ---------- */
+$('#live').checked=cfg.live;$('#live').onchange=()=>{cfg.live=$('#live').checked;saveCfg();};
+async function liveProgress(){const G=window.StudyGemini;if(!G||!T)return '';try{
+ for(const c of T.COURSES)await loadCourse(c.key);
+ let exams=[];try{exams=T.loadSettings(getL(T.SETTINGS_KEY)).exams||[];}catch(e){}
+ return G.buildContext({now:Date.now(),exams,wrongPerCourse:8,goal:' ',courses:T.COURSES.map(c=>({key:c.key,name:c.name,D:data[c.key],study:getL('study-'+c.key)}))}).replace(/\n## What I want from you[\s\S]*$/,'');}catch(e){return '';}}
 /* ---------- chat ---------- */
 function paintState(){const ready=!!cfg[cfg.provider].key;$('#send').disabled=busy||!ready;document.querySelectorAll('[data-quick]').forEach(b=>b.disabled=busy);
  say('#state',busy?'Thinking…':ready?'':'Add your API key in Settings',false);}
@@ -168,7 +177,7 @@ async function ask(){
  busy=true;paintState();
  const key=$('#course').value,D=key?await loadCourse(key):null,catSel=$('#cat').value;
  const course=key?(COURSES.find(x=>x.key===key)||{}).name:'',chapter=catSel&&D?((D.cats||[]).find(x=>x[0]===catSel)||[,''])[1]:'';
- const sys=A.system({course:course&&D?D.title||course:course,chapter,notes:D?A.notes(D,catSel):''});
+ const sys=A.system({course:course&&D?D.title||course:course,chapter,notes:D?A.notes(D,catSel):'',progress:cfg.live?await liveProgress():''});
  const msgs=chat.filter(m=>!m.error&&!m.local);let ctl=null,timer=null;
  try{ctl=new AbortController();timer=setTimeout(()=>ctl.abort(),120000);
   const send=async()=>{const r=A.request(cfg,sys,msgs);r.init.signal=ctl.signal;const res=await fetch(r.url,r.init);return {status:res.status,j:await res.json().catch(()=>null)};};

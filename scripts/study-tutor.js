@@ -21,7 +21,7 @@
  function baseUrl(s){s=clean(s,300).trim().replace(/\/+$/,'');return /^https:\/\/[a-z0-9.-]+(:\d+)?(\/[\w\-./~%]*)?$/i.test(s)?s:'';}
  /* settings without the key; unknown fields dropped */
  function normalize(raw){
-  const o=raw&&typeof raw==='object'?raw:{},out={provider:o.provider==='openai'?'openai':'gemini',remember:o.remember!==false};
+  const o=raw&&typeof raw==='object'?raw:{},out={provider:o.provider==='openai'?'openai':'gemini',remember:o.remember!==false,live:o.live!==false};
   for(const p of Object.keys(PROVIDERS)){const s=o[p]&&typeof o[p]==='object'?o[p]:{};
    out[p]={base:baseUrl(s.base)||PROVIDERS[p].base,model:clean(s.model,120).trim()||PROVIDERS[p].model,key:clean(s.key,400).trim()};}
   return out;
@@ -48,6 +48,7 @@
   +'- Keep answers short unless asked for more. If you are not sure, say so instead of guessing.\n'
   +'- For homework or graded work, guide with hints and let the student do the final step.';
   if(o.notes)s+='\n\nCourse notes the student is studying (use them; say when the question goes beyond them):\n'+o.notes;
+  if(o.progress)s+='\n\nThe student\'s live Study OS progress, read from this device just now (exams, chapter accuracy, questions wrong now). Use it to pick what to study, explain mistakes and plan; do not repeat it back unless asked:\n'+String(o.progress).slice(0,12000);
   return s;
  }
  /* messages: [{role:'user'|'assistant', text, image?:{mime,data(base64)}}] → fetch arguments */

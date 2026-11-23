@@ -1,0 +1,1 @@
+- AI tutor: new **Use my live progress** switch (on by default). The tutor now sees your upcoming exams, chapter scores and current wrong questions from this device every time you ask, so "what should I study?" and "Study plan to my exams" use your real data.
