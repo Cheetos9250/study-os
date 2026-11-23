@@ -104,6 +104,9 @@
   ta.addEventListener('input',function(){status('Saving…');clearTimeout(timer);timer=setTimeout(save,500);});
   ta.addEventListener('blur',flush);
   window.addEventListener('pagehide',flush);
+  /* other note writers on the page (Ask AI → Save to note) flush this panel first, then ask it to reload */
+  document.addEventListener('studyos:notes-flush',flush);
+  document.addEventListener('studyos:notes-changed',function(){if(!timer)load();});
   document.addEventListener('visibilitychange',function(){if(document.hidden)flush();else if(!timer&&document.activeElement!==ta&&!panel.hidden)load();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!panel.hidden){if(panel.classList.contains('full'))setFull(false);else setOpen(false);}});
   /* follow the quiz: when the question on screen moves to another chapter, the note follows (unless a chapter was picked by hand) */
