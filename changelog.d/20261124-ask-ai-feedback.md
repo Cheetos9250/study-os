@@ -1,0 +1,2 @@
+- **Ask AI** under every acc/eco/math practice question: explains with your Gemini key, follow-up questions, **Save to note** into the chapter note.
+- **Feedback** page (nav): send ideas or problems as a GitHub issue, with page-open counts kept on this device (`studyos.usage.v1`, backed up).

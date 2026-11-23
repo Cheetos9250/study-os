@@ -15,6 +15,7 @@
  {href:'stats.html',label:'Stats',icon:'stats'},
   {href:'desk.html',label:'Desk display',icon:'desk'},
   {href:'tutor.html',label:'AI tutor',icon:'tutor'},
+  {href:'feedback.html?from='+((location.pathname.split('/').pop()||'index').replace(/\.html$/i,'')||'index'),label:'Feedback',icon:'feedback'},
   {href:'progress-backup.html',label:'Back up',icon:'backup'},
   {href:'progress-restore.html',label:'Restore',icon:'restore'}
  ];
@@ -36,6 +37,7 @@
   stats:'<path d="M4 19.5h16"/><path d="M4 15l4.5-4.5 3.5 3 7-7.5"/><path d="M15 6h4v4"/>',
   desk:'<rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M9 20h6M12 16.5V20"/>',
   grades:'<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
+  feedback:'<path d="M4.5 5.5h15v10h-9l-4 3.5v-3.5h-2z"/><path d="M12 8.2v3.2M12 13.4h.01"/>',
   backup:'<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M4.5 17.5v2h15v-2"/>',
   restore:'<path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4.5 17.5v2h15v-2"/>',
   fold:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9 4.5v15M15.5 9.5 13 12l2.5 2.5"/>',
@@ -182,6 +184,8 @@
   if(e.key!=='/'||e.metaKey||e.ctrlKey||e.altKey)return;var a=document.activeElement;
   if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return;e.preventDefault();openSearch();
  });
+ /* Page-open counts on this device (scripts/study-usage.js); the nav itself still reads and writes no study data. */
+ if(!window.StudyUsage){var us=document.createElement('script');us.src=navSrc?new URL('study-usage.js?v=1',navSrc).href:'scripts/study-usage.js?v=1';document.head.appendChild(us);}
  window.StudyNav={TABS:TABS,active:active,timesUp:timesUp,search:openSearch};
  if(document.body)pomo();else document.addEventListener('DOMContentLoaded',pomo);
  if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
