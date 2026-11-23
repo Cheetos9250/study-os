@@ -46,3 +46,9 @@ body a:not([class]){color:inherit}
 #studyNav .sn-tab[aria-current="page"]{border-radius:999px}
 /* floating Notes button (scripts/study-quiz-notes.js): ink instead of the red accent */
 html:root #qnBtn{background:var(--ink);color:var(--paper);border-color:var(--ink);border-radius:999px}
+/* touch screens: bigger answer buttons, easier to hit with a finger or pencil (owner, 23 Nov 2026) */
+@media (pointer:coarse){
+ body .opts{gap:12px}
+ body .opt{min-height:64px;padding:14px 16px;align-items:center;font-size:17px}
+ body .opt .k{font-size:16px;font-weight:900;min-width:28px;height:28px;display:inline-grid;place-items:center;border:2px solid currentColor;border-radius:8px;padding:0}
+}
