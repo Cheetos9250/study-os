@@ -15,6 +15,7 @@
  {href:'stats.html',label:'Stats',icon:'stats'},
   {href:'desk.html',label:'Desk display',icon:'desk'},
   {href:'tutor.html',label:'AI tutor',icon:'tutor'},
+  {href:'gemini.html',label:'Share with Gemini',icon:'tutor'},
   {href:'progress-backup.html',label:'Back up',icon:'backup'},
   {href:'progress-restore.html',label:'Restore',icon:'restore'}
  ];

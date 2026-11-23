@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — share my progress with Gemini">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Gemini — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=9">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 110px max(18px,env(safe-area-inset-left))}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:16px 18px;margin:14px 0}
+.lead{color:var(--muted);margin:4px 0 0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.b{min-height:44px;padding:0 18px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 15px var(--ui);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.b.main{background:var(--ink);color:var(--paper)}
+.muted{color:var(--muted);font-size:14px}
+h2{font-size:20px;margin:0 0 8px}
+label.opt{display:inline-flex;gap:8px;align-items:center;min-height:44px;font-weight:700}
+select{min-height:44px;font:700 15px var(--ui);border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);padding:0 8px}
+textarea{width:100%;min-height:320px;font:13px/1.45 ui-monospace,Menlo,monospace;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--paper);color:var(--text);padding:10px;resize:vertical}
+ol.steps{margin:6px 0 0;padding-left:22px}ol.steps li{margin:4px 0}
+</style>
+<script src="scripts/study-theme.js?v=6"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+<link rel="stylesheet" href="assets/study-eink-base.css?v=1">
+</head>
+<body>
+<div class="page">
+<h1>Share with Gemini</h1>
+<p class="lead">Gemini cannot see your progress on its own: it lives only in this browser. This page writes a summary (exams, chapters, wrong questions) that you copy and paste into Gemini. Nothing is sent until you paste it yourself.</p>
+<section class="panel" aria-labelledby="h1s">
+<h2 id="h1s">1. Choose what to include</h2>
+<div class="row">
+<label class="opt">Wrong questions per subject <select id="wn" aria-label="Wrong questions per subject"><option value="0">None</option><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></label>
+</div>
+</section>
+<section class="panel" aria-labelledby="h2s">
+<h2 id="h2s">2. Copy and open Gemini</h2>
+<div class="row"><button type="button" class="b main" id="copy">Copy summary</button><a class="b" id="open" href="https://gemini.google.com/app" target="_blank" rel="noopener">Open Gemini</a><button type="button" class="b" id="dl">Download .md</button><span class="muted" id="msg" role="status" aria-live="polite"></span></div>
+<ol class="steps muted"><li>Tap <b>Copy summary</b>, open Gemini and paste it into a new chat.</li><li>For a coach that always knows your progress: in Gemini make a <b>Gem</b>, and add the downloaded .md file as its knowledge. Download it again after studying to refresh it.</li></ol>
+</section>
+<main class="panel" aria-labelledby="h3s"><h2 id="h3s">Preview</h2><textarea id="out" readonly aria-label="Summary for Gemini">Loading…</textarea></main>
+</div>
+<script src="scripts/study-today.js?v=3"></script>
+<script src="scripts/study-gemini.js?v=1"></script>
+<script src="scripts/study-nav.js?v=12"></script>
+<script>
+(function(){
+'use strict';
+/* Read-only: reads study-<course>, studyos.today.v1 and the course data files. Writes nothing; sends nothing. */
+const T=window.StudyToday,G=window.StudyGemini,$=s=>document.querySelector(s),data={};
+const read=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+let text='';
+function build(){let exams=[];try{exams=T.loadSettings(read(T.SETTINGS_KEY)).exams||[];}catch(e){}
+ text=G.buildContext({now:Date.now(),exams,wrongPerCourse:Number($('#wn').value),courses:T.COURSES.map(c=>({key:c.key,name:c.name,D:data[c.key],study:read('study-'+c.key)}))});
+ $('#out').value=text;}
+function say(t){$('#msg').textContent=t;}
+$('#wn').onchange=build;
+$('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(text);say('Copied. Paste it into Gemini.');}catch(e){const a=$('#out');a.focus();a.select();try{document.execCommand('copy');say('Copied. Paste it into Gemini.');}catch(_){say('Select the text below and copy it.');}}};
+$('#dl').onclick=()=>{const u=URL.createObjectURL(new Blob([text],{type:'text/markdown'})),a=document.createElement('a');a.href=u;a.download='study-os-progress.md';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(build);
+})();
+</script>
+</body>
+</html>
