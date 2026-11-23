@@ -49,3 +49,11 @@ test('worker source has no secrets and the deploy workflow is manual',()=>{
  const wf=fs.readFileSync(path.join(root,'.github/workflows/deploy-gemini-mcp.yml'),'utf8');
  assert.match(wf,/workflow_dispatch/);assert.match(wf,/== 'DEPLOY'/);assert.doesNotMatch(wf,/\bpush:|pull_request:/);
 });
+test('GET /summary returns Markdown with a Bearer token only',async()=>{
+ const e=env([]),get=h=>W.fetch(new Request('https://x.workers.dev/summary?wrong=3',{headers:h}),e);
+ assert.equal((await get({})).status,401);
+ const r=await get({Authorization:'Bearer '+TOKEN});assert.equal(r.status,200);assert.match(r.headers.get('Content-Type'),/markdown/);
+ const t=await r.text();assert.match(t,/## Accounting/);assert.match(t,/## Classes on \d{4}-\d{2}-\d{2}/);
+ assert.equal((t.match(/## Upcoming exams/g)||[]).length,1);
+ assert.equal((await W.fetch(new Request('https://x.workers.dev/summary/'+TOKEN),e)).status,404,'no token in the summary URL');
+});

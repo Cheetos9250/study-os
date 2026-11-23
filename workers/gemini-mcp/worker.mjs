@@ -1,6 +1,7 @@
 // Study OS read-only MCP server for Gemini (and any MCP client).
 // Reads the owner's synced progress from the progress Worker (GET only) and the public course data from GitHub Pages,
 // and answers MCP tool calls with summaries. It never writes anything.
+// GET /summary returns the same data as one Markdown page (Bearer token only) for the Google Doc Apps Script.
 // Auth: the URL path carries a long read-only token (secret MCP_READ_TOKEN): POST /mcp/<token>, or POST /mcp with
 // "Authorization: Bearer <token>". Changing the secret revokes every client. The sync key stays inside this Worker.
 // Deployed only by .github/workflows/deploy-gemini-mcp.yml (manual, owner types DEPLOY).
@@ -108,11 +109,20 @@ export default {
  async fetch(request,env){
   const url=new URL(request.url);
   if(url.pathname==='/health')return json({ok:true});
-  const m=url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
+  const isSummary=url.pathname==='/summary';
+  const m=isSummary?[]:url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
   if(!m)return json({error:'Not found'},404);
   if(typeof env.MCP_READ_TOKEN!=='string'||env.MCP_READ_TOKEN.length<32||typeof env.PROGRESS_SYNC_KEY!=='string')return json({error:'Not configured'},503);
   const auth=(request.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');
   if(!safeEqual(m[1]||auth,env.MCP_READ_TOKEN))return json({error:'Unauthorized'},401);
+  // GET /summary (Bearer token only): the whole overview + schedule as Markdown, for the Google Apps Script that fills a Google Doc.
+  if(isSummary){
+   if(request.method!=='GET')return json({error:'Method not allowed'},405,{Allow:'GET'});
+   const now=Date.now(),n=Math.max(0,Math.min(20,Number(url.searchParams.get('wrong'))||10));
+   try{const md=await callTool(env,'get_overview',{wrong_per_course:n},now)+'\n'+(await callTool(env,'get_schedule',{},now)).replace(/^# Schedule\n\n## Upcoming exams[\s\S]*?(?=## Classes)/,'');
+    return new Response(md,{status:200,headers:{'Content-Type':'text/markdown; charset=utf-8','Cache-Control':'no-store'}});}
+   catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
+  }
   if(request.method==='GET'||request.method==='DELETE')return json({error:'Method not allowed'},405,{Allow:'POST'});
   if(request.method!=='POST')return json({error:'Method not allowed'},405,{Allow:'POST'});
   let body;try{body=JSON.parse(await request.text());}catch{return json({jsonrpc:'2.0',id:null,error:{code:-32700,message:'Parse error'}},400);}
