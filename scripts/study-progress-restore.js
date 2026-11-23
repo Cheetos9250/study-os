@@ -151,13 +151,6 @@
         if (!/^[a-z0-9]{2,12}$/.test(jt) || !Array.isArray(tv) || tv.length !== 2 || !tv.every(function (n) { return Number.isInteger(n) && n >= 0; }) || tv[1] > tv[0])
           throw new Error("Invalid JE Drill score");
       }
-    } else if (key === "studyos.usage.v1") {
-      if (!object(value.days) || Object.keys(value.days).length > 400) throw new Error("Invalid page-open counts");
-      for (var ud of Object.keys(value.days)) {
-        var ur = value.days[ud];
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(ud) || !object(ur) || Object.keys(ur).length > 200 || !Object.keys(ur).every(function (k) { return /^[a-z0-9-]{1,40}$/.test(k) && Number.isInteger(ur[k]) && ur[k] >= 0 && ur[k] <= 9999; }))
-          throw new Error("Invalid page-open counts");
-      }
     } else if (key === "studyos.scratch.v1") {
       var scBad = function () { throw new Error("Invalid scratchpad data"); };
       var scIds = object(value) ? Object.keys(value) : scBad();

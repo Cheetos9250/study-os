@@ -24,7 +24,7 @@
     Object.keys(COURSES).flatMap(function (course) {
       var mark = COURSES[course];
       return ["study-" + course, mark + "-srs", mark + "-typ"];
-    }).concat(["vocabloom_mvp_v1", "studyos.accounting.textbook.progress.v1", "studyos.home.v1", "studyos.today.v1", "studyos.grades.v1", "studyos.notes.v1", "studyos.pdfsets.v1", "studyos.pomolog.v1", "studyos.excel.v1", "studyos.jedrill.v1", "studyos.desk.v1", "studyos.scratch.v1", "studyos.usage.v1"])
+    }).concat(["vocabloom_mvp_v1", "studyos.accounting.textbook.progress.v1", "studyos.home.v1", "studyos.today.v1", "studyos.grades.v1", "studyos.notes.v1", "studyos.pdfsets.v1", "studyos.pomolog.v1", "studyos.excel.v1", "studyos.jedrill.v1", "studyos.desk.v1", "studyos.scratch.v1"])
   );
   var ALLOWED = new Set(KEYS);
 
@@ -120,7 +120,6 @@
     if (key === "studyos.jedrill.v1") return "JE Drill score";
     if (key === "studyos.desk.v1") return "Desk display events and settings";
     if (key === "studyos.scratch.v1") return "Scratchpad working";
-    if (key === "studyos.usage.v1") return "Pages opened (this device)";
     var names = { acc: "Accounting", eco: "Economics", math: "Mathematics", eng: "English", zh: "Chinese" };
     for (var course of Object.keys(COURSES)) {
       if (key === "study-" + course) return names[course] + " quiz answers";

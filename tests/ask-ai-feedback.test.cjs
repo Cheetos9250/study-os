@@ -27,13 +27,8 @@ test('page-open counts: page ids, 120-day cap, summary',()=>{
   assert.deepEqual(U.summary(s,14,d).pages,[['acc-prac',2],['index',1]]);
   for(let i=0;i<130;i++){const x=new Date(2026,0,1+i);U.record(s,'index',x);}assert.equal(Object.keys(U.read(s).days).length,120);
 });
-test('usage key is backed up, labelled and validated; nav loads it and links Feedback',()=>{
-  const B=require('../scripts/study-progress-backup.js'),R=require('../scripts/study-progress-restore.js'),O='https://cheetos9250.github.io';
-  assert.ok(B.keys.includes('studyos.usage.v1'));assert.equal(B.labelForKey('studyos.usage.v1'),'Pages opened (this device)');
-  assert.match(rd('progress-restore.html'),/studyos\.usage\.v1"\) return "Pages opened \(this device\)"/);
-  const snap=raw=>B.createSnapshot({getItem:k=>k==='studyos.usage.v1'?raw:null},O,new Date('2026-11-24T12:00:00Z'));
-  const ok=JSON.stringify({days:{'2026-11-24':{'acc-prac':3}}});const t=mem();assert.deepEqual(R.restoreMissing(t,snap(ok),O),{restored:1,alreadyPresent:0});
-  for(const bad of [{},{days:[]},{days:{'2026-13-x':{}}},{days:{'2026-11-24':{'Bad Key':1}}},{days:{'2026-11-24':{a:-1}}}])assert.throws(()=>R.restoreMissing(mem(),snap(JSON.stringify(bad)),O),JSON.stringify(bad));
+test('usage counts are not backed up (not study progress, would make every restore look different); nav loads it and links Feedback',()=>{
+  const B=require('../scripts/study-progress-backup.js');assert.ok(!B.keys.includes('studyos.usage.v1'));
   const nav=rd('scripts/study-nav.js');assert.match(nav,/study-usage\.js\?v=1/);assert.match(nav,/feedback\.html\?from=/);
   const f=rd('feedback.html');assert.match(f,/github\.com\/cheetos9250\/study-os\/issues\/new/);assert.doesNotMatch(f,/[฀-๿]/);assert.doesNotMatch(f,/localStorage\.setItem/);
 });

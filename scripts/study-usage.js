@@ -1,6 +1,6 @@
 /* Which Study OS pages are opened, counted on this device only (owner, 24 Nov 2026), so we can see which features
    are really used before changing or hiding any. Never sent anywhere by itself; the Feedback page can add a short
-   summary to a message the owner chooses to send. Key studyos.usage.v1 (backed up):
+   summary to a message the owner chooses to send. Key studyos.usage.v1 (not backed up or synced: it is not study progress):
      { days: { "YYYY-MM-DD": { "<page>": opens } } }   page = file name without .html, course pages add the mode (acc-prac)
    Keeps the last 120 days. Loaded by scripts/study-nav.js on every page. */
 (function (root) {
