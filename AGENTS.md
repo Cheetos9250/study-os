@@ -118,6 +118,7 @@ node tests/auto-sync-browser.cjs
 - `workers/progress/wrangler.jsonc` and `.github/workflows/deploy-progress-worker.yml` (from PR #102, now on `main`) deploy `vocabloom-progress-cas-prod`, a compare-and-set progress Worker built from `experiments/prod-progress-cas/worker.mjs`.
 - Redeploying: GitHub secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `PROGRESS_SYNC_KEY` are set; run the workflow and type `DEPLOY` (ask the owner first).
 - Owner request (15 Nov 2026, after losing quiz answers when the iPad cleared site data): when cloud sync goes live it must also sync `studyos.today.v1` (timetable, exams, plan ticks), not only course progress. Until then the owner chose device-side protection: `navigator.storage.persist()` on every page and the Today backup reminder.
+- **Gemini MCP** (24 Nov 2026, owner approved building it): `workers/gemini-mcp/` (`study-os-gemini-mcp`) is a read-only MCP server (Streamable HTTP, JSON responses) over the synced progress: service binding to `vocabloom-progress-cas-prod`, GET only, course data from Pages; tools `get_overview`, `get_wrong_questions`, `get_schedule`. Auth = secret `MCP_READ_TOKEN` (GitHub secret `GEMINI_MCP_TOKEN`) in the path `/mcp/<token>` or as a Bearer header. Deploy only via `.github/workflows/deploy-gemini-mcp.yml` (ask the owner first). Setup: `workers/gemini-mcp/README.md`.
 - `study-api-cas-staging-only` is a staging prototype. Do not use it for real data.
 
 ## Open items

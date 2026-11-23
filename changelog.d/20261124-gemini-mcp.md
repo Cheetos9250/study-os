@@ -1,0 +1,1 @@
+- New read-only MCP server for Gemini (`workers/gemini-mcp`, manual deploy workflow): Gemini can look up live exams, chapter progress, wrong questions and classes from the synced data. It can only read; the sync key never leaves the Worker.

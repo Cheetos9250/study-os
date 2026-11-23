@@ -1,0 +1,62 @@
+name: Deploy Gemini MCP Worker (manual)
+
+# Runs only when the owner starts it from the Actions tab and types DEPLOY.
+# Needs repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, PROGRESS_SYNC_KEY (already set)
+# and GEMINI_MCP_TOKEN (new, 32+ letters/digits/-/_; the read-only token in the Gemini app URL; change it to revoke access).
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEPLOY to deploy study-os-gemini-mcp'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-gemini-mcp
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.inputs.confirm == 'DEPLOY'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROGRESS_SYNC_KEY: ${{ secrets.PROGRESS_SYNC_KEY }}
+      GEMINI_MCP_TOKEN: ${{ secrets.GEMINI_MCP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check secrets are present (values are never printed)
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "Missing secret CLOUDFLARE_API_TOKEN"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "Missing secret CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+          test ${#PROGRESS_SYNC_KEY} -ge 24 || { echo "Secret PROGRESS_SYNC_KEY must be at least 24 characters"; exit 1; }
+          test ${#GEMINI_MCP_TOKEN} -ge 32 || { echo "Secret GEMINI_MCP_TOKEN must be at least 32 characters"; exit 1; }
+          printf '%s' "$GEMINI_MCP_TOKEN" | grep -Eq '^[A-Za-z0-9_-]+$' || { echo "GEMINI_MCP_TOKEN may use only letters, digits, - and _"; exit 1; }
+      - name: Offline tests
+        run: node --test tests/gemini-mcp-worker.test.cjs tests/gemini-share.test.cjs
+      - name: Deploy Worker
+        working-directory: workers/gemini-mcp
+        run: npx --yes wrangler@4 deploy
+      - name: Set secrets
+        working-directory: workers/gemini-mcp
+        run: |
+          printf '%s' "$PROGRESS_SYNC_KEY" | npx --yes wrangler@4 secret put PROGRESS_SYNC_KEY
+          printf '%s' "$GEMINI_MCP_TOKEN" | npx --yes wrangler@4 secret put MCP_READ_TOKEN
+      - name: Smoke test (read-only)
+        run: |
+          sleep 10
+          base=https://study-os-gemini-mcp.kasidit09022550.workers.dev/mcp
+          body='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_schedule","arguments":{}}}'
+          code=$(curl -s -o /tmp/body -w '%{http_code}' -H 'Content-Type: application/json' -H "Authorization: Bearer $GEMINI_MCP_TOKEN" -d "$body" "$base")
+          echo "HTTP $code"; test "$code" = 200
+          grep -q '"result"' /tmp/body || { echo "No result"; exit 1; }
+          grep -q '"isError":true' /tmp/body && { echo "Tool could not read progress"; exit 1; } || true
+          noauth=$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -d "$body" "$base")
+          echo "Without token: HTTP $noauth"; test "$noauth" = 401
