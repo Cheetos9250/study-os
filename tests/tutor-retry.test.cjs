@@ -26,5 +26,5 @@ test('the page retries busy answers twice, then asks another model once, and sho
   assert.match(h,/A\.backupModel\('gemini',ids,cfg\.gemini\.model\)/);
   assert.match(h,/finally\{cfg\.gemini\.model=keep;\}/,'the backup model is used for one answer only');
   for(const k of ['explain','quiz','mistakes','plan'])assert.match(h,new RegExp('data-quick="'+k+'"'));
-  assert.match(h,/scripts\/study-tutor\.js\?v=4/);
+  assert.match(h,/scripts\/study-tutor\.js\?v=5/);
 });
