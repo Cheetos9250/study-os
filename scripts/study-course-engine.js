@@ -160,9 +160,9 @@ Object.entries(OPT.extraCats||{}).forEach(([id,l])=>{ if(QS.some(q=>q.cat===id)&
 /* near-duplicate questions hidden (answers stay saved) */
 const QHIDE=new Set(XTRA.hide||[]);
 /* quiz review (spaced repetition) */
-let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showRetired=false;
-const retired=q=>!!(window.StudyReview&&StudyReview.isRetired(store,q.id,reviewStart));
-const retChip=()=>{const n=QS.filter(retired).length;return n?'<button class="chip" id="retBtn" aria-pressed="'+showRetired+'" type="button" title="Answered right 4 times in a row; back for review in 30–90 days">Retired<span class="n">'+n+'</span></button>':'';};
+let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showOld=false;
+const isOldQ=q=>!!(window.StudyReview&&StudyReview.isOld&&StudyReview.isOld(store,q.id));
+const retChip=()=>{const n=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&isOldQ(q)).length;return n||showOld?'<button class="chip" id="retBtn" aria-pressed="'+showOld+'" type="button" title="Answered right 2 times in a row. They stay out of the normal sets; a wrong answer sends one back.">Old questions<span class="n">'+n+'</span></button>':'';};
 /* Difficulty tag (owner, 21 Nov 2026): from my own answers, no new storage. Wrong now or review box 0 = Hard, box 1 = Medium, box 2+ = Easy; unanswered = no tag. acc/eco/math only (where StudyQSets is loaded). */
 function diffTag(q){ if(!window.StudyQSets||q.open||q.gen||store.ans[q.id]===undefined)return ''; const r=(store.rv||{})[q.id], box=Array.isArray(r)?+r[0]||0:(store.ans[q.id]===q.right?1:0);
   const lv=store.ans[q.id]!==q.right||box<1?['Hard','#e5484d']:box<2?['Medium','#d9a400']:['Easy','#2f9e5b'];
@@ -242,7 +242,7 @@ function setsRow(){
   return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px"><button class="chip" type="button" data-qset="auto" aria-pressed="'+(qset!=='all')+'">Current set of each chapter</button><button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All questions</button></div>'
    +'<div class="count" style="margin:-2px 0 10px">Each chapter has sets of 50 questions (one set when it has 50 or fewer); pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
 }
-function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,(qtopic||qguide)?'all':qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!qtopic||topicOf(q)===qtopic)&&(!qguide||guideOf(q)===qguide)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,(qtopic||qguide)?'all':qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!qtopic||topicOf(q)===qtopic)&&(!qguide||guideOf(q)===qguide)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||(showOld?isOldQ(q):!isOldQ(q)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
   else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
@@ -275,8 +275,8 @@ function renderQ(){
     [['all','All'],...CATS].forEach(([id,l])=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip';
       b.setAttribute('aria-pressed', id==='all'?!qcats.size:qcats.has(id));
-      const inCat=id==='all'?[]:QS.filter(q=>q.cat===id), mastered=inCat.length&&inCat.every(retired);
-      if(mastered) b.title='Mastered: every question here is retired';
+      const inCat=id==='all'?[]:QS.filter(q=>q.cat===id), mastered=inCat.length&&inCat.every(isOldQ);
+      if(mastered) b.title='Mastered: every question here is an old question';
       b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'?!q.gen:q.cat===id)).length+'</span>';
       b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qtopic=''; qJump=null; buildDeck();renderQ(); };
       box.appendChild(b); });
@@ -289,7 +289,7 @@ function renderQ(){
   h+=setsRow()+(SLIM_ROWS?'':topicRow()+guideRow());
   if(OPT.written&&!SLIM_ROWS) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
   h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button>'+(setDone()?'<button class="chip" id="againBtn" type="button" aria-pressed="true">Start again</button>':'')+'<button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
-  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':showOld?'No old questions here yet. A question becomes old after 2 right answers in a row.':QS.some(isOldQ)&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(isOldQ)?'Everything here is an old question (answered right 2 times in a row). Tap Old questions to review them.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
   window.StudyLast&&StudyLast.mark({href:D.key+'.html?tab=prac&q='+encodeURIComponent(q.id),title:D.title+' · Practice',sub:'Q '+(qpos+1)+' · '+q.q,course:D.key});
@@ -343,7 +343,7 @@ function wireQ(){
   const rb=$('#revBtn'); if(rb) rb.onclick=()=>{reviewOnly=!reviewOnly;qJump=null;reviewStart=Date.now();qpos=0;buildDeck();renderQ()};
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;qJump=null;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;qJump=null;buildDeck();renderQ()};
-  const rt=$('#retBtn'); if(rt) rt.onclick=()=>{showRetired=!showRetired;qpos=0;buildDeck();renderQ()};
+  const rt=$('#retBtn'); if(rt) rt.onclick=()=>{showOld=!showOld;qpos=0;buildDeck();renderQ()};
   const gb=$('#genBtn'); if(gb) gb.onclick=()=>{genLoad();qJump=null;qpos=0;save();buildDeck();renderQ()};
   const sh=$('#shufBtn'); if(sh) sh.onclick=()=>{shuffleOn=!shuffleOn;buildDeck();renderQ()};
   const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rv={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };

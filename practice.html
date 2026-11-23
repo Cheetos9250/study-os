@@ -165,7 +165,7 @@ html.nb-lock,html.nb-lock body{overflow:hidden}
 </section>
 </main>
 </div>
-<script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-review.js?v=3"></script>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=5"></script>
 <script src="scripts/study-note-images.js?v=1"></script>
@@ -189,7 +189,7 @@ function render(){
  const ne0=nextExam(now),wideKey=ne0?ne0.course:'';
  const due={};for(const c of T.COURSES)due[c.key]=window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0;
  $('#courses').innerHTML=T.COURSES.map(c=>{const s=sum[c.key];let q=0,a=0,r=0;if(s)for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}
-  return '<div class="pc'+(c.key===wideKey?' wide':'')+'"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+(window.StudyReview&&StudyReview.retiredRaw(read('study-'+c.key),now)?' · '+StudyReview.retiredRaw(read('study-'+c.key),now)+' retired':'')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
+  return '<div class="pc'+(c.key===wideKey?' wide':'')+'"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+(window.StudyReview&&StudyReview.oldRaw(read('study-'+c.key))?' · '+StudyReview.oldRaw(read('study-'+c.key))+' old':'')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
    +'<div class="acts">'+(due[c.key]?'<a class="main" href="'+link(c,'prac')+'&review=1">Review '+due[c.key]+'</a><a href="'+link(c,'prac')+'">Quiz</a>':'<a class="main" href="'+link(c,'prac')+'">Start quiz</a>')+'</div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;

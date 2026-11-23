@@ -77,7 +77,7 @@ Core pages use the "ink manga" system in `assets/study-world.css` (see `DESIGN.m
 | Key | What |
 |---|---|
 | `<mark>-srs`, `<mark>-typ` | Flashcard SRS. Marks: `acc-flashcards-v1`, `econ-flashcards-v1`, `math-flashcards-v1`, `eng-vocab-v1`, `zh-vocab-v1`. |
-| `study-<course>` | Quiz answers (`ans`, `ats`) and the quiz review schedule `rv` (`id → [box, dueMs]`, `scripts/study-review.js`; gaps 1/3/7/14/30/90 days, box ≥ 4 = retired). |
+| `study-<course>` | Quiz answers (`ans`, `ats`) and the quiz review schedule `rv` (`id → [box, dueMs]`, `scripts/study-review.js`; gaps 1/3/7/14/30/90 days). **Old questions** (owner, 23 Nov 2026): box ≥ 2 (2 right in a row) = old: out of the normal sets and Review due, shown only under the **Old questions** chip on acc/eco/math practice; a wrong answer resets the box and sends it back. `isRetired` (box ≥ 4) stays for Stats badges. |
 | `studyos.home.v1` | Owner tasks (a task may have `rep: 'd'|'w'`: ticking it adds the next one, id `<id>~<date>`), cover, icon, card images, `wtarget` (weekly target `{q, p}`, edited on Stats → This week) and `qgoal` (daily practice goal, 1–200 questions; Today goal card, `scripts/study-motivation.js`). |
 | `studyos.today.v1` | Exams, plan ticks, timetable. `markChapter` must keep the other fields. |
 | `studyos.grades.v1` | Grades. |

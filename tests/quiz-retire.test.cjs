@@ -13,10 +13,8 @@ test('a question retires after 4 correct answers in a row and comes back only wh
   assert.equal(R.retiredRaw(JSON.stringify({ans:{a:1,b:1},rv:{a:[4,now+30*DAY],b:[2,now+DAY]}}),now),1);
   assert.equal(R.retiredRaw('bad',now),0);
 });
-test('quiz pages hide retired questions unless Retired is on, and mark chapters that are fully mastered',()=>{
+test('quiz pages: the Retired view was replaced by Old questions (owner, 23 Nov 2026; see quiz-old.test.cjs)',()=>{
   for(const f of ['acc.html','eco.html','math.html']){const s=read(f);
-    assert.match(s,/\(reviewOnly\|\|showRetired\|\|!retired\(q\)\)&&/,f);
-    assert.match(s,/id="retBtn"/,f);assert.match(s,/showRetired=!showRetired/,f);
-    assert.match(s,/mastered=inCat\.length&&inCat\.every\(retired\)/,f);}
-  assert.match(read('practice.html'),/StudyReview\.retiredRaw\(read\('study-'\+c\.key\),now\)/);
+    assert.match(s,/id="retBtn"/,f);assert.match(s,/mastered=inCat\.length&&inCat\.every\(isOldQ\)/,f);}
+  assert.match(read('practice.html'),/StudyReview\.oldRaw\(read\('study-'\+c\.key\)\)/);
 });
