@@ -160,7 +160,7 @@ Object.entries(OPT.extraCats||{}).forEach(([id,l])=>{ if(QS.some(q=>q.cat===id)&
 /* near-duplicate questions hidden (answers stay saved) */
 const QHIDE=new Set(XTRA.hide||[]);
 /* quiz review (spaced repetition) */
-let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showOld=false;
+let autoNext=0; let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showOld=false;
 const isOldQ=q=>!!(window.StudyReview&&StudyReview.isOld&&StudyReview.isOld(store,q.id));
 const retChip=()=>{const n=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&isOldQ(q)).length;return n||showOld?'<button class="chip" id="retBtn" aria-pressed="'+showOld+'" type="button" title="Answered right 2 times in a row. They stay out of the normal sets; a wrong answer sends one back.">Old questions<span class="n">'+n+'</span></button>':'';};
 /* Difficulty tag (owner, 21 Nov 2026): from my own answers, no new storage. Wrong now or review box 0 = Hard, box 1 = Medium, box 2+ = Easy; unanswered = no tag. acc/eco/math only (where StudyQSets is loaded). */
@@ -314,11 +314,15 @@ function renderQ(){
   if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+jpics(q,'after')+(ok?'':askAI(q,ch))+'</div>'; }
   }
   const scrOn=!!window.StudyScratch&&!q.gen, scrId=D.key+':'+q.id;
+  const aiOn=!!window.StudyAskInline&&!!window.StudyTutor&&!q.open&&Array.isArray(q.order);
+  if(aiOn&&StudyAskInline.isOpen()) h+='<div id="aiBox"></div>';
   if(scrOn&&StudyScratch.isOpen()) h+='<div id="scrBox"></div>';
-  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button>'+(scrOn?'<button class="btn" id="qscr" type="button" aria-pressed="'+StudyScratch.isOpen()+'">Scratchpad'+(StudyScratch.has(scrId)?' ✎':'')+'</button>':'')+'<button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
+  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button>'+(scrOn?'<button class="btn" id="qscr" type="button" aria-pressed="'+StudyScratch.isOpen()+'">Scratchpad'+(StudyScratch.has(scrId)?' ✎':'')+'</button>':'')+(aiOn?'<button class="btn" id="qai" type="button" aria-pressed="'+StudyAskInline.isOpen()+'">Ask AI'+(StudyAskInline.has(q.id)?' ✓':'')+'</button>':'')+'<button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
   h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined||reviewFresh(x)?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
   box.innerHTML=h;
-  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); window.StudyReview&&StudyReview.record(store,q.id,store.ans[q.id]===q.right,Date.now()); save(); renderQ(); });
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); window.StudyReview&&StudyReview.record(store,q.id,store.ans[q.id]===q.right,Date.now()); save(); const ok=store.ans[q.id]===q.right; renderQ();
+    /* right answer: move on by itself after a moment (owner, 23 Nov 2026); a wrong one stays so the answer can be read */
+    if(ok&&qpos<deck.length-1){ const at=qpos,id=String(q.id); clearTimeout(autoNext); autoNext=setTimeout(()=>{ if(qpos===at&&deck[qpos]&&String(deck[qpos].id)===id){ qpos++; renderQ(); } },900); } });
   if(q.open){ const ta=$('#tbAns'); if(ta){ ta.value=tbNotes(q.src); ta.oninput=()=>{ clearTimeout(tbTimer); tbTimer=setTimeout(()=>tbSave(q.src,ta.value),400); }; ta.onblur=()=>{ clearTimeout(tbTimer); tbSave(q.src,ta.value); }; }
     jeCtl=null; const jb=$('#jeBox'); if(jb) jeCtl=StudyJE.mount(jb,{answer:q.je,rows:tbJe(q.src),save:rows=>tbSaveJe(q.src,rows),onAllCorrect:done?null:()=>mark(0)});
     fsCtl=null; const fb=$('#fsBox'); if(fb) fsCtl=StudyFS.mount(fb,{answer:q.fs,rows:tbFs(q.src),save:rows=>tbSaveFs(q.src,rows),onAllCorrect:done?null:()=>mark(0)});
@@ -329,6 +333,11 @@ function renderQ(){
     const gq=$('#tbGotQuick'); if(gq) gq.onclick=()=>mark(0);
     const g=$('#tbGot'); if(g) g.onclick=()=>mark(0); const m=$('#tbMiss'); if(m) m.onclick=()=>mark(1); }
   box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
+  { const ab=$('#qai'); if(ab) ab.onclick=()=>{ StudyAskInline.setOpen(!StudyAskInline.isOpen()); renderQ(); };
+    const ax=$('#aiBox'); if(ax){ const cat=((D.cats||[]).find(c=>c[0]===q.cat)||[q.cat,q.cat]);
+      StudyAskInline.mount(ax,{id:q.id,course:D.key,courseName:D.title||D.key,chapterId:q.cat,chapter:cat[1],
+        q:{q:q.q,prompt:q.prompt||'',opts:q.order.map(oi=>q.opts[oi]),right:q.order.indexOf(q.right),exp:q.exp||''},
+        mine:done?q.order.indexOf(ch):undefined}); } }
   { const sb=$('#qscr'); if(sb) sb.onclick=()=>{ StudyScratch.setOpen(!StudyScratch.isOpen()); renderQ(); };
     const sx=$('#scrBox'); if(sx) StudyScratch.mount(sx,scrId,has=>{ const b=$('#qscr'); if(b) b.textContent='Scratchpad'+(has?' ✎':''); }); }
   const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};

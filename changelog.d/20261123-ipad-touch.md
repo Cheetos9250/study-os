@@ -1,0 +1,1 @@
+- Quiz pages on iPad: swipe left or right on the question to go to the next or previous one (a swipe from the right edge still opens the notes), a right answer moves on by itself after a moment, and the answer buttons are bigger on touch screens.

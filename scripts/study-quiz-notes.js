@@ -94,15 +94,19 @@
   /* swipe from the right side towards the left: notes open full screen; swipe right on the full-screen notes: back to the quiz.
      The outermost edge strips are left to Safari's own back/forward gestures. */
   var sx=0,sy=0,st0=0,on=false;
-  document.addEventListener('touchstart',function(e){if(e.touches.length!==1){on=false;return;}var t=e.touches[0];on=t.clientX>16&&t.clientX<innerWidth-16;sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});
+  var inCard=false;
+  document.addEventListener('touchstart',function(e){if(e.touches.length!==1){on=false;return;}var t=e.touches[0];on=t.clientX>16&&t.clientX<innerWidth-16;inCard=!!(e.target.closest&&e.target.closest('.qcard'));sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});
   document.addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Date.now()-st0>700||Math.abs(dx)<90||Math.abs(dy)>Math.abs(dx)*0.5)return;
    var full=panel.classList.contains('full'),inPanel=panel.contains(e.target);
-   if(dx<0&&!full&&!inPanel&&sx>innerWidth*0.45){if(panel.hidden)setOpen(true);setFull(true);ta.focus({preventScroll:true});}
+   if(dx<0&&!full&&!inPanel&&(inCard?sx>innerWidth-64:sx>innerWidth*0.45)){if(panel.hidden)setOpen(true);setFull(true);ta.focus({preventScroll:true});}
    else if(dx>0&&full&&sx>28){setFull(false);setOpen(false);}},{passive:true});
   sel.onchange=function(){flush();chap=sel.value;pinned=chap!==current();load();ta.focus();};
   ta.addEventListener('input',function(){status('Saving…');clearTimeout(timer);timer=setTimeout(save,500);});
   ta.addEventListener('blur',flush);
   window.addEventListener('pagehide',flush);
+  /* other note writers on the page (Ask AI → Save to note) flush this panel first, then ask it to reload */
+  document.addEventListener('studyos:notes-flush',flush);
+  document.addEventListener('studyos:notes-changed',function(){if(!timer)load();});
   document.addEventListener('visibilitychange',function(){if(document.hidden)flush();else if(!timer&&document.activeElement!==ta&&!panel.hidden)load();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!panel.hidden){if(panel.classList.contains('full'))setFull(false);else setOpen(false);}});
   /* follow the quiz: when the question on screen moves to another chapter, the note follows (unless a chapter was picked by hand) */

@@ -13,7 +13,7 @@ test('pins live in the backed-up, synced notes as "<course>:pins" (valid for res
   assert.match(R('scripts/study-pins.js'),/k=c\+':pins'/);
   assert.ok(/^[a-z]+:[A-Za-z0-9_-]+$/.test('acc:pins'),'matches the restore note-key rule');
   assert.match(R('practice.html'),/<section id="pinsPanel"/);assert.match(R('practice.html'),/scripts\/study-pins\.js/);
-  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/scripts\/study-quiz-notes\.js\?v=3"><\/script>\n<script src="scripts\/study-pins\.js/);
+  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/scripts\/study-quiz-notes\.js\?v=4"><\/script>\n<script src="scripts\/study-pins\.js/);
 });
 test('Cram Mode is read-only: lists wrong or box-0 questions with the right answer',()=>{
   const e=R('scripts/study-course-engine.js');
