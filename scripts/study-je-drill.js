@@ -49,9 +49,7 @@
   {id:'fifo',ch:6,title:'Sale with FIFO cost',gen(r){const u1=pick(r,[10,20,30,40]),c1=pick(r,[5,6,8,10]),u2=pick(r,[20,30,40]),c2=c1+pick(r,[1,2,3]),sold=u1+Math.floor(r()*(u2-5))+1,price=c2*2,
     cost=u1*c1+(sold-u1)*c2,s=sold*price;
    return {text:'Beginning inventory: '+u1+' units at '+money(c1)+'. Purchase: '+u2+' units at '+money(c2)+'. Sold '+sold+' units on credit at '+money(price)+' each. Record the sale using FIFO (perpetual).',je:[L('Accounts Receivable',s),L('Sales',0,s),L('Cost of Goods Sold',cost),L('Merchandise Inventory',0,cost)],hint:'FIFO: the '+u1+' oldest units first, then '+(sold-u1)+' from the purchase.'};}},
-  {id:'lifo',ch:6,title:'Sale with LIFO cost',gen(r){const u1=pick(r,[20,30,40]),c1=pick(r,[5,6,8,10]),u2=pick(r,[10,20,30]),c2=c1+pick(r,[1,2,3]),sold=u2+Math.floor(r()*(u1-5))+1,price=c2*2,
-    cost=u2*c2+(sold-u2)*c1,s=sold*price;
-   return {text:'Beginning inventory: '+u1+' units at '+money(c1)+'. Purchase: '+u2+' units at '+money(c2)+'. Sold '+sold+' units for cash at '+money(price)+' each. Record the sale using LIFO (perpetual).',je:[L('Cash',s),L('Sales',0,s),L('Cost of Goods Sold',cost),L('Merchandise Inventory',0,cost)],hint:'LIFO: the '+u2+' newest units first, then '+(sold-u2)+' from beginning inventory.'};}},
+  /* LIFO removed 24 Nov 2026: outside the Final 1201101 exam guide (owner) */
   {id:'lcm',ch:6,title:'Lower of cost or market',gen(r){const c=amt(r,5000,30000),m=c-amt(r,200,2000);
    return {text:'Year-end inventory cost is '+money(c)+'; its market value (replacement cost) is '+money(m)+'. Apply lower of cost or market.',je:[L('Cost of Goods Sold',c-m),L('Merchandise Inventory',0,c-m)],hint:'Write inventory down to market; the loss goes to Cost of Goods Sold.'};}},
   {id:'pcset',ch:8,title:'Set up a petty cash fund',gen(r){const a=pick(r,[100,150,200,250,300,500]);
@@ -106,7 +104,7 @@
   for(let i=0;i<pool.length;i++){x-=w[i];if(x<0)return pool[i];}return pool[pool.length-1];
  }
  /* weakest templates with at least 2 tries */
- function weak(st,n){return Object.entries(normalize(st).tpl).filter(([,v])=>v[0]>=2).map(([id,v])=>({id,title:(T.find(t=>t.id===id)||{}).title||id,tries:v[0],right:v[1],pct:Math.round(v[1]/v[0]*100)}))
+ function weak(st,n){return Object.entries(normalize(st).tpl).filter(([id,v])=>v[0]>=2&&T.some(t=>t.id===id)).map(([id,v])=>({id,title:(T.find(t=>t.id===id)||{}).title||id,tries:v[0],right:v[1],pct:Math.round(v[1]/v[0]*100)}))
   .filter(x=>x.pct<100).sort((a,b)=>a.pct-b.pct||b.tries-a.tries).slice(0,n||3);}
  /* a prompt for the AI tutor about one drill and the learner's lines */
  function askPrompt(d,rows){

@@ -1,0 +1,2 @@
+- Search understands common abbreviations: type cogs, AR, AP, NRV, LCM, FIFO, JE, GDP, CPI and more to find the full term (English or Thai).
+- JE Drill no longer shows LIFO transactions (LIFO is outside the accounting final's exam guide).
