@@ -42,7 +42,7 @@ jobs:
       - name: Build the question bank (bundled into the Worker, not committed)
         run: node scripts/build-question-bank.cjs workers/gemini-mcp/bank.json
       - name: Offline tests
-        run: node --test tests/gemini-mcp-worker.test.cjs tests/gemini-export.test.cjs tests/gemini-share.test.cjs
+        run: node --test tests/gemini-mcp-worker.test.cjs tests/gemini-export.test.cjs tests/gemini-export-more.test.cjs tests/gemini-share.test.cjs
       - name: Deploy Worker
         working-directory: workers/gemini-mcp
         run: npx --yes wrangler@4 deploy

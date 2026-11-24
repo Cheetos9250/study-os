@@ -9,7 +9,7 @@ const prog={acc:{study},eco:{study:{}},math:{study:{}},
 const env={MCP_READ_TOKEN:TOKEN,PROGRESS_SYNC_KEY:'k'.repeat(30),
  PROGRESS:{fetch:async req=>{if(req.method!=='GET')throw Error('write');return new Response(JSON.stringify(prog[req.url.split('/').pop()]),{status:200});}},
  SITE_FETCH:async u=>new Response(fs.readFileSync(path.join(root,u.replace(/^https:\/\/cheetos9250\.github\.io\/study-os\//,'')),'utf8'))};
-test.before(async()=>{bank=B.build();fs.writeFileSync(path.join(root,'workers/gemini-mcp/bank.json'),JSON.stringify(bank));W=(await import(path.join(root,'workers/gemini-mcp/worker.mjs'))).default;});
+test.before(async()=>{bank=require('./gemini-bank.cjs')();W=(await import(path.join(root,'workers/gemini-mcp/worker.mjs'))).default;});
 test('bank has every course, engine ids, no hidden extras',()=>{
  const acc=bank.courses.acc;assert.ok(acc.questions.length>500);assert.equal(acc.questions[0].id,'0');
  assert.ok(acc.questions.some(q=>q.id==='err-1'));
@@ -23,7 +23,7 @@ test('GET /export returns all tables with my answers, Bearer only',async()=>{
  assert.equal((await W.fetch(new Request('https://x/export'),env)).status,401);
  const r=await W.fetch(new Request('https://x/export',{headers:{Authorization:'Bearer '+TOKEN}}),env);assert.equal(r.status,200);
  const {sheets}=await r.json();
- assert.deepEqual(Object.keys(sheets),['Summary','Questions','Notes','Tasks','Grades','Exams','Classes']);
+ assert.deepEqual(Object.keys(sheets).slice(0,7),['Summary','Questions','Notes','Tasks','Grades','Exams','Classes']);
  const Q=sheets.Questions;assert.equal(Q.length-1,bank.courses.acc.questions.length+bank.courses.eco.questions.length+bank.courses.math.questions.length);
  const row0=Q.find(x=>x[2]==='0'&&x[0]==='Accounting');assert.equal(row0[12],'A');assert.equal(row0[13],'Right');
  assert.equal(Q.find(x=>x[2]==='1'&&x[0]==='Accounting')[13],'Wrong');

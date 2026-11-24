@@ -1,0 +1,1 @@
+- Gemini Sheet **Study OS data** gets more tabs from the synced data: Flashcards (all five courses with due dates), WordNest Words and Word days, Textbook written answers, PDF sets and Excel; Questions also show the review box and whether a question is "old". Needs a redeploy of the Gemini Worker; the Apps Script stays the same.
