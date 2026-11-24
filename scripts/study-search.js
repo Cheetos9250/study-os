@@ -46,11 +46,26 @@
    const seen=new Set();for(const t of v.text.match(/#[^\s#.,;:!?()\[\]{}"'“”]+/gu)||[]){const k=t.normalize('NFKC');if(k.length<2||/^#\d+$/.test(k)||seen.has(k))continue;seen.add(k);m[k]=(m[k]||0)+1;}}
   return Object.entries(m).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,30);}
  /* Every word must appear; title matches first, then notes, questions, textbook, summaries, cards. */
+ /* common abbreviations (owner, 24 Nov 2026): typing one also finds the full term (English or Thai);
+    the abbreviation itself then has to stand alone as a word, so "ar" no longer matches every "ar" inside words */
+ const ABBR={cogs:['cost of goods sold','ต้นทุนขาย'],ar:['accounts receivable','account receivable','ลูกหนี้'],ap:['accounts payable','account payable','เจ้าหนี้'],
+  nrv:['net realizable value','net realisable value'],lcm:['lower of cost or market','lower-of-cost-or-market'],lcnrv:['lower of cost and net realizable value','lower of cost or net realizable value'],
+  fifo:['first-in, first-out','first in, first out','first in first out','first-in first-out'],lifo:['last-in, first-out','last in, first out','last in first out'],
+  wac:['weighted average','weighted-average'],wa:['weighted average','weighted-average'],je:['journal entry','journal entries','บันทึกบัญชี'],gp:['gross profit','กำไรขั้นต้น'],
+  ni:['net income','กำไรสุทธิ'],re:['retained earnings'],oe:["owner's equity",'owners equity','ส่วนของเจ้าของ'],dr:['debit','เดบิต'],cr:['credit','เครดิต'],
+  bs:['balance sheet','งบแสดงฐานะการเงิน'],fs:['financial statement'],tb:['trial balance','งบทดลอง'],nsf:['not sufficient funds','nsf check','nsf cheque'],
+  afda:['allowance for doubtful accounts'],ada:['allowance for doubtful accounts'],bde:['bad debt expense','bad debts expense'],ppe:['property, plant','plant assets'],
+  ais:['accounting information system'],coa:['chart of accounts'],gdp:['gross domestic product'],gnp:['gross national product'],cpi:['consumer price index'],
+  ad:['aggregate demand'],sras:['short-run aggregate supply'],lras:['long-run aggregate supply'],mpc:['marginal propensity to consume'],mps:['marginal propensity to save'],
+  pv:['present value'],fv:['future value'],apr:['annual percentage rate']};
+ const wordRe={};
+ function has(text,w){if(text.includes(w)&&!ABBR[w])return true;const alt=ABBR[w];if(!alt)return false;
+  const re=wordRe[w]||(wordRe[w]=new RegExp('(^|[^a-z0-9])'+w+'([^a-z0-9]|$)'));return re.test(text)||alt.some(a=>text.includes(a));}
  function search(index,query,limit){
   const words=fold(query).split(/\s+/).filter(w=>w.length>0);if(!words.length)return [];
   const hits=[];
-  for(const it of index){if(!words.every(w=>it.text.includes(w)))continue;
-   const t=fold(it.title),score=(words.every(w=>t.includes(w))?0:10)+(t.startsWith(words[0])?0:1)+RANK[it.type];hits.push([score,it]);}
+  for(const it of index){if(!words.every(w=>has(it.text,w)))continue;
+   const t=fold(it.title),score=(words.every(w=>has(t,w))?0:10)+(t.startsWith(words[0])?0:1)+RANK[it.type];hits.push([score,it]);}
   hits.sort((a,b)=>a[0]-b[0]||a[1].title.length-b[1].title.length);
   return hits.slice(0,limit||40).map(h=>h[1]);
  }
