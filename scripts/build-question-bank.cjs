@@ -10,11 +10,11 @@ const fs=require('fs'),path=require('path'),vm=require('vm');
 const ROOT=path.join(__dirname,'..'),read=f=>fs.readFileSync(path.join(ROOT,f),'utf8');
 const COURSES=[
  {key:'acc',name:'Accounting',subj:'Accounting',data:'data/courses/acc.js',extra:'data/courses/acc-extra.js',mcq:{file:'scripts/acc-textbook-mcq.js',list:'ACC_TB_MCQ'},englishOnly:true},
- {key:'eco',name:'Economics',subj:'Economics',data:'data/courses/eco.js',mcq:{file:'scripts/eco-practice-mcq.js',list:'ECO_PRACTICE_MCQ',cat:['f','Macro · Fiscal Policy']}},
+ {key:'eco',name:'Economics',subj:'Economics',data:'data/courses/eco.js',mcq:{file:['scripts/eco-practice-mcq.js','scripts/eco-exam-mcq.js'],list:'ECO_PRACTICE_MCQ',cat:['f','Macro · Fiscal Policy']}},
  {key:'math',name:'Math',subj:'Math for Life',data:'data/courses/math.js',mcq:{file:'scripts/math-practice-mcq.js',list:'MATH_PRACTICE_MCQ'}}
 ];
 function courseData(file){const m=/^const D = (\{.*\});\s*$/m.exec(read(file));if(!m)throw Error('no D in '+file);return JSON.parse(m[1]);}
-function runScript(file){const ctx={window:{}};ctx.globalThis=ctx.window;vm.runInNewContext(read(file),ctx,{filename:file,timeout:5000});return ctx.window;}
+function runScript(file){const ctx={window:{}};ctx.globalThis=ctx.window;[].concat(file).forEach(f=>vm.runInNewContext(read(f),ctx,{filename:f,timeout:5000}));return ctx.window;}
 const str=x=>String(x==null?'':x);
 function build(){
  const quizRows=(JSON.parse(read('data/quiz.json')).rows)||[];
