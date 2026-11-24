@@ -12,8 +12,8 @@ function run(sha){
       fetchAll:reqs=>reqs.map(r=>{fetched.push(r.url);const p=decodeURIComponent(r.url.split('/main/')[1]);return res(200,fs.readFileSync(path.join(root,p),'utf8'));})},
     DocumentApp:{create:n=>{const id='d'+Object.keys(docs).length;docs[id]={name:n,text:''};return {getId:()=>id};},
       openById:id=>({getBody:()=>({setText:t=>{docs[id].text=t;}}),saveAndClose:()=>{},getUrl:()=>'u'})},
-    DriveApp:{createFolder:n=>{ctx._folder={name:n,id:'F'};return {getId:()=>'F',getUrl:()=>'fu',isTrashed:()=>false};},getFolderById:id=>({getId:()=>id,getUrl:()=>'fu',isTrashed:()=>false}),
-      getFileById:id=>({getParents:()=>{const p=(docs[id]&&docs[id].parent)||null;let done=!p;return {hasNext:()=>!done,next:()=>{done=true;return {getId:()=>p};}};},moveTo:f=>{docs[id]=docs[id]||{name:id,text:''};docs[id].parent=f.getId();}})},
+    DriveApp:{getFilesByName:n=>{const ids=Object.keys(docs).filter(i=>docs[i].name===n);let k=0;return {hasNext:()=>k<ids.length,next:()=>{const id=ids[k++];return {getId:()=>id,setTrashed:()=>{docs[id].trashed=true;}};}};},createFolder:n=>{ctx._folder={name:n,id:'F'};return {getId:()=>'F',getUrl:()=>'fu',isTrashed:()=>false};},getFolderById:id=>({getId:()=>id,getUrl:()=>'fu',isTrashed:()=>false}),
+      getFileById:id=>({setTrashed:()=>{if(docs[id])docs[id].trashed=true;},getParents:()=>{const p=(docs[id]&&docs[id].parent)||null;let done=!p;return {hasNext:()=>!done,next:()=>{done=true;return {getId:()=>p};}};},moveTo:f=>{docs[id]=docs[id]||{name:id,text:''};docs[id].parent=f.getId();}})},
         Utilities:{formatDate:()=>'2026-11-24 10:00'},ScriptApp:{getProjectTriggers:()=>[],deleteTrigger:()=>{}},Logger:{log:()=>{}}};
   vm.createContext(ctx);vm.runInContext(src,ctx);
   return {ctx,props,docs,fetched,files};
@@ -22,7 +22,7 @@ test('copies app code into Docs under the Google Docs size limit, with an index 
   const {ctx,docs,props,files}=run('abc');ctx.refreshCode();
   const list=Object.values(docs),index=list.find(d=>d.name==='Study OS code – index');
   assert.ok(index,'index Doc');assert.ok(list.length>=6);
-  for(const d of list)assert.ok(d.text.length<1000000,d.name+' is '+d.text.length+' chars');
+  for(const d of list)assert.ok(d.text.length<=101000,d.name+' is '+d.text.length+' chars');
   for(const f of ['scripts/study-course-engine.js','index.html','AGENTS.md','vocabloom/wordnest.js','assets/study-eink.css','workers/gemini-mcp/worker.mjs'])
     assert.ok(index.text.includes('  '+f),f+' in index');
   assert.ok(list.some(d=>d.text.includes('===== FILE: scripts/study-review.js =====')));

@@ -28,7 +28,7 @@ The same Apps Script can also copy the site's **source code** into Google Docs, 
 
 1. Paste the latest `study-os-doc.gs` into the same Apps Script project (replace the old text) and save.
 2. Choose the function **setupCode** and press **Run** (allow external requests if asked).
-3. Drive now has **Study OS code – index** plus six Docs: pages, scripts, scripts (other), wordnest, styles/workers/CI, docs and service worker. A part that grows past 800,000 characters is split into (1/2), (2/2).
+3. Drive now has **Study OS code – index** plus about 16 code Docs (pages, scripts, scripts (other), wordnest, styles/workers/CI, docs and service worker), each at most 100,000 characters and numbered (1/5), (2/5)… A very large file is split into pieces. Docs from an older layout go to the Drive trash.
 
 **One folder:** the Doc, the Sheet and all code Docs are kept in a Drive folder **Study OS for Gemini**. After pasting this version, run **gatherFiles** once (allow Google Drive access) to move files made earlier; later refreshes keep new files there.
 
