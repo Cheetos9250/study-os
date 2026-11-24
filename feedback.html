@@ -46,16 +46,16 @@ table{border-collapse:collapse;width:100%;font-size:14px}td{padding:6px 4px;bord
 <div class="panel"><h2 style="margin:0 0 8px;font-size:18px">Pages opened · last 14 days</h2><div id="use"></div>
 <p class="note">Counted on this device only. Nothing is sent unless you tap Send.</p></div>
 </div>
-<script src="scripts/study-usage.js?v=2"></script>
-<script src="scripts/study-nav.js?v=13"></script>
+<script src="scripts/study-usage.js?v=3"></script>
+<script src="scripts/study-nav.js?v=14"></script>
 <script>
 (function(){'use strict';
 var $=function(s){return document.querySelector(s);},U=window.StudyUsage,from=(new URLSearchParams(location.search).get('from')||'').replace(/[^a-z0-9-]/gi,'').slice(0,40);
-function sum(){return U?U.summary(localStorage,14):{days:0,pages:[]};}
+function sum(){return U?U.summary(localStorage,14):{days:0,pages:[],times:[]};}
 function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
-var s=sum();$('#use').innerHTML=s.pages.length?'<table>'+s.pages.slice(0,25).map(function(p){return '<tr><td>'+esc(p[0])+'</td><td>'+p[1]+'</td></tr>';}).join('')+'</table><p class="note">'+s.days+' day(s) with use.</p>':'<p class="note">No pages counted yet.</p>';
+var s=sum();var tm={};(s.times||[]).forEach(function(p){tm[p[0]]=p[1];});$('#use').innerHTML=s.pages.length?'<table><tr><td></td><td>opens</td><td>time</td></tr>'+s.pages.slice(0,25).map(function(p){return '<tr><td>'+esc(p[0])+'</td><td>'+p[1]+'</td><td>'+(tm[p[0]]?U.fmt(tm[p[0]]):'')+'</td></tr>';}).join('')+'</table><p class="note">'+s.days+' day(s) with use. Time counts only while the page is open and in use.</p>':'<p class="note">No pages counted yet.</p>';
 function body(){var t=$('#msg').value.trim(),b=t+'\n\n---\nFrom page: '+(from||'-')+'\nDevice: '+(innerWidth+'x'+innerHeight)+(navigator.standalone?' (home-screen app)':'');
- if($('#withUse').checked){var x=sum();b+='\n\nPages opened, last 14 days ('+x.days+' days used):\n'+x.pages.slice(0,25).map(function(p){return '- '+p[0]+': '+p[1];}).join('\n');}
+ if($('#withUse').checked){var x=sum();var tx={};(x.times||[]).forEach(function(p){tx[p[0]]=p[1];});b+='\n\nPages opened, last 14 days ('+x.days+' days used):\n'+x.pages.slice(0,25).map(function(p){return '- '+p[0]+': '+p[1]+' opens'+(tx[p[0]]?', '+U.fmt(tx[p[0]]):'');}).join('\n');}
  return b;}
 $('#send').onclick=function(){var t=$('#msg').value.trim();if(!t){$('#st').textContent='Write something first.';$('#msg').focus();return;}
  var title='Feedback: '+t.split('\n')[0].slice(0,70);

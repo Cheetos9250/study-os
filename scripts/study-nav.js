@@ -186,7 +186,7 @@
   if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable))return;e.preventDefault();openSearch();
  });
  /* Page-open counts on this device (scripts/study-usage.js); the nav itself still reads and writes no study data. */
- if(!window.StudyUsage){var us=document.createElement('script');us.src=navSrc?new URL('study-usage.js?v=2',navSrc).href:'scripts/study-usage.js?v=1';document.head.appendChild(us);}
+ if(!window.StudyUsage){var us=document.createElement('script');us.src=navSrc?new URL('study-usage.js?v=3',navSrc).href:'scripts/study-usage.js?v=1';document.head.appendChild(us);}
  window.StudyNav={TABS:TABS,active:active,timesUp:timesUp,search:openSearch};
  if(document.body)pomo();else document.addEventListener('DOMContentLoaded',pomo);
  if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
