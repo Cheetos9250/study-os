@@ -18,6 +18,9 @@
   box.innerHTML = '<button type="button" id="swMain" aria-label="Start stopwatch">⏱ Timer</button><button type="button" id="swReset" aria-label="Reset stopwatch" hidden>↺</button>';
   document.body.appendChild(box);
   var main = box.querySelector('#swMain'), reset = box.querySelector('#swReset');
+  /* the nav's running-Pomodoro pill (#snPomo) sits in the same corner: move below it while it is shown (owner, 24 Nov 2026) */
+  function place() { box.style.top = document.getElementById('snPomo') ? 'calc(56px + env(safe-area-inset-top))' : ''; }
+  new MutationObserver(place).observe(document.body, { childList: true }); place();
   function paint() {
     var n = Math.max(0, answered() - ans0), ms = elapsed();
     if (!running && !ms) { main.textContent = '⏱ Timer'; main.classList.remove('on'); reset.hidden = true; return; }
