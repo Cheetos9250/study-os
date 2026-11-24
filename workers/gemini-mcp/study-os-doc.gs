@@ -113,7 +113,7 @@ function stop() {
  */
 var CODE_REPO = 'cheetos9250/study-os';
 var CODE_PREFIX = 'Study OS code – ';
-var CODE_MAX = 800000; // characters per Doc (Google Docs hold about 1,000,000)
+var CODE_MAX = 100000; // characters per Doc: one setText of ~475,000 made the Docs service stop (24 Nov 2026)
 var CODE_GROUPS = [
   ['pages', /^[^\/]+\.html$/],
   ['scripts', /^scripts\/study-[^\/]+\.(js|cjs)$/],
@@ -133,11 +133,16 @@ function codeGroupOf(path) {
 
 /* files [{path, text}] of one group → Docs [{name, paths, text}], each under CODE_MAX, split between files */
 function codeParts(group, files) {
-  var parts = [], cur = null;
-  files.forEach(function (f) {
-    var block = '\n\n===== FILE: ' + f.path + ' =====\n' + f.text;
+  var parts = [], cur = null, room = CODE_MAX - 200;
+  function add(block, path) {
     if (!cur || (cur.text.length + block.length > CODE_MAX && cur.paths.length)) { cur = { paths: [], text: '' }; parts.push(cur); }
-    cur.paths.push(f.path); cur.text += block;
+    if (cur.paths.indexOf(path) < 0) cur.paths.push(path);
+    cur.text += block;
+  }
+  files.forEach(function (f) {
+    if (f.text.length <= room) { add('\n\n===== FILE: ' + f.path + ' =====\n' + f.text, f.path); return; }
+    for (var i = 0, n = Math.ceil(f.text.length / room); i < n; i++)  // a very large file is split across Docs
+      add('\n\n===== FILE: ' + f.path + ' (piece ' + (i + 1) + '/' + n + ') =====\n' + f.text.slice(i * room, (i + 1) * room), f.path);
   });
   parts.forEach(function (p, i) { p.name = CODE_PREFIX + group + (parts.length > 1 ? ' (' + (i + 1) + '/' + parts.length + ')' : ''); });
   return parts;
@@ -163,17 +168,31 @@ function refreshCode() {
     });
     UrlFetchApp.fetchAll(batch).forEach(function (r) { texts.push(r.getResponseCode() === 200 ? r.getContentText() : '(could not read this file: HTTP ' + r.getResponseCode() + ')'); });
   }
+  var written = {};
   var docs = JSON.parse(props.getProperty('CODE_DOCS') || '{}'), index = [], stamp = Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd HH:mm');
   CODE_GROUPS.forEach(function (g) {
     var files = [];
     paths.forEach(function (p, k) { if (codeGroupOf(p) === g[0]) files.push({ path: p, text: texts[k] }); });
     codeParts(g[0], files).forEach(function (part) {
-      if (!docs[part.name]) docs[part.name] = DocumentApp.create(part.name).getId();
+      if (!docs[part.name]) { docs[part.name] = DocumentApp.create(part.name).getId(); props.setProperty('CODE_DOCS', JSON.stringify(docs)); } // saved at once, so a failed run leaves no untracked Doc
       var d = DocumentApp.openById(docs[part.name]);
       d.getBody().setText('Study OS source code: ' + part.name.slice(CODE_PREFIX.length) + ' (copied ' + stamp + ' Bangkok from github.com/' + CODE_REPO + ')' + part.text);
       d.saveAndClose();
       index.push(part.name + ':\n' + part.paths.map(function (p) { return '  ' + p; }).join('\n'));
+      written[part.name] = true;
     });
+  });
+  // Docs from an earlier layout (for example one big "pages" Doc) are moved to the Drive trash, so Gemini never reads old code
+  Object.keys(docs).forEach(function (n) {
+    if (n === CODE_PREFIX + 'index' || written[n]) return;
+    try { DriveApp.getFileById(docs[n]).setTrashed(true); } catch (e) {}
+    delete docs[n];
+  });
+  // single-part names from the first version (e.g. "Study OS code – pages") left behind by a run that stopped early
+  var keep = {}; Object.keys(docs).forEach(function (n) { keep[docs[n]] = true; });
+  CODE_GROUPS.forEach(function (g) {
+    var it = DriveApp.getFilesByName(CODE_PREFIX + g[0]);
+    while (it.hasNext()) { var f = it.next(); if (!keep[f.getId()]) f.setTrashed(true); }
   });
   var name = CODE_PREFIX + 'index';
   if (!docs[name]) docs[name] = DocumentApp.create(name).getId();
