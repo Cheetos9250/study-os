@@ -22,6 +22,16 @@
 Custom MCP apps in the Gemini app are US + English only (Google Help, Nov 2026), so the Gemini app reads a Google Doc instead:
 `study-os-doc.gs` is a Google Apps Script that runs in the owner's Google account. Every 15 minutes it fetches `GET /summary` and `GET /export` (Bearer token) and rewrites a Doc **Study OS live** and a Sheet **Study OS data**. In Gemini: "@Google Drive read my Study OS live doc …". Setup steps are at the top of the script. The token lives only in the script's properties.
 
+## Source code for Gemini (Google Docs)
+
+The same Apps Script can also copy the site's **source code** into Google Docs, once a day at 04:00 Bangkok (only when the repo changed). It reads the public GitHub repo, so it needs no token.
+
+1. Paste the latest `study-os-doc.gs` into the same Apps Script project (replace the old text) and save.
+2. Choose the function **setupCode** and press **Run** (allow external requests if asked).
+3. Drive now has **Study OS code – index** plus six Docs: pages, scripts, scripts (other), wordnest, styles/workers/CI, docs and service worker. A part that grows past 800,000 characters is split into (1/2), (2/2).
+
+In Gemini: "@Google Drive read Study OS code – index, then open the Doc that has scripts/study-review.js and explain it". Course data, tests, images and the design-tool folder are not copied. Stop with **stopCode**.
+
 ## Add to Gemini as an MCP server (US + English accounts, Gemini CLI, other MCP clients)
 
 Server URL: `https://study-os-gemini-mcp.kasidit09022550.workers.dev/mcp/<your token>`
