@@ -39,8 +39,10 @@ jobs:
           test ${#PROGRESS_SYNC_KEY} -ge 24 || { echo "Secret PROGRESS_SYNC_KEY must be at least 24 characters"; exit 1; }
           test ${#GEMINI_MCP_TOKEN} -ge 32 || { echo "Secret GEMINI_MCP_TOKEN must be at least 32 characters"; exit 1; }
           printf '%s' "$GEMINI_MCP_TOKEN" | grep -Eq '^[A-Za-z0-9_-]+$' || { echo "GEMINI_MCP_TOKEN may use only letters, digits, - and _"; exit 1; }
+      - name: Build the question bank (bundled into the Worker, not committed)
+        run: node scripts/build-question-bank.cjs workers/gemini-mcp/bank.json
       - name: Offline tests
-        run: node --test tests/gemini-mcp-worker.test.cjs tests/gemini-share.test.cjs
+        run: node --test tests/gemini-mcp-worker.test.cjs tests/gemini-export.test.cjs tests/gemini-share.test.cjs
       - name: Deploy Worker
         working-directory: workers/gemini-mcp
         run: npx --yes wrangler@4 deploy
@@ -58,5 +60,7 @@ jobs:
           echo "HTTP $code"; test "$code" = 200
           grep -q '"result"' /tmp/body || { echo "No result"; exit 1; }
           grep -q '"isError":true' /tmp/body && { echo "Tool could not read progress"; exit 1; } || true
+          code=$(curl -s -o /tmp/export -w '%{http_code}' -H "Authorization: Bearer $GEMINI_MCP_TOKEN" "https://study-os-gemini-mcp.kasidit09022550.workers.dev/export")
+          echo "Export HTTP $code"; test "$code" = 200; grep -q '"Questions"' /tmp/export || { echo "No Questions table"; exit 1; }
           noauth=$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -d "$body" "$base")
           echo "Without token: HTTP $noauth"; test "$noauth" = 401
