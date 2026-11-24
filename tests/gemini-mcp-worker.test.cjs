@@ -10,7 +10,7 @@ function env(calls){
   SITE_FETCH:async u=>{const f=u.replace(/^https:\/\/cheetos9250\.github\.io\/study-os\//,'');return new Response(fs.readFileSync(path.join(root,f),'utf8'),{status:200});}};
 }
 const post=(w,e,body,p='/mcp/'+TOKEN,h={})=>w.fetch(new Request('https://x.workers.dev'+p,{method:'POST',headers:{'Content-Type':'application/json',...h},body:JSON.stringify(body)}),e);
-let W;test.before(async()=>{W=(await import(path.join(root,'workers/gemini-mcp/worker.mjs'))).default;});
+let W;test.before(async()=>{require('../scripts/build-question-bank.cjs');fs.writeFileSync(path.join(root,'workers/gemini-mcp/bank.json'),JSON.stringify(require('../scripts/build-question-bank.cjs').build()));W=(await import(path.join(root,'workers/gemini-mcp/worker.mjs'))).default;});
 test('rejects a wrong or missing token and non-POST methods',async()=>{
  const e=env([]);
  assert.equal((await post(W,e,{jsonrpc:'2.0',id:1,method:'ping'},'/mcp/'+'x'.repeat(40))).status,401);
@@ -25,7 +25,7 @@ test('initialize, notifications and tools/list follow MCP',async()=>{
  assert.equal(init.result.serverInfo.name,'study-os');assert.ok(init.result.capabilities.tools);
  assert.equal((await post(W,e,{jsonrpc:'2.0',method:'notifications/initialized'})).status,202);
  const list=await (await post(W,e,{jsonrpc:'2.0',id:2,method:'tools/list'})).json();
- assert.deepEqual(list.result.tools.map(t=>t.name),['get_overview','get_wrong_questions','get_schedule']);
+ assert.deepEqual(list.result.tools.map(t=>t.name),['get_questions','get_overview','get_wrong_questions','get_schedule']);
  assert.ok(list.result.tools.every(t=>t.annotations.readOnlyHint));
  const bad=await (await post(W,e,{jsonrpc:'2.0',id:3,method:'nope'})).json();assert.equal(bad.error.code,-32601);
 });

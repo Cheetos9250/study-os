@@ -1,0 +1,1 @@
+- Gemini can read the whole Study OS: the Apps Script now also keeps a Google Sheet **Study OS data** up to date (every question with options, answer and explanation plus your answer and result, notes, tasks, grades, exams, classes). The Worker gains `GET /export` and a `get_questions` tool; the question bank is built at deploy.
