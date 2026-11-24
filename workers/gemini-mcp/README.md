@@ -30,6 +30,8 @@ The same Apps Script can also copy the site's **source code** into Google Docs, 
 2. Choose the function **setupCode** and press **Run** (allow external requests if asked).
 3. Drive now has **Study OS code – index** plus six Docs: pages, scripts, scripts (other), wordnest, styles/workers/CI, docs and service worker. A part that grows past 800,000 characters is split into (1/2), (2/2).
 
+**One folder:** the Doc, the Sheet and all code Docs are kept in a Drive folder **Study OS for Gemini**. After pasting this version, run **gatherFiles** once (allow Google Drive access) to move files made earlier; later refreshes keep new files there.
+
 In Gemini: "@Google Drive read Study OS code – index, then open the Doc that has scripts/study-review.js and explain it". Course data, tests, images and the design-tool folder are not copied. Stop with **stopCode**.
 
 ## Add to Gemini as an MCP server (US + English accounts, Gemini CLI, other MCP clients)

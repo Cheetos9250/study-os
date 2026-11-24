@@ -16,6 +16,7 @@
  *    (Google Docs, Drive file it creates, external requests, triggers).
  * To stop: run "stop". To revoke: change the GitHub secret GEMINI_MCP_TOKEN and redeploy the Worker.
  * Source code too: after setup, run "setupCode" once (see the code section at the end of this file).
+ * Everything lands in one Drive folder "Study OS for Gemini" (run "gatherFiles" once to move older files in).
  */
 var SUMMARY_URL = 'https://study-os-gemini-mcp.kasidit09022550.workers.dev/summary?wrong=10';
 var EXPORT_URL = 'https://study-os-gemini-mcp.kasidit09022550.workers.dev/export';
@@ -46,6 +47,7 @@ function refresh() {
   doc.getBody().setText('Study OS live progress (updated ' + stamp + ' Bangkok, refreshes every 15 minutes)\n\n' + res.getContentText());
   doc.saveAndClose();
   refreshSheet();
+  gatherFiles();
 }
 
 function refreshSheet() {
@@ -72,6 +74,26 @@ function refreshSheet() {
   ss.getSheets().forEach(function (sh) {
     if (!sheets[sh.getName()] && sh.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(sh);
   });
+}
+
+/* ---------- one folder for everything Gemini reads (owner, 24 Nov 2026) ----------
+ * Keeps the Doc "Study OS live", the Sheet "Study OS data" and every "Study OS code – …" Doc together in a
+ * Drive folder "Study OS for Gemini" (created once). Files already in it are left alone. Run "gatherFiles"
+ * once after pasting this version; refresh and refreshCode also call it. */
+var FOLDER_NAME = 'Study OS for Gemini';
+function gatherFiles() {
+  var props = PropertiesService.getScriptProperties(), folder = null, fid = props.getProperty('FOLDER_ID');
+  if (fid) { try { folder = DriveApp.getFolderById(fid); if (folder.isTrashed()) folder = null; } catch (e) { folder = null; } }
+  if (!folder) { folder = DriveApp.createFolder(FOLDER_NAME); props.setProperty('FOLDER_ID', folder.getId()); }
+  var ids = [props.getProperty('DOC_ID'), props.getProperty('SHEET_ID')];
+  var code = JSON.parse(props.getProperty('CODE_DOCS') || '{}');
+  Object.keys(code).forEach(function (k) { ids.push(code[k]); });
+  ids.filter(Boolean).forEach(function (id) {
+    var file = DriveApp.getFileById(id), inside = false, parents = file.getParents();
+    while (parents.hasNext()) if (parents.next().getId() === folder.getId()) inside = true;
+    if (!inside) file.moveTo(folder);
+  });
+  return folder.getUrl();
 }
 
 function stop() {
@@ -160,6 +182,7 @@ function refreshCode() {
     'Each Doc below holds the full text of the files listed under it. Project guide for AI agents: AGENTS.md in "' + CODE_PREFIX + 'docs and service worker".\n\n' + index.join('\n\n'));
   d.saveAndClose();
   props.setProperty('CODE_DOCS', JSON.stringify(docs));
+  gatherFiles();
   if (tree.sha) props.setProperty('CODE_SHA', tree.sha);
 }
 
