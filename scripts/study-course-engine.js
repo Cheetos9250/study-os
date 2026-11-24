@@ -164,9 +164,11 @@ let autoNext=0; let reviewOnly=/[?&]review=1\b/.test(location.search), reviewSta
 const isOldQ=q=>!!(window.StudyReview&&StudyReview.isOld&&StudyReview.isOld(store,q.id));
 const retChip=()=>{const n=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&isOldQ(q)).length;return n||showOld?'<button class="chip" id="retBtn" aria-pressed="'+showOld+'" type="button" title="Answered right 2 times in a row. They stay out of the normal sets; a wrong answer sends one back.">Old questions<span class="n">'+n+'</span></button>':'';};
 /* Difficulty tag (owner, 21 Nov 2026): from my own answers, no new storage. Wrong now or review box 0 = Hard, box 1 = Medium, box 2+ = Easy; unanswered = no tag. acc/eco/math only (where StudyQSets is loaded). */
-function diffTag(q){ if(!window.StudyQSets||q.open||q.gen||store.ans[q.id]===undefined)return ''; const r=(store.rv||{})[q.id], box=Array.isArray(r)?+r[0]||0:(store.ans[q.id]===q.right?1:0);
-  const lv=store.ans[q.id]!==q.right||box<1?['Hard','#e5484d']:box<2?['Medium','#d9a400']:['Easy','#2f9e5b'];
-  return '<span class="dtag" data-diff="'+lv[0].toLowerCase()+'" title="Difficulty from your answers" style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:2px 9px;border-radius:999px;border:1.5px solid '+lv[1]+';font-size:12px;font-weight:700;line-height:1.5"><i style="width:9px;height:9px;border-radius:50%;background:'+lv[1]+';display:inline-block"></i>'+lv[0]+'</span>'; }
+/* Difficulty of the question itself (owner, 24 Nov 2026): a fixed estimate from scripts/study-qdiff.js, shown before answering;
+   it no longer follows my answers (those already drive Review due and Old questions). Stores nothing. */
+function diffTag(q){ if(!window.StudyQDiff||q.open)return ''; const name=StudyQDiff.level(q);
+  const lv=name==='Hard'?['Hard','#e5484d']:name==='Medium'?['Medium','#d9a400']:['Easy','#2f9e5b'];
+  return '<span class="dtag" data-diff="'+lv[0].toLowerCase()+'" title="How hard this question is (estimated from the question)" style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:2px 9px;border-radius:999px;border:1.5px solid '+lv[1]+';font-size:12px;font-weight:700;line-height:1.5"><i style="width:9px;height:9px;border-radius:50%;background:'+lv[1]+';display:inline-block"></i>'+lv[0]+'</span>'; }
 let redoAt=0,redoIds=new Set(); /* Start again (owner, 21 Nov 2026): in memory only; old answers stay until each question is answered again */
 const reviewFresh=x=>(reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart)||(redoAt>0&&redoIds.has(String(x.id))&&((store.ats||{})[x.id]||0)<redoAt);
 const setDone=()=>setsOn()&&qcats.size===1&&qset!=='all'&&deck.length>0&&deck.every(x=>!x.open&&store.ans[x.id]!==undefined&&!reviewFresh(x));
