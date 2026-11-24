@@ -251,7 +251,7 @@ function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):nu
 /* "Ask AI why" (owner idea, 18 Nov 2026): a link to tutor.html with the question, the options, my answer and the right one.
    Nothing is sent until Send is tapped there (the tutor uses the owner's own key). */
 function askPrompt(q,mine){ const L='ABCDEFGH',o=q.opts.map((t,i)=>L[i]+') '+String(t).replace(/\*\*/g,'')).join('\n'),x=t=>String(t==null?'':t).replace(/\*\*/g,'');
-  return 'Practice question: '+x(q.q)+'\n'+o+'\n\n'+(q.opts[mine]!==undefined?'My answer: '+L[mine]+') '+x(q.opts[mine])+'\n':'')+'Correct answer: '+L[q.right]+') '+x(q.opts[q.right])+'\n\nExplain why the correct answer is right'+(q.opts[mine]!==undefined&&mine!==q.right?' and why mine is wrong':'')+', step by step. Then give me one similar question to try.'; }
+  return 'Practice question: '+x(q.q)+'\n'+o+'\n\n'+(q.opts[mine]!==undefined?'My answer: '+L[mine]+') '+x(q.opts[mine])+'\n':'')+'Correct answer: '+L[q.right]+') '+x(q.opts[q.right])+'\n\nExplain why the correct answer is right, step by step. Do not explain why the other options (or my answer) are wrong. Then give me one similar question to try.'; }
 function askAI(q,mine){ return '<div style="margin-top:8px"><a class="btn" style="min-height:44px;display:inline-flex;align-items:center" href="tutor.html?course='+encodeURIComponent(D.key)+'&cat='+encodeURIComponent(q.cat)+'&q='+encodeURIComponent(askPrompt(q,mine).slice(0,6000))+'">Ask AI why</a></div>'; }
 /* Cram Mode (?tab=prac&cram=1): one read-only page of the questions to fix before the exam — answered wrong now,
    or back in review box 0 — each with its right answer and explanation. Never changes answers. */

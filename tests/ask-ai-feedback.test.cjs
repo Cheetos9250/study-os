@@ -5,7 +5,7 @@ const mem=()=>{const m={};return{getItem:k=>k in m?m[k]:null,setItem:(k,v)=>{m[k
 test('Ask AI prompt: options in shown order, answer only after answering',()=>{
   const q={q:'Current ratio =',opts:['A1','B1','C1','D1'],right:1,exp:'liquidity'};
   const before=A.prompt(q,undefined,'04 Cycle');assert.match(before,/A\) A1\nB\) B1/);assert.doesNotMatch(before,/Correct answer/);assert.match(before,/Solve it in Thai/);
-  const after=A.prompt(q,2,'04 Cycle');assert.match(after,/My answer: C\. Correct answer: B\./);assert.match(after,/goes wrong/);
+  const after=A.prompt(q,2,'04 Cycle');assert.match(after,/My answer: C\. Correct answer: B\./);assert.doesNotMatch(after,/goes wrong/);assert.match(after,/Do not explain why the other options/);
   assert.doesNotMatch(A.prompt(q,1),/goes wrong/);
 });
 test('Save to note appends, keeps pictures and other notes, refuses past 20,000 characters',()=>{

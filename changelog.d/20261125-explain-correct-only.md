@@ -1,0 +1,1 @@
+Practice explanations now explain only why the right answer is right. The second line that said why the other options were wrong was removed from 235 accounting and economics questions, and the Ask AI prompts no longer ask for why other options or my answer are wrong.

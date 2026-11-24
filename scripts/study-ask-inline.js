@@ -18,9 +18,9 @@
     if (mine !== undefined && mine !== null && opts.length) {
       t += '\nMy answer: ' + L[mine] + '. Correct answer: ' + L[q.right] + '.\n';
       if (q.exp) t += 'Book explanation: ' + clip(q.exp, 1500) + '\n';
-      t += '\nExplain in Thai, step by step, why the correct answer is right' + (mine !== q.right ? ' and the exact step where my answer goes wrong' : '') + '. Show the numbers and any journal entry as a table. End with one short line I can memorise.';
+      t += '\nExplain in Thai, step by step, why the correct answer is right. Do not explain why the other options (or my answer) are wrong. Show the numbers and any journal entry as a table. End with one short line I can memorise.';
     } else {
-      t += '\nSolve it in Thai, step by step. Show the numbers and any journal entry as a table, then give the answer letter. End with one short line I can memorise.';
+      t += '\nSolve it in Thai, step by step. Explain only why the correct option is right, not why the others are wrong. Show the numbers and any journal entry as a table, then give the answer letter. End with one short line I can memorise.';
     }
     return t;
   }
