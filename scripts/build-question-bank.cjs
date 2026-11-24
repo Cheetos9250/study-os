@@ -4,6 +4,8 @@
    Sources: D.quiz in data/courses/<course>.js (id = row position), data/courses/acc-extra.js sets (id = pre + n, "hide" left out),
    the course's own MCQ list (scripts/acc-textbook-mcq.js, eco-practice-mcq.js, math-practice-mcq.js; opts[0] is right),
    and the Verified rows of data/quiz.json for that subject (id = "n-" + page id).
+   Also: every flashcard of the five courses (acc, eco, math, eng, zh; id = the card's mid, the key in <mark>-srs) and the
+   WordNest base word list (vocabloom/index.html RAW; id = base-<n>), so the Sheet can show flashcard and word progress.
    Not included: Fresh problems (random each visit) and written exercises.
    Usage: node scripts/build-question-bank.cjs <out.json>   (the Gemini Worker deploy writes workers/gemini-mcp/bank.json; not committed) */
 const fs=require('fs'),path=require('path'),vm=require('vm');
@@ -38,9 +40,18 @@ function build(){
    push(id,hit[0],r.Question,opts,0,r.Explanation);});
   out.courses[c.key]={name:c.name,cats,questions:qs};
  }
+ // flashcards of every course (the engine's CARDS: [cat, front, back, ref, mid])
+ out.cards={};
+ for(const [key,name,file] of [['acc','Accounting','data/courses/acc.js'],['eco','Economics','data/courses/eco.js'],['math','Math','data/courses/math.js'],['eng','English','data/courses/eng.js'],['zh','Chinese','data/courses/zh.js']]){
+  const D=courseData(file),cats=D.cats.map(x=>[str(x[0]),str(x[1])]);
+  out.cards[key]={name,cats,cards:(D.cards||[]).filter(c=>c&&c[4]).map(c=>({id:str(c[4]),cat:str(c[0]),front:str(c[1]),back:str(c[2])}))};
+ }
+ // WordNest base words, ids as vocabloom/index.html makes them
+ const m=/const RAW = `([\s\S]*?)`;/.exec(read('vocabloom/index.html'));if(!m)throw Error('no RAW in vocabloom/index.html');
+ out.words=m[1].trim().split('\n').map((line,i)=>{const [en,th,example,,category,level]=line.split('|');return {id:'base-'+(i+1),en:str(en),th:str(th),example:str(example),category:str(category),level:str(level)};});
  return out;
 }
 module.exports={build};
 if(require.main===module){const dest=process.argv[2];if(!dest){console.error('usage: build-question-bank.cjs <out.json>');process.exit(2);}
  const b=build();fs.writeFileSync(dest,JSON.stringify(b));
- console.log(Object.entries(b.courses).map(([k,v])=>k+' '+v.questions.length).join(', '));}
+ console.log(Object.entries(b.courses).map(([k,v])=>k+' '+v.questions.length).join(', ')+'; cards '+Object.entries(b.cards).map(([k,v])=>k+' '+v.cards.length).join(', ')+'; words '+b.words.length);}

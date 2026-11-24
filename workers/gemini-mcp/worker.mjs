@@ -9,6 +9,7 @@ import T from '../../scripts/study-today.js';
 import G from '../../scripts/study-gemini.js';
 // Built at deploy by scripts/build-question-bank.cjs (not committed): every acc/eco/math practice question with the engine's ids.
 import BANK from './bank.json' with {type:'json'};
+import TBI from '../../data/accounting-textbook-index.json' with {type:'json'};
 
 export const PROGRESS_URL='https://vocabloom-progress-cas-prod.kasidit09022550.workers.dev';
 export const SITE='https://cheetos9250.github.io/study-os/';
@@ -130,11 +131,52 @@ async function rpc(env,msg,now){
 
 const cell=v=>{const s=String(v==null?'':v);return s.length>45000?s.slice(0,45000)+'…':s;};
 const day=t=>t?new Date(t+7*3600000).toISOString().slice(0,16).replace('T',' '):'';
+const RATING=['','Again','Hard','Good','Easy'],obj=x=>x&&typeof x==='object'&&!Array.isArray(x);
+const rows=list=>Array.isArray(list)?list.filter(Array.isArray).map(r=>r.map(c=>String(c==null?'':c)).join(' | ')).join('\n'):'';
+/* flashcards of every course with their schedule (<mark>-srs entries keyed by the card's mid) */
+function cardRows(key,doc){
+ const B=(BANK.cards||{})[key];if(!B)return [];const s=(doc&&doc.srs&&obj(doc.srs.s))?doc.srs.s:{},labels=Object.fromEntries(B.cats);
+ return B.cards.map(c=>{const x=obj(s[c.id])?s[c.id]:null;
+  return [B.name,labels[c.cat]||c.cat,c.id,clean(c.front),clean(c.back),!x?'New':x.st==='rev'?'Review':'Learning',x&&x.ivl!=null?x.ivl:'',x?day(Number(x.due)||0):'',x&&x.lapses?x.lapses:'',x?RATING[x.last]||'':'',x?day(Number(x.ts)||0):''].map(cell);});
+}
+/* WordNest English words (shadow entries vb/v1/… inside the eng schedule) and answers per day */
+function wordSheets(doc){
+ const s=(doc&&doc.srs&&obj(doc.srs.s))?doc.srs.s:{},prog={},custom=[],days={};
+ for(const [k,e] of Object.entries(s)){if(!obj(e)||!e.value)continue;const v=e.value;
+  if(k.startsWith('vb/v1/word/')&&obj(v))prog[decodeURIComponent(k.slice(11))]=v;
+  else if(k.startsWith('vb/v1/custom/')&&obj(v)&&v.en)custom.push(v);
+  else if(k.startsWith('vb/v1/day/')&&obj(v)){const d=k.split('/').pop();const x=days[d]||(days[d]={a:0,c:0});x.a+=Number(v.answered)||0;x.c+=Number(v.correct)||0;}}
+ const W=[['Word','Thai','Example','Category','Level','Source','Seen','Right','Wrong','Streak','Mastered','Next due','Last practised','Favorite']],known=new Set();
+ const add=(w,src)=>{known.add(w.id);const p=prog[w.id]||{};W.push([w.en,w.th,w.example,w.category,w.level,src,p.seen?'yes':'',p.correct||0,p.wrong||0,p.streak||0,p.mastered?'yes':'',p.due||'',p.last||'',p.favorite?'yes':''].map(cell));};
+ (BANK.words||[]).forEach(w=>add(w,'WordNest'));custom.forEach(w=>add({id:String(w.id),en:clean(w.en),th:clean(w.th),example:clean(w.example),category:clean(w.category),level:clean(w.level)},'My words'));
+ Object.keys(prog).filter(id=>!known.has(id)).sort().forEach(id=>add({id,en:id,th:'',example:'',category:'',level:''},'Other'));
+ const D=[['Date','Answered','Right']];Object.keys(days).sort().forEach(d=>D.push([d,days[d].a,days[d].c]));
+ return {Words:W,'Word days':D};
+}
+/* textbook written answers, My PDF sets answers and notes, Excel steps (the extra subject) */
+function extraSheets(x){
+ const tb=obj(x&&x.textbook)?x.textbook:{},pdf=obj(x&&x.pdfsets)&&obj(x.pdfsets.sets)?x.pdfsets.sets:{},ex=obj(x&&x.excel)?x.excel:{};
+ const items=Object.fromEntries(((TBI&&TBI.items)||[]).map(i=>[i.id,i]));
+ const T=[['Exercise','Chapter','Type','Title','Status','My notes','Journal entry','Statement','Book journal','Book statement','Updated']];
+ Object.keys(tb).sort().forEach(id=>{const r=tb[id];if(!obj(r))return;const i=items[id]||{};
+  T.push([id,i.chapter||'',i.type||'',i.title||'',r.status||'',r.notes||'',rows(r.je),rows(r.fs),rows(r.bje),rows(r.bfs),r.updated||''].map(cell));});
+ const P=[['Set','Name','Item','My answer','Key','Result','Note']];
+ Object.keys(pdf).sort().forEach(id=>{const p=pdf[id];if(!obj(p))return;const ans=obj(p.ans)?p.ans:{},key=obj(p.key)?p.key:{},notes=obj(p.notes)?p.notes:{};
+  const qs=[...new Set(Object.keys(ans).concat(Object.keys(key)))].sort((a,b)=>a-b);
+  qs.forEach(q=>{const a=String(ans[q]||'').toUpperCase(),k=String(key[q]||'').toUpperCase();P.push([id,p.name||'','Q'+q,a,k,a&&k?(a===k?'Right':'Wrong'):'',''].map(cell));});
+  Object.keys(notes).sort((a,b)=>a-b).forEach(n=>{if(String(notes[n]).trim())P.push([id,p.name||'','Page '+n,'','','',notes[n]].map(cell));});
+  if(!qs.length&&!Object.keys(notes).length)P.push([id,p.name||'','','','','',''].map(cell));});
+ const X=[['Kind','Item','Value']];
+ for(const [kind,label] of [['done','Step done'],['ans','Quiz answer']])if(obj(ex[kind]))Object.keys(ex[kind]).sort().forEach(k=>X.push([label,k,typeof ex[kind][k]==='object'?JSON.stringify(ex[kind][k]):String(ex[kind][k])].map(cell)));
+ return {Textbook:T,'PDF sets':P,Excel:X};
+}
 export async function exportSheets(env,now){
- const [today,home,...docs]=await Promise.all([progress(env,'today').catch(()=>null),progress(env,'home').catch(()=>null),...COURSE_KEYS.map(k=>progress(env,k).catch(()=>null))]);
+ const [today,home,extra,eng,zh,...docs]=await Promise.all([progress(env,'today').catch(()=>null),progress(env,'home').catch(()=>null),progress(env,'extra').catch(()=>null),progress(env,'eng').catch(()=>null),progress(env,'zh').catch(()=>null),...COURSE_KEYS.map(k=>progress(env,k).catch(()=>null))]);
  const t=(today&&today.today)||{},h=(home&&home.home)||{},g=(home&&home.grades)||{},settings=T.loadSettings(JSON.stringify(t));
- const Q=[['Course','Chapter','ID','Question','Case','A','B','C','D','E','Correct','Explanation','My answer','Result','Answered at (Bangkok)']];
- COURSE_KEYS.forEach((k,i)=>bankRows(k,docs[i]).forEach(r=>Q.push([BANK.courses[k].name,r.label,r.id,r.q,r.case,r.opts[0]||'',r.opts[1]||'',r.opts[2]||'',r.opts[3]||'',r.opts[4]||'',L[r.right],r.exp,r.mine,r.result,day(r.t)].map(cell))));
+ const Q=[['Course','Chapter','ID','Question','Case','A','B','C','D','E','Correct','Explanation','My answer','Result','Answered at (Bangkok)','Review box','Next review (Bangkok)','Old question']];
+ COURSE_KEYS.forEach((k,i)=>{const rv=(docs[i]&&docs[i].study&&docs[i].study.rv)||{};
+  bankRows(k,docs[i]).forEach(r=>{const v=Array.isArray(rv[r.id])?rv[r.id]:null,box=v?Number(v[0])||0:'';
+   Q.push([BANK.courses[k].name,r.label,r.id,r.q,r.case,r.opts[0]||'',r.opts[1]||'',r.opts[2]||'',r.opts[3]||'',r.opts[4]||'',L[r.right],r.exp,r.mine,r.result,day(r.t),box,v?day(Number(v[1])||0):'',v&&box>=2?'yes':''].map(cell));});});
  const N=[['Note','Text','Updated']];const notes=t.notes&&typeof t.notes==='object'?t.notes:{};
  Object.keys(notes).sort().forEach(k=>{const v=notes[k];const text=typeof v==='string'?v:v&&typeof v.text==='string'?v.text:'';if(text.trim())N.push([k,cell(text),v&&v.updated?String(v.updated):'']);});
  const K=[['Task','Due','Priority','Done','Repeats','Link']];(Array.isArray(h.tasks)?h.tasks:[]).forEach(x=>{if(x&&typeof x==='object')K.push([cell(x.title),x.date||'',x.pri||'',x.done?'yes':'',x.rep||'',x.link||'']);});
@@ -144,7 +186,10 @@ export async function exportSheets(env,now){
  const E=[['Exam','Date','Days left','Chapters']];settings.exams.map(e=>({e,d:T.daysUntil(e.date,now)})).sort((a,b)=>a.e.date.localeCompare(b.e.date)).forEach(({e,d})=>E.push([e.title,e.date,d,(e.cats||[]).map(c=>(labels[e.course]||{})[c]||c).join(', ')]));
  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],C=[['Day','Start','End','Class','Code']];settings.timetable.slice().sort((a,b)=>a.day-b.day||a.start.localeCompare(b.start)).forEach(x=>C.push([DAYS[x.day],x.start,x.end,x.name,x.code]));
  const md=await callTool(env,'get_overview',{wrong_per_course:0},now);
- return {Summary:md.split('\n').map(l=>[l]),Questions:Q,Notes:N,Tasks:K,Grades:Gr,Exams:E,Classes:C};
+ const F=[['Course','Chapter','Card ID','Front','Back','State','Interval (days)','Due (Bangkok)','Lapses','Last rating','Last reviewed (Bangkok)']];
+ const cdoc={eng,zh};COURSE_KEYS.forEach((k,i)=>{cdoc[k]=docs[i];});
+ ['acc','eco','math','eng','zh'].forEach(k=>cardRows(k,cdoc[k]).forEach(r=>F.push(r)));
+ return {Summary:md.split('\n').map(l=>[l]),Questions:Q,Notes:N,Tasks:K,Grades:Gr,Exams:E,Classes:C,Flashcards:F,...wordSheets(eng),...extraSheets(extra)};
 }
 export default {
  async fetch(request,env){
@@ -164,7 +209,8 @@ export default {
     return new Response(md,{status:200,headers:{'Content-Type':'text/markdown; charset=utf-8','Cache-Control':'no-store'}});}
    catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
   }
-  // GET /export (Bearer token only): every table for the Google Sheet (Questions, Notes, Tasks, Grades, Exams, Classes, Summary).
+  // GET /export (Bearer token only): every table for the Google Sheet (Summary, Questions, Notes, Tasks, Grades,
+  // Exams, Classes, Flashcards, Words, Word days, Textbook, PDF sets, Excel).
   if(isExport){
    if(request.method!=='GET')return json({error:'Method not allowed'},405,{Allow:'GET'});
    try{return json({built:BANK.built,sheets:await exportSheets(env,Date.now())});}catch(e){return json({error:'Could not read Study OS: '+e.message},502);}

@@ -30,3 +30,4 @@
 # impeccable-ignore-end
 __pycache__/
 workers/gemini-mcp/bank.json
+workers/gemini-mcp/bank.json.*.tmp
