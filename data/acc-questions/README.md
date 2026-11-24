@@ -8,3 +8,4 @@ One file per chapter (`c1.json` … `c9.json`), one question per line:
 - **Add a question:** append a line at the end of its chapter file with the next free id of the newest set, and raise that set's `count` in `_sets.json`. For a new batch, add a set to `_sets.json` with a new prefix and a new seed.
 - `"hide": true` keeps a near-duplicate out of practice (answers stay saved).
 - After editing run `node scripts/build-acc-questions.cjs`. It rewrites the quiz part of `data/courses/acc.js` and all of `data/courses/acc-extra.js`; commit all of them. `--check` fails when they are out of date (the test suite runs it).
+- **Explanations explain the right option only** (owner, 25 Nov 2026): one paragraph on why the right answer is right. Do not add a second line or sentence on why the other options are wrong (`tests/explain-correct-only.test.cjs`).
