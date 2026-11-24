@@ -1,0 +1,1 @@
+- Gemini files in one place: the Apps Script now keeps "Study OS live", "Study OS data" and the "Study OS code – …" Docs together in a Drive folder "Study OS for Gemini" (run `gatherFiles` once to move older files in).

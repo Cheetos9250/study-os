@@ -12,7 +12,9 @@ function run(sha){
       fetchAll:reqs=>reqs.map(r=>{fetched.push(r.url);const p=decodeURIComponent(r.url.split('/main/')[1]);return res(200,fs.readFileSync(path.join(root,p),'utf8'));})},
     DocumentApp:{create:n=>{const id='d'+Object.keys(docs).length;docs[id]={name:n,text:''};return {getId:()=>id};},
       openById:id=>({getBody:()=>({setText:t=>{docs[id].text=t;}}),saveAndClose:()=>{},getUrl:()=>'u'})},
-    Utilities:{formatDate:()=>'2026-11-24 10:00'},ScriptApp:{getProjectTriggers:()=>[],deleteTrigger:()=>{}},Logger:{log:()=>{}}};
+    DriveApp:{createFolder:n=>{ctx._folder={name:n,id:'F'};return {getId:()=>'F',getUrl:()=>'fu',isTrashed:()=>false};},getFolderById:id=>({getId:()=>id,getUrl:()=>'fu',isTrashed:()=>false}),
+      getFileById:id=>({getParents:()=>{const p=(docs[id]&&docs[id].parent)||null;let done=!p;return {hasNext:()=>!done,next:()=>{done=true;return {getId:()=>p};}};},moveTo:f=>{docs[id]=docs[id]||{name:id,text:''};docs[id].parent=f.getId();}})},
+        Utilities:{formatDate:()=>'2026-11-24 10:00'},ScriptApp:{getProjectTriggers:()=>[],deleteTrigger:()=>{}},Logger:{log:()=>{}}};
   vm.createContext(ctx);vm.runInContext(src,ctx);
   return {ctx,props,docs,fetched,files};
 }
