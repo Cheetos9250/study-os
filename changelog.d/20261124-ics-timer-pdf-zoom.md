@@ -1,0 +1,3 @@
+- Calendar: **Add to iPad Calendar** saves your upcoming exams as a calendar file with reminders the day before and on the day.
+- Practice (acc/eco/math): a **stopwatch** at the top right shows time, questions answered and seconds per question.
+- My PDF sets: a **page and zoom bar** under the PDF (previous/next page, zoom in/out, Fit width).
