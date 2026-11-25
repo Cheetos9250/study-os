@@ -1,22 +1,29 @@
 /* Study OS question inbox — Google Apps Script (runs in the owner's own Google account; no token is shared with GitHub or Cloudflare).
  *
- * What it does: reads every Markdown/text file (and Google Doc) in the Drive folder "Study OS Questions", turns the questions
- * into rows with the same parser the site uses, and serves them as JSON from a web app. The course pages fetch that JSON
- * each time they open and add the questions to Practice. Questions are not personal data; only the folder's files are read.
+ * What it does: reads the Markdown/text files (and Google Docs) changed in the last DAYS days in the Drive folder "Study OS Questions",
+ * turns the questions into rows with the same parser the site uses, keeps the newest MAX_ROWS rows, and serves them as JSON from a web
+ * app. A copy of the JSON is kept in the file _inbox-cache.json in the same folder and refreshed every 10 minutes by a trigger, so the
+ * site's page loads stay fast. The course pages fetch the JSON each time they open and add the questions to Practice.
+ * Questions are not personal data; only the folder's files are read.
  *
  * Setup (once, ~3 minutes, on any device with a browser):
  *  1. script.google.com → New project → paste this whole file → Save.
- *  2. Pick the function  setup  and press Run. Allow access to Drive. It creates the Drive folder "Study OS Questions"
- *     and logs its link. Put Gemini's daily .md files in that folder (the file name does not matter).
+ *  2. Pick the function  setup  and press Run. Allow access to Drive and to run on a schedule. It creates the Drive folder
+ *     "Study OS Questions", starts the 10-minute refresh and logs the folder link. Put Gemini's daily files in that folder.
  *  3. Deploy → New deployment → type Web app → Execute as: Me → Who has access: Anyone → Deploy. Copy the Web app URL.
- *  4. On the site: More → Share with Gemini → Daily questions from Drive → paste the URL → Save → Test.
- *  After you change this file later: Deploy → Manage deployments → pencil → Version: New version → Deploy (the URL stays).
+ *  4. On the site: Share with Gemini → Daily questions from Drive → paste the URL → Save → Test.
+ *  After you change this file later: Deploy → Manage deployments → pencil → Version: New version → Deploy (the URL stays),
+ *  then run  setup  once more if this version added a trigger.
  *
  * The URL is the only thing that opens the questions, so do not post it. It exposes only question text. Remove access
  * any time: Deploy → Manage deployments → Archive.
  */
 var FOLDER_NAME = 'Study OS Questions';
 var MAX_FILES = 400;
+var DAYS = 7;               // only files changed in the last DAYS days are read
+var MAX_ROWS = 3000;        // newest questions first; the site keeps the same number on the device
+var CACHE_NAME = '_inbox-cache.json';
+var CACHE_MINUTES = 15;     // a cached answer older than this is rebuilt when someone asks
 
 // === Parser: a copy of scripts/study-inbox.js (tests/inbox-script-sync.test.cjs keeps them identical). Do not edit here. ===
 // PARSER-COPY-START
@@ -88,14 +95,16 @@ function matchChapter(cats, text) {
 }
 // PARSER-COPY-END
 
-function setup() {
-  var f = folder_();
-  Logger.log('Put the Markdown files in: ' + f.getUrl());
-}
-
 function folder_() {
   var it = DriveApp.getFoldersByName(FOLDER_NAME);
   return it.hasNext() ? it.next() : DriveApp.createFolder(FOLDER_NAME);
+}
+
+function setup() {
+  var f = folder_();
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'refresh') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('refresh').timeBased().everyMinutes(10).create();
+  Logger.log('Put the Markdown files in: ' + f.getUrl());
 }
 
 function readFile_(file) {
@@ -106,21 +115,45 @@ function readFile_(file) {
 }
 
 function build_() {
-  var files = [], it = folder_().getFiles();
-  while (it.hasNext() && files.length < MAX_FILES) files.push(it.next());
-  files.sort(function (a, b) { return a.getName() < b.getName() ? -1 : 1; });
+  var cutoff = Date.now() - DAYS * 86400000, files = [], it = folder_().getFiles(), f;
+  while (it.hasNext()) {
+    f = it.next();
+    if (f.getName() === CACHE_NAME || f.getLastUpdated().getTime() < cutoff) continue;
+    files.push(f);
+    if (files.length >= MAX_FILES) break;
+  }
+  files.sort(function (a, b) { return b.getLastUpdated().getTime() - a.getLastUpdated().getTime(); });   // newest file first
   var rows = [], errors = [], seen = {};
-  files.forEach(function (f) {
+  files.forEach(function (file) {
     var res;
-    try { res = parse(readFile_(f), {}); } catch (e) { errors.push(f.getName() + ': ' + e); return; }
-    res.errors.forEach(function (m) { errors.push(f.getName() + ': ' + m); });
+    try { res = parse(readFile_(file), {}); } catch (e) { errors.push(file.getName() + ': ' + e); return; }
+    res.errors.forEach(function (m) { errors.push(file.getName() + ': ' + m); });
     res.rows.forEach(function (r) { if (!seen[r.page_id]) { seen[r.page_id] = 1; rows.push(r); } });
   });
-  return { updated: new Date().toISOString(), files: files.length, rows: rows, errors: errors.slice(0, 50) };
+  return { updated: new Date().toISOString(), files: files.length, rows: rows.slice(0, MAX_ROWS), total: rows.length, errors: errors.slice(0, 50) };
 }
 
-function doGet() {
-  var out;
-  try { out = build_(); } catch (e) { out = { updated: new Date().toISOString(), rows: [], errors: [String(e)] }; }
-  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
+function cacheFile_(dir) {
+  var it = dir.getFilesByName(CACHE_NAME);
+  return it.hasNext() ? it.next() : null;
+}
+
+function rebuild_() {
+  var json = JSON.stringify(build_()), dir = folder_(), c = cacheFile_(dir);
+  if (c) c.setContent(json); else dir.createFile(CACHE_NAME, json, MimeType.PLAIN_TEXT);
+  return json;
+}
+
+/* run by the 10-minute trigger */
+function refresh() { rebuild_(); }
+
+/* ?fresh=1 skips the cache (the site's Test button uses it) */
+function doGet(e) {
+  var json;
+  try {
+    var c = cacheFile_(folder_());
+    if (!(e && e.parameter && e.parameter.fresh) && c && Date.now() - c.getLastUpdated().getTime() < CACHE_MINUTES * 60000) json = c.getBlob().getDataAsString('UTF-8');
+    else json = rebuild_();
+  } catch (err) { json = JSON.stringify({ updated: new Date().toISOString(), rows: [], errors: [String(err)] }); }
+  return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
 }

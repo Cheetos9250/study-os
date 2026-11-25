@@ -1,0 +1,1 @@
+- Drive question inbox: the Apps Script now reads only files changed in the last 7 days, serves the newest 3,000 questions first, and keeps a cached copy refreshed every 10 minutes so Practice loads fast. Test uses a fresh read. Re-paste `workers/inbox/study-os-inbox.gs`, run `setup` once and deploy a new version.

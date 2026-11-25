@@ -26,7 +26,7 @@ test('gemini page is read-only, sends nothing and is linked from the nav',()=>{
  assert.deepEqual([...new Set((h.match(/localStorage\.(?:setItem|removeItem)\(\s*([A-Za-z]+)/g)||[]).map(x=>x.replace(/.*\(\s*/,'')))].sort(),['C','K']);
  assert.match(h,/var K='studyos\.inbox\.url\.v1',C='studyos\.inbox\.cache\.v1'/);
  /* only GETs: course data, the owner's own Drive-inbox URL, and the prompt file; no body is ever sent */
- assert.doesNotMatch(h,/fetch\((?!c\.data|u,\{cache:'no-store'\}|'docs\/gemini-question-prompt\.md')/);
+ assert.doesNotMatch(h,/fetch\((?!c\.data|u\+\(u\.indexOf\('\?'\)<0\?'\?':'&'\)\+'fresh=1',\{cache:'no-store'\}|'docs\/gemini-question-prompt\.md')/);
  assert.doesNotMatch(h,/method\s*:|body\s*:/);
  assert.match(h,/study-eink-base\.css/);
  assert.match(read('scripts/study-nav.js'),/gemini\.html/);
