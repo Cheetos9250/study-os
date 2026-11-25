@@ -14,7 +14,7 @@ test('the page retries once after a Gemini 404 with the picked model and saves i
   assert.match(h,/cfg\.gemini\.model=m;saveCfg\(\);/);
   assert.match(h,/async function newestModel\(\)\{return A\.pickModel\(cfg\.provider,await modelIds\(\)\);\}/);
 });
-test('the sidebar scrolls when the menu is taller than the screen, without a sideways scrollbar',()=>{
+test('the sidebar never scrolls (owner, 25 Nov 2026): items shrink to the visible height instead',()=>{
   const n=R('scripts/study-nav.js');
-  assert.match(n,/#studyNav\{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:none;/);
+  assert.match(n,/#studyNav\{overflow:hidden;overscroll-behavior:none;touch-action:none;scrollbar-width:none;/);
 });
