@@ -1,0 +1,6 @@
+[
+ {"id":"0","row":["c1","Which is the correct accounting equation?",["Assets = Liabilities + Equity","Assets = Equity − Liabilities","Liabilities = Assets + Equity","Equity = Assets + Liabilities"],0,"Assets equal the sources of funding: liabilities plus owner's equity."]},
+ {"id":"1","row":["c1","Which is NOT a component of the Fraud Triangle?",["Opportunity","Pressure","Rationalization","Materiality"],3,"Materiality is part of Relevance, not the Fraud Triangle."]},
+ {"id":"2","row":["c1","A customer pays 5,000 owed on account. What is the result?",["Cash +5,000 · A/R −5,000","Revenue +5,000","Equity +5,000","Liabilities −5,000"],0,"One asset is exchanged for another; it is not new revenue."]},
+ {"id":"3","row":["c1","How is ROA calculated?",["Net income ÷ Avg total assets","Net income ÷ Sales","Assets ÷ Liabilities","Equity ÷ Assets"],0,"ROA measures return on average total assets."]}
+]

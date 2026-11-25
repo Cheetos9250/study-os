@@ -96,7 +96,9 @@
       for (var nk of Object.keys(value)) {
         var note = value[nk];
         if (!/^[a-z]+:[A-Za-z0-9_-]+$/.test(nk) || !object(note) || typeof note.text !== "string" ||
-            (note.updated !== undefined && typeof note.updated !== "string"))
+            (note.updated !== undefined && typeof note.updated !== "string") ||
+            (note.imgs !== undefined && (!Array.isArray(note.imgs) || note.imgs.length > 40 ||
+              !note.imgs.every(function (x) { return typeof x === "string" && /^[a-f0-9]{32}$/.test(x); }))))
           throw new Error("Invalid lesson notes");
       }
     } else if (key === "studyos.pdfsets.v1") {
@@ -149,6 +151,38 @@
         if (!/^[a-z0-9]{2,12}$/.test(jt) || !Array.isArray(tv) || tv.length !== 2 || !tv.every(function (n) { return Number.isInteger(n) && n >= 0; }) || tv[1] > tv[0])
           throw new Error("Invalid JE Drill score");
       }
+    } else if (key === "studyos.scratch.v1") {
+      var scBad = function () { throw new Error("Invalid scratchpad data"); };
+      var scIds = object(value) ? Object.keys(value) : scBad();
+      if (scIds.length > 600) scBad();
+      var scTotal = 0;
+      scIds.forEach(function (sid) {
+        var sl = value[sid];
+        if (!/^[a-z]{2,8}:[A-Za-z0-9_.\-]{1,60}$/.test(sid) || !Array.isArray(sl) || sl.length > 300) scBad();
+        sl.forEach(function (st) {
+          if (!Array.isArray(st) || st.length < 3 || st.length % 2 === 0 || st.length > 6000 || !st.every(function (n) { return typeof n === "number" && isFinite(n); }) || st[0] < 0.5 || st[0] > 40 || st.slice(1).some(function (n) { return n < -100 || n > 2000; })) scBad();
+          scTotal += st.length;
+        });
+        if (scTotal > 600 * 24000) scBad();
+      });
+    } else if (key === "studyos.desk.v1") {
+      var dkBad = function () { throw new Error("Invalid desk display data"); };
+      var dkCity = function (c) {
+        return object(c) && typeof c.name === "string" && c.name.trim() && c.name.length <= 40 &&
+          Number.isFinite(c.lat) && Number.isFinite(c.lon) && c.lat >= -90 && c.lat <= 90 && c.lon >= -180 && c.lon <= 180;
+      };
+      if (value.events !== undefined && (!Array.isArray(value.events) || value.events.length > 300)) dkBad();
+      for (var dke of value.events || [])
+        if (!object(dke) || typeof dke.id !== "string" || !dke.id || dke.id.length > 40 || !/^\d{4}-\d{2}-\d{2}$/.test(dke.date) ||
+            isNaN(Date.parse(dke.date + "T00:00:00Z")) || new Date(dke.date + "T00:00:00Z").toISOString().slice(0, 10) !== dke.date ||
+            typeof dke.title !== "string" || !dke.title.trim() || dke.title.length > 80 ||
+            (dke.time !== undefined && dke.time !== "" && !/^([01]\d|2[0-3]):[0-5]\d$/.test(dke.time))) dkBad();
+      if (value.city !== undefined && !dkCity(value.city)) dkBad();
+      if (value.aq !== undefined && (!Array.isArray(value.aq) || value.aq.length > 12 || !value.aq.every(dkCity))) dkBad();
+      if (value.auto !== undefined && [0, 15, 30, 60].indexOf(value.auto) < 0) dkBad();
+      if (value.awake !== undefined && typeof value.awake !== "boolean") dkBad();
+      if (value.pages !== undefined && (!Array.isArray(value.pages) || value.pages.length > 8 ||
+          !value.pages.every(function (id) { return ["home", "air", "cal", "study", "wx", "tasks", "week", "prog"].indexOf(id) >= 0; }))) dkBad();
     } else if (key === "studyos.excel.v1") {
       if ((value.done !== undefined && !object(value.done)) || (value.ans !== undefined && !object(value.ans)))
         throw new Error("Invalid Excel lesson progress");

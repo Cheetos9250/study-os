@@ -46,6 +46,7 @@
   d.innerHTML='<h2 id="wnAiTitle">Ask AI about <span'+(lang==='zh'?' lang="zh"':'')+'>'+esc(clean(term))+'</span></h2>'
    +'<p class="subheading">Opens the AI tutor with the question ready. Check it, then tap Send.</p>'
    +list.map(([label,q])=>'<a class="btn btn-outline wn-ai-opt" href="'+esc(link(lang,q))+'"><b>'+esc(label)+'</b><small>'+esc(q.length>120?q.slice(0,117)+'…':q)+'</small></a>').join('')
+   +(window.WordNestConfuse?WordNestConfuse.dialogPart(lang,term):'')
    +'<button type="button" class="btn btn-primary" data-ai-close>Close</button>';
   if(d.showModal&&!d.open)d.showModal();else d.setAttribute('open','');
  }

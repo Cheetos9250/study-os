@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — subjects and chapters">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -96,6 +96,7 @@ button.danger{color:var(--red)}
 <link rel="stylesheet" href="assets/study-world.css?v=9">
 <script src="scripts/study-theme.js?v=6"></script>
 <script src="scripts/study-accent.js?v=2"></script>
+<link rel="stylesheet" href="assets/study-eink-base.css?v=1">
 </head>
 <body>
 <div class="container">
@@ -112,7 +113,8 @@ button.danger{color:var(--red)}
 </div>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=6"></script>
-<script src="scripts/study-nav.js?v=12"></script>
+<script src="scripts/study-note-images.js?v=1"></script>
+<script src="scripts/study-nav.js?v=14"></script>
 <script>
 (function(){
 'use strict';
@@ -161,12 +163,15 @@ const NOTES_KEY='studyos.notes.v1';let notes={},openNote=null;
 try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}
 const noteText=k=>notes[k]&&typeof notes[k].text==='string'?notes[k].text:'';
 function noteBtn(k){const has=noteText(k).trim();return '<button type="button" class="notebtn'+(has?' has':'')+'" data-note="'+esc(k)+'" aria-expanded="'+(openNote===k)+'">'+(has?'Edit notes':'+ Notes')+'</button>';}
-function noteBox(k){if(openNote!==k)return '';const n=notes[k];return '<div class="notebox"><textarea data-note-text="'+esc(k)+'" maxlength="20000" placeholder="Write notes for this chapter…" aria-label="Notes">'+esc(noteText(k))+'</textarea><p class="notemeta" data-note-meta="'+esc(k)+'">'+(n&&n.updated?'Saved '+new Date(n.updated).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</p></div>';}
+function noteBox(k){if(openNote!==k)return '';const n=notes[k];return '<div class="notebox"><textarea data-note-text="'+esc(k)+'" maxlength="20000" placeholder="Write notes for this chapter…" aria-label="Notes">'+esc(noteText(k))+'</textarea><div data-ni="'+esc(k)+'"></div><p class="notemeta" data-note-meta="'+esc(k)+'">'+(n&&n.updated?'Saved '+new Date(n.updated).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</p></div>';}
 let noteTimer=null;
 function saveNote(k,text){try{const o=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))notes=o;}catch{}
- if(text.trim())notes[k]={text:text.slice(0,20000),updated:new Date().toISOString()};else delete notes[k];
+ const nn=(window.StudyNoteImages?window.StudyNoteImages.withText:function(o,t,u){var im=o&&Array.isArray(o.imgs)&&o.imgs.length?o.imgs:null;if(!String(t).trim()&&!im)return null;var n={text:t,updated:u};if(im)n.imgs=im;return n;})(notes[k],text.slice(0,20000),new Date().toISOString());if(nn)notes[k]=nn;else delete notes[k]; /* keeps the note's pictures */
  let ok=true;try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));window.StudyCloud&&StudyCloud.dirty();}catch{ok=false;}
  const m=document.querySelector('[data-note-meta="'+CSS.escape(k)+'"]');if(m)m.textContent=ok?(text.trim()?'Saved':'Empty note removed'):'Could not save (storage full)';}
+/* pictures in the open chapter note (paste or Add image), synced with it */
+function mountNoteImgs(){if(!window.StudyNoteImages)return;document.querySelectorAll('[data-ni]').forEach(h=>{if(h.__niKey)return;const k=h.dataset.ni;StudyNoteImages.mount(h,()=>k,document.querySelector('[data-note-text="'+CSS.escape(k)+'"]'));});}
+render=(f=>function(){const r=f.apply(this,arguments);mountNoteImgs();return r;})(render);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-note]');if(!b)return;openNote=openNote===b.dataset.note?null:b.dataset.note;render();const t=document.querySelector('[data-note-text="'+CSS.escape(b.dataset.note)+'"]');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length);}});
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.noteText;if(!k)return;clearTimeout(noteTimer);const v=e.target.value;noteTimer=setTimeout(()=>saveNote(k,v),400);});
 document.addEventListener('focusout',e=>{const k=e.target.dataset&&e.target.dataset.noteText;if(k){clearTimeout(noteTimer);saveNote(k,e.target.value);}});

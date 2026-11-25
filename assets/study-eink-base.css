@@ -1,0 +1,57 @@
+/* Study OS "e-ink desk display" base for every core page except Today (Today has study-eink.css).
+   Loaded last in <head>, after study-world.css and the page's own styles, so it re-tokens the
+   ink-manga system: one light-grey e-ink screen, ink frames, chunky rounded M PLUS Rounded 1c
+   (Thai falls back to Mali), monochrome. The nav is the dark bezel. Dark mode is the inverted screen. */
+:root,:root.warm{
+ --ui:'M PLUS Rounded 1c','Mali',system-ui,-apple-system,sans-serif;
+ --num:'M PLUS Rounded 1c','Mali',system-ui,sans-serif;--mono:var(--ui);
+ --bezel:#1d1b26;--bezel-ink:#e9e9ec;--bezel-mute:#b9b8c2;
+ --bg:#d9dcd9;--panel:#e1e3e1;--panel-2:#cfd2cf;--text:#16161b;--muted:#4b4c52;--line:#16161b;--line-soft:#a9aca9;--line-strong:#16161b;
+ --ink:#16161b;--paper:#d9dcd9;--dot:#5a5b60;--halftone:#8c8f8c;
+ --acc:var(--ink);--acc-ink:var(--paper);--acc-t:var(--ink);--acc-text:var(--ink);--acc-soft:var(--panel-2);--acc-tone:rgba(22,22,27,.18);
+ --link:var(--ink);--accent:var(--ink);--accent-ink:var(--paper);--focus:var(--ink);
+ --red:var(--ink);--orange:var(--ink);--green:var(--ink);
+ --hi:var(--ink);--hi-t:var(--paper);--med:var(--panel-2);--med-t:var(--ink);--low:transparent;--low-t:var(--ink);--blue-soft:var(--panel-2);
+ --t-acc:var(--panel-2);--t-eco:var(--panel-2);--t-math:var(--panel-2);--t-eng:var(--panel-2);--t-zh:var(--panel-2);
+ --hatch:radial-gradient(circle,var(--dot) 1.1px,transparent 1.4px) 0 0/6px 6px;
+ --hatch-ink:radial-gradient(circle,var(--halftone) 1.1px,transparent 1.4px) 0 0/6px 6px;
+ --dots:radial-gradient(circle,var(--dot) 1.1px,transparent 1.4px) 0 0/6px 6px;
+ --bw:2.5px;--r:10px;--r-s:10px;
+ color-scheme:light;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bezel:#000;--bezel-ink:#cfd1cd;--bezel-mute:#8d8f8b;
+ --bg:#0d0d0f;--panel:#141417;--panel-2:#1e1e22;--text:#d8dad6;--muted:#9a9c98;--line:#d8dad6;--line-soft:#3a3a3e;--line-strong:#d8dad6;
+ --ink:#d8dad6;--paper:#0d0d0f;--dot:#7d7f7b;--halftone:#55574f;
+ --acc:var(--ink);--acc-ink:var(--paper);--acc-t:var(--ink);--acc-text:var(--ink);--acc-soft:var(--panel-2);--acc-tone:rgba(216,218,214,.2);
+ --link:var(--ink);--accent:var(--ink);--accent-ink:var(--paper);--focus:var(--ink);
+ --red:var(--ink);--orange:var(--ink);--green:var(--ink);--hi:var(--ink);--hi-t:var(--paper);
+ --med:var(--panel-2);--med-t:var(--ink);--low:transparent;--low-t:var(--ink);--blue-soft:var(--panel-2);
+ --t-acc:var(--panel-2);--t-eco:var(--panel-2);--t-math:var(--panel-2);--t-eng:var(--panel-2);--t-zh:var(--panel-2);
+ color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+ --bezel:#000;--bezel-ink:#cfd1cd;--bezel-mute:#8d8f8b;
+ --bg:#0d0d0f;--panel:#141417;--panel-2:#1e1e22;--text:#d8dad6;--muted:#9a9c98;--line:#d8dad6;--line-soft:#3a3a3e;--line-strong:#d8dad6;
+ --ink:#d8dad6;--paper:#0d0d0f;--dot:#7d7f7b;--halftone:#55574f;
+ --acc:var(--ink);--acc-ink:var(--paper);--acc-t:var(--ink);--acc-text:var(--ink);--acc-soft:var(--panel-2);--acc-tone:rgba(216,218,214,.2);
+ --link:var(--ink);--accent:var(--ink);--accent-ink:var(--paper);--focus:var(--ink);
+ --red:var(--ink);--orange:var(--ink);--green:var(--ink);--hi:var(--ink);--hi-t:var(--paper);
+ --med:var(--panel-2);--med-t:var(--ink);--low:transparent;--low-t:var(--ink);--blue-soft:var(--panel-2);
+ --t-acc:var(--panel-2);--t-eco:var(--panel-2);--t-math:var(--panel-2);--t-eng:var(--panel-2);--t-zh:var(--panel-2);
+ color-scheme:dark;
+}
+html,body,:root.warm body{background-color:var(--bg)}
+body{color:var(--text);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--ui);font-weight:900;letter-spacing:0}
+main a:not([class]){color:inherit}
+
+/* nav = the dark bezel */
+#studyNav#studyNav{
+ --sn-bg:var(--bezel);--sn-fg:var(--bezel-ink);--sn-mute:var(--bezel-mute);--sn-line:var(--bezel);--sn-hi:rgba(255,255,255,.08);--sn-on:var(--bezel-ink);--sn-pill:var(--bezel-ink);--sn-pill-ink:var(--bezel);
+ font-family:var(--ui)}
+#studyNav .sn-brand{font-family:var(--ui)!important;font-weight:900!important}
+#studyNav .sn-tab[aria-current="page"]{border-radius:999px}
+
+/* subject jerseys and chips: outlined ink, no team colours */
+.jersey{background:transparent;color:inherit;border:2px solid currentColor;border-radius:8px;font-family:var(--num);font-weight:900}

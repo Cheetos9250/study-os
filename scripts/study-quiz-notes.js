@@ -55,9 +55,9 @@
  function key(){return ck+':'+chap;}
  function label(id){if(id==='general')return 'General';var c=cats().find(function(x){return x[0]===id;});return c?c[1]:id;}
  function status(text,err){st.textContent=text;st.classList.toggle('err',!!err);}
- function load(){var n=all()[key()];ta.value=n&&typeof n.text==='string'?n.text:'';sel.value=chap;ta.placeholder='Notes for '+label(chap)+'. They also show on the Lessons page.';status(ta.value?'Saved · '+ta.value.length.toLocaleString('en-US')+' characters':'Saved on this device');}
+ function load(){if(panel&&panel.__ni&&window.StudyNoteImages)window.StudyNoteImages.refresh(panel.__ni);var n=all()[key()];ta.value=n&&typeof n.text==='string'?n.text:'';sel.value=chap;ta.placeholder='Notes for '+label(chap)+'. They also show on the Lessons page.';status(ta.value?'Saved · '+ta.value.length.toLocaleString('en-US')+' characters':'Saved on this device');}
  function save(){clearTimeout(timer);timer=null;var notes=all(),k=key(),text=ta.value.slice(0,MAX);
-  if(text.trim())notes[k]={text:text,updated:new Date().toISOString()};else delete notes[k];
+  var nn=(window.StudyNoteImages?window.StudyNoteImages.withText:function(o,t,u){var im=o&&Array.isArray(o.imgs)&&o.imgs.length?o.imgs:null;if(!String(t).trim()&&!im)return null;var n={text:t,updated:u};if(im)n.imgs=im;return n;})(notes[k],text,new Date().toISOString());if(nn)notes[k]=nn;else delete notes[k]; /* keeps the note's pictures */
   try{localStorage.setItem(KEY,JSON.stringify(notes));if(window.StudyCloud)window.StudyCloud.dirty();status('Saved · '+text.length.toLocaleString('en-US')+' characters');}
   catch(e){status('Not saved: storage is full',true);}}
  function flush(){if(timer)save();}
@@ -76,6 +76,8 @@
   panel.innerHTML='<div class="qn-bar"><h2 class="qn-t">Notes</h2><select aria-label="Chapter">'+opts+'</select><button type="button" class="qn-c" aria-pressed="false" title="Lines written as question :: answer become flip cards">Cards</button><button type="button" class="qn-x qn-f" aria-pressed="false" aria-label="Full screen"></button><button type="button" class="qn-x" aria-label="Close notes">'+X+'</button><span class="qn-s" role="status"></span><p class="qn-hint">Swipe from the right towards the left to open notes full screen; swipe right to go back.</p></div><textarea maxlength="'+MAX+'" spellcheck="true" aria-label="Chapter notes"></textarea><div class="qn-cards" hidden></div>';
   document.body.appendChild(panel);document.body.appendChild(btn);document.documentElement.classList.add('qn-ready');
   ta=panel.querySelector('textarea');sel=panel.querySelector('select');st=panel.querySelector('.qn-s');
+  /* pictures in the note (paste or Add image), synced with it */
+  if(window.StudyNoteImages){var ni=document.createElement('div');ni.className='qn-img';ni.style.cssText='border-top:2px solid var(--qn-rule);max-height:40%;overflow-y:auto;flex:none';ta.insertAdjacentElement('afterend',ni);window.StudyNoteImages.mount(ni,key,ta);panel.__ni=ni;}
   /* note cards: lines "question :: answer" in this chapter's note, as flip cards; the note itself is not changed */
   var cb=panel.querySelector('.qn-c'),cv=panel.querySelector('.qn-cards');
   function cardsOn(on){cb.setAttribute('aria-pressed',String(on));cv.hidden=!on;ta.hidden=on;if(on){flush();paintCards();}else ta.focus({preventScroll:true});}
@@ -92,15 +94,19 @@
   /* swipe from the right side towards the left: notes open full screen; swipe right on the full-screen notes: back to the quiz.
      The outermost edge strips are left to Safari's own back/forward gestures. */
   var sx=0,sy=0,st0=0,on=false;
-  document.addEventListener('touchstart',function(e){if(e.touches.length!==1){on=false;return;}var t=e.touches[0];on=t.clientX>16&&t.clientX<innerWidth-16;sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});
+  var inCard=false;
+  document.addEventListener('touchstart',function(e){if(e.touches.length!==1){on=false;return;}var t=e.touches[0];on=t.clientX>16&&t.clientX<innerWidth-16;inCard=!!(e.target.closest&&e.target.closest('.qcard'));sx=t.clientX;sy=t.clientY;st0=Date.now();},{passive:true});
   document.addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Date.now()-st0>700||Math.abs(dx)<90||Math.abs(dy)>Math.abs(dx)*0.5)return;
    var full=panel.classList.contains('full'),inPanel=panel.contains(e.target);
-   if(dx<0&&!full&&!inPanel&&sx>innerWidth*0.45){if(panel.hidden)setOpen(true);setFull(true);ta.focus({preventScroll:true});}
+   if(dx<0&&!full&&!inPanel&&(inCard?sx>innerWidth-64:sx>innerWidth*0.45)){if(panel.hidden)setOpen(true);setFull(true);ta.focus({preventScroll:true});}
    else if(dx>0&&full&&sx>28){setFull(false);setOpen(false);}},{passive:true});
   sel.onchange=function(){flush();chap=sel.value;pinned=chap!==current();load();ta.focus();};
   ta.addEventListener('input',function(){status('Saving…');clearTimeout(timer);timer=setTimeout(save,500);});
   ta.addEventListener('blur',flush);
   window.addEventListener('pagehide',flush);
+  /* other note writers on the page (Ask AI → Save to note) flush this panel first, then ask it to reload */
+  document.addEventListener('studyos:notes-flush',flush);
+  document.addEventListener('studyos:notes-changed',function(){if(!timer)load();});
   document.addEventListener('visibilitychange',function(){if(document.hidden)flush();else if(!timer&&document.activeElement!==ta&&!panel.hidden)load();});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!panel.hidden){if(panel.classList.contains('full'))setFull(false);else setOpen(false);}});
   /* follow the quiz: when the question on screen moves to another chapter, the note follows (unless a chapter was picked by hand) */

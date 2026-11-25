@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — today, tasks, exams">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -121,6 +121,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 @media(max-width:560px){.qg{flex-wrap:wrap}.qg .qgo{flex-direction:row;border-left:0;padding-left:0;width:100%}.qg .qgo>*{flex:1}}
 /* WordNest daily goal (scripts/study-wordnest.js) */
 .wng{display:flex;align-items:center;gap:14px;margin:12px 0 0;padding:12px 18px;border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel);color:inherit;text-decoration:none;min-height:44px}
+.wng-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0 0}.wng-add{min-height:44px;padding:0 16px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 14px var(--ui);cursor:pointer}.wng-hint{font-size:13px;color:var(--muted)}
+.wng-dlg{max-width:min(440px,calc(100vw - 32px));border:var(--bw) solid var(--ink);border-radius:var(--r);background:var(--panel);color:var(--text);padding:18px}.wng-dlg h2{margin:0 0 8px;font:700 22px var(--num)}.wng-dlg label{display:block;font-weight:900;margin:10px 0 4px}.wng-dlg input{width:100%;min-height:44px;border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:600 16px var(--ui);padding:0 10px}.wa-msg{min-height:20px;margin:8px 0 0;font-size:14px}.wa-acts{display:flex;gap:8px;margin-top:10px}.wa-acts button{min-height:44px;padding:0 16px;border:2.5px solid var(--ink);border-radius:var(--r-s,8px);background:var(--panel);color:var(--text);font:900 14px var(--ui);cursor:pointer}.wa-acts .main{background:var(--ink);color:var(--paper)}
 .wng[hidden]{display:none}.wng:focus-visible{outline:3px solid var(--focus,#2f6bff);outline-offset:3px}
 .wng .wt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .wng .k{font:900 12px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--acc-t,var(--red))}
@@ -211,31 +213,42 @@ a.sb:hover{background:var(--dots),var(--panel)}
 }
 @media(max-width:420px){.sb{padding:12px 14px 14px;min-height:110px}}
 </style>
+<link rel="stylesheet" href="assets/study-eink.css?v=1">
 <script src="scripts/study-theme.js?v=6"></script>
 <script src="scripts/study-accent.js?v=2"></script>
 </head>
 <body>
-<div class="cover" id="cover" role="img" aria-label="Cover">
- <div class="cover-tools"><button type="button" id="coverPick" data-img="cover">Change cover</button></div>
-</div>
 <div class="page">
 <div class="headrow">
 <header class="head">
- <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 24 32 12l28 12-28 12z" fill="var(--panel)" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M16 30v12c0 4 7 9 16 9s16-5 16-9V30" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M54 27v15" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M50 46l4-5 4 5-4 5z" fill="currentColor"/><path d="M20 40l4 4M26 43l4 3M34 43l4-2M40 41l4-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
  <div><h1 id="welcome-title">Study</h1><p class="date" id="today">Study OS</p></div>
 </header>
 <div class="bk" id="backupNudge" role="status" hidden></div>
 </div>
+<section class="hero" aria-label="Next exam and cover">
+<div class="hx" id="heroExam"></div>
+<div class="cover" id="cover">
+ <div class="cover-tools"><button type="button" id="coverPick" data-img="cover">Change cover</button></div>
+ <button type="button" class="avatar" id="avatar" data-img="avatar" aria-label="Change icon"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 24 32 12l28 12-28 12z" fill="var(--panel)" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M16 30v12c0 4 7 9 16 9s16-5 16-9V30" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M54 27v15" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/><path d="M50 46l4-5 4 5-4 5z" fill="currentColor"/><path d="M20 40l4 4M26 43l4 3M34 43l4-2M40 41l4-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+</div>
+</section>
 <div class="chips scoreboard" id="chips" aria-label="Scoreboard"></div>
 <main>
 <a class="cont" id="continue" hidden></a>
 <div class="wng qg" id="qGoal" hidden></div>
 <a class="wng" id="wordGoal" hidden></a>
+<div class="wng-tools"><button type="button" id="wordAdd" class="wng-add">+ New word</button><span class="wng-hint">Jot down a word you meet while studying. It goes to WordNest → My words.</span></div>
+<dialog id="wordAddDlg" class="wng-dlg" aria-labelledby="wordAddT"><form method="dialog" id="wordAddForm"><h2 id="wordAddT">New English word</h2>
+<label for="waEn">Word</label><input id="waEn" required maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false">
+<label for="waTh">Meaning (Thai)</label><input id="waTh" required maxlength="120" autocomplete="off">
+<label for="waEx">Example sentence (optional)</label><input id="waEx" maxlength="200" autocomplete="off">
+<p class="wa-msg" id="waMsg" role="status"></p><div class="wa-acts"><button type="submit" class="main" value="save">Add word</button><button type="button" id="waCancel">Cancel</button></div></form></dialog>
 <h2>Today</h2>
 <div class="classes" id="classes" aria-label="Classes today"></div>
 <section class="top">
  <div class="box" id="planBox" aria-label="Today's plan"><p class="empty">Loading…</p></div>
  <div class="pomo" aria-label="Pomodoro timer">
+  <div class="mascot" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" shape-rendering="crispEdges"><path d="M18 14h26v34H18z"/><path d="M22 14v34"/><path d="M16 19h4M16 25h4M16 31h4M16 37h4M16 43h4"/><path d="M28 24h2M38 24h2"/><path d="M30 31h6"/><path d="M44 34l10-10 3 3-10 10-4 1z"/><path d="M24 48v6M38 48v6M22 54h4M36 54h4"/><path d="M12 10l2 2M50 8l-2 3"/></svg><span class="bubble" id="pBubble">One focus block at a time.</span></div>
   <div class="tabs" role="group" aria-label="Mode"><button class="tab" type="button" data-m="25" aria-pressed="true">pomodoro</button><button class="tab" type="button" data-m="5" aria-pressed="false">short break</button><button class="tab" type="button" data-m="15" aria-pressed="false">long break</button></div>
   <div class="clock" id="clock" role="timer" aria-live="off">25:00</div>
   <div class="pbtn"><button type="button" id="pStart">start</button><button type="button" class="ghost" id="pReset" aria-label="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button></div>
@@ -267,7 +280,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <section class="subjects" id="subjects" aria-label="Subjects"></section>
 </main>
 </div>
-<script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-review.js?v=3"></script>
 <script src="scripts/study-stats.js?v=1"></script>
 <script src="scripts/study-motivation.js?v=1"></script>
 <script src="scripts/study-today-extras.js?v=2"></script>
@@ -276,7 +289,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=6"></script>
 <script src="scripts/study-wordnest.js?v=2"></script>
-<script src="scripts/study-nav.js?v=12"></script>
+<script src="scripts/study-nav.js?v=14"></script>
 <script>
 (function(){
 'use strict';
@@ -388,6 +401,26 @@ const link=(c,tab,cat)=>c.page+'?tab='+tab+(cat?'&cat='+encodeURIComponent(cat):
 function leftLabel(iso){const d=T.daysUntil(iso,now);return d<0?{t:(-d)+'d late',c:'late'}:d===0?{t:'Today',c:'today'}:{t:d+'d left',c:''};}
 const PRI={High:0,Medium:1,Low:2};
 function upcoming(){return settings.exams.map(e=>({...e,d:T.daysUntil(e.date,now)})).filter(e=>e.d>=0).sort((a,b)=>a.d-b.d||a.date.localeCompare(b.date));}
+/* next class in the coming 7 days (today: only ones not started yet) */
+function nextClass(){
+ if(!settings.timetable.length)return null;
+ const d=new Date(now+7*3600000),hm=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
+ for(let i=0;i<8;i++){const iso=T.dayKey(now+i*86400000),list=T.classesOn(settings.timetable,iso).filter(x=>!x.skip&&(i>0||x.start>hm));
+  if(list.length){const p=parts(iso);return {x:list[0],when:i===0?'Today':i===1?'Tomorrow':DAYS[dowOf(iso)].slice(0,3)+' '+p.d+' '+MO[p.m].slice(0,3)};}}
+ return null;
+}
+/* readiness for an exam: questions answered right in its chapters out of all questions there */
+function readiness(e){const s=summaries[e.course];if(!s||!e.cats.length)return null;let q=0,r=0;for(const id of e.cats){const x=s.per[id];if(x){q+=x.quiz;r+=x.correct;}}return q?Math.round(r/q*100):null;}
+let heroClock=0;
+function renderHero(ne){
+ const el=$('#heroExam');clearInterval(heroClock);
+ if(!ne){const paint=()=>{const d=new Date(Date.now()+7*3600000);el.innerHTML='<div class="hx-clock">'+String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0')+'</div><p class="hx-m">No exams coming up · <a href="calendar.html">Add one in Calendar</a></p>';};paint();heroClock=setInterval(paint,30000);return;}
+ const c=course(ne.course),r=readiness(ne),rest=upcoming().slice(1,3),seg=r==null?0:Math.round(r/20);
+ el.innerHTML='<a class="hx-top" href="#exams"><span class="hx-n">'+(ne.d===0?'0':ne.d)+'</span><span class="hx-t"><span>'+(ne.d===0?'Exam today':ne.d===1?'day to':'days to')+'</span><b>'+esc(ne.title)+'</b></span></a>'
+  +'<p class="hx-m">'+esc(DAYS[dowOf(ne.date)].slice(0,3)+' '+shortDay(ne.date))+(c?' · '+esc(c.name):'')+(ne.cats.length&&c&&data[c.key]?' · '+ne.cats.length+' chapter'+(ne.cats.length>1?'s':''):'')+'</p>'
+  +(r==null?'':'<div class="hx-r"><span class="k">Ready</span><span class="meter" role="img" aria-label="Ready '+r+'%: questions right in the exam chapters">'+[1,2,3,4,5].map(i=>'<i class="'+(i<=seg?'on':'')+(i===seg?' here':'')+'"></i>').join('')+'</span><b>'+r+'%</b></div>')
+  +(rest.length?'<p class="hx-next">Then '+rest.map(e=>'<b>'+esc((course(e.course)||{}).name||e.title)+'</b> '+e.d+'d').join(' · ')+'</p>':'');
+}
 function renderChips(){
  const dueTotal=Object.values(summaries).reduce((n,s)=>n+(s?s.reviewNow:0),0);
  const open=st.tasks.filter(t=>!t.done),late=open.filter(t=>t.date<today).length,ne=upcoming()[0];
@@ -397,8 +430,11 @@ function renderChips(){
  const qd=T.COURSES.map(c=>({c,n:window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0})).sort((a,b)=>b.n-a.n),quizDue=qd.reduce((n,x)=>n+x.n,0),qTop=qd[0];
  const cells=['<a class="sb" href="'+(quizDue?link(qTop.c,'prac')+'&review=1':dueTotal&&!FOCUS?link(top,'cards'):'practice.html')+'"><span class="n">'+quizDue+'</span><span class="l">Quiz review</span><span class="s">'+(quizDue?esc(qTop.c.name)+' has '+qTop.n+(dueTotal&&!FOCUS?' · '+dueTotal+' cards due':''):dueTotal&&!FOCUS?dueTotal+' cards due':'All caught up')+'</span></a>',
   '<a class="sb'+(late?' alert':'')+'" href="#tasks"><span class="n">'+open.length+'</span><span class="l">Tasks</span><span class="s">'+(late?late+' late':open.length?'Open':'Nothing open')+'</span></a>'];
- if(ne){const c=course(ne.course);cells.push('<a class="sb next'+(ne.d<=3?' alert':'')+'" href="#exams" aria-label="Next exam: '+esc(ne.title)+'"><span class="bub"><span class="fx">'+esc(ne.title)+(ne.d===0?'':' in')+'</span><span class="n">'+(ne.d===0?'Today!':ne.d+'<small>'+(ne.d===1?'day':'days')+'</small>'+(ne.d<=3?'!':''))+'</span></span><span class="s">'+esc(shortDay(ne.date))+(c?' · '+esc(c.name):'')+'</span></a>');}
- else cells.push('<a class="sb next" href="calendar.html"><span class="bub"><span class="fx">No exams coming up</span></span><span class="s">Add one in Calendar</span></a>');
+ /* the next exam is the hero (renderHero); the third cell is the next class from the timetable */
+ const nc=nextClass();
+ cells.push(nc?'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="w">'+esc(nc.when)+' · '+nc.x.start+'</span><span class="nm">'+esc(nc.x.name)+'</span>'+(nc.x.code?'<span class="s">'+esc(nc.x.code)+'</span>':'')+'</a>'
+  :'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="nm">'+(settings.timetable.length?'None this week':'No timetable')+'</span><span class="s">'+(settings.timetable.length?'Open Calendar':'Import it in Calendar')+'</span></a>');
+ renderHero(ne);
  const chips=cells;
  $('#chips').innerHTML=chips.join('');
 }
@@ -411,10 +447,14 @@ function renderPlan(){
  if(window.StudyReview){const qd=T.COURSES.map(x=>({x,n:StudyReview.countRaw(read('study-'+x.key),now)})).filter(y=>y.n).sort((a,b)=>b.n-a.n);
   if(FOCUS)plan.tasks=plan.tasks.filter(t=>t.kind!=='review');
   const n=qd.reduce((s,y)=>s+y.n,0);if(n)plan.tasks.unshift({id:'quiz-review',kind:'quiz',course:qd[0].x.key,title:'Review '+n+' question'+(n>1?'s':'')+' due',detail:qd.map(y=>y.x.name+' '+y.n).join(' · ')+' · missed or due again today',top:qd[0].x});}
+ /* WordNest daily goal as a plan task: it ticks itself once the goal is met */
+ const wg=window.StudyWordNest&&StudyWordNest.read();
+ if(wg&&wg.started)plan.tasks.push({id:'wordnest-goal',kind:'words',title:'Review vocabulary (WordNest)',detail:wg.done+' / '+wg.goal+' words today'+(wg.met?' · goal met, ticked automatically':' · ticks itself at the goal'),auto:wg.met,lang:wg.dueZh>wg.dueEn?'zh':'en'});
  $('#today').textContent=DAYS[dowOf(plan.today)]+', '+p.d+' '+MO[p.m];
  if(!Object.keys(summaries).length){$('#planBox').innerHTML='<p class="empty">'+(loadFailed?'Could not load subjects. Refresh to retry.':'Loading…')+'</p>';return;}
  $('#planBox').innerHTML=plan.tasks.length?'<ul class="plan">'+plan.tasks.map((t,i)=>{
-  const c=t.course?course(t.course):null,done=t.kind==='chapter'?t.done:!!doneToday[t.id];let acts='';
+  const c=t.course?course(t.course):null,done=t.kind==='chapter'?t.done:!!(doneToday[t.id]||t.auto);let acts='';
+  if(t.kind==='words')acts='<a class="main" href="vocabloom/?lang='+t.lang+'">Open WordNest</a>';
   if(t.kind==='quiz')acts='<a class="main" href="'+link(t.top,'prac')+'&review=1">Start review</a>';
   else if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
   else if(c&&t.kind==='chapter')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="pdf-sets.html?book=1&ch='+t.cat.slice(1)+'">Textbook</a>':'');
@@ -422,7 +462,7 @@ function renderPlan(){
   else if(c&&t.kind==='weak')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>';
   else if(c&&t.kind==='final')acts=(FOCUS?'':'<a href="'+link(c,'sum')+'">Summaries</a>')+'<a class="main" href="'+link(c,'prac',(t.cats||[]).join(','))+'">Practice</a><a href="mock.html?course='+c.key+'">Mock exam</a>';
   else if(c)acts='<a class="main" href="'+link(c,'prac')+'">Practice</a>';
-  return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
+  return '<li class="'+(done?'done':'')+(t.kind==='chapter'?' stack':'')+'"><input type="checkbox" data-i="'+i+'" id="p'+i+'"'+(done?' checked':'')+(t.auto?' disabled':'')+' aria-label="Done: '+esc(t.title)+'"><div><h3>'+(c&&t.kind!=='quiz'?'<span class="tag t-'+c.key+'">'+esc(c.name)+'</span>':'')+esc(t.title)+'</h3>'+(sub(t)?'<p>'+esc(sub(t))+'</p>':'')+'</div>'+(acts?'<div class="acts">'+acts+'</div>':'')+'</li>';}).join('')+'</ul>'
   :'<p class="empty">Nothing planned. Free time? Go to Practice.</p>';
  $('#planBox').querySelectorAll('input[type=checkbox]').forEach(b=>b.onchange=()=>{settings=T.markChapter(settings,plan.tasks[+b.dataset.i],b.checked,Date.now());saveSettings();renderAll();});
 }
@@ -572,6 +612,27 @@ function renderWordGoal(){
   +'<span class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></span></span>'
   +'<span class="wdue" aria-hidden="true"><span class="n">'+g.due+'</span><span class="l">due '+(g.due===1?'word':'words')+' →</span></span>';
 }
+/* ---------- + New word: adds to WordNest My words (vocabloom_mvp_v1.custom, same shape as WordNest's own Add word) ---------- */
+(function(){
+ const WN_KEY='vocabloom_mvp_v1',dlg=$('#wordAddDlg'),btn=$('#wordAdd');if(!dlg||!btn)return;
+ const msg=t=>{$('#waMsg').textContent=t;};
+ btn.onclick=()=>{$('#wordAddForm').reset();msg('');if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','');$('#waEn').focus();};
+ $('#waCancel').onclick=()=>dlg.close();
+ $('#wordAddForm').onsubmit=e=>{
+  e.preventDefault();
+  const en=$('#waEn').value.trim().toLowerCase(),th=$('#waTh').value.trim(),ex=$('#waEx').value.trim();
+  if(!en||!th){msg('Type the word and its meaning.');return;}
+  let v={};try{v=JSON.parse(read(WN_KEY)||'{}')||{};}catch(err){msg('WordNest data could not be read here; add the word inside WordNest.');return;}
+  if(!v||typeof v!=='object'||Array.isArray(v)){msg('WordNest data could not be read here; add the word inside WordNest.');return;}
+  const custom=Array.isArray(v.custom)?v.custom:[];
+  if(custom.some(w=>w&&String(w.en).toLowerCase()===en)){msg('“'+en+'” is already in My words.');return;}
+  const t=Date.now();
+  v.custom=custom.concat([{id:'custom-'+t+'-'+Math.random().toString(36).slice(2,7),en,th,example:ex||en,emoji:'💡',category:'personal',level:'B1',syncTs:t}]);
+  try{localStorage.setItem(WN_KEY,JSON.stringify(v));}catch(err){msg('Could not save on this device.');return;}
+  msg('Added “'+en+'”. Open WordNest once to sync it to your other devices.');
+  $('#wordAddForm').reset();setTimeout(()=>dlg.close(),1200);
+ };
+})();
 /* ---------- practice goal: questions answered today (any subject) vs the owner's goal, saved as qgoal in studyos.home.v1 ---------- */
 function renderPracticeGoal(){
  const el=$('#qGoal'),M=window.StudyMotivation;if(!el||!M||!window.StudyStats)return;

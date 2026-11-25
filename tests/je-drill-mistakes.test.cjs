@@ -68,12 +68,12 @@ test('Ask AI why links on wrong answers: course engine, Cram Mode, mock exam, Mi
  const en=rd('scripts/study-course-engine.js');
  assert.match(en,/\(ok\?'':askAI\(q,ch\)\)/);assert.match(en,/askAI\(q,wrong\?mine:undefined\)/);
  assert.match(en,/href="tutor\.html\?course='\+encodeURIComponent\(D\.key\)/);
- for(const f of ['acc','eco','math','eng','zh'])assert.match(rd(f+'.html'),/study-course-engine\.js\?v=5/);
+ for(const f of ['acc','eco','math','eng','zh'])assert.match(rd(f+'.html'),/study-course-engine\.js\?v=18/);
  assert.match(rd('mock.html'),/Ask AI why<\/a>/);assert.match(rd('mistakes.html'),/Ask AI why<\/a>/);
  /* the prompt is built from the question data, never sends anything by itself */
  const fn=en.match(/function askPrompt\(q,mine\)\{[\s\S]*?; \}\n/)[0]+'return askPrompt;';
  const askPrompt=new Function(fn)();
  const q={q:'What is **2+2**?',opts:['3','4','5'],right:1};
- const t=askPrompt(q,2);assert.match(t,/What is 2\+2\?/);assert.match(t,/My answer: C\) 5/);assert.match(t,/Correct answer: B\) 4/);assert.match(t,/why mine is wrong/);
+ const t=askPrompt(q,2);assert.match(t,/What is 2\+2\?/);assert.match(t,/My answer: C\) 5/);assert.match(t,/Correct answer: B\) 4/);assert.doesNotMatch(t,/why mine is wrong/);assert.match(t,/Do not explain why the other options/);
  assert.doesNotMatch(askPrompt(q,undefined),/My answer/);
 });

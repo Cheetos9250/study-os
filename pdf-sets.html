@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — practise from your own PDF question sets">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -38,6 +38,12 @@ h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px)}
 .ps-work{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
 @media (max-width:900px){.ps-work{grid-template-columns:1fr}}
 .ps-viewer{border:1px solid var(--line);border-radius:14px;padding:8px;background:var(--bg);min-height:200px}
+/* page + zoom bar (owner, 24 Nov 2026): sticks to the bottom of the screen while the PDF is in view */
+.ps-vcol{min-width:0}.ps-viewer{--z:1;overflow-x:auto}.ps-viewer .ps-pg{width:calc(100% * var(--z))!important;max-width:none}
+.ps-zbar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom));z-index:5;display:flex;flex-wrap:wrap;box-sizing:border-box;max-width:100%;gap:4px;align-items:center;justify-content:center;width:max-content;margin:8px auto 0;padding:6px;border:2px solid var(--ink,currentColor);border-radius:999px;background:var(--panel,var(--bg));box-shadow:0 6px 18px -10px rgba(0,0,0,.4)}
+.ps-zbar button{min-width:40px;min-height:44px;border:0;border-radius:999px;background:transparent;color:inherit;font:800 18px var(--ui,system-ui);cursor:pointer}
+.ps-zbar button:active{background:var(--panel-2,rgba(127,127,127,.2))}.ps-zbar #zFit{font-size:14px;padding:0 12px}
+.ps-zbar #zPage{min-width:72px;text-align:center;font:800 14px var(--ui,system-ui);font-variant-numeric:tabular-nums}.ps-zbar .zsep{width:2px;height:24px;background:var(--line);margin:0 2px}
 .ps-viewer canvas{display:block;width:100%;height:auto;margin:0 0 8px;border-radius:6px;background:#fff}
 .ps-sheet{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
 @media (max-width:900px){.ps-sheet{position:static;max-height:none}}
@@ -64,6 +70,7 @@ h1{margin:0 0 4px;font-size:clamp(26px,4vw,36px)}
 input[type=file]{display:none}
 </style>
 <link rel="stylesheet" href="assets/study-world.css?v=9">
+<link rel="stylesheet" href="assets/study-eink-base.css?v=1">
 </head>
 <body>
 <script src="scripts/study-theme.js?v=6"></script>
@@ -81,7 +88,8 @@ input[type=file]{display:none}
 <section id="workArea" hidden>
  <div class="ps-bar"><b id="setName"></b><span class="ps-note" id="setInfo"></span><button class="ps-btn ps-jump" id="toSheet" type="button">Answer sheet ↓</button></div>
  <div class="ps-work">
-  <div class="ps-viewer" id="viewer" aria-label="Original PDF pages"></div>
+  <div class="ps-vcol"><div class="ps-viewer" id="viewer" aria-label="Original PDF pages"></div>
+  <div class="ps-zbar" id="zbar" role="toolbar" aria-label="Page and zoom"><button type="button" id="zPrev" aria-label="Previous page">‹</button><span id="zPage" aria-live="polite">1</span><button type="button" id="zNext" aria-label="Next page">›</button><span class="zsep"></span><button type="button" id="zOut" aria-label="Zoom out">−</button><button type="button" id="zFit" aria-label="Fit width">Fit</button><button type="button" id="zIn" aria-label="Zoom in">+</button></div></div>
   <aside class="ps-sheet" aria-label="Answer sheet">
    <div class="ps-tools">
     <div class="ps-bar"><b id="pageNow">Page 1</b><input id="pageInput" type="number" min="1" inputmode="numeric" aria-label="Go to page" style="width:90px"><button class="ps-btn" id="pageGo" type="button">Go</button></div>
@@ -175,7 +183,7 @@ function renderSets(){
   $('sets').innerHTML=ids.map(id=>{ const s=data.sets[id],st=stats(s); return '<button class="ps-set" type="button" data-id="'+id+'" aria-current="'+(id===cur)+'"><b>'+esc(s.name)+'</b><small>'+COURSE[s.course]+' · '+(s.n?s.n+' questions · '+st.ans+' answered':(s.pages||0)+' pages'+(Object.keys(s.notes||{}).length?' · '+Object.keys(s.notes).length+' pages with notes':''))+(st.keyN?' · '+st.ok+' correct':'')+'</small></button>'; }).join('');
   $('sets').querySelectorAll('.ps-set').forEach(b=>b.onclick=()=>select(b.dataset.id));
 }
-let doc=null, io=null, seen=null, curPage=1, notesTimer=null;
+let doc=null, io=null, seen=null, curPage=1, notesTimer=null, rezoom=()=>{}, zoom=1;
 /* the page last viewed per PDF, on this device only (not backed up; studyos.pdfpos.v1 → {setId: page}) */
 const POS_KEY='studyos.pdfpos.v1'; let posTimer=null;
 function readPos(){ try{ const o=JSON.parse(localStorage.getItem(POS_KEY)||'{}'); return o&&typeof o==='object'&&!Array.isArray(o)?o:{}; }catch(e){ return {}; } }
@@ -194,14 +202,23 @@ async function select(id,opts){
     io=new IntersectionObserver(es=>es.forEach(e=>{ const d=e.target; if(e.isIntersecting) draw(d).catch(()=>{ delete d.dataset.done; }); else if(d.dataset.done){ delete d.dataset.done; d.innerHTML='<span>'+d.dataset.p+'</span>'; } }),{rootMargin:'1500px 0px'});
     seen=new IntersectionObserver(es=>{ const vis=es.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0]; if(vis){ const p=+vis.target.dataset.p; if(p!==curPage){ if(notesTimer) flushNotes(); curPage=p; showPage(); savePos(id,p); } } },{threshold:[0.35,0.6]});
     v.querySelectorAll('.ps-pg').forEach(d=>{ io.observe(d); seen.observe(d); });
+    rezoom=()=>v.querySelectorAll('.ps-pg').forEach(d=>{ delete d.dataset.done; d.innerHTML='<span>'+d.dataset.p+'</span>'; io.unobserve(d); io.observe(d); });
     const back=+readPos()[id]||0;
     if(!opts.noResume&&back>1&&back<=pdf.numPages){ requestAnimationFrame(()=>goPage(back)); $('setInfo').textContent+=' · reopened at page '+back; }
     else if(s.book&&s.page&&s.page[1]) requestAnimationFrame(()=>goPage(s.page[1]));
   }catch(e){ v.innerHTML='<p class="ps-err">'+esc(e.message||'Could not open the PDF.')+'</p>'; }
 }
+/* zoom: pages are drawn for their on-screen width, so a new zoom redraws them sharp; nothing is stored */
+const ZOOMS=[1,1.25,1.5,2,2.5,3];
+function setZoom(z){ const keep=curPage; zoom=z; $('viewer').style.setProperty('--z',String(z)); $('zFit').textContent=z===1?'Fit':Math.round(z*100)+'%'; rezoom(); requestAnimationFrame(()=>goPage(keep)); }
+$('zIn').onclick=()=>{ const n=ZOOMS.find(x=>x>zoom); if(n) setZoom(n); };
+$('zOut').onclick=()=>{ const n=[...ZOOMS].reverse().find(x=>x<zoom); if(n) setZoom(n); };
+$('zFit').onclick=()=>{ if(zoom!==1) setZoom(1); };
+$('zPrev').onclick=()=>{ if(curPage>1) goPage(curPage-1); };
+$('zNext').onclick=()=>{ const s=data.sets[cur]; if(!s||!s.pages||curPage<s.pages) goPage(curPage+1); };
 function goPage(p){ const el=$('pg'+p); if(el) el.scrollIntoView({behavior:'auto',block:'start'}); }
 function flushNotes(){ clearTimeout(notesTimer); notesTimer=null; const s=data.sets[cur]; if(!s) return; const t=$('pageNotes').value; s.notes=s.notes||{}; if(t.trim()) s.notes[curPage]=t; else delete s.notes[curPage]; save(); }
-function showPage(){ const s=data.sets[cur]; if(!s) return; $('pageNow').textContent='Page '+curPage+(s.pages?' of '+s.pages:''); $('pageNotes').value=(s.notes&&s.notes[curPage])||''; $('pageInput').placeholder=String(curPage); }
+function showPage(){ const s=data.sets[cur]; if(!s) return; $('zPage').textContent=curPage+(s.pages?' / '+s.pages:''); $('pageNow').textContent='Page '+curPage+(s.pages?' of '+s.pages:''); $('pageNotes').value=(s.notes&&s.notes[curPage])||''; $('pageInput').placeholder=String(curPage); }
 /* ---------- textbook: written exercises (from the textbook index) and each chapter's multiple-choice quiz ---------- */
 const TYPES=['Quick Study','Exercise','Problem A','Problem B'];
 let exKind='w';
@@ -364,6 +381,6 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(
 <script src="scripts/fs-grid.js?v=3"></script>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=6"></script>
-<script src="scripts/study-nav.js?v=12"></script>
+<script src="scripts/study-nav.js?v=14"></script>
 </body>
 </html>

@@ -155,13 +155,23 @@ const XTRA=window.StudyCourseExtra||{}, OPT=window.StudyCourseOpts||{};
 (XTRA.sets||[]).forEach(set=>set.rows.forEach((q,i)=>{ let s=(i+set.seed)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
   const idx=q[2].map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   const o={id:set.pre+(i+set.from),cat:q[0],q:q[1],opts:q[2],exp:q[4],order:idx,right:q[3]}; if(set.case) o.case=q[5]||''; QS.push(o); }));
+/* chapters that exist only in an extra set (acc: c10 Plant assets, from the 20 Nov practice exam) get a chip too */
+Object.entries(OPT.extraCats||{}).forEach(([id,l])=>{ if(QS.some(q=>q.cat===id)&&!CATS.some(c=>c[0]===id)) CATS.push([id,String(l)]); });
 /* near-duplicate questions hidden (answers stay saved) */
 const QHIDE=new Set(XTRA.hide||[]);
 /* quiz review (spaced repetition) */
-let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showRetired=false;
-const retired=q=>!!(window.StudyReview&&StudyReview.isRetired(store,q.id,reviewStart));
-const retChip=()=>{const n=QS.filter(retired).length;return n?'<button class="chip" id="retBtn" aria-pressed="'+showRetired+'" type="button" title="Answered right 4 times in a row; back for review in 30–90 days">Retired<span class="n">'+n+'</span></button>':'';};
-const reviewFresh=x=>reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart;
+let autoNext=0; let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showOld=false;
+const isOldQ=q=>!!(window.StudyReview&&StudyReview.isOld&&StudyReview.isOld(store,q.id));
+const retChip=()=>{const n=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&isOldQ(q)).length;return n||showOld?'<button class="chip" id="retBtn" aria-pressed="'+showOld+'" type="button" title="Answered right 2 times in a row. They stay out of the normal sets; a wrong answer sends one back.">Old questions<span class="n">'+n+'</span></button>':'';};
+/* Difficulty tag (owner, 21 Nov 2026): from my own answers, no new storage. Wrong now or review box 0 = Hard, box 1 = Medium, box 2+ = Easy; unanswered = no tag. acc/eco/math only (where StudyQSets is loaded). */
+/* Difficulty of the question itself (owner, 24 Nov 2026): a fixed estimate from scripts/study-qdiff.js, shown before answering;
+   it no longer follows my answers (those already drive Review due and Old questions). Stores nothing. */
+function diffTag(q){ if(!window.StudyQDiff||q.open)return ''; const name=StudyQDiff.level(q);
+  const lv=name==='Hard'?['Hard','#e5484d']:name==='Medium'?['Medium','#d9a400']:['Easy','#2f9e5b'];
+  return '<span class="dtag" data-diff="'+lv[0].toLowerCase()+'" title="How hard this question is (estimated from the question)" style="display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:2px 9px;border-radius:999px;border:1.5px solid '+lv[1]+';font-size:12px;font-weight:700;line-height:1.5"><i style="width:9px;height:9px;border-radius:50%;background:'+lv[1]+';display:inline-block"></i>'+lv[0]+'</span>'; }
+let redoAt=0,redoIds=new Set(); /* Start again (owner, 21 Nov 2026): in memory only; old answers stay until each question is answered again */
+const reviewFresh=x=>(reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.id]||0)<reviewStart)||(redoAt>0&&redoIds.has(String(x.id))&&((store.ats||{})[x.id]||0)<redoAt);
+const setDone=()=>setsOn()&&qcats.size===1&&qset!=='all'&&deck.length>0&&deck.every(x=>!x.open&&store.ans[x.id]!==undefined&&!reviewFresh(x));
 const revChip=()=>'<button class="chip" id="revBtn" aria-pressed="'+reviewOnly+'" type="button">Review due<span class="n">'+(window.StudyReview?QS.filter(q=>StudyReview.isDue(store,q.id,Date.now())).length:0)+'</span></button>';
 for(let i=QS.length-1;i>=0;i--) if(QHIDE.has(String(QS[i].id))) QS.splice(i,1);
 /* the course's own practice set (acc: scripts/acc-textbook-mcq.js, eco: eco-practice-mcq.js, math: math-practice-mcq.js) */
@@ -170,6 +180,14 @@ if(OPT.mcq&&OPT.mcq.cat&&(window[OPT.mcq.list]||[]).some(q=>q.cat===OPT.mcq.cat[
   const idx=q.opts.map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
   const o={id:q.id,cat:q.cat,q:q.q,opts:q.opts,exp:q.exp,order:idx,right:0,case:q.case||''}; if(OPT.mcq.md) o.md=true; if(OPT.mcq.tb&&q.ref) o.tb=q.ref.replace(/-/,' '); QS.push(o); });
 let qJump=new URLSearchParams(location.search).get('q');
+/* Fresh problems (acc, scripts/acc-generator.js): random-number questions made in the browser. Nothing stored for them:
+   answers of earlier visits are dropped on load, so at most one batch (OPT.gen.n) of gen-* ids ever sits in study-<course>. */
+function genLoad(){ if(!OPT.gen||!window.StudyAccGen) return;
+  for(const k of ['ans','ats','rv']){ const o=store[k]; if(o&&typeof o==='object') Object.keys(o).forEach(id=>{ if(/^gen-/.test(id)) delete o[id]; }); }
+  for(let i=QS.length-1;i>=0;i--) if(QS[i].gen) QS.splice(i,1);
+  if(!CATS.some(c=>c[0]==='g')) CATS.push(['g','Fresh problems']);
+  StudyAccGen.make((Date.now()%2147483000)+1,OPT.gen.n||30).forEach(q=>QS.push(q)); }
+genLoad();
 /* textbook written exercises (data/textbook-sos/chN.json): full problem, working box, solution, self-marked */
 const TBP_KEY='studyos.accounting.textbook.progress.v1'; const tbReveal=new Set(); let tbTimer=null;
 function tbNotes(id){ try{ const p=JSON.parse(localStorage.getItem(TBP_KEY)||'{}'); return (p&&p[id]&&typeof p[id].notes==='string')?p[id].notes:''; }catch(e){ return ''; } }
@@ -186,40 +204,61 @@ function tbSave(id,text){ try{ const raw=localStorage.getItem(TBP_KEY); const p=
       QS.push({id,cat:'c'+ch,q:it.title||it.id,opts:['I got it','I missed it'],order:[0,1],right:0,exp:'',open:true,src:it.id,prompt:it.prompt,solution:it.solution||'',checks:Array.isArray(it.checks)?it.checks:[],je:window.StudyJE?StudyJE.parse(it.solution||''):[],fs:window.StudyFS?StudyFS.parse(it.solution||''):{title:'',rows:[]},tb:OPT.writtenDir?it.id.replace(/^[A-Z]+(\d+)-(\d+)$/,'Ch$1 · Problem $2'):it.id.replace('-',' ')+' · written',wtag:OPT.writtenTag}); added++; } }catch(e){} }
   if(added){ const cur=deck[qpos]&&deck[qpos].id; buildDeck(); if(cur&&!qJump){ const i=deck.findIndex(x=>x.id===cur); if(i>=0) qpos=i; } renderQ(); }
 })();
+/* owner, 21 Nov 2026: the practice view shows only the set chips and the tool row; topic, exam-guide and type rows are hidden (code kept), written questions are off unless ?type=written */
+const SLIM_ROWS=true;
 const QTYPE_KEY='studyos.'+D.key+'.qtype';
-let qtype=(()=>{if(!OPT.written)return 'all';try{const u=new URLSearchParams(location.search);const v=u.get('type')||(u.get('q')?'all':sessionStorage.getItem(QTYPE_KEY));return v==='mcq'||v==='written'?v:'all';}catch(e){return 'all';}})();
-const typeOk=q=>qtype==='all'||(qtype==='written'?!!q.open:!q.open);
+let qtype='mcq'; /* written questions are hidden from Practice (owner, 21 Nov 2026) */
+const typeOk=q=>(!q.open||(qJump!==null&&String(q.id)===String(qJump))); /* written questions stay out of Practice (owner, 21 Nov 2026); a ?q= link to one still opens it */
 let qcats=new Set(), missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
 URL_CATS.forEach(id=>qcats.add(id));
-/* question sets (scripts/study-qsets.js): repeats hidden, ≤100 questions a set, 3 sets a chapter, the next set opens at 90% mastered.
+/* question sets (scripts/study-qsets.js): repeats hidden, ≤50 questions a set, 3 sets a chapter, the next set opens at 90% answered right.
    Not applied to Review due, Missed, deep links (?q=) or Cram Mode, so nothing you need to redo is ever hidden. */
 let qset=(()=>{try{const v=sessionStorage.getItem('studyos.'+D.key+'.qset');return v==='all'?'all':/^[0-9]$/.test(v||'')?+v:'auto';}catch(e){return 'auto';}})();
+/* topic filter (scripts/acc-topics.js, acc only): with exactly one chapter chosen, narrow the questions to a topic. Nothing is stored. */
+let qtopic='',qguide='';
+const topicOf=q=>window.StudyAccTopics?StudyAccTopics.of(q):'';
+/* exam-guide filter (owner, 20 Nov 2026, Final 1201101 study guide): chip row All / In exam guide / Outside guide. Nothing is stored. */
+const guideOf=q=>window.StudyAccTopics&&StudyAccTopics.guide?StudyAccTopics.guide(q):'';
+const guideOn=()=>!!window.StudyAccTopics&&!!StudyAccTopics.guide&&!CRAM;
+function guideRow(){
+  if(!guideOn())return '';
+  const pool=QS.filter(q=>!q.gen&&typeOk(q)&&(!qcats.size||qcats.has(q.cat))),n=v=>pool.filter(q=>guideOf(q)===v).length;
+  const chip=(v,l,c)=>'<button class="chip" type="button" data-qguide="'+v+'" aria-pressed="'+(qguide===v)+'">'+l+'<span class="n">'+c+'</span></button>';
+  return '<div class="row qguides" role="group" aria-label="Exam guide" style="margin-bottom:8px">'+chip('','All questions',n('in')+n('out'))+chip('in','In exam guide',n('in'))+chip('out','Outside guide',n('out'))+'</div>'+(qguide?'<div class="count" style="margin:-2px 0 10px">'+(qguide==='in'?'Final 1201101 guide: merchandising, inventory (FIFO and weighted average), AIS, cash and internal control, receivables.':'LIFO, periodic non-average methods, retail/gross-profit estimates, specific identification and plant assets are not in the guide.')+' Shows every set.</div>':'');
+}
+const topicOn=()=>!!window.StudyAccTopics&&qcats.size===1&&StudyAccTopics.has([...qcats][0])&&!CRAM;
+function topicRow(){
+  if(!topicOn())return '';
+  const one=[...qcats][0],SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null,pool=QS.filter(q=>q.cat===one&&!q.gen&&typeOk(q)&&(!SM||q.open||!SM.hidden.has(String(q.id))));
+  const chip=(v,l,n)=>'<button class="chip" type="button" data-qtopic="'+esc(v)+'" aria-pressed="'+(qtopic===v)+'">'+esc(l)+'<span class="n">'+n+'</span></button>';
+  return '<div class="row qtopics" role="group" aria-label="Topic" style="margin-bottom:8px">'+chip('','All topics',pool.length)+StudyAccTopics.topics(one).map(t=>[t,pool.filter(q=>topicOf(q)===t).length]).filter(x=>x[1]).map(x=>chip(x[0],x[0],x[1])).join('')+'</div>'+(qtopic?'<div class="count" style="margin:-2px 0 10px">Topic view shows every set of this chapter.</div>':'');
+}
 const setsOn=()=>!!window.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;
 function setsRow(){
   if(!setsOn())return '';
-  const SM=StudyQSets.build(QS),one=qcats.size===1?[...qcats][0]:null;
+  const SM=StudyQSets.build(QS.filter(q=>!q.gen)),one=qcats.size===1?[...qcats][0]:null;
   if(one&&SM.sets[one]){const pr=StudyQSets.progress(SM.sets[one],store),cur=qset==='auto'?pr.current:qset;
-    return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px">'+pr.sets.map((x,k)=>'<button class="chip" type="button" data-qset="'+k+'" aria-pressed="'+(qset!=='all'&&cur===k)+'"'+(x.open?'':' disabled title="Opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of set '+k+' is mastered"')+'>Set '+(k+1)+(x.done?' ✓':x.open?'':' 🔒')+'<span class="n">'+x.mastered+'/'+x.n+'</span></button>').join('')
+    return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px">'+pr.sets.map((x,k)=>'<button class="chip" type="button" data-qset="'+k+'" aria-pressed="'+(qset!=='all'&&cur===k)+'"'+(x.open?'':' disabled title="Opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of set '+k+' is answered right"')+'>Set '+(k+1)+(x.done?' ✓':x.open?'':' 🔒')+'<span class="n">'+x.right+'/'+x.n+'</span></button>').join('')
      +'<button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All</button></div>'
-     +'<div class="count" style="margin:-2px 0 10px">Mastered = right twice in a row. The next set opens at '+Math.round(StudyQSets.UNLOCK*100)+'%.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';}
+     +'<div class="count" style="margin:-2px 0 10px">The next set opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of this set is answered right.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';}
   return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px"><button class="chip" type="button" data-qset="auto" aria-pressed="'+(qset!=='all')+'">Current set of each chapter</button><button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All questions</button></div>'
-   +'<div class="count" style="margin:-2px 0 10px">Each chapter has up to 3 sets of at most 100 questions; pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
+   +'<div class="count" style="margin:-2px 0 10px">Each chapter has sets of 50 questions (one set when it has 50 or fewer); pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
 }
-function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS):null, okSet=SM?StudyQSets.allowed(SM,store,qset):null; deck=QS.filter(q=>typeOk(q)&&(!SM||q.open||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||showRetired||!retired(q))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,(qtopic||qguide)?'all':qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!qtopic||topicOf(q)===qtopic)&&(!qguide||guideOf(q)===qguide)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||(showOld?isOldQ(q):!isOldQ(q)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
   else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
 /* "Ask AI why" (owner idea, 18 Nov 2026): a link to tutor.html with the question, the options, my answer and the right one.
    Nothing is sent until Send is tapped there (the tutor uses the owner's own key). */
 function askPrompt(q,mine){ const L='ABCDEFGH',o=q.opts.map((t,i)=>L[i]+') '+String(t).replace(/\*\*/g,'')).join('\n'),x=t=>String(t==null?'':t).replace(/\*\*/g,'');
-  return 'Practice question: '+x(q.q)+'\n'+o+'\n\n'+(q.opts[mine]!==undefined?'My answer: '+L[mine]+') '+x(q.opts[mine])+'\n':'')+'Correct answer: '+L[q.right]+') '+x(q.opts[q.right])+'\n\nExplain why the correct answer is right'+(q.opts[mine]!==undefined&&mine!==q.right?' and why mine is wrong':'')+', step by step. Then give me one similar question to try.'; }
+  return 'Practice question: '+x(q.q)+'\n'+o+'\n\n'+(q.opts[mine]!==undefined?'My answer: '+L[mine]+') '+x(q.opts[mine])+'\n':'')+'Correct answer: '+L[q.right]+') '+x(q.opts[q.right])+'\n\nExplain why the correct answer is right, step by step. Do not explain why the other options (or my answer) are wrong. Then give me one similar question to try.'; }
 function askAI(q,mine){ return '<div style="margin-top:8px"><a class="btn" style="min-height:44px;display:inline-flex;align-items:center" href="tutor.html?course='+encodeURIComponent(D.key)+'&cat='+encodeURIComponent(q.cat)+'&q='+encodeURIComponent(askPrompt(q,mine).slice(0,6000))+'">Ask AI why</a></div>'; }
 /* Cram Mode (?tab=prac&cram=1): one read-only page of the questions to fix before the exam — answered wrong now,
    or back in review box 0 — each with its right answer and explanation. Never changes answers. */
 const CRAM=/[?&]cram=1\b/.test(location.search);
 function cramList(){
   const rv=store.rv||{};
-  return QS.filter(q=>!q.open&&(!qcats.size||qcats.has(q.cat))&&store.ans[q.id]!==undefined&&(store.ans[q.id]!==q.right||(Array.isArray(rv[q.id])&&rv[q.id][0]===0)))
+  return QS.filter(q=>!q.open&&!q.gen&&(!qcats.size||qcats.has(q.cat))&&store.ans[q.id]!==undefined&&(store.ans[q.id]!==q.right||(Array.isArray(rv[q.id])&&rv[q.id][0]===0)))
     .map(q=>({q,wrong:store.ans[q.id]!==q.right})).sort((a,b)=>(b.wrong-a.wrong)||CATS.findIndex(c=>c[0]===a.q.cat)-CATS.findIndex(c=>c[0]===b.q.cat));
 }
 function renderCram(box){
@@ -232,15 +271,16 @@ function renderCram(box){
      +'<p class="qtext">'+rich(q.q)+'</p><div class="explain good"><b class="v">Answer: '+rich(right)+'</b>'+(wrong&&q.opts[mine]!==undefined?'<div class="cram-mine">You chose: '+rich(q.opts[mine])+'</div>':'')+(q.exp?rich(q.exp):'')+askAI(q,wrong?mine:undefined)+'</div></li>'; }).join('')+'</ol>';
   box.innerHTML=h;
 }
+const jpics=(q,when)=>window.AccJournalPics?AccJournalPics.html(q.id,when):'';
 function renderQ(){
   (function(box){ box.innerHTML='';
     [['all','All'],...CATS].forEach(([id,l])=>{
       const b=document.createElement('button'); b.type='button'; b.className='chip';
       b.setAttribute('aria-pressed', id==='all'?!qcats.size:qcats.has(id));
-      const inCat=id==='all'?[]:QS.filter(q=>q.cat===id), mastered=inCat.length&&inCat.every(retired);
-      if(mastered) b.title='Mastered: every question here is retired';
-      b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'||q.cat===id)).length+'</span>';
-      b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qJump=null; buildDeck();renderQ(); };
+      const inCat=id==='all'?[]:QS.filter(q=>q.cat===id), mastered=inCat.length&&inCat.every(isOldQ);
+      if(mastered) b.title='Mastered: every question here is an old question';
+      b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'?!q.gen:q.cat===id)).length+'</span>';
+      b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qtopic=''; qJump=null; buildDeck();renderQ(); };
       box.appendChild(b); });
   })($('#qCats'));
   if(CRAM){ renderCram($('#qBody')); return; }
@@ -248,14 +288,14 @@ function renderQ(){
   const answered=QS.filter(q=>store.ans[q.id]!==undefined), correct=answered.filter(q=>store.ans[q.id]===q.right);
   let h='<div class="score"><span class="big">'+correct.length+'/'+answered.length+'</span><span class="count">correct / answered ('+QS.length+' total)</span></div>';
   if(qStat&&qStatErr) h+='<div class="count" style="margin:-4px 0 10px;'+(qStatErr?'color:#b3261e':'')+'">'+esc(qStat)+'</div>';
-  h+=setsRow();
-  if(OPT.written) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
-  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button><button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
-  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':(!showRetired&&QS.some(retired))&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(retired)?'Everything here is retired (answered right 4 times in a row). Tap Retired to see it.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
+  h+=setsRow()+(SLIM_ROWS?'':topicRow()+guideRow());
+  if(OPT.written&&!SLIM_ROWS) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
+  h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button>'+(setDone()?'<button class="chip" id="againBtn" type="button" aria-pressed="true">Start again</button>':'')+'<button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':showOld?'No old questions here yet. A question becomes old after 2 right answers in a row.':QS.some(isOldQ)&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(isOldQ)?'Everything here is an old question (answered right 2 times in a row). Tap Old questions to review them.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
   window.StudyLast&&StudyLast.mark({href:D.key+'.html?tab=prac&q='+encodeURIComponent(q.id),title:D.title+' · Practice',sub:'Q '+(qpos+1)+' · '+q.q,course:D.key});
-  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span></div>';
+  h+='<div class="qcard"><div class="qbar"><i style="width:'+((qpos+1)/deck.length*100)+'%"></i></div><div class="qmeta"><b>Q '+(qpos+1)+'/'+deck.length+'</b><span>'+esc(catLabel(q.cat))+'</span>'+diffTag(q)+'</div>';
   if(q.tb) h+='<div class="qsrc" style="font-size:12px;opacity:.7;margin:4px 0">'+esc(q.wtag||'Textbook style')+' · '+esc(q.tb)+'</div>';
   if(q.case) h+='<div class="qcase" style="border:1px solid var(--line,rgba(127,127,127,.35));border-radius:10px;padding:10px 12px;margin:8px 0 12px;font-size:14px;line-height:1.55;overflow-wrap:anywhere">'+(q.md&&window.StudySosMd?StudySosMd(q.case):rich(q.case))+'</div>';
   if(q.open){ const shown=done||tbReveal.has(q.id);
@@ -269,16 +309,22 @@ function renderQ(){
     else { h+='<div class="explain"><b class="v">Solution</b><div class="sos-body">'+StudySosMd(q.solution)+'</div></div>';
       h+= done ? '<div class="count" style="margin-top:8px">'+(ch===q.right?'Marked: got it':'Marked: missed · it will come back in Review due')+'</div>' : '<div class="tb-row"><span class="count">How did you do?</span><button class="btn" id="tbGot" type="button">I got it</button><button class="btn" id="tbMiss" type="button">I missed it</button></div>'; }
   } else {
-  h+='<p class="qtext">'+rich(q.q)+'</p><div class="opts">';
+  h+='<p class="qtext">'+rich(q.q)+'</p>'+jpics(q,'before')+'<div class="opts">';
   q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
     h+='<button type="button" class="'+cls+'" data-oi="'+oi+'" '+(done?'disabled':'')+'><span class="k">'+'ABCD'[k]+'</span><span>'+rich(q.opts[oi])+'</span></button>'; });
   h+='</div>';
-  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+(ok?'':askAI(q,ch))+'</div>'; }
+  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+jpics(q,'after')+(ok?'':askAI(q,ch))+'</div>'; }
   }
-  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button><button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
+  const scrOn=!!window.StudyScratch&&!q.gen, scrId=D.key+':'+q.id;
+  const aiOn=!!window.StudyAskInline&&!!window.StudyTutor&&!q.open&&Array.isArray(q.order);
+  if(aiOn&&StudyAskInline.isOpen()) h+='<div id="aiBox"></div>';
+  if(scrOn&&StudyScratch.isOpen()) h+='<div id="scrBox"></div>';
+  h+='<div class="qnav"><button class="btn" id="qprev" type="button" '+(qpos===0?'disabled':'')+'>Previous</button>'+(scrOn?'<button class="btn" id="qscr" type="button" aria-pressed="'+StudyScratch.isOpen()+'">Scratchpad'+(StudyScratch.has(scrId)?' ✎':'')+'</button>':'')+(aiOn?'<button class="btn" id="qai" type="button" aria-pressed="'+StudyAskInline.isOpen()+'">Ask AI'+(StudyAskInline.has(q.id)?' ✓':'')+'</button>':'')+'<button class="btn primary" id="qnext" type="button" '+(qpos===deck.length-1?'disabled':'')+'>Next</button></div></div>';
   h+='<div class="cells">'+deck.map((x,i)=>{const a=store.ans[x.id]; return '<button type="button" class="cell'+(a===undefined||reviewFresh(x)?'':(a===x.right?' ok':' no'))+(i===qpos?' cur':'')+'" data-i="'+i+'" aria-label="Question '+(i+1)+'">'+(i+1)+'</button>'}).join('')+'</div>';
   box.innerHTML=h;
-  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); window.StudyReview&&StudyReview.record(store,q.id,store.ans[q.id]===q.right,Date.now()); save(); renderQ(); });
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ store.ans[q.id]=+b.dataset.oi; (store.ats=store.ats||{})[q.id]=Date.now(); window.StudyReview&&StudyReview.record(store,q.id,store.ans[q.id]===q.right,Date.now()); save(); const ok=store.ans[q.id]===q.right; renderQ();
+    /* right answer: move on by itself after a moment (owner, 23 Nov 2026); a wrong one stays so the answer can be read */
+    if(ok&&qpos<deck.length-1){ const at=qpos,id=String(q.id); clearTimeout(autoNext); autoNext=setTimeout(()=>{ if(qpos===at&&deck[qpos]&&String(deck[qpos].id)===id){ qpos++; renderQ(); } },900); } });
   if(q.open){ const ta=$('#tbAns'); if(ta){ ta.value=tbNotes(q.src); ta.oninput=()=>{ clearTimeout(tbTimer); tbTimer=setTimeout(()=>tbSave(q.src,ta.value),400); }; ta.onblur=()=>{ clearTimeout(tbTimer); tbSave(q.src,ta.value); }; }
     jeCtl=null; const jb=$('#jeBox'); if(jb) jeCtl=StudyJE.mount(jb,{answer:q.je,rows:tbJe(q.src),save:rows=>tbSaveJe(q.src,rows),onAllCorrect:done?null:()=>mark(0)});
     fsCtl=null; const fb=$('#fsBox'); if(fb) fsCtl=StudyFS.mount(fb,{answer:q.fs,rows:tbFs(q.src),save:rows=>tbSaveFs(q.src,rows),onAllCorrect:done?null:()=>mark(0)});
@@ -289,16 +335,27 @@ function renderQ(){
     const gq=$('#tbGotQuick'); if(gq) gq.onclick=()=>mark(0);
     const g=$('#tbGot'); if(g) g.onclick=()=>mark(0); const m=$('#tbMiss'); if(m) m.onclick=()=>mark(1); }
   box.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ qpos=+b.dataset.i; renderQ(); });
+  { const ab=$('#qai'); if(ab) ab.onclick=()=>{ StudyAskInline.setOpen(!StudyAskInline.isOpen()); renderQ(); };
+    const ax=$('#aiBox'); if(ax){ const cat=((D.cats||[]).find(c=>c[0]===q.cat)||[q.cat,q.cat]);
+      StudyAskInline.mount(ax,{id:q.id,course:D.key,courseName:D.title||D.key,chapterId:q.cat,chapter:cat[1],
+        q:{q:q.q,prompt:q.prompt||'',opts:q.order.map(oi=>q.opts[oi]),right:q.order.indexOf(q.right),exp:q.exp||''},
+        mine:done?q.order.indexOf(ch):undefined}); } }
+  { const sb=$('#qscr'); if(sb) sb.onclick=()=>{ StudyScratch.setOpen(!StudyScratch.isOpen()); renderQ(); };
+    const sx=$('#scrBox'); if(sx) StudyScratch.mount(sx,scrId,has=>{ const b=$('#qscr'); if(b) b.textContent='Scratchpad'+(has?' ✎':''); }); }
   const p=$('#qprev'), n=$('#qnext'); if(p) p.onclick=()=>{qpos--;renderQ()}; if(n) n.onclick=()=>{qpos++;renderQ()};
   wireQ();
 }
 function wireQ(){
+  document.querySelectorAll('#qBody [data-qguide]').forEach(b=>b.onclick=()=>{ qguide=b.dataset.qguide||''; qJump=null; buildDeck(); renderQ(); });
+  document.querySelectorAll('#qBody [data-qtopic]').forEach(b=>b.onclick=()=>{ qtopic=b.dataset.qtopic||''; qJump=null; buildDeck(); renderQ(); });
   document.querySelectorAll('#qBody [data-qset]').forEach(b=>b.onclick=()=>{ const v=b.dataset.qset; qset=v==='all'?'all':v==='auto'?'auto':+v; try{sessionStorage.setItem('studyos.'+D.key+'.qset',String(qset));}catch(e){} buildDeck(); renderQ(); });
   document.querySelectorAll('#qBody .qtype').forEach(b=>b.onclick=()=>{ qtype=b.dataset.qtype; try{sessionStorage.setItem(QTYPE_KEY,qtype);}catch(e){} qJump=null; buildDeck(); renderQ(); });
+  const ab=$('#againBtn'); if(ab) ab.onclick=()=>{redoIds=new Set(deck.map(x=>String(x.id)));redoAt=Date.now();shuffleOn=true;qJump=null;buildDeck();renderQ()};
   const rb=$('#revBtn'); if(rb) rb.onclick=()=>{reviewOnly=!reviewOnly;qJump=null;reviewStart=Date.now();qpos=0;buildDeck();renderQ()};
   const m=$('#missBtn'); if(m) m.onclick=()=>{missedOnly=!missedOnly;qJump=null;buildDeck();renderQ()};
   const u=$('#unansBtn'); if(u) u.onclick=()=>{unansOnly=!unansOnly;qJump=null;buildDeck();renderQ()};
-  const rt=$('#retBtn'); if(rt) rt.onclick=()=>{showRetired=!showRetired;qpos=0;buildDeck();renderQ()};
+  const rt=$('#retBtn'); if(rt) rt.onclick=()=>{showOld=!showOld;qpos=0;buildDeck();renderQ()};
+  const gb=$('#genBtn'); if(gb) gb.onclick=()=>{genLoad();qJump=null;qpos=0;save();buildDeck();renderQ()};
   const sh=$('#shufBtn'); if(sh) sh.onclick=()=>{shuffleOn=!shuffleOn;buildDeck();renderQ()};
   const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rv={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }

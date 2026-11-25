@@ -1,0 +1,1 @@
+- Fix: copying the code to Google Docs stopped with "Document service stopped" because one Doc held about 475,000 characters. Each code Doc now holds at most 100,000 (about 21 Docs, numbered), very large files are split, and leftover Docs from the first try go to the Drive trash.

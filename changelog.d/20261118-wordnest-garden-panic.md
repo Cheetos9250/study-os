@@ -1,0 +1,6 @@
+- WordNest: EN / 中文 switch in the top bar; 拼音 on/off to practise reading characters.
+- WordNest: word garden with New / Learning / Mastered and a plant that grows as words are mastered; Panic review (10 words, 3 minutes) and Review weakest 10.
+- WordNest: 12-week goal calendar; typo highlighting in typed answers; Sentence dictation (English) and Dictation (Chinese) games.
+- WordNest: CSV import (also Anki text export) and export of words.
+- WordNest: "Don't mix up with…" for look-alike words, a side-by-side compare, and your own links between confusing words (synced).
+- Today: the WordNest goal is a plan task that ticks itself; "+ New word" adds a word to WordNest My words from Today.

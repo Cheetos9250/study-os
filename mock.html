@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — timed mock exam">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -51,6 +51,7 @@ select,input[type=number]{min-height:44px;border:2px solid var(--ink);border-rad
 </style>
 <script src="scripts/study-theme.js?v=6"></script>
 <script src="scripts/study-accent.js?v=2"></script>
+<link rel="stylesheet" href="assets/study-eink-base.css?v=1">
 </head>
 <body>
 <div class="page">
@@ -58,10 +59,10 @@ select,input[type=number]{min-height:44px;border:2px solid var(--ink);border-rad
 <p class="lead">Random questions from the exam chapters, with a timer. Answers are saved like normal practice, so missed questions come back in Review.</p>
 <main id="app"><p class="muted">Loading…</p></main>
 </div>
-<script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-review.js?v=3"></script>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=6"></script>
-<script src="scripts/study-nav.js?v=12"></script>
+<script src="scripts/study-nav.js?v=14"></script>
 <script>
 (function(){
 'use strict';
@@ -81,6 +82,30 @@ function exam(key){const s=T.loadSettings(read(T.SETTINGS_KEY));return s.exams.m
 function askHref(key,q,a){const L='ABCDEFGH',x=t=>String(t==null?'':t).replace(/\*\*/g,'');
  const p='Practice question: '+x(q[1])+'\n'+q[2].map((t,i)=>L[i]+') '+x(t)).join('\n')+'\n\n'+(a!==undefined&&q[2][a]!==undefined?'My answer: '+L[a]+') '+x(q[2][a])+'\n':'')+'Correct answer: '+L[q[3]]+') '+x(q[2][q[3]])+'\n\nExplain why the correct answer is right'+(a!==undefined?' and why mine is wrong':'')+', step by step. Then give me one similar question to try.';
  return 'tutor.html?course='+encodeURIComponent(key)+'&cat='+encodeURIComponent(q[0])+'&q='+encodeURIComponent(p.slice(0,6000));}
+/* ---------- Final 1201101 guide mock (owner, 20 Nov 2026) ----------
+   50 questions, 180 minutes: Part A inventory 20 (Ch5 + Ch6), B AIS 10 (Ch7), C cash and control 10 (Ch8), D receivables 10 (Ch9).
+   Drawn at random from accounting questions that match the study guide (StudyAccTopics.guide), including the extra sets of acc-extra.js.
+   A running guide mock keeps its questions in the sessionStorage entry (st.g, st.items), so a reload does not change them. */
+const PARTS={A:{label:'A · Inventory & merchandising',cats:['c5','c6'],n:20},B:{label:'B · Accounting information systems',cats:['c7'],n:10},C:{label:'C · Cash, fraud & internal control',cats:['c8'],n:10},D:{label:'D · Receivables',cats:['c9'],n:10}};
+const partOf=c=>c==='c5'||c==='c6'?'A':c==='c7'?'B':c==='c8'?'C':c==='c9'?'D':'';
+const rowOf=(D,x)=>st&&st.items?st.items[x.i]:D.quiz[x.i];
+function loadScript(src,ok){return new Promise((res,rej)=>{if(ok()){res();return;}const e=document.createElement('script');e.src=src;e.onload=()=>ok()?res():rej(Error('bad '+src));e.onerror=()=>rej(Error('load '+src));document.head.appendChild(e);});}
+async function guidePool(D){
+ await loadScript('data/courses/acc-extra.js',()=>!!window.StudyCourseExtra);await loadScript('scripts/acc-topics.js?v=2',()=>!!(window.StudyAccTopics&&window.StudyAccTopics.guide));
+ const X=window.StudyCourseExtra,hide=new Set((X.hide||[]).map(String)),out=[];
+ const add=(id,row,withCase)=>{if(hide.has(String(id))||!Array.isArray(row[2])||row[2].length<2||!partOf(row[0]))return;
+  if(StudyAccTopics.guide({cat:row[0],q:row[1],case:withCase?row[5]||'':'',opts:row[2],right:row[3]})!=='in')return;
+  out.push({id:String(id),row:[row[0],row[1],row[2],row[3],row[4]||'',withCase?row[5]||'':'']});};
+ D.quiz.forEach((r,i)=>add(i,r,false));(X.sets||[]).forEach(set=>set.rows.forEach((r,i)=>add(set.pre+(i+set.from),r,!!set.case)));
+ return out;}
+/* n per part; at most 2 questions that share one case text, so one long case cannot fill a part */
+function guidePick(pool){
+ const picked=[];
+ Object.keys(PARTS).forEach(k=>{const P=PARTS[k],cases={},by=P.cats.map(c=>shuffle(pool.filter(x=>x.row[0]===c))),got=[];let t=0,guard=0;
+  while(got.length<P.n&&by.some(l=>l.length)&&guard++<5000){const l=by[t++%by.length];if(!l.length)continue;const x=l.shift(),ck=x.row[5];
+   if(ck){if((cases[ck]||0)>=2)continue;cases[ck]=(cases[ck]||0)+1;}got.push(x);}
+  picked.push(...got);});
+ return shuffle(picked);}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 /* pick n questions spread across the chosen chapters (round robin), shuffled */
 function pick(D,cats,n){
@@ -94,7 +119,7 @@ async function setup(pref){
  const D=await load(c.key),ex=exam(c.key),cats=(pref&&pref.cats)||(ex&&ex.cats.length?ex.cats:D.cats.map(x=>x[0])).filter(id=>D.cats.some(x=>x[0]===id));
  const sel=new Set(cats);
  const count=id=>D.quiz.filter(q=>q[0]===id).length;
- $('#app').innerHTML='<section class="panel"><label class="f" for="course">Subject</label><select id="course">'+COURSES.map(x=>'<option value="'+x.key+'"'+(x.key===c.key?' selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select>'
+ $('#app').innerHTML=(c.key==='acc'?'<section class="panel" id="gpanel"><h2 style="margin:0 0 6px;font-size:20px">Final 1201101 · exam-guide mock</h2><p class="muted">50 questions in 3 hours, like the exam: Part A inventory 20, B accounting information systems 10, C cash, fraud and internal control 10, D receivables 10. Drawn at random from questions that match the study guide (no LIFO, periodic non-average methods or plant assets).</p><div class="mk-row" style="margin-top:10px"><button type="button" class="b main" id="gstart">Start guide mock</button></div><p class="muted" id="gmsg" role="status"></p></section>':'')+'<section class="panel"><label class="f" for="course">Subject</label><select id="course">'+COURSES.map(x=>'<option value="'+x.key+'"'+(x.key===c.key?' selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select>'
   +(ex?'<p class="muted">'+esc(ex.title)+' '+(ex.d===0?'is today':'in '+ex.d+' day'+(ex.d>1?'s':''))+'. Chapters below follow its scope in Calendar.</p>':'')
   +'<label class="f" id="chL">Chapters</label><div class="chips" role="group" aria-labelledby="chL">'+D.cats.map(x=>'<button type="button" class="chip" data-c="'+esc(x[0])+'" aria-pressed="'+sel.has(x[0])+'">'+esc(x[1])+' ('+count(x[0])+')</button>').join('')+'</div>'
   +'<div class="mk-row" style="margin-top:6px"><div><label class="f" for="n">Questions</label><select id="n">'+[10,20,30,40,60].map(v=>'<option'+(v===20?' selected':'')+'>'+v+'</option>').join('')+'</select></div>'
@@ -103,6 +128,10 @@ async function setup(pref){
  const avail=()=>{const n=[...sel].reduce((s,id)=>s+count(id),0),want=+$('#n').value;$('#avail').textContent=n+' questions in the chosen chapters'+(n<want?' · the exam will have '+n:'');$('#go').disabled=!n;};
  const mins=()=>{$('#mins').value=Math.max(5,Math.round(+$('#n').value*1.5));};
  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const id=b.dataset.c;if(sel.has(id))sel.delete(id);else sel.add(id);b.setAttribute('aria-pressed',sel.has(id));avail();});
+ if($('#gstart'))$('#gstart').onclick=async()=>{const b=$('#gstart');b.disabled=true;$('#gmsg').textContent='Building the exam…';
+  try{const items={},qs=guidePick(await guidePool(D)).map(x=>{items[x.id]=x.row;return{i:x.id,order:shuffle(x.row[2].map((_,j)=>j))};});
+   if(!qs.length)throw Error('empty');st={course:'acc',g:1,items,qs,ans:{},flag:{},pos:0,end:Date.now()+180*60000,start:Date.now(),cats:['c5','c6','c7','c8','c9']};putS(st);run();}
+  catch(e){b.disabled=false;$('#gmsg').textContent='Could not build the exam. Check the connection and try again.';}};
  $('#course').onchange=()=>setup({course:$('#course').value});
  $('#n').onchange=()=>{mins();avail();};mins();avail();
  $('#go').onclick=()=>{const qs=pick(D,D.cats.map(x=>x[0]).filter(id=>sel.has(id)),+$('#n').value);if(!qs.length)return;
@@ -113,9 +142,9 @@ function left(){return Math.max(0,st.end-Date.now());}
 function fmt(ms){const s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
 function tick(){const el=$('#clock');if(!el)return;const l=left();el.textContent=fmt(l);el.classList.toggle('low',l<5*60000);if(!l)finish(true);}
 async function run(){
- const D=await load(st.course),q=st.qs[st.pos],raw=D.quiz[q.i],n=Object.keys(st.ans).length;
+ const D=await load(st.course),q=st.qs[st.pos],raw=rowOf(D,q),n=Object.keys(st.ans).length;
  $('#app').innerHTML='<div class="mk-bar" role="group" aria-label="Exam"><span class="mk-clock" id="clock" role="timer" aria-live="off"></span><span class="muted">'+n+' / '+st.qs.length+' answered</span><span class="mk-sp"></span><button type="button" class="b" id="fin">Finish</button></div>'
-  +'<section class="panel"><p class="muted">Question '+(st.pos+1)+' of '+st.qs.length+' · '+esc((D.cats.find(c=>c[0]===raw[0])||[,''])[1])+'</p><div class="q">'+rich(raw[1])+'</div>'
+  +'<section class="panel"><p class="muted">Question '+(st.pos+1)+' of '+st.qs.length+' · '+esc(st.g?PARTS[partOf(raw[0])].label:(D.cats.find(c=>c[0]===raw[0])||[,''])[1])+'</p>'+(raw[5]?'<div class="muted" style="border-left:4px solid var(--ink);padding:2px 12px;margin:8px 0;overflow-wrap:anywhere">'+rich(raw[5])+'</div>':'')+'<div class="q">'+rich(raw[1])+'</div>'
   +q.order.map((o,k)=>'<button type="button" class="opt" data-o="'+o+'" aria-pressed="'+(st.ans[q.i]===o)+'">'+'ABCDEF'[k]+'. '+rich(raw[2][o])+'</button>').join('')
   +'<div class="mk-row"><button type="button" class="b" id="prev"'+(st.pos?'':' disabled')+'>← Back</button><button type="button" class="b" id="flag" aria-pressed="'+!!st.flag[q.i]+'">'+(st.flag[q.i]?'Flagged':'Flag')+'</button><button type="button" class="b main" id="next">'+(st.pos+1<st.qs.length?'Next →':'Finish')+'</button></div>'
   +'<div class="mk-grid" aria-label="Jump to question">'+st.qs.map((x,k)=>'<button type="button" data-j="'+k+'" class="'+(st.ans[x.i]!==undefined?'ans ':'')+(k===st.pos?'cur ':'')+(st.flag[x.i]?'flag':'')+'" aria-label="Question '+(k+1)+(st.ans[x.i]!==undefined?', answered':'')+(st.flag[x.i]?', flagged':'')+'">'+(k+1)+'</button>').join('')+'</div></section>';
@@ -142,15 +171,15 @@ async function finish(timeUp){
  if(!st.saved){st.saved=save(D);st.used=Date.now()-st.start;}
  putS(null);
  const c=COURSES.find(x=>x.key===st.course),per={};let right=0;
- st.qs.forEach(x=>{const q=D.quiz[x.i],p=per[q[0]]=per[q[0]]||{n:0,r:0};p.n++;if(st.ans[x.i]===q[3]){p.r++;right++;}});
- const pct=Math.round(right/st.qs.length*100),rows=Object.keys(per).map(id=>({id,label:(D.cats.find(x=>x[0]===id)||[,id])[1],...per[id]})).sort((a,b)=>a.r/a.n-b.r/b.n);
- const wrong=st.qs.filter(x=>st.ans[x.i]!==D.quiz[x.i][3]),weak=rows.filter(r=>r.r/r.n<0.7).map(r=>r.id);
+ st.qs.forEach(x=>{const q=rowOf(D,x),k=st.g?partOf(q[0]):q[0],p=per[k]=per[k]||{n:0,r:0};p.n++;if(st.ans[x.i]===q[3]){p.r++;right++;}});
+ const pct=Math.round(right/st.qs.length*100),rows=Object.keys(per).map(id=>({id,label:st.g?PARTS[id].label:(D.cats.find(x=>x[0]===id)||[,id])[1],...per[id]})).sort((a,b)=>a.r/a.n-b.r/b.n);
+ const wrong=st.qs.filter(x=>st.ans[x.i]!==rowOf(D,x)[3]),weak=rows.filter(r=>r.r/r.n<0.7).map(r=>r.id);
  $('#app').innerHTML='<section class="panel"><p class="muted">'+(timeUp?'Time is up. ':'')+esc(c.name)+' · '+Math.round((st.used||0)/60000)+' min</p><div class="mk-big">'+right+' / '+st.qs.length+'</div><p><b>'+pct+'%</b> correct'+(st.saved?' · answers saved, missed questions come back in Review':'')+'</p>'
-  +'<div class="mk-row" style="margin-top:10px"><a class="b main" href="mock.html?course='+c.key+'">New mock exam</a>'+(wrong.length?'<a class="b" href="'+c.page+'?tab=prac&cat='+[...new Set(wrong.map(x=>D.quiz[x.i][0]))].join(',')+'&missed=1">Redo missed</a>':'')
-  +(weak.length?'<a class="b" href="'+c.page+'?tab=sum&cat='+weak[0]+'">Read weakest chapter</a>':'')+'</div></section>'
-  +'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">By chapter</h2>'+rows.map(r=>'<div class="mk-ch"><a href="'+c.page+'?tab=prac&cat='+esc(r.id)+'" style="color:inherit">'+esc(r.label)+'</a><span class="mk-meter" aria-hidden="true"><i style="width:'+Math.round(r.r/r.n*100)+'%"></i></span><span class="mk-pc">'+r.r+'/'+r.n+'</span></div>').join('')+'</section>'
-  +(wrong.length?'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">Missed questions</h2>'+wrong.map(x=>{const q=D.quiz[x.i],a=st.ans[x.i];
-    return '<div class="mk-rev"><p><b>'+rich(q[1])+'</b></p><p>'+(a===undefined?'Not answered':'Your answer: '+rich(q[2][a]))+'</p><p>✓ '+rich(q[2][q[3]])+'</p>'+(q[4]?'<p class="muted">'+rich(q[4])+'</p>':'')+'<p><a class="b" href="'+askHref(c.key,q,a)+'">Ask AI why</a></p></div>';}).join('')+'</section>':'');
+  +'<div class="mk-row" style="margin-top:10px"><a class="b main" href="mock.html?course='+c.key+'">New mock exam</a>'+(wrong.length?'<a class="b" href="'+c.page+'?tab=prac&cat='+[...new Set(wrong.map(x=>rowOf(D,x)[0]))].join(',')+'&missed=1">Redo missed</a>':'')
+  +(weak.length?'<a class="b" href="'+c.page+'?tab=sum&cat='+(st.g?PARTS[weak[0]].cats[0]:weak[0])+'">Read weakest chapter</a>':'')+'</div></section>'
+  +'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">'+(st.g?'By part':'By chapter')+'</h2>'+rows.map(r=>'<div class="mk-ch"><a href="'+c.page+'?tab=prac&cat='+esc(st.g?PARTS[r.id].cats.join(','):r.id)+'" style="color:inherit">'+esc(r.label)+'</a><span class="mk-meter" aria-hidden="true"><i style="width:'+Math.round(r.r/r.n*100)+'%"></i></span><span class="mk-pc">'+r.r+'/'+r.n+'</span></div>').join('')+'</section>'
+  +(wrong.length?'<section class="panel"><h2 style="margin:0 0 6px;font-size:20px">Missed questions</h2>'+wrong.map(x=>{const q=rowOf(D,x),a=st.ans[x.i];
+    return '<div class="mk-rev">'+(q[5]?'<p class="muted">'+rich(q[5])+'</p>':'')+'<p><b>'+rich(q[1])+'</b></p><p>'+(a===undefined?'Not answered':'Your answer: '+rich(q[2][a]))+'</p><p>✓ '+rich(q[2][q[3]])+'</p>'+(q[4]?'<p class="muted">'+rich(q[4])+'</p>':'')+'<p><a class="b" href="'+askHref(c.key,q,a)+'">Ask AI why</a></p></div>';}).join('')+'</section>':'');
  window.scrollTo({top:0});
 }
 /* resume a running exam after a reload */

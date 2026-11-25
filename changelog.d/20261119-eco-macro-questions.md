@@ -1,0 +1,1 @@
+- Economics practice: 160 new English multiple-choice questions, 20 for each macro chapter (GDP, Inflation & CPI, Business Cycle, AD–AS, Growth & Development, Money & Banking, Fiscal Policy, Monetary Policy), appended to `scripts/eco-practice-mcq.js` with new ids and explanations; existing ids and progress unchanged.

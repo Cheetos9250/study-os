@@ -1,0 +1,1 @@
+Practice: when every question of the chosen set is answered, a Start again chip appears. It shuffles the set and lets you answer all 50 again. Old answers stay until you answer each one again; nothing is cleared.

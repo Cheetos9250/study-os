@@ -1,0 +1,12 @@
+const test=require('node:test'),assert=require('node:assert'),fs=require('fs'),path=require('path');
+const P=require('../scripts/acc-journal-pics.js');
+const rows={}; for(const c of ['c5','c7','c8','c9']) for(const r of JSON.parse(fs.readFileSync(path.join(__dirname,'../data/acc-questions/'+c+'.json'),'utf8'))) rows[r.id]=r;
+{ const g={window:{}}; new Function('window',fs.readFileSync(path.join(__dirname,'../scripts/acc-textbook-mcq.js'),'utf8'))(g.window); for(const x of g.window.ACC_TB_MCQ) rows[x.id]={id:x.id,row:[x.cat,x.q,x.opts,0,x.exp]}; }
+const NAME={sales:/sales journal/i,purchases:/purchases? journal/i,receipts:/cash receipts? journal/i,disbursements:/cash (disbursements?|payments?) journal/i};
+test('every picture file exists and is a valid svg',()=>{ for(const [k,[,f]] of Object.entries(P.FILES)){ const s=fs.readFileSync(path.join(__dirname,'..',f),'utf8'); assert.match(s,/^<svg[^>]*viewBox="0 0 680 \d+"/,k); assert.ok(!/Page\s*\d/.test(s),k+' has no page label'); } });
+test('listed questions exist, are visible and have a journal picture',()=>{ for(const m of [P.BEFORE,P.AFTER]) for(const [id,ks] of Object.entries(m)){ const r=rows[id]; assert.ok(r,'missing '+id); assert.ok(!r.hide,id+' is hidden'); for(const k of ks) assert.ok(P.FILES[k],id+' '+k); } });
+test('a picture under the question only when the question names that journal',()=>{ for(const [id,ks] of Object.entries(P.BEFORE)){ const q=rows[id].row[1]; for(const k of ks) assert.match(q,NAME[k],id+' stem should name '+k); } });
+test('a picture that waits for the answer is never for a stem that names the journal',()=>{ for(const [id,ks] of Object.entries(P.AFTER)){ const q=rows[id].row[1]; for(const k of ks) assert.doesNotMatch(q,NAME[k],id+' would be shown early'); } });
+test('html helper and engine wiring',()=>{ assert.match(P.html('ps-123','before'),/assets\/journals\/sales\.svg/); assert.equal(P.html('ps-123','after'),''); assert.equal(P.html('nope','before'),'');
+  const e=fs.readFileSync(path.join(__dirname,'../scripts/study-course-engine.js'),'utf8'); assert.match(e,/jpics\(q,'before'\)/); assert.match(e,/jpics\(q,'after'\)/);
+  assert.match(fs.readFileSync(path.join(__dirname,'../acc.html'),'utf8'),/scripts\/acc-journal-pics\.js/); });

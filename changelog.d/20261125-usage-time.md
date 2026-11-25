@@ -1,0 +1,1 @@
+Feedback page: the page-use table now also shows time spent per page, counted only while the page is open and in use (a tap, scroll or key in the last 2 minutes). Stored on this device with the page-open counts.

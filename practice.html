@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
 <meta name="description" content="Study OS — practice and review">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -132,6 +132,7 @@ html.nb-lock,html.nb-lock body{overflow:hidden}
 </style>
 <script src="scripts/study-theme.js?v=6"></script>
 <script src="scripts/study-accent.js?v=2"></script>
+<link rel="stylesheet" href="assets/study-eink-base.css?v=1">
 </head>
 <body>
 <div class="page">
@@ -164,11 +165,12 @@ html.nb-lock,html.nb-lock body{overflow:hidden}
 </section>
 </main>
 </div>
-<script src="scripts/study-review.js?v=2"></script>
+<script src="scripts/study-review.js?v=3"></script>
 <script src="scripts/study-today.js?v=3"></script>
 <script src="scripts/study-cloud.js?v=6"></script>
-<script src="scripts/study-pins.js?v=1"></script>
-<script src="scripts/study-nav.js?v=12"></script>
+<script src="scripts/study-note-images.js?v=1"></script>
+<script src="scripts/study-pins.js?v=2"></script>
+<script src="scripts/study-nav.js?v=14"></script>
 <script>
 (function(){
 'use strict';
@@ -187,7 +189,7 @@ function render(){
  const ne0=nextExam(now),wideKey=ne0?ne0.course:'';
  const due={};for(const c of T.COURSES)due[c.key]=window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0;
  $('#courses').innerHTML=T.COURSES.map(c=>{const s=sum[c.key];let q=0,a=0,r=0;if(s)for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}
-  return '<div class="pc'+(c.key===wideKey?' wide':'')+'"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+(window.StudyReview&&StudyReview.retiredRaw(read('study-'+c.key),now)?' · '+StudyReview.retiredRaw(read('study-'+c.key),now)+' retired':'')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
+  return '<div class="pc'+(c.key===wideKey?' wide':'')+'"><h3>'+ICON[c.key]+esc(c.name)+'</h3>'+(s?'<div class="big">'+a+'<small>/ '+q+' done</small></div><p class="small">'+(a?'<b>'+Math.round(r/a*100)+'%</b> correct':'No answers yet')+(window.StudyReview&&StudyReview.oldRaw(read('study-'+c.key))?' · '+StudyReview.oldRaw(read('study-'+c.key))+' old':'')+'</p>':'<p class="empty" style="padding:0">'+(failed.includes(c.key)?'Could not load':'Loading…')+'</p>')
    +'<div class="acts">'+(due[c.key]?'<a class="main" href="'+link(c,'prac')+'&review=1">Review '+due[c.key]+'</a><a href="'+link(c,'prac')+'">Quiz</a>':'<a class="main" href="'+link(c,'prac')+'">Start quiz</a>')+'</div></div>';}).join('');
  const weak=T.weakSpots(sum,8);
  if(!Object.keys(sum).length)return;
@@ -214,10 +216,12 @@ const KEY='studyos.notes.v1',$=s=>document.querySelector(s),box=$('#nb'),ta=$('#
 let book='general',timer=null;
 function all(){try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch{return {};}}
 const count=t=>t.length.toLocaleString('en-US')+' characters';
-function load(){const n=all()['practice:'+book];ta.value=n&&typeof n.text==='string'?n.text:'';st.classList.remove('err');st.textContent=ta.value?'Saved · '+count(ta.value):'Saved on this device';}
+/* pictures in the notebook page (paste or Add image), synced with it */
+let ni=null;if(window.StudyNoteImages){ni=document.createElement('div');ni.className='nb-img';ni.style.borderTop='2px solid var(--line-soft,#ddd)';ta.insertAdjacentElement('afterend',ni);StudyNoteImages.mount(ni,()=>'practice:'+book,ta);}
+function load(){if(ni)StudyNoteImages.refresh(ni);const n=all()['practice:'+book];ta.value=n&&typeof n.text==='string'?n.text:'';st.classList.remove('err');st.textContent=ta.value?'Saved · '+count(ta.value):'Saved on this device';}
 /* re-read before every write so notes written on the Lessons page (or another tab) are kept */
 function save(){clearTimeout(timer);timer=null;const notes=all(),k='practice:'+book,text=ta.value.slice(0,100000);
- if(text.trim())notes[k]={text,updated:new Date().toISOString()};else delete notes[k];
+ const nn=(window.StudyNoteImages?window.StudyNoteImages.withText:function(o,t,u){var im=o&&Array.isArray(o.imgs)&&o.imgs.length?o.imgs:null;if(!String(t).trim()&&!im)return null;var n={text:t,updated:u};if(im)n.imgs=im;return n;})(notes[k],text,new Date().toISOString());if(nn)notes[k]=nn;else delete notes[k]; /* keeps the note's pictures */
  try{localStorage.setItem(KEY,JSON.stringify(notes));st.classList.remove('err');st.textContent='Saved · '+count(text);window.StudyCloud&&StudyCloud.dirty();}
  catch{st.classList.add('err');st.textContent='Not saved: storage is full';}}
 ta.addEventListener('input',()=>{st.classList.remove('err');st.textContent='Saving…';clearTimeout(timer);timer=setTimeout(save,500);});

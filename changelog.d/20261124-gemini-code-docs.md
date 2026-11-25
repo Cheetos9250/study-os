@@ -1,0 +1,1 @@
+- Gemini can read the source code: the Study OS Apps Script gains `setupCode`, which copies the site's code into Google Docs "Study OS code – …" (plus an index) once a day. Ask Gemini "@Google Drive read Study OS code – index".

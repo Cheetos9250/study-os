@@ -1,0 +1,54 @@
+/* Study OS "e-ink desk display" look for the course pages (acc/eco/math/eng/zh), loaded right after
+   study-unify.css. html:root beats the pages' own :root tokens; rules are prefixed with body so they win
+   over the page styles that come later. One light-grey screen, ink lines, M PLUS Rounded 1c (Thai: Mali),
+   dark bezel nav. Right/wrong keep a muted green/red so answers stay easy to read. */
+html:root,html:root.warm{
+ --paper:#e1e3e1;--surface:#d9dcd9;--ink:#16161b;--muted:#4b4c52;--line:#16161b;
+ --accent:#16161b;--accent-soft:#cfd2cf;--known:#cfd2cf;
+ --ok:#2d6b45;--ok-soft:#cfdccf;--bad:#9b2f2a;--bad-soft:#e6d1cf;
+ --ui:'M PLUS Rounded 1c','Mali',system-ui,-apple-system,sans-serif;
+ --heading:'M PLUS Rounded 1c','Mali',system-ui,sans-serif;
+ --bezel:#1d1b26;--bezel-ink:#e9e9ec;--bezel-mute:#b9b8c2;--dot:#5a5b60;
+ color-scheme:light;
+}
+@media (prefers-color-scheme:dark){html:root:not([data-theme="light"]){
+ --paper:#141417;--surface:#0d0d0f;--ink:#d8dad6;--muted:#9a9c98;--line:#d8dad6;
+ --accent:#d8dad6;--accent-soft:#1e1e22;--known:#1e1e22;
+ --ok:#8fcfa5;--ok-soft:#1d2a21;--bad:#f0a29b;--bad-soft:#33201e;
+ --bezel:#000;--bezel-ink:#cfd1cd;--bezel-mute:#8d8f8b;--dot:#7d7f7b;
+ color-scheme:dark}}
+html:root[data-theme="dark"]{
+ --paper:#141417;--surface:#0d0d0f;--ink:#d8dad6;--muted:#9a9c98;--line:#d8dad6;
+ --accent:#d8dad6;--accent-soft:#1e1e22;--known:#1e1e22;
+ --ok:#8fcfa5;--ok-soft:#1d2a21;--bad:#f0a29b;--bad-soft:#33201e;
+ --bezel:#000;--bezel-ink:#cfd1cd;--bezel-mute:#8d8f8b;--dot:#7d7f7b;
+ color-scheme:dark}
+html body{background:var(--surface);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+body h1,body h2,body h3{font-family:var(--heading);font-weight:900;letter-spacing:0}
+body header span{color:var(--muted)}
+body .chip{border:2px solid var(--line);border-radius:999px;background:transparent;font-weight:800}
+body .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+body .btn{border:2px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);font-weight:800}
+body .btn.primary{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+body .face,body .qcard,body .card{background:var(--paper);border:2.5px solid var(--line);border-radius:12px}
+body .opt{border:2px solid var(--line);border-radius:12px;background:transparent}
+body .srs .n{color:var(--ink)}
+body .sec h2{border-left-color:var(--ink)}
+body table{background:var(--paper)}
+body th{background:var(--accent-soft)}
+body a:not([class]){color:inherit}
+
+/* nav = the dark bezel */
+#studyNav#studyNav{
+ --sn-bg:var(--bezel);--sn-fg:var(--bezel-ink);--sn-mute:var(--bezel-mute);--sn-line:var(--bezel);--sn-hi:rgba(255,255,255,.08);--sn-on:var(--bezel-ink);--sn-pill:var(--bezel-ink);--sn-pill-ink:var(--bezel);
+ font-family:var(--ui)}
+#studyNav .sn-brand{font-family:var(--ui)!important;font-weight:900!important}
+#studyNav .sn-tab[aria-current="page"]{border-radius:999px}
+/* floating Notes button (scripts/study-quiz-notes.js): ink instead of the red accent */
+html:root #qnBtn{background:var(--ink);color:var(--paper);border-color:var(--ink);border-radius:999px}
+/* touch screens: bigger answer buttons, easier to hit with a finger or pencil (owner, 23 Nov 2026) */
+@media (pointer:coarse){
+ body .opts{gap:12px}
+ body .opt{min-height:64px;padding:14px 16px;align-items:center;font-size:17px}
+ body .opt .k{font-size:16px;font-weight:900;min-width:28px;height:28px;display:inline-grid;place-items:center;border:2px solid currentColor;border-radius:8px;padding:0}
+}

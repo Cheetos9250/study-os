@@ -1,0 +1,1 @@
+- New **Share with Gemini** page (nav → More): writes a Markdown summary of exams, chapter progress, weak chapters and wrong questions to copy into Gemini or download as a .md file for a Gemini Gem. Read-only; nothing is sent until you paste it.

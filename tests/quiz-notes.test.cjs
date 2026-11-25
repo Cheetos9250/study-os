@@ -20,7 +20,8 @@ test('Lessons page re-reads notes before saving, so quiz notes are kept',()=>{
 test('quiz notes open full screen on a right-to-left swipe and leave screen edges to Safari',()=>{
  const s=read('scripts/study-quiz-notes.js');
  assert.match(s,/addEventListener\('touchstart'[\s\S]*?t\.clientX>16&&t\.clientX<innerWidth-16/);
- assert.match(s,/if\(dx<0&&!full&&!inPanel&&sx>innerWidth\*0\.45\)\{if\(panel\.hidden\)setOpen\(true\);setFull\(true\)/);
+ /* on the question card only the right edge zone opens the notes; swipes elsewhere on the card change questions (study-quiz-touch.js) */
+ assert.match(s,/if\(dx<0&&!full&&!inPanel&&\(inCard\?sx>innerWidth-64:sx>innerWidth\*0\.45\)\)\{if\(panel\.hidden\)setOpen\(true\);setFull\(true\)/);
  assert.match(s,/else if\(dx>0&&full&&sx>28\)\{setFull\(false\);setOpen\(false\);\}/);
  assert.match(s,/aria-label="Full screen"/);
 });

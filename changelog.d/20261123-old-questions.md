@@ -1,0 +1,1 @@
+- Practice: a question you answer right 2 times in a row becomes an "old question". It leaves the normal sets and Review due and waits under the new **Old questions** chip; answer it wrong there and it goes back to the normal sets. Earlier answers count.

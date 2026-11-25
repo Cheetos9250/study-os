@@ -53,10 +53,37 @@ function safeEqual(a,b){
   diff|=(a.charCodeAt(i)||0)^(b.charCodeAt(i)||0);
  return diff===0;
 }
+// Note images: one immutable entry per picture, keyed by the first 32 hex digits of SHA-256 of its data URL.
+const MAX_IMAGE_BYTES=1_500_000;
+const IMAGE_ID=/^[a-f0-9]{32}$/;
+const IMAGE_DATA=/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+\/]+={0,2}$/;
+async function sha32(text){
+ const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
+ return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,32);
+}
 export class ProductionProgressDO {
  constructor(ctx){this.ctx=ctx;}
+ async image(request){
+  const id=request.headers.get('X-Image-Id')||'';
+  if(!IMAGE_ID.test(id))return json({error:'Bad image id'},400);
+  if(request.method==='GET'){
+   const v=this.ctx.storage.kv.get('img:'+id);
+   if(typeof v!=='string')return json({error:'Not found'},404);
+   return new Response(v,{status:200,headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
+  }
+  const declared=Number(request.headers.get('Content-Length'));
+  if(Number.isFinite(declared)&&declared>MAX_IMAGE_BYTES)return json({error:'Payload too large'},413);
+  const raw=await request.text();
+  if(new TextEncoder().encode(raw).byteLength>MAX_IMAGE_BYTES)return json({error:'Payload too large'},413);
+  if(!IMAGE_DATA.test(raw))return json({error:'Not an image data URL'},400);
+  if(await sha32(raw)!==id)return json({error:'Image id does not match its content'},400);
+  if(typeof this.ctx.storage.kv.get('img:'+id)==='string')return json({ok:true,stored:false},200);
+  this.ctx.storage.kv.put('img:'+id,raw);
+  return json({ok:true,stored:true},201);
+ }
  async fetch(request){
   const kind=request.headers.get('X-Progress-Subject');
+  if(kind==='image')return this.image(request);
   const initial=kind==='today'?initialToday:kind==='home'?initialHome:kind==='extra'?initialExtra:initialCourse;
   const validator=kind==='today'?todayValidator:kind==='home'?homeValidator:kind==='extra'?extraValidator:courseValidator;
   const max=kind==='home'||kind==='extra'?MAX_HOME_BYTES:MAX_BYTES;
@@ -126,6 +153,17 @@ export default {
     state:writesEnabled?'writes-enabled':'read-only',
     subjects:SUBJECTS
    },200));
+  const im=url.pathname.match(/^\/img\/([a-f0-9]{32})$/);
+  if(im){
+   if(request.method==='PUT'&&!writesEnabled)
+    return cors(json({error:'Migration approval and write enablement required'},423));
+   if(request.method!=='GET'&&request.method!=='PUT')return cors(json({error:'Method not allowed'},405));
+   if(!env.PROD_PROGRESS_DO||typeof env.PROD_PROGRESS_DO.idFromName!=='function'||typeof env.PROD_PROGRESS_DO.get!=='function')
+    return cors(json({error:'Dedicated production Durable Object binding missing'},503));
+   const stub=env.PROD_PROGRESS_DO.get(env.PROD_PROGRESS_DO.idFromName('vocabloom:production-progress:v1:images'));
+   const inner=new Request(request);inner.headers.set('X-Progress-Subject','image');inner.headers.set('X-Image-Id',im[1]);
+   return cors(await stub.fetch(inner));
+  }
   const m=url.pathname.match(/^\/progress\/([a-z]+)$/);
   if(!m||!SUBJECT_SET.has(m[1]))return cors(json({error:'Unknown endpoint'},404));
   if(request.method==='PUT'&&!writesEnabled)

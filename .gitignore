@@ -29,3 +29,4 @@
 **/.impeccable/live/*.png
 # impeccable-ignore-end
 __pycache__/
+workers/gemini-mcp/bank.json

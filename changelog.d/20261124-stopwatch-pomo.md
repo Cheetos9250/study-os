@@ -1,0 +1,1 @@
+- Fix: the practice stopwatch no longer covers the running Pomodoro countdown; it moves just below it.
