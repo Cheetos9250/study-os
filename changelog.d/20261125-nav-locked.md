@@ -1,0 +1,1 @@
+Left sidebar no longer scrolls up and down: its rubber-band colour pads were adding a hidden full screen of height. The pads are now fixed, and the sidebar is more compact on short screens (iPad mini, 720-830 px high) so every item fits.
