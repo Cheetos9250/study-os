@@ -22,7 +22,7 @@ test('grades merge per course id',()=>{
 test('home subject wiring: last in the list, 404 skipped, size guard, pages refresh and push',()=>{
   const s=read('scripts/study-cloud.js');
   assert.match(s,/list\.push\(\{ id: 'home' \}\)/);assert.match(s,/r\.status === 404 && \(?s\.id === 'home'( \|\| s\.id === 'extra'\))?\) return false/);
-  assert.match(s,/> MAXH\) throw Error/);assert.match(s,/ls\.get\(HOMEK\) !== hraw \|\| ls\.get\(GRADESK\) !== graw\) return 'retry'/);
+  assert.match(s,/> MAXH\) throw Error/);assert.match(s,/ls\.get\(HOMEK\) !== hraw \|\| ls\.get\(GRADESK\) !== graw( \|\| [^\n]*?)?\) return 'retry'/);
   assert.match(read('index.html'),/addEventListener\('studycloud:applied',\(\)=>\{st=load\(\);/);
   const gr=read('grades.html');assert.match(gr,/study-cloud\.js\?v=\d+/);assert.match(gr,/addEventListener\('studycloud:applied',\(\)=>\{st=G\.load\(read\(\)\);render\(\);\}\)/);
   const keys=require('../scripts/study-progress-backup.js').keys;assert.ok(!keys.includes('study-sync-home-base-v1'));

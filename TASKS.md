@@ -331,3 +331,21 @@ Status: done
 `mistakes.html`: every question answered wrong in Accounting, Economics and Math, by chapter, with Redo, Redo all and Ask AI why, plus the weakest JE Drill types. Read-only.
 
 Status: done
+
+## J. Basics first, 18 Nov 2026 (Thai: ทำพื้นฐานให้ดีก่อน)
+
+### 42. Sync Pomodoro history and JE Drill score (Thai: ซิงก์ประวัติ Pomodoro และคะแนน JE Drill)
+
+Both ride inside the cloud `home` document (`home._pomolog`, `home._jedrill`), so the live Worker needs no redeploy. Additive merges, never double counted.
+
+Status: done
+
+### 43. Content check of exam questions (Thai: ตรวจข้อสอบก่อนสอบ)
+
+Automatic structure and arithmetic checks on every Accounting, Economics and Math multiple-choice question, plus a hand review of 45 Ch5–9 accounting questions. No errors found.
+
+Status: done
+
+### 44. Tap targets on iPad (Thai: ปุ่มกดง่ายขึ้น)
+
+Status: done

@@ -283,11 +283,11 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <script src="scripts/study-review.js?v=3"></script>
 <script src="scripts/study-stats.js?v=1"></script>
 <script src="scripts/study-motivation.js?v=1"></script>
-<script src="scripts/study-today-extras.js?v=1"></script>
+<script src="scripts/study-today-extras.js?v=2"></script>
 <script src="scripts/study-last.js?v=1"></script>
 <script src="scripts/study-progress-backup.js?v=20261117-weekly"></script>
 <script src="scripts/study-today.js?v=3"></script>
-<script src="scripts/study-cloud.js?v=5"></script>
+<script src="scripts/study-cloud.js?v=6"></script>
 <script src="scripts/study-wordnest.js?v=2"></script>
 <script src="scripts/study-nav.js?v=15"></script>
 <script>
@@ -379,7 +379,7 @@ function stop(){clearInterval(tick);tick=null;endAt=0;$('#pStart').textContent='
 /* Pomodoro history for Stats: minutes of finished 25-minute sessions per day (studyos.pomolog.v1, backed up). lastEnd stops double counting. */
 const POMOLOG='studyos.pomolog.v1';
 function logPomo(end,m,sub){if(m!==25||!end)return;try{const o=JSON.parse(read(POMOLOG)||'{}')||{};if(o.lastEnd===end)return;const d=T.dayKey(end);o.days=o.days&&typeof o.days==='object'?o.days:{};o.days[d]=(+o.days[d]||0)+m;
- if(sub){o.bySub=o.bySub&&typeof o.bySub==='object'?o.bySub:{};const b=o.bySub[d]&&typeof o.bySub[d]==='object'?o.bySub[d]:{};b[sub]=(+b[sub]||0)+m;o.bySub[d]=b;}o.lastEnd=end;localStorage.setItem(POMOLOG,JSON.stringify(o));}catch{}}
+ if(sub){o.bySub=o.bySub&&typeof o.bySub==='object'?o.bySub:{};const b=o.bySub[d]&&typeof o.bySub[d]==='object'?o.bySub[d]:{};b[sub]=(+b[sub]||0)+m;o.bySub[d]=b;}o.lastEnd=end;localStorage.setItem(POMOLOG,JSON.stringify(o));window.StudyCloud&&StudyCloud.dirty();}catch{}}
 function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){const m=mins;logPomo(endAt,m,psub);if(m===25&&window.StudyTodayX)StudyTodayX.sessionDone(psub,endAt);left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}window.StudyNav&&StudyNav.timesUp&&StudyNav.timesUp(m);return;}showClock();}
 function run(){tick=setInterval(step,500);$('#pStart').textContent='pause';if(mins===25)Sound.start(soundPick());else if(window.StudyTodayX)StudyTodayX.breakStarted();step();}
 $('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();savePomo();showClock();$('#pStart').textContent='resume';return;}

@@ -58,7 +58,7 @@
   const hhmm=t=>new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date(t));
   el.innerHTML='<h3>Session log</h3>'+(pending?'<form class="tx-log" id="txLogForm"><label class="sub" for="txLogIn" style="width:100%;margin:0">Session done'+(pending.sub?' · '+esc(NAMES[pending.sub]||pending.sub):'')+'. What did you finish?</label><input id="txLogIn" maxlength="200" placeholder="e.g. Ch6 FIFO questions 1–15" autocomplete="off"><button class="primary" type="submit">Save</button><button type="button" id="txLogSkip">Skip</button></form>':'')
    +(list.length?'<ul class="tx-logs">'+list.map(x=>'<li><small>'+hhmm(x.t)+(x.s?' · '+esc(NAMES[x.s]||x.s):'')+'</small>'+esc(x.n)+'</li>').join('')+'</ul>':'');
-  const f=$('#txLogForm');if(f){f.onsubmit=e=>{e.preventDefault();const v=$('#txLogIn').value;if(v.trim()){try{localStorage.setItem(LOGKEY,JSON.stringify(addLog(readJ(LOGKEY),pending.end,pending.sub,v)));}catch(err){}}pending=null;renderLog();};
+  const f=$('#txLogForm');if(f){f.onsubmit=e=>{e.preventDefault();const v=$('#txLogIn').value;if(v.trim()){try{localStorage.setItem(LOGKEY,JSON.stringify(addLog(readJ(LOGKEY),pending.end,pending.sub,v)));window.StudyCloud&&StudyCloud.dirty();}catch(err){}}pending=null;renderLog();};
    $('#txLogSkip').onclick=()=>{pending=null;renderLog();};setTimeout(()=>{try{$('#txLogIn').focus({preventScroll:true});}catch(e){}},50);}}
  function sessionDone(sub,end){pending={sub:sub||'',end:end||Date.now()};renderLog();renderTime();const el=$('#sessionLog');if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest',behavior:'smooth'});}
  /* ---------- formulas drawer ---------- */
