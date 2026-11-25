@@ -1,0 +1,2 @@
+- Practice: a question answered right once now moves to Old questions (before: two right in a row); wrong ones stay in the normal pool and in Review due.
+- New: Gemini's daily question files (Markdown template) in a Google Drive folder are added to Practice automatically through an Apps Script Web app (`workers/inbox/`). Set the URL once on Share with Gemini → Daily questions from Drive; the same page copies the Gemini prompt.

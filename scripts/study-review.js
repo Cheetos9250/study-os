@@ -6,7 +6,7 @@
   var DAY = 86400000, TZ = 7 * 3600000;               // days start at midnight Bangkok, like the flashcards
   var GAPS = [1, 3, 7, 14, 30, 90];                    // days until the next review, per box
   var RETIRE = 4;                                      // 4 correct in a row: retired (30, then 90 days away)
-  var OLD = 2;                                         // 2 correct in a row: an "old question" (owner, 23 Nov 2026)
+  var OLD = 1;                                         // 1 correct answer: an "old question" (owner, 25 Nov 2026; before: 2 in a row)
   function sod(t) { return Math.floor((t + TZ) / DAY) * DAY - TZ; }
   function valid(e) { return Array.isArray(e) && e.length === 2 && isFinite(e[0]) && isFinite(e[1]); }
   /* box and due time after answering; `prev` is the current [box, due] or undefined */
@@ -31,7 +31,7 @@
     }
     return changed;
   }
-  /* old question: answered right at least OLD times in a row (the box counts the streak; a wrong answer resets it to 0).
+  /* old question: answered right at least OLD times in a row (OLD = 1 since 25 Nov 2026; the box counts the streak; a wrong answer resets it to 0).
      Old questions leave the normal deck and Review due; they wait in the "Old questions" view until answered wrong. */
   function isOld(store, id) {
     var e = store.rv && store.rv[id];

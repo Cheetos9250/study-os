@@ -162,7 +162,7 @@ const QHIDE=new Set(XTRA.hide||[]);
 /* quiz review (spaced repetition) */
 let autoNext=0; let reviewOnly=/[?&]review=1\b/.test(location.search), reviewStart=Date.now(), dueSet=new Set(), showOld=false;
 const isOldQ=q=>!!(window.StudyReview&&StudyReview.isOld&&StudyReview.isOld(store,q.id));
-const retChip=()=>{const n=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&isOldQ(q)).length;return n||showOld?'<button class="chip" id="retBtn" aria-pressed="'+showOld+'" type="button" title="Answered right 2 times in a row. They stay out of the normal sets; a wrong answer sends one back.">Old questions<span class="n">'+n+'</span></button>':'';};
+const retChip=()=>{const n=QS.filter(q=>(!qcats.size||qcats.has(q.cat))&&isOldQ(q)).length;return n||showOld?'<button class="chip" id="retBtn" aria-pressed="'+showOld+'" type="button" title="Answered right once. They stay out of the normal sets; a wrong answer sends one back.">Old questions<span class="n">'+n+'</span></button>':'';};
 /* Difficulty tag (owner, 21 Nov 2026): from my own answers, no new storage. Wrong now or review box 0 = Hard, box 1 = Medium, box 2+ = Easy; unanswered = no tag. acc/eco/math only (where StudyQSets is loaded). */
 /* Difficulty of the question itself (owner, 24 Nov 2026): a fixed estimate from scripts/study-qdiff.js, shown before answering;
    it no longer follows my answers (those already drive Review due and Old questions). Stores nothing. */
@@ -229,14 +229,14 @@ function guideRow(){
 const topicOn=()=>!!window.StudyAccTopics&&qcats.size===1&&StudyAccTopics.has([...qcats][0])&&!CRAM;
 function topicRow(){
   if(!topicOn())return '';
-  const one=[...qcats][0],SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null,pool=QS.filter(q=>q.cat===one&&!q.gen&&typeOk(q)&&(!SM||q.open||!SM.hidden.has(String(q.id))));
+  const one=[...qcats][0],SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen&&!q.inbox)):null,pool=QS.filter(q=>q.cat===one&&!q.gen&&typeOk(q)&&(!SM||q.open||!SM.hidden.has(String(q.id))));
   const chip=(v,l,n)=>'<button class="chip" type="button" data-qtopic="'+esc(v)+'" aria-pressed="'+(qtopic===v)+'">'+esc(l)+'<span class="n">'+n+'</span></button>';
   return '<div class="row qtopics" role="group" aria-label="Topic" style="margin-bottom:8px">'+chip('','All topics',pool.length)+StudyAccTopics.topics(one).map(t=>[t,pool.filter(q=>topicOf(q)===t).length]).filter(x=>x[1]).map(x=>chip(x[0],x[0],x[1])).join('')+'</div>'+(qtopic?'<div class="count" style="margin:-2px 0 10px">Topic view shows every set of this chapter.</div>':'');
 }
 const setsOn=()=>!!window.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;
 function setsRow(){
   if(!setsOn())return '';
-  const SM=StudyQSets.build(QS.filter(q=>!q.gen)),one=qcats.size===1?[...qcats][0]:null;
+  const SM=StudyQSets.build(QS.filter(q=>!q.gen&&!q.inbox)),one=qcats.size===1?[...qcats][0]:null;
   if(one&&SM.sets[one]){const pr=StudyQSets.progress(SM.sets[one],store),cur=qset==='auto'?pr.current:qset;
     return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px">'+pr.sets.map((x,k)=>'<button class="chip" type="button" data-qset="'+k+'" aria-pressed="'+(qset!=='all'&&cur===k)+'"'+(x.open?'':' disabled title="Opens when '+Math.round(StudyQSets.UNLOCK*100)+'% of set '+k+' is answered right"')+'>Set '+(k+1)+(x.done?' ✓':x.open?'':' 🔒')+'<span class="n">'+x.right+'/'+x.n+'</span></button>').join('')
      +'<button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All</button></div>'
@@ -244,7 +244,7 @@ function setsRow(){
   return '<div class="row qsets" role="group" aria-label="Question sets" style="margin-bottom:8px"><button class="chip" type="button" data-qset="auto" aria-pressed="'+(qset!=='all')+'">Current set of each chapter</button><button class="chip" type="button" data-qset="all" aria-pressed="'+(qset==='all')+'">All questions</button></div>'
    +'<div class="count" style="margin:-2px 0 10px">Each chapter has sets of 50 questions (one set when it has 50 or fewer); pick one chapter to choose a set.'+(SM.hidden.size?' '+SM.hidden.size+' repeated question'+(SM.hidden.size===1?'':'s')+' hidden.':'')+'</div>';
 }
-function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen)):null, okSet=SM?StudyQSets.allowed(SM,store,(qtopic||qguide)?'all':qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!qtopic||topicOf(q)===qtopic)&&(!qguide||guideOf(q)===qguide)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||(showOld?isOldQ(q):!isOldQ(q)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
+function buildDeck(keep){ const keepId=keep&&deck[qpos]?String(deck[qpos].id):null, keepPos=qpos; /* keep: stay on the current question (background reloads and cloud sync) */ if(window.StudyReview&&StudyReview.seed(store,QS,Date.now()))save(); /* questions from data/quiz.json arrive later, so schedule earlier answers here */ dueSet=new Set(window.StudyReview?StudyReview.dueIds(store,reviewStart):[]); const wrong=q=>store.ans[q.id]!==undefined&&store.ans[q.id]!==q.right, none=q=>store.ans[q.id]===undefined; const SM=setsOn()?StudyQSets.build(QS.filter(q=>!q.gen&&!q.inbox)):null, okSet=SM?StudyQSets.allowed(SM,store,(qtopic||qguide)?'all':qset):null; deck=QS.filter(q=>typeOk(q)&&(!q.gen||qcats.has('g'))&&(!SM||q.open||q.gen||q.inbox||(!SM.hidden.has(String(q.id))&&okSet.has(String(q.id))))&&(!qtopic||topicOf(q)===qtopic)&&(!qguide||guideOf(q)===qguide)&&(!reviewOnly||dueSet.has(String(q.id)))&&(reviewOnly||(showOld?isOldQ(q):!isOldQ(q)))&&(!qcats.size||qcats.has(q.cat))&&(!(missedOnly||unansOnly)||(missedOnly&&wrong(q))||(unansOnly&&none(q))));
   if(shuffleOn){ for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } }
   qpos=0; if(qJump){ const ji=deck.findIndex(x=>String(x.id)===qJump); if(ji>=0) qpos=ji; }
   else if(keepId!==null){ const ki=deck.findIndex(x=>String(x.id)===keepId); qpos=ki>=0?ki:Math.min(keepPos,Math.max(0,deck.length-1)); } }
@@ -291,7 +291,7 @@ function renderQ(){
   h+=setsRow()+(SLIM_ROWS?'':topicRow()+guideRow());
   if(OPT.written&&!SLIM_ROWS) h+='<div class="row" role="group" aria-label="Question type" style="margin-bottom:8px">'+[['all','All types'],['mcq','Multiple choice'],['written','Written']].map(([v,l])=>'<button class="chip qtype" type="button" data-qtype="'+v+'" aria-pressed="'+(qtype===v)+'">'+l+'<span class="n">'+QS.filter(q=>v==='all'||(v==='written'?!!q.open:!q.open)).length+'</span></button>').join('')+'</div>';
   h+='<div class="row" style="margin-bottom:12px">'+revChip()+'<button class="chip" id="missBtn" aria-pressed="'+missedOnly+'" type="button">Missed</button><button class="chip" id="unansBtn" aria-pressed="'+unansOnly+'" type="button">Unanswered</button>'+(setDone()?'<button class="chip" id="againBtn" type="button" aria-pressed="true">Start again</button>':'')+'<button class="chip" id="shufBtn" aria-pressed="'+shuffleOn+'" type="button">Shuffle</button>'+retChip()+(OPT.gen&&qcats.has('g')?'<button class="chip" id="genBtn" type="button">New problems</button>':'')+'<button class="chip" id="resetBtn" type="button">Clear answers</button></div>';
-  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':showOld?'No old questions here yet. A question becomes old after 2 right answers in a row.':QS.some(isOldQ)&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(isOldQ)?'Everything here is an old question (answered right 2 times in a row). Tap Old questions to review them.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
+  if(!deck.length){ box.innerHTML=h+'<div class="empty">'+(reviewOnly?'Nothing to review right now. Come back tomorrow.':showOld?'No old questions here yet. A question becomes old after one right answer.':QS.some(isOldQ)&&QS.filter(q=>typeOk(q)&&(!qcats.size||qcats.has(q.cat))).every(isOldQ)?'Everything here is an old question (answered right). Tap Old questions to review them.':(missedOnly||unansOnly)?'No questions match this filter':'No questions in this chapter')+'</div>'; wireQ(); return; }
   const q=deck[qpos], ch=store.ans[q.id], done=ch!==undefined&&!reviewFresh(q);
   if(qJump&&deck.some(x=>String(x.id)===qJump)&&String(q.id)!==qJump) qJump=null; /* deep link used once you move on */
   window.StudyLast&&StudyLast.mark({href:D.key+'.html?tab=prac&q='+encodeURIComponent(q.id),title:D.title+' · Practice',sub:'Q '+(qpos+1)+' · '+q.q,course:D.key});
@@ -478,7 +478,8 @@ const QDS='collection://21fcc8d7-5e96-4061-a02f-d71fc5705812', QKEY=D.markKey+'-
 function hashN(s){ let h=7; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%1000003; return h; }
 function setExtQ(rows){
   for(let i=QS.length-1;i>=0;i--) if(String(QS[i].id).startsWith('n-')) QS.splice(i,1);
-  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Question||!r.Correct) return;
+  const have=new Set(); if(window.StudyInbox&&(rows||[]).some(r=>r&&r._inbox)) QS.forEach(x=>have.add(StudyInbox.norm(x.q))); /* inbox questions that repeat one already in the pool are skipped */
+  (rows||[]).forEach(r=>{ if(r.Status!=='Verified') return; if(r._inbox&&have.has(StudyInbox.norm(r.Question))) return; const hit=CATS.find(c=>c[1]===r.Chapter); if(!hit||!r.Question||!r.Correct) return;
     if(OPT.englishOnlyNotion&&/[\u0E00-\u0E7F]/.test([r.Question,r.Correct,r['Wrong 1'],r['Wrong 2'],r['Wrong 3'],r.Explanation].join(' '))) return; // English-only practice (owner, 15 Nov 2026)
     const opts=[r.Correct,r['Wrong 1'],r['Wrong 2'],r['Wrong 3']].filter(x=>x&&String(x).trim());
     if(opts.length<2) return;
@@ -486,10 +487,25 @@ function setExtQ(rows){
     if(typeof QHIDE!=='undefined'&&QHIDE.has(id)) return;
     let s=hashN(id)+49297; const rn=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};
     const idx=opts.map((_,k)=>k); for(let k=idx.length-1;k>0;k--){const j=Math.floor(rn()*(k+1));[idx[k],idx[j]]=[idx[j],idx[k]]}
-    QS.push({id,cat:hit[0],q:r.Question,opts,exp:r.Explanation||'',order:idx,right:0}); });
+    QS.push(Object.assign({id,cat:hit[0],q:r.Question,opts,exp:r.Explanation||'',order:idx,right:0},r._inbox?{inbox:true}:{})); }); /* inbox: Drive-inbox questions skip the 50-question sets so today's batch shows at once (not `open`, which means a written question) */
+}
+/* ---------- Drive inbox (owner, 25 Nov 2026): Gemini's daily Markdown files → Apps Script web app → rows (scripts/study-inbox.js, workers/inbox/) ---------- */
+const INBOX_URL_KEY='studyos.inbox.url.v1', INBOX_CACHE_KEY='studyos.inbox.cache.v1';
+function inboxCached(){ try{ if(!window.StudyInbox||!SUBJ) return []; const c=JSON.parse(localStorage.getItem(INBOX_CACHE_KEY)||'null'); return c&&Array.isArray(c.rows)?StudyInbox.forCourse(c.rows,SUBJ,CATS).rows:[]; }catch(e){ return []; } }
+async function loadInbox(){
+  try{
+    if(!window.StudyInbox||!SUBJ) return [];
+    const url=(localStorage.getItem(INBOX_URL_KEY)||'').trim(); if(!/^https:\/\/script\.google(?:usercontent)?\.com\//.test(url)) return inboxCached();
+    const ac=new AbortController(), t=setTimeout(()=>ac.abort(),9000);
+    try{ const r=await fetch(url,{cache:'no-store',signal:ac.signal}); if(!r.ok) throw new Error(r.status); const j=await r.json();
+      if(!j||!Array.isArray(j.rows)) throw new Error('bad inbox');
+      try{ localStorage.setItem(INBOX_CACHE_KEY,JSON.stringify({at:Date.now(),rows:j.rows.slice(0,3000)})); }catch(e){}
+    }finally{ clearTimeout(t); }
+    return inboxCached();
+  }catch(e){ return inboxCached(); }
 }
 const EMBQ_ROWS=typeof EMBQ!=='undefined'&&Array.isArray(EMBQ)?EMBQ:[]; /* data/courses/<course>-snapshot.js */
-try{ const _c=JSON.parse(localStorage.getItem(QKEY)||'[]'); const _m=new Map(); EMBQ_ROWS.forEach(r=>_m.set(r.url,r)); _c.forEach(r=>_m.set(r.url,r)); setExtQ([..._m.values()]); buildDeck(); }catch(e){}
+try{ const _c=JSON.parse(localStorage.getItem(QKEY)||'[]'); const _m=new Map(); EMBQ_ROWS.forEach(r=>_m.set(r.url,r)); _c.forEach(r=>_m.set(r.url,r)); setExtQ([..._m.values(),...inboxCached()]); buildDeck(); }catch(e){}
 async function loadExtQ(){
   if(!SUBJ) return;
   if(!mcp){ qStat='Notion not connected — using built-in questions (as of 10 Nov 2026)'; qStatErr=false; renderQ(); loadStatic(); return; }
@@ -519,7 +535,8 @@ async function loadStatic(){
     };
     const [q,c]=await Promise.all([getJ('quiz'), getJ('cards').catch(()=>null)]);
     const rows=(q.rows||[]).filter(x=>x.Subject===SUBJ);
-    setExtQ(rows); try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
+    const ib=await loadInbox();
+    setExtQ(rows.concat(ib)); try{ localStorage.setItem(QKEY,JSON.stringify(rows)); }catch(e){}
     if(c&&c.rows){ const cr=c.rows.filter(x=>x.Subject===SUBJ); setExt(cr); try{ localStorage.setItem(EXT_KEY,JSON.stringify(cr)); }catch(e){} cardsRow(); if(!shown) renderCard(); }
     const n=QS.filter(x=>String(x.id).startsWith('n-')).length;
     qStat='Saved questions · added '+n+' questions · updated '+(q.updated||'-'); qStatErr=false;
