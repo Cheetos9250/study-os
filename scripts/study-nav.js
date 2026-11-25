@@ -64,14 +64,13 @@
  +'#studyNav .sn-more{display:none}'
  +'@media(min-width:900px){'
  +' html.sn-on body{padding-left:224px!important}'
- +' #studyNav{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:none;left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
+ +' #studyNav{overflow:hidden;overscroll-behavior:none;touch-action:none;scrollbar-width:none;left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
  +' #studyNav .sn-brand{font:700 25px/1 "Kaisei Decol",serif;padding:4px 12px 22px;min-height:0;margin-right:54px}'
- /* short screens (iPad mini, 720-800 px): tighten so the sidebar never needs to scroll */
- +'}@media(min-width:900px) and (max-height:830px){'
- +' #studyNav{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:10px;gap:0}'
- +' #studyNav a,#studyNav button{min-height:38px}'
- +' #studyNav .sn-brand{padding-bottom:12px}'
- +'}@media(min-width:900px){'
+ /* sidebar never scrolls: item height follows the visible height (dvh also shrinks when the browser toolbar is shown) */
+ +' #studyNav{padding-top:max(clamp(8px,1.8dvh,20px),env(safe-area-inset-top));padding-bottom:clamp(6px,1.5dvh,16px);gap:0}'
+ +' #studyNav a,#studyNav button{min-height:clamp(30px,4.2dvh,44px)}'
+ +' #studyNav .sn-brand{padding-bottom:clamp(6px,1.8dvh,22px)}'
+ +' html.sn-on{overscroll-behavior-y:none}'
  +' #studyNav .sn-brand b{color:var(--sn-on);font-weight:700;margin-left:.25em}'
  /* Safari rubber-band scrolling moves fixed elements; extend the sidebar colour above and below so no gap shows */
  +' #studyNav::before,#studyNav::after{content:"";position:fixed;left:0;width:224px;box-sizing:border-box;height:100vh;background:var(--sn-bg);border-right:3px solid var(--sn-line);pointer-events:none}'
