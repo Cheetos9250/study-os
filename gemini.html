@@ -89,9 +89,9 @@ Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)
  $('ibSave').onclick=function(){var u=$('ibUrl').value.trim();if(u&&!ok(u)){msg('The URL must start with https://script.google.com/');return}
   try{if(u)localStorage.setItem(K,u);else{localStorage.removeItem(K);localStorage.removeItem(C)}msg(u?'Saved. Press Test.':'Removed.')}catch(e){msg('Could not save on this device.')}};
  $('ibTest').onclick=function(){var u=$('ibUrl').value.trim();if(!ok(u)){msg('Save a Web app URL first.');return}msg('Testing…');
-  fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
+  fetch(u+(u.indexOf('?')<0?'?':'&')+'fresh=1',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
    var n=(j.rows||[]).length,er=j.errors||[];try{localStorage.setItem(C,JSON.stringify({at:Date.now(),rows:(j.rows||[]).slice(0,3000)}))}catch(e){}
-   msg(n+' questions from '+(j.files||0)+' files'+(er.length?'. '+er.length+' problem(s), first: '+er[0]:'. No problems.'))}).catch(function(e){msg('Could not read it ('+e.message+'). Check the deployment: Who has access = Anyone.')})};
+   msg(n+' questions from '+(j.files||0)+' recent files'+(er.length?'. '+er.length+' problem(s), first: '+er[0]:'. No problems.'))}).catch(function(e){msg('Could not read it ('+e.message+'). Check the deployment: Who has access = Anyone.')})};
  $('ibPrompt').onclick=function(){fetch('docs/gemini-question-prompt.md').then(function(r){return r.text()}).then(function(t){
   return navigator.clipboard.writeText(t).then(function(){msg('Prompt copied. Paste it in Gemini and fill {SUBJECT}, {CHAPTER}, {N}.')})}).catch(function(){msg('Could not copy. Open docs/gemini-question-prompt.md in the repo.')})};
 })();
