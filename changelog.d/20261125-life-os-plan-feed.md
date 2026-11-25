@@ -1,0 +1,1 @@
+- Gemini MCP Worker: `GET /plan` (Bearer token) returns open tasks, upcoming exams and the timetable as small JSON, so Life OS can show Study OS tasks. Read-only; needs a Worker redeploy.

@@ -146,12 +146,23 @@ export async function exportSheets(env,now){
  const md=await callTool(env,'get_overview',{wrong_per_course:0},now);
  return {Summary:md.split('\n').map(l=>[l]),Questions:Q,Notes:N,Tasks:K,Grades:Gr,Exams:E,Classes:C};
 }
+// Small read-only feed for Life OS: open tasks, upcoming exams, the weekly timetable. No question bank.
+export async function planFeed(env,now){
+ const [today,home]=await Promise.all([progress(env,'today').catch(()=>null),progress(env,'home').catch(()=>null)]);
+ const t=(today&&today.today)||{},h=(home&&home.home)||{},settings=T.loadSettings(JSON.stringify(t));
+ const str=(v,n)=>String(v==null?'':v).slice(0,n);
+ const tasks=(Array.isArray(h.tasks)?h.tasks:[]).filter(x=>x&&typeof x==='object'&&x.title).slice(0,500)
+  .map(x=>({id:str(x.id,80),title:str(x.title,200),date:/^\d{4}-\d{2}-\d{2}$/.test(x.date||'')?x.date:null,pri:str(x.pri,10),done:!!x.done,rep:str(x.rep,2),link:/^https:\/\//.test(x.link||'')?str(x.link,500):null}));
+ const exams=settings.exams.map(e=>({title:str(e.title,120),date:e.date,days_left:T.daysUntil(e.date,now),course:str(e.course,20)})).filter(e=>e.days_left>=0).sort((a,b)=>a.date.localeCompare(b.date));
+ const classes=settings.timetable.map(x=>({day:x.day,start:x.start,end:x.end,name:str(x.name,120)}));
+ return {tasks,exams,classes};
+}
 export default {
  async fetch(request,env){
   const url=new URL(request.url);
   if(url.pathname==='/health')return json({ok:true});
-  const isSummary=url.pathname==='/summary',isExport=url.pathname==='/export';
-  const m=isSummary||isExport?[]:url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
+  const isSummary=url.pathname==='/summary',isExport=url.pathname==='/export',isPlan=url.pathname==='/plan';
+  const m=isSummary||isExport||isPlan?[]:url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
   if(!m)return json({error:'Not found'},404);
   if(typeof env.MCP_READ_TOKEN!=='string'||env.MCP_READ_TOKEN.length<32||typeof env.PROGRESS_SYNC_KEY!=='string')return json({error:'Not configured'},503);
   const auth=(request.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');
@@ -163,6 +174,11 @@ export default {
    try{const md=await callTool(env,'get_overview',{wrong_per_course:n},now)+'\n'+(await callTool(env,'get_schedule',{},now)).replace(/^# Schedule\n\n## Upcoming exams[\s\S]*?(?=## Classes)/,'');
     return new Response(md,{status:200,headers:{'Content-Type':'text/markdown; charset=utf-8','Cache-Control':'no-store'}});}
    catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
+  }
+  // GET /plan (Bearer token only): open tasks, exams and timetable for Life OS (small; no question bank).
+  if(isPlan){
+   if(request.method!=='GET')return json({error:'Method not allowed'},405,{Allow:'GET'});
+   try{return json(await planFeed(env,Date.now()));}catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
   }
   // GET /export (Bearer token only): every table for the Google Sheet (Questions, Notes, Tasks, Grades, Exams, Classes, Summary).
   if(isExport){
