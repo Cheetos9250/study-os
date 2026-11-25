@@ -19,11 +19,11 @@ test('earlier answers get a schedule without touching answers; only answered, du
   const before=JSON.stringify(store.ans);
   assert.equal(R.seed(store,[{id:'a',right:1},{id:'b',right:2},{id:'c',right:0}],now),true);
   assert.equal(JSON.stringify(store.ans),before);
-  assert.deepEqual(R.dueIds(store,now).sort(),['a','b']);
+  assert.deepEqual(R.dueIds(store,now).sort(),['b'],'right answers are old since 25 Nov 2026, so only the wrong one is due');
   assert.equal(R.seed(store,[{id:'a',right:1}],now),false,'seeding twice changes nothing');
-  assert.equal(R.countRaw(JSON.stringify(store),now),2);
+  assert.equal(R.countRaw(JSON.stringify(store),now),1);
   assert.equal(R.countRaw('not json',now),0);
-  delete store.ans.b;assert.deepEqual(R.dueIds(store,now),['a']);
+  delete store.ans.b;assert.deepEqual(R.dueIds(store,now),[]);
 });
 test('quiz pages keep review state inside the backed-up study-<course> key and carry it through sync',()=>{
   for(const f of ['acc.html','eco.html','math.html']){const s=read(f);

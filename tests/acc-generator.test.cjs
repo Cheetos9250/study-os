@@ -53,5 +53,5 @@ test('acc.html loads the generator and the engine hooks it without storing its a
   assert.match(src,/function genLoad\(\)/);
   assert.match(src,/\/\^gen-\/\.test\(id\)\)\s*delete o\[id\]/,'old gen answers are dropped on load');
   assert.match(src,/!q\.gen\|\|qcats\.has\('g'\)/,'only shown when the Fresh problems chapter is chosen');
-  assert.match(src,/StudyQSets\.build\(QS\.filter\(q=>!q\.gen\)\)/);
+  assert.match(src,/StudyQSets\.build\(QS\.filter\(q=>!q\.gen&&!q\.inbox\)\)/);
 });

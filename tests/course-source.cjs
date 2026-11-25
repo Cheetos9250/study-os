@@ -6,7 +6,7 @@
 const fs=require('node:fs'),path=require('node:path');
 const ROOT=path.join(__dirname,'..');
 const COURSE=/^(acc|eco|math|eng|zh)\.html$/;
-const TAGS=/((?:<script src="data\/courses\/[^"]+"><\/script>\n)+)<script>(window\.StudyCourseOpts=[^\n]*)<\/script>\n((?:<script src="scripts\/(?:study-qsets|acc-topics)\.js[^"]*"><\/script>\n)*)<script src="scripts\/study-course-engine\.js[^"]*"><\/script>/;
+const TAGS=/((?:<script src="data\/courses\/[^"]+"><\/script>\n)+)<script>(window\.StudyCourseOpts=[^\n]*)<\/script>\n((?:<script src="scripts\/(?:study-qsets|study-inbox|acc-topics)\.js[^"]*"><\/script>\n)*)<script src="scripts\/study-course-engine\.js[^"]*"><\/script>/;
 function file(rel){return fs.readFileSync(path.join(ROOT,rel),'utf8');}
 function inline(html){
  return html.replace(TAGS,(m,data,opts,extra)=>{

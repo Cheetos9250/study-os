@@ -52,6 +52,13 @@ ol.steps{margin:6px 0 0;padding-left:22px}ol.steps li{margin:4px 0}
 <div class="row"><button type="button" class="b main" id="copy">Copy summary</button><a class="b" id="open" href="https://gemini.google.com/app" target="_blank" rel="noopener">Open Gemini</a><button type="button" class="b" id="dl">Download .md</button><span class="muted" id="msg" role="status" aria-live="polite"></span></div>
 <ol class="steps muted"><li>Tap <b>Copy summary</b>, open Gemini and paste it into a new chat.</li><li>For a coach that always knows your progress: in Gemini make a <b>Gem</b>, and add the downloaded .md file as its knowledge. Download it again after studying to refresh it.</li></ol>
 </section>
+<section class="panel" aria-labelledby="h4s">
+<h2 id="h4s">Daily questions from Drive</h2>
+<p class="muted">Gemini's daily question files go into one Drive folder; the course pages add them to Practice by themselves. Set it up once with <code>workers/inbox/study-os-inbox.gs</code> (steps at the top of that file), then paste the Web app URL here.</p>
+<div class="row"><input id="ibUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec" aria-label="Web app URL" style="flex:1 1 280px;min-height:44px;font:14px var(--ui);border:2px solid var(--ink);border-radius:var(--r-s,8px);background:var(--paper);color:var(--text);padding:0 10px">
+<button type="button" class="b main" id="ibSave">Save</button><button type="button" class="b" id="ibTest">Test</button><button type="button" class="b" id="ibPrompt">Copy Gemini prompt</button></div>
+<p class="muted" id="ibMsg" role="status" aria-live="polite"></p>
+</section>
 <main class="panel" aria-labelledby="h3s"><h2 id="h3s">Preview</h2><textarea id="out" readonly aria-label="Summary for Gemini">Loading…</textarea></main>
 </div>
 <script src="scripts/study-today.js?v=3"></script>
@@ -72,6 +79,21 @@ $('#wn').onchange=build;
 $('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(text);say('Copied. Paste it into Gemini.');}catch(e){const a=$('#out');a.focus();a.select();try{document.execCommand('copy');say('Copied. Paste it into Gemini.');}catch(_){say('Select the text below and copy it.');}}};
 $('#dl').onclick=()=>{const u=URL.createObjectURL(new Blob([text],{type:'text/markdown'})),a=document.createElement('a');a.href=u;a.download='study-os-progress.md';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);};
 Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(build);
+})();
+</script>
+<script>
+(function(){
+ var K='studyos.inbox.url.v1',C='studyos.inbox.cache.v1',$=function(i){return document.getElementById(i)},msg=function(t){$('ibMsg').textContent=t};
+ try{$('ibUrl').value=localStorage.getItem(K)||''}catch(e){}
+ function ok(u){return /^https:\/\/script\.google(?:usercontent)?\.com\//.test(u)}
+ $('ibSave').onclick=function(){var u=$('ibUrl').value.trim();if(u&&!ok(u)){msg('The URL must start with https://script.google.com/');return}
+  try{if(u)localStorage.setItem(K,u);else{localStorage.removeItem(K);localStorage.removeItem(C)}msg(u?'Saved. Press Test.':'Removed.')}catch(e){msg('Could not save on this device.')}};
+ $('ibTest').onclick=function(){var u=$('ibUrl').value.trim();if(!ok(u)){msg('Save a Web app URL first.');return}msg('Testing…');
+  fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
+   var n=(j.rows||[]).length,er=j.errors||[];try{localStorage.setItem(C,JSON.stringify({at:Date.now(),rows:(j.rows||[]).slice(0,3000)}))}catch(e){}
+   msg(n+' questions from '+(j.files||0)+' files'+(er.length?'. '+er.length+' problem(s), first: '+er[0]:'. No problems.'))}).catch(function(e){msg('Could not read it ('+e.message+'). Check the deployment: Who has access = Anyone.')})};
+ $('ibPrompt').onclick=function(){fetch('docs/gemini-question-prompt.md').then(function(r){return r.text()}).then(function(t){
+  return navigator.clipboard.writeText(t).then(function(){msg('Prompt copied. Paste it in Gemini and fill {SUBJECT}, {CHAPTER}, {N}.')})}).catch(function(){msg('Could not copy. Open docs/gemini-question-prompt.md in the repo.')})};
 })();
 </script>
 </body>

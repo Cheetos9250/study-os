@@ -22,8 +22,12 @@ test('buildContext writes exams, chapter table, weak chapters and wrong question
 });
 test('gemini page is read-only, sends nothing and is linked from the nav',()=>{
  const h=read('gemini.html');
- assert.doesNotMatch(h,/localStorage\.setItem|removeItem/);
- assert.doesNotMatch(h,/fetch\((?!c\.data)/);
+ /* the only thing the page may store is the Drive-inbox Web app URL and its cache (owner, 25 Nov 2026); never progress */
+ assert.deepEqual([...new Set((h.match(/localStorage\.(?:setItem|removeItem)\(\s*([A-Za-z]+)/g)||[]).map(x=>x.replace(/.*\(\s*/,'')))].sort(),['C','K']);
+ assert.match(h,/var K='studyos\.inbox\.url\.v1',C='studyos\.inbox\.cache\.v1'/);
+ /* only GETs: course data, the owner's own Drive-inbox URL, and the prompt file; no body is ever sent */
+ assert.doesNotMatch(h,/fetch\((?!c\.data|u,\{cache:'no-store'\}|'docs\/gemini-question-prompt\.md')/);
+ assert.doesNotMatch(h,/method\s*:|body\s*:/);
  assert.match(h,/study-eink-base\.css/);
  assert.match(read('scripts/study-nav.js'),/gemini\.html/);
 });

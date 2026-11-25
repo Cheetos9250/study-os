@@ -22,8 +22,8 @@ test('progress: set 1 open; the next opens when 90% is mastered (right twice in 
 test('engine: sets never hide Review due, Missed, deep links or Cram Mode; pages load the script first',()=>{
   const e=R('scripts/study-course-engine.js');
   assert.match(e,/const setsOn=\(\)=>!!window\.StudyQSets&&!reviewOnly&&!missedOnly&&!qJump&&!CRAM;/);
-  assert.match(e,/\(!SM\|\|q\.open\|\|q\.gen\|\|\(!SM\.hidden\.has\(String\(q\.id\)\)&&okSet\.has\(String\(q\.id\)\)\)\)/);
-  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=3"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=\d+"/);
+  assert.match(e,/\(!SM\|\|q\.open\|\|q\.gen\|\|q\.inbox\|\|\(!SM\.hidden\.has\(String\(q\.id\)\)&&okSet\.has\(String\(q\.id\)\)\)\)/);
+  for(const c of ['acc','eco','math'])assert.match(R(c+'.html'),/study-qsets\.js\?v=3"><\/script>\n<script src="scripts\/study-inbox\.js\?v=1"><\/script>\n<script src="scripts\/study-course-engine\.js\?v=\d+"/);
 });
 test('deep links never untick a chapter the engine already selected from ?cat=',()=>{
   const src=R('scripts/study-course-nav.js');
