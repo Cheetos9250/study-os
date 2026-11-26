@@ -7,8 +7,8 @@
 export const GEMINI='https://generativelanguage.googleapis.com/v1beta/';
 // "-latest" aliases follow Google's newest Flash / Pro model, so the Worker does not need an update when models change.
 export const MODELS={flash:'gemini-flash-latest',pro:'gemini-pro-latest'};
-const FALLBACK={'gemini-flash-latest':['gemini-flash-lite-latest'],'gemini-pro-latest':['gemini-flash-latest']},BUSY=new Set([429,500,503,504]);
-const PROTOCOL='2025-06-18',MAX_PROMPT=200000,TIMEOUT_MS=240000;
+const FALLBACK={'gemini-flash-latest':['gemini-flash-lite-latest'],'gemini-pro-latest':['gemini-flash-latest']},BUSY=new Set([429,500,502,503,504,524]);
+const PROTOCOL='2025-06-18',MAX_PROMPT=200000,TIMEOUT_MS=170000,ATTEMPT_MS=60000;
 
 const enc=new TextEncoder();
 function safeEqual(a,b){
@@ -47,17 +47,20 @@ export async function askGemini(env,args){
  if(Number.isInteger(a.max_output_tokens)&&a.max_output_tokens>=16)gc.maxOutputTokens=Math.min(65536,a.max_output_tokens);
  if(Object.keys(gc).length)body.generationConfig=gc;
  const f=env.GEMINI_FETCH||fetch,wait=env.RETRY_WAIT||(ms=>new Promise(res=>setTimeout(res,ms)));
- // Busy (429/500/503/504): wait and retry once, then fall back to the next model in the chain.
+ // Busy (429/5xx/524) or slow (no answer in 60 s): wait and retry once, then fall back to the next model in the chain.
  const chain=[model,...(FALLBACK[model]||[])],started=Date.now();
  let r,data=null,used=model,lastErr='',busyErr='';
  for(const m of chain){
   for(let attempt=0;attempt<2;attempt++){
-   const left=TIMEOUT_MS-(Date.now()-started);if(left<=1000)break;
+   const left=Math.min(env.ATTEMPT_MS||ATTEMPT_MS,TIMEOUT_MS-(Date.now()-started));if(left<=1000)break;
    const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),left);
+   let net='';
    try{r=await f(GEMINI+'models/'+m+':generateContent',{method:'POST',signal:ctl.signal,
     headers:{'Content-Type':'application/json','x-goog-api-key':env.GEMINI_API_KEY},body:JSON.stringify(body)});}
-   catch(e){throw Error(e&&e.name==='AbortError'?'Gemini took longer than '+TIMEOUT_MS/1000+' s':'could not reach Gemini');}
+   catch(e){net=e&&e.name==='AbortError'?'Gemini timeout ('+m+' gave no answer in '+Math.round(left/1000)+' s)':'Gemini network error';}
    finally{clearTimeout(timer);}
+   // a slow model is not retried: go straight to the next model
+   if(net){r=null;lastErr=net;busyErr=busyErr||net;break;}
    data=null;try{data=await r.json();}catch{}
    used=m;
    if(r.ok)break;
@@ -70,7 +73,7 @@ export async function askGemini(env,args){
   }
   if(r&&r.ok)break;
  }
- if(!r||!r.ok)throw Error(lastErr||'Gemini did not answer');
+ if(!r||!r.ok)throw Error(busyErr||lastErr||'Gemini did not answer');
  const model_=used;
  const c=data&&Array.isArray(data.candidates)?data.candidates[0]:null;
  const text=c&&c.content&&Array.isArray(c.content.parts)?c.content.parts.filter(p=>p&&typeof p.text==='string'&&!p.thought).map(p=>p.text).join(''):'';
