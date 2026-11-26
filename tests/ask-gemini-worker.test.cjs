@@ -66,3 +66,16 @@ test('busy Gemini: retries once, then falls back to the next model',async()=>{
  const bad=await (await W2.fetch(new Request('https://x.workers.dev/mcp/'+TOKEN,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'ask_gemini',arguments:{prompt:'hi'}}})}),e2)).json();
  assert.equal(bad.result.isError,true);assert.match(bad.result.content[0].text,/HTTP 503: high demand/);
 });
+test('slow or 524 Gemini: a hung model is abandoned for the fallback; busy codes include 524',async()=>{
+ const urls=[];let n=0;
+ const e={CLAUDE_MCP_TOKEN:TOKEN,GEMINI_API_KEY:KEY,RETRY_WAIT:async()=>{},ATTEMPT_MS:1200,
+  GEMINI_FETCH:(url,init)=>{urls.push(url.match(/models\/([^:]+)/)[1]);n++;
+   if(n===1)return new Promise((_,rej)=>init.signal.addEventListener('abort',()=>{const x=Error('aborted');x.name='AbortError';rej(x);}));
+   return Promise.resolve(new Response(JSON.stringify({candidates:[{content:{parts:[{text:'ok'}]},finishReason:'STOP'}]}),{status:200}));}};
+ const req=b=>new Request('https://x.workers.dev/mcp/'+TOKEN,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'ask_gemini',arguments:b}})});
+ const out=await (await W.fetch(req({prompt:'hi'}),e)).json();
+ assert.equal(out.result.content[0].text,'ok');assert.deepEqual(urls,['gemini-flash-latest','gemini-flash-lite-latest']);
+ const seq=[524,524,524,524];const e2={...e,GEMINI_FETCH:async()=>new Response('',{status:seq.shift()})};
+ const bad=await (await W.fetch(req({prompt:'hi'}),e2)).json();
+ assert.equal(bad.result.isError,true);assert.match(bad.result.content[0].text,/Gemini HTTP 524/);assert.equal(seq.length,0);
+});
