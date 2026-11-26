@@ -60,7 +60,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
               assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'quiz reset changed flashcard progress');
               await page.locator('#qBody .opt').first().click();await page.locator('.explain').waitFor();
               await page.reload();await page.locator('.explain').waitFor();
-              assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans[0],choice,'quiz answer did not survive reload');
+              assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans[Object.keys(JSON.parse(quiz).ans)[0]],choice,'quiz answer did not survive reload');
             }
             await page.locator('#studyNav .sn-tab[data-sn="today"]').click();
             await page.locator('#welcome-title').waitFor();
