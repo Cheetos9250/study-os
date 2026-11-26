@@ -1,0 +1,9 @@
+// Ask-Gemini MCP server for Claude. Deployed ONLY by .github/workflows/deploy-ask-gemini.yml.
+// Secrets GEMINI_API_KEY and CLAUDE_MCP_TOKEN are set by that workflow from GitHub secrets; never stored here.
+// No storage and no bindings: it only forwards a prompt to the Gemini API.
+{
+  "name": "study-os-ask-gemini",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": true
+}
