@@ -148,7 +148,7 @@ function chapters(c,now){
  const D=data[c.key],s=summaries[c.key];
  $('#title').textContent=c.name;$('#crumb').hidden=false;$('#secTitle').hidden=true;$('#nextStep').hidden=true;
  if(!D||!s){$('#view').className='list';$('#view').innerHTML='<p class="status'+(errors.includes(c.key)?' err':'')+'">'+(errors.includes(c.key)?'Could not load':'Loading…')+'</p>';return;}
- const rows=D.cats.map(([id,label])=>{
+ const rows=D.cats.filter(([id])=>!(c.key==='eco'&&(id==='c2'||id==='c3'))).map(([id,label])=>{
   const p=s.per[id],ex=examFor(c.key,id,now),acc=T.accuracy(p);
   const book=c.key==='acc'&&/^c\d+$/.test(id)?'<a href="pdf-sets.html?book=1&amp;ch='+id.slice(1)+'">Textbook</a>':'';
   return '<div class="card chap"><h3>'+esc(label)+(ex?' <span class="tagx">'+esc(ex.title)+' · '+(ex.days===0?'today':ex.days+'d')+'</span>':'')+'</h3>'

@@ -15,7 +15,8 @@ const rich = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<b
 let store = {known:[], ans:{}};
 try{ const r = localStorage.getItem(KEY); if(r) store = Object.assign(store, JSON.parse(r)); }catch(e){}
 const save = () => { progressWrites.write(KEY,JSON.stringify(store)); window.__xs&&window.__xs.dirty(); };
-const CATS = D.cats; // [[id,label],...]
+const HIDE_CATS = (window.StudyCourseOpts&&window.StudyCourseOpts.hideCats)||[]; // chapters hidden by the owner (data and answers stay saved)
+const CATS = HIDE_CATS.length?D.cats.filter(c=>!HIDE_CATS.includes(c[0])):D.cats; // [[id,label],...]
 /* links from Today: ?cat=<id>[,<id>…] opens those chapters, &missed=1 shows only missed questions */
 const URL_CATS=(()=>{try{return (new URLSearchParams(location.search).get('cat')||'').split(',').filter(id=>id&&D.cats.some(c=>c[0]===id));}catch(e){return [];}})();
 const catLabel = id => (CATS.find(c=>c[0]===id)||[0,id])[1];
@@ -37,7 +38,7 @@ let srs={}, meta={day:0,newDone:0}, NEWLIM=20;
 try{ const r=JSON.parse(localStorage.getItem(D.markKey+'-srs')||'{}'); srs=r.s||{}; meta=r.m||meta; NEWLIM=r.lim||20; }catch(e){}
 const saveS=()=>{ progressWrites.write(D.markKey+'-srs',JSON.stringify({s:srs,m:meta,lim:NEWLIM})); window.__xs&&window.__xs.dirty(); };
 const chkDay=()=>{ const d=sod(Date.now()); if(meta.day!==d){ meta.day=d; meta.newDone=0; } };
-const CARDS = D.cards.map((c,i)=>({id:i,cat:c[0],f:c[1],b:c[2],ref:c[3]||'',mid:c[4],tp:c[5],tb:c[6],ans:c[7]}));
+const CARDS = D.cards.filter(c=>!HIDE_CATS.includes(c[0])).map((c,i)=>({id:i,cat:c[0],f:c[1],b:c[2],ref:c[3]||'',mid:c[4],tp:c[5],tb:c[6],ans:c[7]}));
 let fcat=URL_CATS.length===1?URL_CATS[0]:'all', dirBack=false, cur=null, shown=false;
 const LEARN=[1,10];
 const CAN_TYPE=!!D.typing; let TYPING=CAN_YES();
@@ -174,6 +175,7 @@ const reviewFresh=x=>(reviewOnly&&dueSet.has(String(x.id))&&((store.ats||{})[x.i
 const setDone=()=>setsOn()&&qcats.size===1&&qset!=='all'&&deck.length>0&&deck.every(x=>!x.open&&store.ans[x.id]!==undefined&&!reviewFresh(x));
 const revChip=()=>'<button class="chip" id="revBtn" aria-pressed="'+reviewOnly+'" type="button">Review due<span class="n">'+(window.StudyReview?QS.filter(q=>StudyReview.isDue(store,q.id,Date.now())).length:0)+'</span></button>';
 for(let i=QS.length-1;i>=0;i--) if(QHIDE.has(String(QS[i].id))) QS.splice(i,1);
+for(let i=QS.length-1;i>=0;i--) if(HIDE_CATS.includes(QS[i].cat)) QS.splice(i,1);
 /* the course's own practice set (acc: scripts/acc-textbook-mcq.js, eco: eco-practice-mcq.js, math: math-practice-mcq.js) */
 if(OPT.mcq&&OPT.mcq.cat&&(window[OPT.mcq.list]||[]).some(q=>q.cat===OPT.mcq.cat[0])&&!CATS.some(c=>c[0]===OPT.mcq.cat[0])) CATS.push(OPT.mcq.cat.slice());
 (OPT.mcq&&window[OPT.mcq.list]||[]).forEach((q,i)=>{ let s=(i+OPT.mcq.seed)*9301+49297; const r=()=>{s=(s*233280+49297)%2147483647;return s/2147483647};

@@ -52,15 +52,15 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
               const option=page.locator('#qBody .opt').first(),choice=Number(await option.getAttribute('data-oi'));
               await option.click();await page.locator('.explain').waitFor();
               const quiz=await page.evaluate(()=>localStorage.getItem('study-'+D.key));
-              assert.equal(JSON.parse(quiz).ans[0],choice);
+              assert.equal(Object.values(JSON.parse(quiz).ans)[0],choice);
               page.once('dialog',dialog=>dialog.dismiss());await page.locator('#resetBtn').click();
               assert.equal(await page.evaluate(()=>localStorage.getItem('study-'+D.key)),quiz,'cancel reset changed quiz history');
               page.once('dialog',dialog=>dialog.accept());await page.locator('#resetBtn').click();
               assert.deepEqual(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans,{});
               assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'quiz reset changed flashcard progress');
-              await page.locator('#qBody .opt').first().click();await page.locator('.explain').waitFor();
-              await page.reload();await page.locator('.explain').waitFor();
-              assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans[0],choice,'quiz answer did not survive reload');
+              await page.locator('#qBody .opt').first().click();await page.locator('.explain').waitFor();const kept=await page.evaluate(()=>localStorage.getItem('study-'+D.key));
+              await page.reload();await page.locator('#qBody').waitFor();
+              assert.equal(await page.evaluate(()=>localStorage.getItem('study-'+D.key)),kept,'quiz answer did not survive reload');
             }
             await page.locator('#studyNav .sn-tab[data-sn="today"]').click();
             await page.locator('#welcome-title').waitFor();
