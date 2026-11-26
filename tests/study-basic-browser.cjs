@@ -52,7 +52,7 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
               const option=page.locator('#qBody .opt').first(),choice=Number(await option.getAttribute('data-oi'));
               await option.click();await page.locator('.explain').waitFor();
               const quiz=await page.evaluate(()=>localStorage.getItem('study-'+D.key));
-              assert.equal(JSON.parse(quiz).ans[0],choice);
+              assert.equal(Object.values(JSON.parse(quiz).ans)[0],choice);
               page.once('dialog',dialog=>dialog.dismiss());await page.locator('#resetBtn').click();
               assert.equal(await page.evaluate(()=>localStorage.getItem('study-'+D.key)),quiz,'cancel reset changed quiz history');
               page.once('dialog',dialog=>dialog.accept());await page.locator('#resetBtn').click();
