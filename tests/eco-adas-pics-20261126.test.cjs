@@ -10,22 +10,22 @@ const D=JSON.parse(/^const D = (\{.*\});/m.exec(fs.readFileSync(path.join(ROOT,'
 test('every picture file exists and is well formed',()=>{
   for(const [k,[alt,f]] of Object.entries(P.FILES)){
     const s=fs.readFileSync(path.join(ROOT,f),'utf8');
-    assert.match(s,/^<svg [^>]*viewBox="0 0 680 370"/,k);
+    assert.match(s,/^<svg [^>]*viewBox="0 0 680 350"/,k);
     assert.match(s,/<title>/,k);
     assert.ok(alt.length>5,k);
   }
 });
 test('every mapped id is a real economics question in the AD-AS chapter',()=>{
-  for(const id of Object.keys(P.AFTER)){
+  for(const id of Object.keys(P.PICS)){
     if(/^\d+$/.test(id)) assert.equal(D.quiz[Number(id)][0],'a',id);
     else { assert.ok(ids.has(id),id); assert.equal(ctx.window.ECO_PRACTICE_MCQ.find(q=>q.id===id).cat,'a',id); }
-    for(const k of P.AFTER[id]) assert.ok(P.FILES[k],id+' '+k);
+    for(const k of P.PICS[id]) assert.ok(P.FILES[k],id+' '+k);
   }
 });
-test('pictures only after the answer (never before)',()=>{
-  assert.equal(P.html('ep-a8','before'),'');
-  assert.match(P.html('ep-a8','after'),/assets\/adas\/keynesian\.svg/);
-  assert.equal(P.html('ep-a1','after'),'');
+test('pictures sit under the question text',()=>{
+  assert.equal(P.html('ep-a8','after'),'');
+  assert.match(P.html('ep-a8','before'),/assets\/adas\/keynesian\.svg/);
+  assert.equal(P.html('ep-a1','before'),'');
 });
 test('engine and eco.html wire the pictures in',()=>{
   const e=fs.readFileSync(path.join(ROOT,'scripts/study-course-engine.js'),'utf8');
