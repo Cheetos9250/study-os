@@ -7,6 +7,7 @@
 // Deployed only by .github/workflows/deploy-gemini-mcp.yml (manual, owner types DEPLOY).
 import T from '../../scripts/study-today.js';
 import G from '../../scripts/study-gemini.js';
+import {digestFeed} from './study-digest.mjs';
 // Built at deploy by scripts/build-question-bank.cjs (not committed): every acc/eco/math practice question with the engine's ids.
 import BANK from './bank.json' with {type:'json'};
 
@@ -150,8 +151,8 @@ export default {
  async fetch(request,env){
   const url=new URL(request.url);
   if(url.pathname==='/health')return json({ok:true});
-  const isSummary=url.pathname==='/summary',isExport=url.pathname==='/export';
-  const m=isSummary||isExport?[]:url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
+  const isSummary=url.pathname==='/summary',isExport=url.pathname==='/export',isDigest=url.pathname==='/digest';
+  const m=isSummary||isExport||isDigest?[]:url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
   if(!m)return json({error:'Not found'},404);
   if(typeof env.MCP_READ_TOKEN!=='string'||env.MCP_READ_TOKEN.length<32||typeof env.PROGRESS_SYNC_KEY!=='string')return json({error:'Not configured'},503);
   const auth=(request.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');
@@ -163,6 +164,11 @@ export default {
    try{const md=await callTool(env,'get_overview',{wrong_per_course:n},now)+'\n'+(await callTool(env,'get_schedule',{},now)).replace(/^# Schedule\n\n## Upcoming exams[\s\S]*?(?=## Classes)/,'');
     return new Response(md,{status:200,headers:{'Content-Type':'text/markdown; charset=utf-8','Cache-Control':'no-store'}});}
    catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
+  }
+  // GET /digest (Bearer token only): counts only (cards due, review due, accuracy, weak chapters) for Life OS's Telegram morning message.
+  if(isDigest){
+   if(request.method!=='GET')return json({error:'Method not allowed'},405,{Allow:'GET'});
+   try{return json(await digestFeed(env,Date.now(),{progress,courseData}));}catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
   }
   // GET /export (Bearer token only): every table for the Google Sheet (Questions, Notes, Tasks, Grades, Exams, Classes, Summary).
   if(isExport){
