@@ -1,0 +1,1 @@
+Economics practice: AD–AS pictures (assets/adas/*.svg, `scripts/eco-adas-pics.js`) now show in the answer box for 24 questions: Keynesian / classical / intermediate range, AD decrease, recessionary and inflationary gap, stagflation. Shown only after answering. The course engine calls `EcoAdasPics` next to the Chapter 7 journal pictures.
