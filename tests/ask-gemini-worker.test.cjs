@@ -54,3 +54,15 @@ test('errors come back as tool errors without the key; an empty prompt is reject
  assert.equal(cut.result.content[0].text,'part\n\n[Gemini stopped early: MAX_TOKENS]');
  const empty=await call(env([]),{prompt:'  '});assert.equal(empty.error.code,-32602);
 });
+test('busy Gemini: retries once, then falls back to the next model',async()=>{
+ const W2=W,seq=[503,503,200],urls=[];
+ const e={CLAUDE_MCP_TOKEN:TOKEN,GEMINI_API_KEY:KEY,RETRY_WAIT:async()=>{},
+  GEMINI_FETCH:async(url)=>{urls.push(url);const s=seq.shift();return new Response(JSON.stringify(s===200?{candidates:[{content:{parts:[{text:'ok'}]},finishReason:'STOP'}]}:{error:{message:'high demand'}}),{status:s});}};
+ const out=await (await W2.fetch(new Request('https://x.workers.dev/mcp/'+TOKEN,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'ask_gemini',arguments:{prompt:'hi'}}})}),e)).json();
+ assert.equal(out.result.content[0].text,'ok');
+ assert.deepEqual(urls.map(u=>u.match(/models\/([^:]+)/)[1]),['gemini-flash-latest','gemini-flash-latest','gemini-flash-lite-latest']);
+ // all busy, and a missing fallback model: the busy error is reported
+ const seq2=[503,503,404];const e2={...e,GEMINI_FETCH:async()=>{const s=seq2.shift();return new Response(JSON.stringify({error:{message:s===404?'not found':'high demand'}}),{status:s});}};
+ const bad=await (await W2.fetch(new Request('https://x.workers.dev/mcp/'+TOKEN,{method:'POST',body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'ask_gemini',arguments:{prompt:'hi'}}})}),e2)).json();
+ assert.equal(bad.result.isError,true);assert.match(bad.result.content[0].text,/HTTP 503: high demand/);
+});
