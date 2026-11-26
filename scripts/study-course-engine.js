@@ -273,7 +273,7 @@ function renderCram(box){
      +'<p class="qtext">'+rich(q.q)+'</p><div class="explain good"><b class="v">Answer: '+rich(right)+'</b>'+(wrong&&q.opts[mine]!==undefined?'<div class="cram-mine">You chose: '+rich(q.opts[mine])+'</div>':'')+(q.exp?rich(q.exp):'')+askAI(q,wrong?mine:undefined)+'</div></li>'; }).join('')+'</ol>';
   box.innerHTML=h;
 }
-const jpics=(q,when)=>window.AccJournalPics?AccJournalPics.html(q.id,when):'';
+const jpics=(q,when)=>(window.AccJournalPics?AccJournalPics.html(q.id,when):'')+(window.EcoAdasPics?EcoAdasPics.html(q.id,when):'');
 function renderQ(){
   (function(box){ box.innerHTML='';
     [['all','All'],...CATS].forEach(([id,l])=>{
