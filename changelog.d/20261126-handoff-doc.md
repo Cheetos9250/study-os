@@ -1,0 +1,1 @@
+- Add `HANDOFF.md`: start prompt, current state and a fill-in template so work can continue between Claude accounts (no secrets).
