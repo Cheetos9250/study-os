@@ -7,6 +7,7 @@
 export const GEMINI='https://generativelanguage.googleapis.com/v1beta/';
 // "-latest" aliases follow Google's newest Flash / Pro model, so the Worker does not need an update when models change.
 export const MODELS={flash:'gemini-flash-latest',pro:'gemini-pro-latest'};
+const FALLBACK={'gemini-flash-latest':['gemini-flash-lite-latest'],'gemini-pro-latest':['gemini-flash-latest']},BUSY=new Set([429,500,503,504]);
 const PROTOCOL='2025-06-18',MAX_PROMPT=200000,TIMEOUT_MS=240000;
 
 const enc=new TextEncoder();
@@ -45,19 +46,32 @@ export async function askGemini(env,args){
  if(typeof a.temperature==='number'&&a.temperature>=0&&a.temperature<=2)gc.temperature=a.temperature;
  if(Number.isInteger(a.max_output_tokens)&&a.max_output_tokens>=16)gc.maxOutputTokens=Math.min(65536,a.max_output_tokens);
  if(Object.keys(gc).length)body.generationConfig=gc;
- const f=env.GEMINI_FETCH||fetch;
- const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),TIMEOUT_MS);
- let r;
- try{r=await f(GEMINI+'models/'+model+':generateContent',{method:'POST',signal:ctl.signal,
-  headers:{'Content-Type':'application/json','x-goog-api-key':env.GEMINI_API_KEY},body:JSON.stringify(body)});}
- catch(e){throw Error(e&&e.name==='AbortError'?'Gemini took longer than '+TIMEOUT_MS/1000+' s':'could not reach Gemini');}
- finally{clearTimeout(timer);}
- let data=null;try{data=await r.json();}catch{}
- if(!r.ok){
-  const msg=data&&data.error&&typeof data.error.message==='string'?data.error.message:'';
-  // never echo anything that could contain the key
-  throw Error('Gemini HTTP '+r.status+(msg?': '+msg.replace(env.GEMINI_API_KEY,'[key]').slice(0,300):''));
+ const f=env.GEMINI_FETCH||fetch,wait=env.RETRY_WAIT||(ms=>new Promise(res=>setTimeout(res,ms)));
+ // Busy (429/500/503/504): wait and retry once, then fall back to the next model in the chain.
+ const chain=[model,...(FALLBACK[model]||[])],started=Date.now();
+ let r,data=null,used=model,lastErr='',busyErr='';
+ for(const m of chain){
+  for(let attempt=0;attempt<2;attempt++){
+   const left=TIMEOUT_MS-(Date.now()-started);if(left<=1000)break;
+   const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),left);
+   try{r=await f(GEMINI+'models/'+m+':generateContent',{method:'POST',signal:ctl.signal,
+    headers:{'Content-Type':'application/json','x-goog-api-key':env.GEMINI_API_KEY},body:JSON.stringify(body)});}
+   catch(e){throw Error(e&&e.name==='AbortError'?'Gemini took longer than '+TIMEOUT_MS/1000+' s':'could not reach Gemini');}
+   finally{clearTimeout(timer);}
+   data=null;try{data=await r.json();}catch{}
+   used=m;
+   if(r.ok)break;
+   const msg=data&&data.error&&typeof data.error.message==='string'?data.error.message:'';
+   // never echo anything that could contain the key
+   lastErr='Gemini HTTP '+r.status+(msg?': '+msg.split(env.GEMINI_API_KEY).join('[key]').slice(0,300):'');
+   if(!BUSY.has(r.status)){if(m===model)throw Error(lastErr);lastErr=busyErr||lastErr;break;}
+   busyErr=busyErr||lastErr;
+   if(attempt===0)await wait(1500);
+  }
+  if(r&&r.ok)break;
  }
+ if(!r||!r.ok)throw Error(lastErr||'Gemini did not answer');
+ const model_=used;
  const c=data&&Array.isArray(data.candidates)?data.candidates[0]:null;
  const text=c&&c.content&&Array.isArray(c.content.parts)?c.content.parts.filter(p=>p&&typeof p.text==='string'&&!p.thought).map(p=>p.text).join(''):'';
  if(!text){
@@ -65,7 +79,7 @@ export async function askGemini(env,args){
   throw Error('Gemini returned no answer ('+why+')');
  }
  const end=c.finishReason&&c.finishReason!=='STOP'?'\n\n[Gemini stopped early: '+c.finishReason+']':'';
- return {text:text+end,model:(data&&data.modelVersion)||model};
+ return {text:text+end,model:(data&&data.modelVersion)||model_};
 }
 
 async function rpc(env,msg){

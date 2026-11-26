@@ -57,7 +57,11 @@ jobs:
           body='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask_gemini","arguments":{"prompt":"Reply with the single word OK.","max_output_tokens":64}}}'
           code=$(curl -s -o /tmp/body -w '%{http_code}' -H 'Content-Type: application/json' -H "Authorization: Bearer $CLAUDE_MCP_TOKEN" -d "$body" "$base")
           echo "HTTP $code"; test "$code" = 200
-          grep -q '"isError":true' /tmp/body && { echo "Gemini call failed:"; grep -o 'Ask Gemini failed[^"]*' /tmp/body; exit 1; } || true
+          if grep -q '"isError":true' /tmp/body; then
+            err=$(grep -o 'Ask Gemini failed[^"]*' /tmp/body); echo "$err"
+            # Google busy (429/5xx) is temporary: the Worker, key and token still work, so warn instead of failing.
+            if printf '%s' "$err" | grep -Eq 'Gemini HTTP (429|500|503|504)'; then echo "::warning::Gemini is busy right now; the Worker is deployed. Try the connector again later."; else exit 1; fi
+          fi
           grep -q '"result"' /tmp/body || { echo "No result"; exit 1; }
           noauth=$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -d "$body" "$base")
           echo "Without token: HTTP $noauth"; test "$noauth" = 401
