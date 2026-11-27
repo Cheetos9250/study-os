@@ -45,4 +45,7 @@ details.qmore>summary{list-style:none;cursor:pointer;display:inline-flex;align-i
 details.qmore>summary::-webkit-details-marker{display:none}
 details.qmore>summary::after{content:" ▾"}
 details.qmore[open]>summary::after{content:" ▴"}
-details.qmore .qmore-row{display:inline-flex;gap:8px;flex-wrap:wrap;margin-left:8px}
+details.qmore .qmore-row{display:inline-flex;gap:8px;flex-wrap:wrap;margin-left:8px;vertical-align:top}
+details.qmore[open]{display:flex;flex:1 1 100%;flex-wrap:wrap;align-items:center;gap:8px}
+details.qmore[open] .qmore-row{margin-left:0}
+details.qmore>summary.chip{min-height:44px}
