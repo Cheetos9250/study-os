@@ -61,6 +61,10 @@ async function sha32(text){
  const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
  return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,32);
 }
+const PAIR_MS=5*60_000,SESSION_MS=12*3600_000,MAX_PAIRS=20,MAX_SESSIONS=10;
+const SESSION_TOKEN=/^pst_[a-f0-9]{64}$/,POLL_TOKEN=/^pp_[a-f0-9]{64}$/;
+function randomHex(n){return [...crypto.getRandomValues(new Uint8Array(n))].map(b=>b.toString(16).padStart(2,'0')).join('');}
+function randomCode(){return String(crypto.getRandomValues(new Uint32Array(1))[0]%1_000_000).padStart(6,'0');}
 export class ProductionProgressDO {
  constructor(ctx){this.ctx=ctx;}
  async image(request){
@@ -81,9 +85,51 @@ export class ProductionProgressDO {
   this.ctx.storage.kv.put('img:'+id,raw);
   return json({ok:true,stored:true},201);
  }
+ // Sign-in from another device ("Approve from iPad"): a computer asks for a 6-digit code, a device that holds the
+ // sync key approves it, and the computer gets a session token (pst_…) that works like the key for 12 hours.
+ // Only SHA-256 hashes of poll and session tokens are stored. One object holds every pairing and session.
+ async pair(request){
+  const op=request.headers.get('X-Pair-Op')||'',now=Date.now();
+  const body=request.method==='POST'?await request.json().catch(()=>({})):{};
+  const pollHash=op==='poll'?await sha32(request.headers.get('X-Pair-Poll')||''):'';
+  const tokenHash=op==='check'||op==='logout'?await sha32(request.headers.get('X-Session-Token')||''):'';
+  const fresh=op==='start'?{code:randomCode(),poll:'pp_'+randomHex(32)}:op==='approve'?{token:'pst_'+randomHex(32)}:null;
+  const freshHash=fresh?await sha32(fresh.poll||fresh.token):'';
+  // No await below this line: synchronous kv get + put is atomic in a SQLite-backed Durable Object.
+  const pairs=this.ctx.storage.kv.get('pairs')||{},sess=this.ctx.storage.kv.get('sessions')||{};
+  for(const c of Object.keys(pairs))if(pairs[c].exp<now)delete pairs[c];
+  for(const h of Object.keys(sess))if(sess[h]<now)delete sess[h];
+  const save=()=>{this.ctx.storage.kv.put('pairs',pairs);this.ctx.storage.kv.put('sessions',sess);};
+  if(op==='start'){
+   if(Object.keys(pairs).length>=MAX_PAIRS){save();return json({error:'Too many sign-in requests, try again in a few minutes'},429);}
+   let code=fresh.code;while(pairs[code])code=randomCode();
+   pairs[code]={poll:freshHash,exp:now+PAIR_MS};save();
+   return json({code,poll:fresh.poll,expires:now+PAIR_MS},201);
+  }
+  if(op==='approve'){
+   const code=String(body.code||'').replace(/\D/g,''),p=pairs[code];
+   if(!/^\d{6}$/.test(code)||!p||p.token){save();return json({error:'Code not found or expired'},404);}
+   const ids=Object.keys(sess).sort((a,b)=>sess[a]-sess[b]);while(ids.length>=MAX_SESSIONS)delete sess[ids.shift()];
+   sess[freshHash]=now+SESSION_MS;p.token=fresh.token;p.texp=now+SESSION_MS;save();
+   return json({ok:true,expires:p.texp},200);
+  }
+  if(op==='poll'){
+   const code=Object.keys(pairs).find(c=>pairs[c].poll===pollHash);
+   if(!code){save();return json({error:'Expired'},404);}
+   const p=pairs[code];
+   if(!p.token){save();return json({pending:true},202);}
+   delete pairs[code];save();
+   return json({token:p.token,expires:p.texp},200);
+  }
+  if(op==='check'){save();return sess[tokenHash]?json({ok:true,expires:sess[tokenHash]},200):json({error:'Unauthorized'},401);}
+  if(op==='logout'){delete sess[tokenHash];save();return json({ok:true},200);}
+  if(op==='revoke'){const n=Object.keys(sess).length;for(const h of Object.keys(sess))delete sess[h];save();return json({ok:true,revoked:n},200);}
+  return json({error:'Unknown endpoint'},404);
+ }
  async fetch(request){
   const kind=request.headers.get('X-Progress-Subject');
   if(kind==='image')return this.image(request);
+  if(kind==='pair')return this.pair(request);
   const initial=kind==='today'?initialToday:kind==='home'?initialHome:kind==='extra'?initialExtra:initialCourse;
   const validator=kind==='today'?todayValidator:kind==='home'?homeValidator:kind==='extra'?extraValidator:courseValidator;
   const max=kind==='home'||kind==='extra'?MAX_HOME_BYTES:MAX_BYTES;
@@ -121,8 +167,8 @@ function applyCors(response,origin){
  const r=new Response(response.body,{status:response.status,headers:response.headers});
  if(origin===ORIGIN){
   r.headers.set('Access-Control-Allow-Origin',ORIGIN);
-  r.headers.set('Access-Control-Allow-Methods','GET, PUT, OPTIONS');
-  r.headers.set('Access-Control-Allow-Headers','X-Sync-Key, Content-Type, If-Match');
+  r.headers.set('Access-Control-Allow-Methods','GET, PUT, POST, OPTIONS');
+  r.headers.set('Access-Control-Allow-Headers','X-Sync-Key, Content-Type, If-Match, X-Pair-Poll');
   r.headers.set('Access-Control-Expose-Headers','ETag, X-Sync-Revision');
   r.headers.set('Vary','Origin');
  }
@@ -142,9 +188,29 @@ export default {
    if(origin!==ORIGIN)return json({error:'Origin required'},403);
    return cors(new Response(null,{status:204,headers:{'Cache-Control':'no-store'}}));
   }
-  if(typeof env.PROGRESS_SYNC_KEY!=='string'||env.PROGRESS_SYNC_KEY.length<24||
-    !safeEqual(request.headers.get('X-Sync-Key'),env.PROGRESS_SYNC_KEY))
-   return cors(json({error:'Unauthorized'},401));
+  const hasDO=!!env.PROD_PROGRESS_DO&&typeof env.PROD_PROGRESS_DO.idFromName==='function'&&typeof env.PROD_PROGRESS_DO.get==='function';
+  const keyOk=typeof env.PROGRESS_SYNC_KEY==='string'&&env.PROGRESS_SYNC_KEY.length>=24;
+  const pairDO=(op,headers={},body)=>{
+   const stub=env.PROD_PROGRESS_DO.get(env.PROD_PROGRESS_DO.idFromName('vocabloom:production-progress:v1:pairing'));
+   const h=new Headers({'X-Progress-Subject':'pair','X-Pair-Op':op,'Content-Type':'application/json',...headers});
+   return stub.fetch(new Request('https://do/pair',{method:'POST',headers:h,body:JSON.stringify(body||{})}));
+  };
+  const pm=url.pathname.match(/^\/pair\/(start|poll|approve|revoke|logout)$/);
+  if(pm&&request.method!=='POST')return cors(json({error:'Method not allowed'},405));
+  if(pm&&(!keyOk||!hasDO))return cors(json({error:'Not configured'},503));
+  // The computer that wants to sign in has no key yet: start and poll need none (start only from the site itself).
+  if(pm&&pm[1]==='start'){if(origin!==ORIGIN)return json({error:'Origin required'},403);return cors(await pairDO('start'));}
+  if(pm&&pm[1]==='poll'){const t=request.headers.get('X-Pair-Poll')||'';if(!POLL_TOKEN.test(t))return cors(json({error:'Expired'},404));return cors(await pairDO('poll',{'X-Pair-Poll':t}));}
+  const given=request.headers.get('X-Sync-Key')||'';
+  let full=keyOk&&safeEqual(given,env.PROGRESS_SYNC_KEY),session=false;
+  if(!full&&keyOk&&hasDO&&SESSION_TOKEN.test(given))session=(await pairDO('check',{'X-Session-Token':given})).status===200;
+  if(!full&&!session)return cors(json({error:'Unauthorized'},401));
+  if(pm){
+   if(pm[1]==='logout')return session?cors(await pairDO('logout',{'X-Session-Token':given})):cors(json({error:'Only a signed-in computer can sign out'},400));
+   if(!full)return cors(json({error:'Approve and revoke need the sync key'},403));
+   if(pm[1]==='approve'){let b={};try{b=JSON.parse(await request.text());}catch{}return cors(await pairDO('approve',{},{code:String(b&&b.code||'')}));}
+   return cors(await pairDO('revoke'));
+  }
   const writesEnabled=String(env.PROGRESS_WRITES_ENABLED)==='true'&&
    String(env.PROGRESS_MIGRATION_VERIFIED)==='true';
   if(url.pathname==='/__prod/health'&&request.method==='GET')

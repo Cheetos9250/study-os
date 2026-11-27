@@ -201,8 +201,52 @@
     return ready;
   }
   function key() {
-    try { var e = JSON.parse(ls.get(PROGRESS_LSK) || 'null'); return e && e.endpoint === api && typeof e.key === 'string' ? e.key.trim() : ''; }
+    try { var e = JSON.parse(ls.get(PROGRESS_LSK) || 'null'); return e && e.endpoint === api && typeof e.key === 'string' && !(e.exp && e.exp < Date.now()) ? e.key.trim() : ''; }
     catch (e) { return ''; }
+  }
+  /* a computer signed in with "Approve from iPad" holds a 12-hour session token (pst_…) instead of the key */
+  function isSession() { return /^pst_/.test(key()); }
+  function sessionEnd() { try { var e = JSON.parse(ls.get(PROGRESS_LSK) || 'null'); return e && e.exp || 0; } catch (x) { return 0; } }
+  function post(path, hdr, body) {
+    return fetch(api + path, { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, hdr || {}), body: J(body || {}), cache: 'no-store' })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.status = r.status; return j; }); });
+  }
+  var pairing = null;                                                         // {code, expires} while this computer waits
+  function pairStart(onChange) {
+    return post('/pair/start').then(function (j) {
+      if (j.status !== 201) { note(false, j.error || 'could not start sign-in'); return null; }
+      pairing = { code: j.code, expires: j.expires }; onChange();
+      return new Promise(function (done) {
+        (function poll() {
+          if (!pairing || Date.now() > pairing.expires) { pairing = null; onChange(); return done(null); }
+          post('/pair/poll', { 'X-Pair-Poll': j.poll }).then(function (r) {
+            if (r.status === 200 && r.token) {
+              pairing = null;
+              ls.set(PROGRESS_LSK, J({ endpoint: api, key: r.token, exp: r.expires })); ls.set(AUTOK, '1');
+              onChange(); done(syncAll('pair'));
+            } else if (r.status === 202) setTimeout(poll, 2000);
+            else { pairing = null; onChange(); done(null); }
+          }, function () { setTimeout(poll, 4000); });
+        })();
+      });
+    }, function () { note(false, 'offline'); return null; });
+  }
+  function approve() {
+    var c = '';
+    try { c = (root.prompt('Type the 6-digit code shown on the computer.') || '').replace(/\D/g, ''); } catch (e) {}
+    if (!c) return Promise.resolve(null);
+    return post('/pair/approve', { 'X-Sync-Key': key() }, { code: c }).then(function (j) {
+      note(j.status === 200, j.status === 200 ? 'computer approved until ' + new Date(j.expires).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : (j.error || 'code not found'));
+    });
+  }
+  function revoke() {
+    return post('/pair/revoke', { 'X-Sync-Key': key() }).then(function (j) { note(j.status === 200, j.status === 200 ? 'signed out ' + (j.revoked || 0) + ' computer(s)' : (j.error || 'failed')); });
+  }
+  function logout() {
+    var t = key();
+    try { localStorage.removeItem(PROGRESS_LSK); } catch (e) {}
+    note(true, 'signed out of this computer');
+    return post('/pair/logout', { 'X-Sync-Key': t }).catch(function () {});
   }
   var autoOn = function () { var v = ls.get(AUTOK); if (v === null && key()) { ls.set(AUTOK, '1'); return true; } return v === '1'; };
   function last() { try { return JSON.parse(ls.get(LASTK) || 'null'); } catch (e) { return null; } }
@@ -355,11 +399,12 @@
   function ago(t) { var s = Math.round((Date.now() - t) / 1000); return s < 60 ? 'just now' : s < 3600 ? Math.round(s / 60) + ' min ago' : new Date(t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
   function label() {
     if (!api) return 'Cloud sync is not set up yet';
+    if (pairing) return 'Waiting for approval…';
     if (!key()) return 'Sync key not set on this device';
     var l = status || last();
     if (busy) return 'Syncing…';
     if (!l) return autoOn() ? 'Auto sync on' : 'Auto sync off';
-    return l.ok ? 'Synced ' + ago(l.t) : 'Sync failed: ' + l.msg;
+    return l.ok ? (l.msg ? l.msg.charAt(0).toUpperCase() + l.msg.slice(1) : 'Synced ' + ago(l.t)) : 'Sync failed: ' + l.msg;
   }
   /* small dialog opened from the nav's Cloud sync button */
   function open() {
@@ -378,15 +423,19 @@
         d.innerHTML = '<h2 id="cloudTitle" style="margin:0 0 6px;font:700 22px var(--num,serif)">Cloud sync</h2>'
           + '<p id="cloudMsg" role="status" style="margin:0 0 12px;color:var(--muted,#555)">' + label().replace(/</g, '&lt;') + '</p>'
           + (api ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Quiz answers, review schedule, flashcards, notes, exams, plan ticks, the timetable, tasks, grades and the cover, icon and card images sync automatically: when a page opens, after changes and every few minutes.</p>' : '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">The sync server has not been switched on for this site yet.</p>')
+          + (pairing ? '<p style="margin:0 0 6px">On your iPad: Cloud sync → <b>Approve a computer</b>, then type</p><p aria-live="polite" style="margin:0 0 14px;font:700 40px/1.1 var(--num,monospace);letter-spacing:.12em">' + pairing.code.slice(0, 3) + ' ' + pairing.code.slice(3) + '</p>' : '')
+          + (has && isSession() ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Signed in from another device until ' + new Date(sessionEnd()).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '. Sign out before you leave a shared computer.</p>' : '')
           + '<div style="display:flex;flex-wrap:wrap;gap:8px">'
-          + (api ? (has ? '<button type="button" data-a="now" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sync now</button><button type="button" data-a="auto" aria-pressed="' + autoOn() + '" style="' + btn + '">Auto sync: ' + (autoOn() ? 'on' : 'off') + '</button><button type="button" data-a="key" style="' + btn + '">Change key</button>' : '<button type="button" data-a="key" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Set sync key</button>') : '')
+          + (api ? (has ? '<button type="button" data-a="now" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sync now</button><button type="button" data-a="auto" aria-pressed="' + autoOn() + '" style="' + btn + '">Auto sync: ' + (autoOn() ? 'on' : 'off') + '</button>'
+              + (isSession() ? '<button type="button" data-a="logout" style="' + btn + '">Sign out</button>' : '<button type="button" data-a="approve" style="' + btn + '">Approve a computer</button><button type="button" data-a="revoke" style="' + btn + '">Sign out all computers</button><button type="button" data-a="key" style="' + btn + '">Change key</button>')
+            : pairing ? '' : '<button type="button" data-a="pair" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sign in from iPad</button><button type="button" data-a="key" style="' + btn + '">Set sync key</button>') : '')
           + '<button type="button" data-a="close" style="' + btn + '">Close</button></div>';
         d.querySelectorAll('button').forEach(function (b) {
           b.onclick = function () {
             var a = b.getAttribute('data-a');
-            if (a === 'close') return d.close();
+            if (a === 'close') { pairing = null; return d.close(); }
             if (a === 'auto') { ls.set(AUTOK, autoOn() ? '0' : '1'); return paint(); }
-            var p = a === 'key' ? setKey() : syncAll('manual');
+            var p = a === 'key' ? setKey() : a === 'pair' ? pairStart(paint) : a === 'approve' ? approve() : a === 'revoke' ? revoke() : a === 'logout' ? logout() : syncAll('manual');
             paint(); p.then(paint);
           };
         });
