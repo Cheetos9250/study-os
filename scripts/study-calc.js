@@ -45,11 +45,10 @@
  +':root[data-theme="dark"] #calcBtn,:root[data-theme="dark"] #calc{--c-ink:#f0f0ee;--c-paper:#171718;--c-key:#242426;--c-mute:#a9a9a6;--c-acc:#ff8a7a;--c-acc-ink:#0e0e0f}'
  +'#calcBtn{position:fixed;z-index:72;right:var(--calc-right,16px);bottom:calc(16px + env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;border:3px solid var(--c-ink);border-radius:6px;background:var(--c-paper);color:var(--c-ink);font-weight:900;font-size:15px;cursor:pointer}'
  +'#calcBtn svg{width:20px;height:20px}'
- +'@media(max-width:899.98px){#calcBtn,#qnBtn{width:44px!important;min-height:44px!important;opacity:.6;transition:opacity .2s,transform .2s}#calcBtn:active,#calcBtn:focus-visible,#qnBtn:active,#qnBtn:focus-visible{opacity:1}html.fab-away #calcBtn,html.fab-away #qnBtn{opacity:0;pointer-events:none;transform:translateY(12px)}body{padding-bottom:calc(150px + env(safe-area-inset-bottom))}}'
- +'@media(max-width:899.98px){#calcBtn{bottom:calc(84px + env(safe-area-inset-bottom))}}'
+ +'#studyNav .sn-tool{display:none}@media(max-width:899.98px){#studyNav .sn-tool{display:flex;align-items:center;gap:14px;min-height:48px}#studyNav .sn-tool svg{width:20px;height:20px;flex:none}}'
+ +'@media(max-width:899.98px){#calcBtn,#qnBtn{display:none!important}}'
  +'@media(min-width:1000px){html.qn-open #calcBtn{right:calc(min(380px,32vw) + 16px)}}'
  +'@media(max-width:999.98px){html.qn-open #calcBtn{display:none}}'
- +'@media(max-width:899.98px){#calcBtn{width:52px;padding:0;justify-content:center}#calcBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
  +'@media(min-width:900px){html:not(.qn-open) #calcBtn{right:max(12px,env(safe-area-inset-right))!important;bottom:calc(76px + env(safe-area-inset-bottom));width:52px;padding:0;justify-content:center}html:not(.qn-open) #calcBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
  +'#calc{position:fixed;z-index:90;width:min(300px,calc(100vw - 24px));background:var(--c-paper);color:var(--c-ink);border:3px solid var(--c-ink);border-radius:8px;box-shadow:0 14px 34px -12px rgba(0,0,0,.45);touch-action:none}'
  +'#calc[hidden]{display:none}'
@@ -138,9 +137,8 @@
   head.addEventListener('pointermove',function(e){if(drag)place(e.clientX-dx,e.clientY-dy);});
   head.addEventListener('pointerup',function(){drag=false;});
   addEventListener('resize',function(){if(!panel.hidden)place(panel.offsetLeft,panel.offsetTop);});
-  // phones/portrait iPad: floating buttons slide away while scrolling so they never sit on an answer
-  var lastY=scrollY,fabT=0;
-  addEventListener('scroll',function(){var y=scrollY;if(Math.abs(y-lastY)>6){document.documentElement.classList.add('fab-away');lastY=y;}clearTimeout(fabT);fabT=setTimeout(function(){document.documentElement.classList.remove('fab-away');},700);},{passive:true});
+  // phones/portrait iPad: the floating buttons are hidden (they sat on the answers) and live in the bottom bar's More menu instead
+  (function(){var n=0;function put(){var f=document.getElementById('snFoot'),nav=document.getElementById('studyNav');if(!f||!nav){if(n++<30)setTimeout(put,100);return;}if(f.querySelector('[data-tool="calcBtn"]'))return;var t=document.createElement('button');t.type='button';t.className='sn-tool';t.dataset.tool='calcBtn';t.innerHTML=btn.innerHTML.replace(/<span[\s\S]*$/,'')+'<span>Calculator</span>';t.onclick=function(){nav.classList.remove('sn-open');var m=nav.querySelector('.sn-more');if(m)m.setAttribute('aria-expanded','false');btn.click();};f.insertBefore(t,f.firstChild);}put();})();
   show();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
