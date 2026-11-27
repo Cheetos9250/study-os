@@ -1,0 +1,1 @@
+Fix flaky Gemini MCP deploy: test files wrote `workers/gemini-mcp/bank.json` at the same time, so one could read a half-written file. Tests now write it atomically; the deploy runs those tests one at a time and uses newer checkout/setup-node actions.
