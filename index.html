@@ -433,7 +433,7 @@ function renderChips(){
  /* the next exam is the hero (renderHero); the third cell is the next class from the timetable */
  const nc=nextClass();
  cells.push(nc?'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="w">'+esc(nc.when)+' · '+nc.x.start+'</span><span class="nm">'+esc(nc.x.name)+'</span>'+(nc.x.code?'<span class="s">'+esc(nc.x.code)+'</span>':'')+'</a>'
-  :'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="nm">'+(settings.timetable.length?'None this week':'No timetable')+'</span><span class="s">'+(settings.timetable.length?'Open Calendar':'Import it in Calendar')+'</span></a>');
+  :'<a class="sb ncls none" href="calendar.html"><span class="l">Next class</span><span class="nm">'+(settings.timetable.length?'None this week':'No timetable')+'</span><span class="s">'+(settings.timetable.length?'Open Calendar':'Import it in Calendar')+'</span></a>');
  renderHero(ne);
  const chips=cells;
  $('#chips').innerHTML=chips.join('');$('#chips').className='chips scoreboard n'+chips.length;

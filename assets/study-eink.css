@@ -180,3 +180,7 @@ main>h2::after{content:"";flex:1;border-bottom:2.5px solid var(--bezel-ink);opac
 @media(max-width:560px){.exams{grid-template-columns:1fr}}
 
 @media(min-width:701px){.chips.scoreboard.n1{grid-template-columns:minmax(0,1fr)}.chips.scoreboard.n2{grid-template-columns:minmax(0,1fr) minmax(0,1.7fr)}}
+
+/* empty "Next class" card: one compact row (27 Nov 2026) */
+.sb.ncls.none{min-height:0;padding:12px 18px;flex-direction:row;align-items:center;flex-wrap:wrap;gap:6px 14px}
+.sb.ncls.none .nm{font-size:18px;order:2}.sb.ncls.none .l{order:1}.sb.ncls.none .s{order:3;margin:0 0 0 auto}

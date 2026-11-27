@@ -190,3 +190,15 @@ h3 .jersey{margin-right:10px;vertical-align:middle}
 .need span{font:700 12px var(--ui);background:var(--panel);border:2px solid var(--ink);border-radius:4px}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* touch targets: at least 44px on touch screens (owner iPad, 27 Nov 2026) */
+@media (pointer:coarse){
+ .acts a,.acts button,.qg .qgo a,.qg .qgo button,.subj .acts a,.pomo .tab,.pomo select,.cover-tools button,.tab,.lead-panel .go,a.go,.tgedit,select,
+ body button:not(.cell):not(.opt):not([aria-label]):not(.sn-tab){min-height:44px!important}
+ .acts a,.acts button{display:inline-flex;align-items:center}
+ .plan input[type=checkbox],.row input[type=checkbox]{width:32px!important;height:32px!important}
+ .plan .row,.row{min-height:44px}
+ label:has(>input[type=checkbox]){min-height:44px;display:inline-flex;align-items:center;gap:10px}
+ input[type=checkbox]{min-width:22px;min-height:22px}
+ summary,details.tbl summary{min-height:44px!important;display:flex;align-items:center}
+}

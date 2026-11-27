@@ -52,3 +52,8 @@ html:root #qnBtn{background:var(--ink);color:var(--paper);border-color:var(--ink
  body .opt{min-height:64px;padding:14px 16px;align-items:center;font-size:17px}
  body .opt .k{font-size:16px;font-weight:900;min-width:28px;height:28px;display:inline-grid;place-items:center;border:2px solid currentColor;border-radius:8px;padding:0}
 }
+
+/* touch targets: question number grid 44px (owner iPad, 27 Nov 2026) */
+@media (pointer:coarse){
+ body .cells .cell,body .cell{width:44px;height:44px}
+}

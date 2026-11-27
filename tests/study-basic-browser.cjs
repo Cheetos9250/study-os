@@ -53,9 +53,9 @@ const fs=require('node:fs/promises'),http=require('node:http'),path=require('nod
               await option.click();await page.locator('.explain').waitFor();
               const quiz=await page.evaluate(()=>localStorage.getItem('study-'+D.key));
               assert.equal(Object.values(JSON.parse(quiz).ans)[0],choice);
-              page.once('dialog',dialog=>dialog.dismiss());await page.locator('#resetBtn').click();
+              page.once('dialog',dialog=>dialog.dismiss());await page.evaluate(()=>{const d=document.querySelector('details.qmore');if(d)d.open=true});await page.locator('#resetBtn').click();
               assert.equal(await page.evaluate(()=>localStorage.getItem('study-'+D.key)),quiz,'cancel reset changed quiz history');
-              page.once('dialog',dialog=>dialog.accept());await page.locator('#resetBtn').click();
+              page.once('dialog',dialog=>dialog.accept());await page.evaluate(()=>{const d=document.querySelector('details.qmore');if(d)d.open=true});await page.locator('#resetBtn').click();
               assert.deepEqual(JSON.parse(await page.evaluate(()=>localStorage.getItem('study-'+D.key))).ans,{});
               assert.equal(await page.evaluate(()=>localStorage.getItem(D.markKey+'-srs')),stored,'quiz reset changed flashcard progress');
               await page.locator('#qBody .opt').first().click();await page.locator('.explain').waitFor();const kept=await page.evaluate(()=>localStorage.getItem('study-'+D.key));
