@@ -45,6 +45,7 @@
  +':root[data-theme="dark"] #calcBtn,:root[data-theme="dark"] #calc{--c-ink:#f0f0ee;--c-paper:#171718;--c-key:#242426;--c-mute:#a9a9a6;--c-acc:#ff8a7a;--c-acc-ink:#0e0e0f}'
  +'#calcBtn{position:fixed;z-index:72;right:var(--calc-right,16px);bottom:calc(16px + env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;border:3px solid var(--c-ink);border-radius:6px;background:var(--c-paper);color:var(--c-ink);font-weight:900;font-size:15px;cursor:pointer}'
  +'#calcBtn svg{width:20px;height:20px}'
+ +'@media(max-width:899.98px){#calcBtn,#qnBtn{width:44px!important;min-height:44px!important;opacity:.6;transition:opacity .2s,transform .2s}#calcBtn:active,#calcBtn:focus-visible,#qnBtn:active,#qnBtn:focus-visible{opacity:1}html.fab-away #calcBtn,html.fab-away #qnBtn{opacity:0;pointer-events:none;transform:translateY(12px)}body{padding-bottom:calc(150px + env(safe-area-inset-bottom))}}'
  +'@media(max-width:899.98px){#calcBtn{bottom:calc(84px + env(safe-area-inset-bottom))}}'
  +'@media(min-width:1000px){html.qn-open #calcBtn{right:calc(min(380px,32vw) + 16px)}}'
  +'@media(max-width:999.98px){html.qn-open #calcBtn{display:none}}'
@@ -137,6 +138,9 @@
   head.addEventListener('pointermove',function(e){if(drag)place(e.clientX-dx,e.clientY-dy);});
   head.addEventListener('pointerup',function(){drag=false;});
   addEventListener('resize',function(){if(!panel.hidden)place(panel.offsetLeft,panel.offsetTop);});
+  // phones/portrait iPad: floating buttons slide away while scrolling so they never sit on an answer
+  var lastY=scrollY,fabT=0;
+  addEventListener('scroll',function(){var y=scrollY;if(Math.abs(y-lastY)>6){document.documentElement.classList.add('fab-away');lastY=y;}clearTimeout(fabT);fabT=setTimeout(function(){document.documentElement.classList.remove('fab-away');},700);},{passive:true});
   show();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
