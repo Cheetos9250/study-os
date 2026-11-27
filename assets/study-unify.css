@@ -38,3 +38,11 @@ body #sync{display:none!important}
 html:not(.show-sync) .cloud-sync-bar{display:none!important}
 /* warm paper theme (scripts/study-theme.js adds .warm with data-theme=light) */
 :root.warm{--paper:#f6eedb;--surface:#fbf4e4;--ink:#3a2e22;--muted:#6b5a45;--line:#e0d2b2;--accent-soft:#efe3c8}
+
+/* Shuffle / Clear answers folded under "More" (27 Nov 2026) */
+details.qmore{display:inline-block}
+details.qmore>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center}
+details.qmore>summary::-webkit-details-marker{display:none}
+details.qmore>summary::after{content:" ▾"}
+details.qmore[open]>summary::after{content:" ▴"}
+details.qmore .qmore-row{display:inline-flex;gap:8px;flex-wrap:wrap;margin-left:8px}

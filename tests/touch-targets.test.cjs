@@ -6,3 +6,7 @@ test('touch-target CSS and FAB auto-hide exist',()=>{
  assert.match(c,/fab-away/);
  assert.match(fs.readFileSync('practice.html','utf8'),/\.pc\.wide\{background:var\(--panel\)\}/);
 });
+test('declutter: acc textbook button gone, extra chips folded',()=>{
+ assert.doesNotMatch(fs.readFileSync('acc.html','utf8'),/Textbook \(My PDF sets\)/);
+ assert.match(fs.readFileSync('scripts/study-course-engine.js','utf8'),/<details class="qmore">/);
+});

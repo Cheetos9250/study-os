@@ -43,7 +43,6 @@ test('catalog record counts and source pages reconcile',()=>{
 test('study links open the textbook in My PDF sets; answers keep their own namespace',()=>{
   assert.match(html,/data\/accounting-textbook-index\.json/);
   assert.match(html,/studyos\.accounting\.textbook\.progress\.v1/);
-  assert.match(accounting,/href="pdf-sets\.html\?book=1"/);
   assert.match(home,/href="pdf-sets\.html\?book=1"/);
   assert.match(home,/403 written exercises \(Quick Study, Exercises &amp; Problems, Ch 1–9\)/);
   assert.doesNotMatch(html,/localStorage\.clear\(/);
