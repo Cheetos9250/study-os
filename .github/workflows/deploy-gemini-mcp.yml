@@ -28,8 +28,8 @@ jobs:
       PROGRESS_SYNC_KEY: ${{ secrets.PROGRESS_SYNC_KEY }}
       GEMINI_MCP_TOKEN: ${{ secrets.GEMINI_MCP_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
       - name: Check secrets are present (values are never printed)
@@ -42,7 +42,7 @@ jobs:
       - name: Build the question bank (bundled into the Worker, not committed)
         run: node scripts/build-question-bank.cjs workers/gemini-mcp/bank.json
       - name: Offline tests
-        run: node --test tests/gemini-mcp-worker.test.cjs tests/gemini-export.test.cjs tests/gemini-share.test.cjs
+        run: node --test --test-concurrency=1 tests/gemini-mcp-worker.test.cjs tests/gemini-export.test.cjs tests/gemini-share.test.cjs
       - name: Deploy Worker
         working-directory: workers/gemini-mcp
         run: npx --yes wrangler@4 deploy

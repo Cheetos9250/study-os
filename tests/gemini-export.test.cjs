@@ -9,7 +9,7 @@ const prog={acc:{study},eco:{study:{}},math:{study:{}},
 const env={MCP_READ_TOKEN:TOKEN,PROGRESS_SYNC_KEY:'k'.repeat(30),
  PROGRESS:{fetch:async req=>{if(req.method!=='GET')throw Error('write');return new Response(JSON.stringify(prog[req.url.split('/').pop()]),{status:200});}},
  SITE_FETCH:async u=>new Response(fs.readFileSync(path.join(root,u.replace(/^https:\/\/cheetos9250\.github\.io\/study-os\//,'')),'utf8'))};
-test.before(async()=>{bank=B.build();fs.writeFileSync(path.join(root,'workers/gemini-mcp/bank.json'),JSON.stringify(bank));W=(await import(path.join(root,'workers/gemini-mcp/worker.mjs'))).default;});
+test.before(async()=>{bank=B.build();require('./bank-file.cjs').writeBank();W=(await import(path.join(root,'workers/gemini-mcp/worker.mjs'))).default;});
 test('bank has every course, engine ids, no hidden extras',()=>{
  const acc=bank.courses.acc;assert.ok(acc.questions.length>500);assert.equal(acc.questions[0].id,'0');
  assert.ok(acc.questions.some(q=>q.id==='err-1'));

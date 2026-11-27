@@ -11,7 +11,7 @@ let V,W;
 test.before(async()=>{
  V=await import(path.join(root,'workers/gemini-mcp/ecosystem-v1.mjs'));
  const b=path.join(root,'workers/gemini-mcp/bank.json');
- if(!fs.existsSync(b))fs.writeFileSync(b,JSON.stringify(require('../scripts/build-question-bank.cjs').build()));
+ if(!fs.existsSync(b))require('./bank-file.cjs').writeBank();
  W=(await import(path.join(root,'workers/gemini-mcp/worker.mjs'))).default;
 });
 
