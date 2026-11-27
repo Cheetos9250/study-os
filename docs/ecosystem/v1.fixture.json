@@ -1,0 +1,31 @@
+{
+  "plan": {
+    "v": 1,
+    "kind": "plan",
+    "generated": 1795737600000,
+    "tasks": [
+      {"id": "t1", "title": "Sample homework", "date": "2026-12-02", "pri": "high", "done": false, "link": null},
+      {"id": "gc-123", "title": "Sample Classroom assignment", "date": null, "pri": "medium", "done": false, "link": "https://classroom.google.com/c/sample"}
+    ],
+    "exams": [
+      {"title": "Sample final", "date": "2026-12-10", "course": "acc"}
+    ],
+    "classes": [
+      {"day": 1, "start": "09:00", "end": "12:00", "name": "Sample class"}
+    ]
+  },
+  "digest": {
+    "v": 1,
+    "kind": "digest",
+    "generated": 1795737600000,
+    "courses": [
+      {"key": "acc", "name": "Accounting", "cards_due": 12, "quiz_due": 5, "answered": 120, "total": 400, "correct": 90, "pct": 75,
+       "recent": {"days": 7, "answered": 40, "correct": 30, "pct": 75},
+       "weak": [{"label": "Sample chapter", "pct": 50, "answered": 10}]},
+      {"key": "math", "name": "Math for Life", "cards_due": 0, "quiz_due": 0, "answered": 0, "total": 80, "correct": 0, "pct": null,
+       "recent": {"days": 7, "answered": 0, "correct": 0, "pct": null},
+       "weak": []}
+    ],
+    "totals": {"cards_due": 12, "quiz_due": 5}
+  }
+}

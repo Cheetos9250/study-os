@@ -1,0 +1,1 @@
+Gemini MCP Worker: new read-only `GET /plan` (open tasks, upcoming exams, timetable) and a `"v":1` version on `GET /digest`, the **ecosystem/v1** contract Life OS reads. Map and rules in `docs/ecosystem.md`, shared example in `docs/ecosystem/v1.fixture.json`. Needs a Worker redeploy to go live.
