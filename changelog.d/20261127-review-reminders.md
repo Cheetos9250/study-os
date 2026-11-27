@@ -1,0 +1,1 @@
+Review reminders: opt-in on Today (`scripts/study-remind.js`, device setting `studyos.remind.v1`, not backed up). One notification a day (07:00-21:00 Bangkok) when cards/questions are due, plus an app-icon badge. Limits: no push server, so nothing fires while the app is closed (iPad needs the Home Screen app on iOS 16.4+); the Life OS Telegram digest covers closed-app reminders.
