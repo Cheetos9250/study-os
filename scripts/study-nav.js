@@ -62,6 +62,7 @@
  +'#studyNav .sn-tab[aria-current="page"]{background:var(--sn-pill);color:var(--sn-pill-ink);font-weight:900}'
  +'#studyNav .sn-tab[aria-current="page"] .sn-ic{color:inherit}'
  +'#studyNav .sn-more{display:none}'
+ +'#studyNav .sn-xt{display:none}'
  +'@media(min-width:900px){'
  +' html.sn-on body{padding-left:224px!important}'
  +' #studyNav{overflow:hidden;overscroll-behavior:none;touch-action:none;scrollbar-width:none;left:0;top:0;bottom:0;height:100vh;height:100lvh;width:224px;max-height:100dvh;border-right:3px solid var(--sn-line);padding:max(20px,env(safe-area-inset-top)) 12px 16px max(12px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:2px}'
@@ -119,6 +120,7 @@
  +'@media(prefers-reduced-motion:reduce){#snAlert .sa-box{animation:none}}'
  /* search: a field-like button under the brand in the sidebar, an item in More on phones */
  +'#studyNav .sn-find{display:none}#studyNav .sn-find kbd{margin-left:auto;font:700 11px var(--ui,inherit);border:1.5px solid currentColor;border-radius:4px;padding:0 5px;opacity:.6}'
+ +'@media(min-width:900px){#studyNav .sn-xt{display:flex;align-items:center;gap:10px;min-height:40px}#studyNav .sn-xt .sn-ic{transition:transform .15s}#studyNav .sn-xt[aria-expanded="true"] .sn-ic{transform:rotate(90deg)}#studyNav:not(.sn-xopen) .sn-foot .sn-x{display:none}}'
  +'@media(min-width:900px){#studyNav .sn-find{display:flex;margin:0 0 10px;padding:0 12px;min-height:42px;border:2px solid var(--sn-line)!important;border-radius:6px;color:var(--sn-mute);font-size:14px;font-weight:700}#studyNav .sn-find:hover{color:var(--sn-fg);background:var(--sn-hi)}#studyNav .sn-foot .sn-find-m{display:none}html.sn-collapsed #studyNav .sn-find{display:none}}'
  +'@media print{#studyNav{display:none}html.sn-on body{padding:0!important}}';
  /* Red popup when a Pomodoro ends (Today calls it, other pages call it from the nav countdown). */
@@ -146,9 +148,15 @@
   TABS.forEach(function(t){if(FOCUS&&t.id==='cards'&&active!=='cards')return;h+='<a class="sn-tab" data-sn="'+t.id+'" href="'+t.href+'"'+(t.id===active?' aria-current="page"':'')+' title="'+esc(t.label)+'">'+svg(t.icon)+'<span>'+esc(t.label)+'</span></a>';});
   h+='<button type="button" class="sn-more" aria-expanded="false" aria-controls="snFoot">'+svg('more')+'<span>More</span></button></div>';
   h+='<div class="sn-foot" id="snFoot"><button type="button" class="sn-find-m">'+svg('search')+'<span>Search</span></button><button type="button" class="sn-theme"></button>'+(window.StudyTheme&&window.StudyTheme.setFocus?'<button type="button" class="sn-focus" aria-pressed="'+FOCUS+'" title="Show or hide summaries and flashcards">'+svg('cards')+'<span>'+(FOCUS?'Show cards &amp; summaries':'Hide cards &amp; summaries')+'</span></button>':'')+((course||window.StudyCloud)?'<button type="button" class="sn-sync">'+svg('sync')+'<span>Cloud sync</span></button>':'');
-  MORE.forEach(function(m){h+='<a href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
+  var KEEP={'grades.html':1,'stats.html':1};
+  h+='<button type="button" class="sn-xt" aria-expanded="false">'+svg('more')+'<span>More tools</span></button>';
+  MORE.forEach(function(m){var k=KEEP[m.href]?'':' class="sn-x"';h+='<a'+k+' href="'+m.href+'" title="'+esc(m.label)+'">'+svg(m.icon)+'<span>'+esc(m.label)+'</span></a>';});
   h+='</div>';
   nav.innerHTML=h;document.body.appendChild(nav);if(!document.querySelector('link[href*="Zen+Maru+Gothic"],style[data-world]')){/* Course pages: load only the glyphs the nav shows (Google Fonts text=), a few KB instead of whole Japanese fonts. */var tx=nav.textContent.replace(/\s+/g,'');var u={};tx.split('').forEach(function(c){u[c]=1;});var fl=document.createElement('link');fl.rel='stylesheet';fl.href='https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&family=Zen+Maru+Gothic:wght@700;900&display=swap&text='+encodeURIComponent(Object.keys(u).sort().join('')+'0123456789');document.head.appendChild(fl);}document.documentElement.classList.add('sn-on');
+  var xt=nav.querySelector('.sn-xt');
+  if(xt){var cur=[].some.call(nav.querySelectorAll('.sn-x'),function(a){return (a.getAttribute('href')||'').split('?')[0].toLowerCase()===file;});
+   function setX(o){nav.classList.toggle('sn-xopen',o);xt.setAttribute('aria-expanded',String(o));}
+   setX(cur);xt.onclick=function(e){e.stopPropagation();setX(!nav.classList.contains('sn-xopen'));};}
   var more=nav.querySelector('.sn-more');
   more.onclick=function(e){e.stopPropagation();var o=nav.classList.toggle('sn-open');more.setAttribute('aria-expanded',o?'true':'false');};
   document.addEventListener('click',function(e){if(!nav.contains(e.target)){nav.classList.remove('sn-open');more.setAttribute('aria-expanded','false');}});

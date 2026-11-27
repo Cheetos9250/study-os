@@ -48,6 +48,8 @@
  +'@media(max-width:899.98px){#calcBtn{bottom:calc(84px + env(safe-area-inset-bottom))}}'
  +'@media(min-width:1000px){html.qn-open #calcBtn{right:calc(min(380px,32vw) + 16px)}}'
  +'@media(max-width:999.98px){html.qn-open #calcBtn{display:none}}'
+ +'@media(max-width:899.98px){#calcBtn{width:52px;padding:0;justify-content:center}#calcBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
+ +'@media(min-width:900px){html:not(.qn-open) #calcBtn{right:max(12px,env(safe-area-inset-right))!important;bottom:calc(76px + env(safe-area-inset-bottom));width:52px;padding:0;justify-content:center}html:not(.qn-open) #calcBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
  +'#calc{position:fixed;z-index:90;width:min(300px,calc(100vw - 24px));background:var(--c-paper);color:var(--c-ink);border:3px solid var(--c-ink);border-radius:8px;box-shadow:0 14px 34px -12px rgba(0,0,0,.45);touch-action:none}'
  +'#calc[hidden]{display:none}'
  +'#calc .c-head{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-bottom:3px solid var(--c-ink);cursor:grab;user-select:none;-webkit-user-select:none}'
@@ -107,7 +109,7 @@
   var mode=document.documentElement.getAttribute('data-mode');
   if(document.getElementById('calc')||(mode&&mode!=='prac'))return;
   var st=document.createElement('style');st.id='calcCss';st.textContent=CSS;document.head.appendChild(st);
-  btn=document.createElement('button');btn.type='button';btn.id='calcBtn';btn.setAttribute('aria-controls','calc');btn.setAttribute('aria-expanded','false');btn.innerHTML=ICON+'<span>Calc</span>';
+  btn=document.createElement('button');btn.type='button';btn.id='calcBtn';btn.setAttribute('aria-controls','calc');btn.setAttribute('aria-label','Calculator');btn.title='Calculator';btn.setAttribute('aria-expanded','false');btn.innerHTML=ICON+'<span>Calc</span>';
   panel=document.createElement('div');panel.id='calc';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Calculator');
   panel.innerHTML='<div class="c-head"><b>Calculator</b><small>drag to move</small><button type="button" class="c-hb" aria-pressed="false">History</button><button type="button" class="c-x" aria-label="Close calculator">'+X+'</button></div>'
    +'<div class="c-scr"><div class="c-exp" aria-live="polite"></div><div class="c-res" role="status">0</div><div class="c-tape" aria-label="Recent results"></div></div>'

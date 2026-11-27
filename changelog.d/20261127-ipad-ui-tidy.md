@@ -1,0 +1,1 @@
+- UI tidy for iPad: Calc and Notes buttons are icon-only at the screen edge (no longer cover answers); practice page folds the chapter chips into one "Chapter" button; sidebar folds Desk display, AI tutor, Share with Gemini, Feedback, Back up and Restore under "More tools" (opens by itself on those pages).

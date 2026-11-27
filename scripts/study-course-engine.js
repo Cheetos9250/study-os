@@ -211,7 +211,7 @@ const SLIM_ROWS=true;
 const QTYPE_KEY='studyos.'+D.key+'.qtype';
 let qtype='mcq'; /* written questions are hidden from Practice (owner, 21 Nov 2026) */
 const typeOk=q=>(!q.open||(qJump!==null&&String(q.id)===String(qJump))); /* written questions stay out of Practice (owner, 21 Nov 2026); a ?q= link to one still opens it */
-let qcats=new Set(), missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
+let qcats=new Set(), catsOpen=false, missedOnly=/[?&]missed=1\b/.test(location.search), unansOnly=false, shuffleOn=false, deck=[], qpos=0, qStat='', qStatErr=false;
 URL_CATS.forEach(id=>qcats.add(id));
 /* question sets (scripts/study-qsets.js): repeats hidden, ≤50 questions a set, 3 sets a chapter, the next set opens at 90% answered right.
    Not applied to Review due, Missed, deep links (?q=) or Cram Mode, so nothing you need to redo is ever hidden. */
@@ -284,6 +284,14 @@ function renderQ(){
       b.innerHTML=esc(l)+(mastered?' ✓':'')+'<span class="n">'+QS.filter(q=>typeOk(q)&&(id==='all'?!q.gen:q.cat===id)).length+'</span>';
       b.onclick=()=>{ if(id==='all')qcats.clear(); else if(qcats.has(id))qcats.delete(id); else qcats.add(id); qtopic=''; qJump=null; buildDeck();renderQ(); };
       box.appendChild(b); });
+  })($('#qCats'));
+  (function(box){ /* chapter chips fold into one button so the first question shows without scrolling */
+    let t=document.getElementById('qCatsToggle');
+    if(CRAM){ if(t)t.hidden=true; box.style.display=''; return; }
+    if(!t){ t=document.createElement('button'); t.type='button'; t.id='qCatsToggle'; t.className='chip'; t.style.marginBottom='10px'; box.parentNode.insertBefore(t,box); t.onclick=()=>{ catsOpen=!catsOpen; renderQ(); }; }
+    t.hidden=false; const names=[...qcats].map(c=>catLabel(c));
+    t.textContent='Chapter: '+(names.length?(names.length>2?names.length+' chapters':names.join(', ')):'All')+(catsOpen?' ▴':' ▾');
+    t.setAttribute('aria-expanded',String(catsOpen)); box.style.display=catsOpen?'':'none';
   })($('#qCats'));
   if(CRAM){ renderCram($('#qBody')); return; }
   const box=$('#qBody');

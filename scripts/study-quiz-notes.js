@@ -43,6 +43,8 @@
  +'@media(max-width:999.98px){#qn{left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));height:min(46vh,420px);border-width:3px 0 3px}html.qn-open body{padding-bottom:calc(72px + min(46vh,420px) + env(safe-area-inset-bottom))!important}#qnBtn{bottom:calc(84px + env(safe-area-inset-bottom))}html.qn-open #qnBtn{display:none}}'
  +'html.qn-ready:not(.qn-open) body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}'
  +'@media(max-width:899.98px){html.qn-ready:not(.qn-open) body{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}}'
+ +'@media(max-width:899.98px){#qnBtn{width:52px;padding:0;justify-content:center}#qnBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
+ +'@media(min-width:900px){html.qn-ready:not(.qn-open) body{padding-right:76px!important}html.qn-ready:not(.qn-open) #qnBtn{right:max(12px,env(safe-area-inset-right));width:52px;padding:0;justify-content:center}html.qn-ready:not(.qn-open) #qnBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
  +'#qn.full{top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;height:auto!important;z-index:96;border-width:0!important;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}'
  +'html.qn-full,html.qn-full body{overflow:hidden}'
  +'#qn .qn-hint{width:100%;font-size:12px;color:var(--qn-mute);margin:-2px 0 0}'
@@ -70,7 +72,7 @@
  function mount(){
   ck=course();if(!ck||document.documentElement.getAttribute('data-mode')!=='prac'||!document.getElementById('tab-prac')||document.getElementById('qn'))return;
   var s=document.createElement('style');s.id='qnCss';s.textContent=CSS;document.head.appendChild(s);
-  btn=document.createElement('button');btn.type='button';btn.id='qnBtn';btn.setAttribute('aria-controls','qn');btn.setAttribute('aria-expanded','false');btn.innerHTML=PEN+'<span>Notes</span>';
+  btn=document.createElement('button');btn.type='button';btn.id='qnBtn';btn.setAttribute('aria-controls','qn');btn.setAttribute('aria-label','Notes');btn.title='Notes';btn.setAttribute('aria-expanded','false');btn.innerHTML=PEN+'<span>Notes</span>';
   panel=document.createElement('aside');panel.id='qn';panel.hidden=true;panel.setAttribute('aria-label','Chapter notes');
   var opts='<option value="general">General</option>'+cats().map(function(c){return '<option value="'+esc(c[0])+'">'+esc(c[1])+'</option>';}).join('');
   panel.innerHTML='<div class="qn-bar"><h2 class="qn-t">Notes</h2><select aria-label="Chapter">'+opts+'</select><button type="button" class="qn-c" aria-pressed="false" title="Lines written as question :: answer become flip cards">Cards</button><button type="button" class="qn-x qn-f" aria-pressed="false" aria-label="Full screen"></button><button type="button" class="qn-x" aria-label="Close notes">'+X+'</button><span class="qn-s" role="status"></span><p class="qn-hint">Swipe from the right towards the left to open notes full screen; swipe right to go back.</p></div><textarea maxlength="'+MAX+'" spellcheck="true" aria-label="Chapter notes"></textarea><div class="qn-cards" hidden></div>';
