@@ -41,6 +41,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 .msg{border:var(--bw) solid var(--ink);border-radius:var(--r);padding:10px 14px;max-width:100%;overflow-wrap:anywhere;font-size:16px;line-height:1.6}
 .msg.u{background:var(--acc-soft);justify-self:end;max-width:min(100%,640px);white-space:pre-wrap}
 .msg.a{background:var(--panel)}.msg.a p{margin:0 0 8px}.msg.a p:last-child{margin:0}.msg.a h4{margin:10px 0 6px;font-size:16px}.msg.a ul,.msg.a ol{margin:4px 0 8px;padding-left:22px}
+.msg .qf{white-space:pre-wrap;font:14px/1.5 ui-monospace,Menlo,monospace;margin:0 0 8px;overflow-wrap:anywhere}
 .msg.e{background:var(--panel);border-style:dashed;color:var(--red,#c21f2f);font-weight:700}
 .msg img{display:block;max-width:220px;max-height:220px;border-radius:6px;border:2px solid var(--ink);margin-bottom:6px}
 .msg .who{display:block;font-size:12px;font-weight:900;color:var(--muted);margin-bottom:2px;letter-spacing:.04em;text-transform:uppercase}
@@ -80,7 +81,7 @@ textarea{padding:10px;line-height:1.5;resize:vertical}
 </section>
 <main id="log" aria-live="polite"></main>
 <form class="compose" id="form" autocomplete="off">
- <div class="quick" role="group" aria-label="Quick asks"><button type="button" class="qk" data-quick="explain">Explain this chapter</button><button type="button" class="qk" data-quick="quiz">Quiz me</button><button type="button" class="qk" data-quick="mistakes">Common mistakes</button><button type="button" class="qk" data-quick="plan">Study plan to my exams</button></div>
+ <div class="quick" role="group" aria-label="Quick asks"><button type="button" class="qk" data-quick="explain">Explain this chapter</button><button type="button" class="qk" data-quick="quiz">Quiz me</button><button type="button" class="qk" data-quick="mistakes">Common mistakes</button><button type="button" class="qk" data-quick="plan">Study plan to my exams</button><button type="button" class="qk" data-quick="qfile">Questions from my photo</button></div>
  <label for="q" class="note">Ask a question, paste your working, or add a photo of the problem.</label>
  <textarea id="q" rows="3" maxlength="8000" placeholder="Ask anything, or type /help for commands (e.g. /quiz 10)"></textarea>
  <div class="btnrow">
@@ -167,7 +168,9 @@ function paintLog(){const log=$('#log');
  log.innerHTML=chat.map((m,i)=>m.role==='user'
   ?'<div class="msg u"><span class="who">You</span>'+(m.image?'<img src="data:'+esc(m.image.mime)+';base64,'+m.image.data+'" alt="Your photo">':m.img?'<i>(photo)</i><br>':'')+esc(m.show||m.text)+'</div>'
   :m.error?'<div class="msg e">'+esc(m.text)+' <button type="button" class="b" data-retry="'+i+'">Try again</button></div>'
+  :A.isQFile(m.text)?'<div class="msg a"><span class="who">Question file</span><pre class="qf">'+esc(m.text)+'</pre><button type="button" class="b" data-copyq="'+i+'">Copy file text</button> <span class="note">Paste into a new file in Drive: Study OS Questions</span></div>'
   :'<div class="msg a"><span class="who">Tutor</span>'+md(m.text)+'</div>').join('');
+ log.querySelectorAll('[data-copyq]').forEach(b=>b.onclick=async()=>{const t=chat[+b.dataset.copyq].text.trim()+'\n';try{await navigator.clipboard.writeText(t);b.textContent='Copied';}catch(e){b.textContent='Copy failed: select the text instead';}});
  const r=log.querySelector('[data-retry]');if(r)r.onclick=()=>{chat=chat.filter(m=>!m.error);ask();};
 }
 async function modelIds(){try{const r=A.modelsRequest(cfg),res=await fetch(r.url,r.init);if(!res.ok)return [];return A.models(cfg.provider,await res.json());}catch(e){return [];}}
@@ -213,6 +216,8 @@ async function runQuick(kind,extra){if(busy)return;
  const key=$('#course').value,D=key?await loadCourse(key):null,cat=$('#cat').value;
  if(['explain','quiz','mistakes','summary','example'].includes(kind)&&!key&&!extra.topic){say('#state','Pick a subject (and a chapter) first, or add a topic after the command',true);$('#course').focus();return;}
  const o={course:key?(D&&D.title)||(COURSES.find(x=>x.key===key)||{}).name:'',chapter:cat&&D?((D.cats||[]).find(x=>x[0]===cat)||[,''])[1]:'',topic:extra.topic||'',n:extra.n||''};
+ if(kind==='qfile'){if(!image){say('#state','Add a photo of your notes first (or type notes after /questions)',true);return;}
+  const nm=(COURSES.find(x=>x.key===key)||{}).name;o.subject=nm==='Math'?'Math for Life':nm;}
  if(kind==='plan'&&T){let st=null;try{st=T.loadSettings(localStorage.getItem(T.SETTINGS_KEY));}catch(e){}
   o.exams=((st&&st.exams)||[]).map(e=>({name:e.title,date:e.date,days:T.daysUntil(e.date,Date.now())})).filter(e=>e.days>=0).sort((a,b)=>a.days-b.days).slice(0,8);}
  const m={role:'user',text:A.quick(kind,o)};if(extra.show)m.show=extra.show;if(image)m.image=image;
