@@ -58,6 +58,9 @@
             !/^\d{4}-\d{2}-\d{2}$/.test(String(t.date)) || !["High", "Medium", "Low"].includes(t.pri) ||
             (t.done !== undefined && typeof t.done !== "boolean") || (t.rep !== undefined && t.rep !== "d" && t.rep !== "w"))
           throw new Error("Invalid home dashboard task");
+        if ((t.rounds !== undefined && (!Number.isInteger(t.rounds) || t.rounds < 1 || t.rounds > 20)) ||
+            (t.rdone !== undefined && (!Number.isInteger(t.rdone) || t.rdone < 0 || t.rdone > 99)))
+          throw new Error("Invalid home dashboard task rounds");
         if ((t.link !== undefined && (typeof t.link !== "string" || t.link.length > 500 || !/^https:\/\/classroom\.google\.com\/[^\s"'<>]*$/.test(t.link))) ||
             (t.src !== undefined && t.src !== "classroom"))
           throw new Error("Invalid home dashboard task link");

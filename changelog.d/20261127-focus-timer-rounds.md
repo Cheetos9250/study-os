@@ -1,0 +1,1 @@
+Timer: **Full screen** focus timer on Today (big clock, Exit/Esc, screen kept awake where supported). Tasks get an optional **Rounds** (expected 25-minute rounds, 1-20); pick a task under the timer and each finished round counts toward it (`rdone`, shown as ⏱ 2/4). Stored inside the task in `studyos.home.v1`; restore validates both fields.
