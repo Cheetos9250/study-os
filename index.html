@@ -165,6 +165,18 @@ a.sb:hover{background:var(--dots),var(--panel)}
 .pomo .tab{border:0;border-radius:0;color:var(--text);font:900 13px var(--ui);padding:0 12px;min-height:40px;background:none}
 .pomo .tab+.tab{border-left:2px solid var(--ink)}
 .pomo .tab[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.pomo{position:relative}
+.pomo .pfullbtn{min-height:40px;border:2.5px solid var(--ink);border-radius:6px;background:var(--panel);color:var(--text);font:900 13px var(--ui);padding:0 12px;cursor:pointer}
+.pomo .pround{margin:0;font:700 14px var(--ui);text-align:center;max-width:90%}.pomo .pexit{position:absolute;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));min-height:44px;padding:0 18px;border:var(--bw) solid var(--ink);border-radius:6px;background:var(--panel);color:var(--text);font:900 15px var(--ui);cursor:pointer}
+.rchip{display:inline-block;margin-left:6px;padding:0 7px;border:2px solid var(--ink);border-radius:999px;font:800 12px var(--ui);white-space:nowrap}
+.pomo.pfull{position:fixed;inset:0;z-index:120;align-items:center;text-align:center;border-radius:0;border:0;min-height:0;justify-content:center;gap:clamp(14px,3vh,30px);padding:24px;background:var(--paper)}
+.pomo.pfull .mascot,.pomo.pfull #pSub,.pomo.pfull #pSound,.pomo.pfull #pFull{display:none}
+.pomo.pfull .clock{font-size:clamp(88px,26vw,320px);line-height:1;padding:.08em .2em;border-width:4px}
+.pomo.pfull .pround{font-size:clamp(16px,3vw,26px)}
+.pomo.pfull .pbtn button{min-height:64px;font-size:22px;padding:0 34px}
+.pomo.pfull .pbtn button.ghost{padding:0 22px}.pomo.pfull .pbtn button.ghost svg{width:26px;height:26px}
+html.pfull-open,html.pfull-open body{overflow:hidden}html.pfull-open #studyNav{display:none}
+@media(orientation:landscape) and (max-height:520px){.pomo.pfull .clock{font-size:clamp(70px,32vh,260px)}}
 .clock{font:700 clamp(58px,7.6vw,80px)/1.05 var(--num);color:var(--text);background:var(--panel);border:var(--bw) solid var(--ink);padding:6px 20px 8px;font-variant-numeric:tabular-nums}
 .pbtn button{border-radius:6px;font:900 16px var(--ui);min-height:48px;background:var(--acc);color:var(--acc-ink);border:var(--bw) solid var(--ink);text-transform:capitalize}
 .pbtn button.ghost{background:var(--panel);color:var(--text);display:inline-grid;place-items:center;padding:0 14px}
@@ -250,9 +262,11 @@ a.sb:hover{background:var(--dots),var(--panel)}
  <div class="pomo" aria-label="Pomodoro timer">
   <div class="mascot" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" shape-rendering="crispEdges"><path d="M18 14h26v34H18z"/><path d="M22 14v34"/><path d="M16 19h4M16 25h4M16 31h4M16 37h4M16 43h4"/><path d="M28 24h2M38 24h2"/><path d="M30 31h6"/><path d="M44 34l10-10 3 3-10 10-4 1z"/><path d="M24 48v6M38 48v6M22 54h4M36 54h4"/><path d="M12 10l2 2M50 8l-2 3"/></svg><span class="bubble" id="pBubble">One focus block at a time.</span></div>
   <div class="tabs" role="group" aria-label="Mode"><button class="tab" type="button" data-m="25" aria-pressed="true">pomodoro</button><button class="tab" type="button" data-m="5" aria-pressed="false">short break</button><button class="tab" type="button" data-m="15" aria-pressed="false">long break</button></div>
+  <button type="button" class="pexit" id="pExit" aria-label="Exit full screen" hidden>Exit</button>
   <div class="clock" id="clock" role="timer" aria-live="off">25:00</div>
+  <p class="pround" id="pRound" hidden></p>
   <div class="pbtn"><button type="button" id="pStart">start</button><button type="button" class="ghost" id="pReset" aria-label="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button></div>
-  <div class="pmeta"><select id="pSub" aria-label="Subject for this Pomodoro"><option value="">Any subject</option><option value="acc">Accounting</option><option value="eco">Economics</option><option value="math">Math</option><option value="excel">Excel</option><option value="eng">English</option><option value="zh">Chinese</option></select><select id="pSound" aria-label="Background sound"><option value="off">Sound off</option><option value="rain">Rain</option><option value="white">White noise</option><option value="brown">Brown noise</option></select></div>
+  <div class="pmeta"><select id="pTask" aria-label="Task for this Pomodoro"><option value="">No task</option></select><button type="button" class="pfullbtn" id="pFull" aria-label="Full screen focus timer">Full screen</button><select id="pSub" aria-label="Subject for this Pomodoro"><option value="">Any subject</option><option value="acc">Accounting</option><option value="eco">Economics</option><option value="math">Math</option><option value="excel">Excel</option><option value="eng">English</option><option value="zh">Chinese</option></select><select id="pSound" aria-label="Background sound"><option value="off">Sound off</option><option value="rain">Rain</option><option value="white">White noise</option><option value="brown">Brown noise</option></select></div>
  </div>
 </section>
 <div class="tx-row" id="txRow" aria-label="Quick tools"></div>
@@ -269,6 +283,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
   <input class="grow" id="tTitle" placeholder="Add a task" maxlength="80" required aria-label="Task">
   <input type="date" id="tDate" aria-label="Due date" required>
   <select id="tPri" aria-label="Priority"><option>High</option><option selected>Medium</option><option>Low</option></select>
+  <input type="number" id="tRounds" min="1" max="20" step="1" inputmode="numeric" placeholder="Rounds" aria-label="Expected 25-minute rounds (optional)" title="Expected 25-minute rounds" style="max-width:92px">
   <select id="tRep" aria-label="Repeat"><option value="">No repeat</option><option value="d">Daily</option><option value="w">Weekly</option></select>
   <button class="primary" type="submit">Add</button>
  </form>
@@ -360,7 +375,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
    The timer keeps running when you leave Today: its end time is kept in studyos.pomo.v1 (a screen setting, not study data,
    not backed up), and the nav shows a small countdown on every other page. */
 const POMO_KEY='studyos.pomo.v1';
-let mins=25,left=25*60,endAt=0,tick=null,psub='';
+let mins=25,left=25*60,endAt=0,tick=null,psub='',ptask='';
 /* background sound while the timer runs: generated in the browser (no download); choice kept on this device (studyos.pomosound.v1, not backed up) */
 const Sound=(()=>{let ctx=null,src=null;
  function noise(kind){const sr=ctx.sampleRate,b=ctx.createBuffer(1,sr*4,sr),d=b.getChannelData(0);let last=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;if(kind==='brown'){last=(last+0.02*w)/1.02;d[i]=last*3.5;}else d[i]=w;}return b;}
@@ -373,13 +388,13 @@ const Sound=(()=>{let ctx=null,src=null;
 const SOUND_KEY='studyos.pomosound.v1';
 function soundPick(){try{const v=localStorage.getItem(SOUND_KEY);return ['rain','white','brown'].includes(v)?v:'off';}catch{return 'off';}}
 const clock=$('#clock'),fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
-function savePomo(){try{localStorage.setItem(POMO_KEY,JSON.stringify(endAt?{mins,endAt,sub:psub}:{mins,left,sub:psub}));}catch{}}
-function showClock(){clock.textContent=fmt(Math.max(0,left));document.title=(endAt?fmt(Math.max(0,left))+' · ':'')+'Today — Study OS';}
+function savePomo(){try{localStorage.setItem(POMO_KEY,JSON.stringify(endAt?{mins,endAt,sub:psub,task:ptask}:{mins,left,sub:psub,task:ptask}));}catch{}}
+function showClock(){paintRound();clock.textContent=fmt(Math.max(0,left));document.title=(endAt?fmt(Math.max(0,left))+' · ':'')+'Today — Study OS';}
 function stop(){clearInterval(tick);tick=null;endAt=0;$('#pStart').textContent='start';Sound.stop();}
 /* Pomodoro history for Stats: minutes of finished 25-minute sessions per day (studyos.pomolog.v1, backed up). lastEnd stops double counting. */
 const POMOLOG='studyos.pomolog.v1';
 function logPomo(end,m,sub){if(m!==25||!end)return;try{const o=JSON.parse(read(POMOLOG)||'{}')||{};if(o.lastEnd===end)return;const d=T.dayKey(end);o.days=o.days&&typeof o.days==='object'?o.days:{};o.days[d]=(+o.days[d]||0)+m;
- if(sub){o.bySub=o.bySub&&typeof o.bySub==='object'?o.bySub:{};const b=o.bySub[d]&&typeof o.bySub[d]==='object'?o.bySub[d]:{};b[sub]=(+b[sub]||0)+m;o.bySub[d]=b;}o.lastEnd=end;localStorage.setItem(POMOLOG,JSON.stringify(o));window.StudyCloud&&StudyCloud.dirty();}catch{}}
+ if(sub){o.bySub=o.bySub&&typeof o.bySub==='object'?o.bySub:{};const b=o.bySub[d]&&typeof o.bySub[d]==='object'?o.bySub[d]:{};b[sub]=(+b[sub]||0)+m;o.bySub[d]=b;}o.lastEnd=end;localStorage.setItem(POMOLOG,JSON.stringify(o));window.StudyCloud&&StudyCloud.dirty();bumpTask();}catch{}}
 function step(){left=Math.ceil((endAt-Date.now())/1000);if(left<=0){const m=mins;logPomo(endAt,m,psub);if(m===25&&window.StudyTodayX)StudyTodayX.sessionDone(psub,endAt);left=0;stop();savePomo();showClock();try{navigator.vibrate&&navigator.vibrate(300);}catch{}window.StudyNav&&StudyNav.timesUp&&StudyNav.timesUp(m);return;}showClock();}
 function run(){tick=setInterval(step,500);$('#pStart').textContent='pause';if(mins===25)Sound.start(soundPick());else if(window.StudyTodayX)StudyTodayX.breakStarted();step();}
 $('#pStart').onclick=()=>{if(tick){left=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();savePomo();showClock();$('#pStart').textContent='resume';return;}
@@ -389,9 +404,33 @@ function paintTabs(){document.querySelectorAll('.tab').forEach(b=>b.setAttribute
 $('#pReset').onclick=()=>setMode(mins);
 $('#pSub').onchange=()=>{psub=$('#pSub').value;savePomo();};
 $('#pSound').value=soundPick();$('#pSound').onchange=()=>{const v=$('#pSound').value;try{localStorage.setItem(SOUND_KEY,v);}catch{}if(tick&&mins===25)Sound.start(v);else Sound.stop();};document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setMode(+b.dataset.m));
+/* ---------- task for the timer + expected rounds (27 Nov 2026) ----------
+   A task may carry `rounds` (expected 25-minute rounds, 1-20) and `rdone` (rounds finished). A finished 25-minute round counts once for the
+   task picked under the timer (logPomo guards double counting with lastEnd). Both live in the task inside studyos.home.v1. */
+function bumpTask(){if(!ptask)return;const t=st.tasks.find(x=>x.id===ptask);if(!t)return;t.rdone=Math.min(99,(parseInt(t.rdone,10)||0)+1);save();renderTasks();}
+function fillTaskSelect(){const sel=$('#pTask');if(!sel)return;const open=st.tasks.filter(t=>!t.done).sort((a,b)=>a.date.localeCompare(b.date)||PRI[a.pri]-PRI[b.pri]).slice(0,30);
+ if(ptask&&!open.some(t=>t.id===ptask))ptask='';
+ sel.innerHTML='<option value="">No task</option>'+open.map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title.slice(0,40))+(t.rounds?' ('+Math.min(t.rdone||0,99)+'/'+t.rounds+')':'')+'</option>').join('');sel.value=ptask;paintRound();}
+function paintRound(){const el=$('#pRound');if(!el)return;const t=ptask&&st.tasks.find(x=>x.id===ptask);
+ if(!t){el.hidden=true;return;}const d=parseInt(t.rdone,10)||0;el.hidden=false;
+ el.textContent=(t.rounds?(d>=t.rounds?'All '+t.rounds+' rounds done · ':'Round '+Math.min(d+1,t.rounds)+' of '+t.rounds+' · '):(d?d+' round'+(d>1?'s':'')+' done · ':''))+t.title.slice(0,60);}
+$('#pTask').onchange=()=>{ptask=$('#pTask').value;savePomo();paintRound();};
+/* full screen focus timer: a CSS overlay (works on iPad Safari and in the Home Screen app), plus the browser's own full screen where it exists,
+   and a screen wake lock while it is open so the iPad does not dim. Esc or Exit closes it. */
+let wake=null;
+async function wakeOn(){try{if(navigator.wakeLock&&!wake){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{wake=null;});}}catch{}}
+function wakeOff(){try{wake&&wake.release();}catch{}wake=null;}
+function pomoFull(on){const el=document.querySelector('.pomo');if(!el)return;el.classList.toggle('pfull',on);document.documentElement.classList.toggle('pfull-open',on);$('#pExit').hidden=!on;$('#pFull').setAttribute('aria-pressed',String(on));
+ if(on){wakeOn();try{const r=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;if(r&&!document.fullscreenElement)Promise.resolve(r.call(document.documentElement)).catch(()=>{});}catch{}$('#pExit').focus();}
+ else{wakeOff();try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});}catch{}$('#pFull').focus();}}
+$('#pFull').onclick=()=>pomoFull(true);$('#pExit').onclick=()=>pomoFull(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.pomo.pfull'))pomoFull(false);});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.querySelector('.pomo.pfull'))pomoFull(false);});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.querySelector('.pomo.pfull'))wakeOn();});
 /* pick the timer up where it was */
 (function(){let s=null;try{s=JSON.parse(localStorage.getItem(POMO_KEY)||'null');}catch{}
- if(!s||![5,15,25].includes(s.mins))return;mins=s.mins;paintTabs();if(typeof s.sub==='string'&&$('#pSub').querySelector('option[value="'+s.sub+'"]')){psub=s.sub;$('#pSub').value=psub;}
+ if(!s||![5,15,25].includes(s.mins))return;mins=s.mins;paintTabs();if(typeof s.task==='string')ptask=s.task;
+ if(typeof s.sub==='string'&&$('#pSub').querySelector('option[value="'+s.sub+'"]')){psub=s.sub;$('#pSub').value=psub;}
  if(s.endAt&&s.endAt>Date.now()){endAt=s.endAt;run();}
  else if(s.endAt){logPomo(s.endAt,mins,psub);left=0;showClock();savePomo();}
  else if(Number.isFinite(s.left)&&s.left>=0&&s.left<=mins*60){left=s.left;showClock();if(left&&left<mins*60)$('#pStart').textContent='resume';}})();
@@ -476,17 +515,19 @@ function renderTasks(){
  const list=st.tasks.filter(t=>showDone||!t.done).sort((a,b)=>a.date.localeCompare(b.date)||PRI[a.pri]-PRI[b.pri]);
  const shown=list.slice(0,limit);$('#moreBtn').hidden=list.length<=limit;
  $('#tasks').innerHTML=shown.length?shown.map(t=>{const l=leftLabel(t.date);
-  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+(/^https:\/\/classroom\.google\.com\//.test(t.link||'')?'<a href="'+esc(t.link)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(t.title)+'</a>':esc(t.title))+(t.rep?' <span title="Repeats '+(t.rep==='d'?'daily':'weekly')+'" aria-label="repeats '+(t.rep==='d'?'daily':'weekly')+'">↻</span>':'')+'</span><span class="meta"><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span></span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);min-height:44px;min-width:40px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';}).join(''):'<p class="empty">No tasks.</p>';
+  return '<div class="row'+(t.done?' done':'')+'" role="listitem"><input type="checkbox" data-id="'+esc(t.id)+'" aria-label="Done: '+esc(t.title)+'"'+(t.done?' checked':'')+'><span class="t" title="'+esc(t.title)+'">'+(/^https:\/\/classroom\.google\.com\//.test(t.link||'')?'<a href="'+esc(t.link)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(t.title)+'</a>':esc(t.title))+(t.rounds?' <span class="rchip" title="25-minute rounds done / expected">⏱ '+Math.min(t.rdone||0,99)+'/'+t.rounds+'</span>':'')+(t.rep?' <span title="Repeats '+(t.rep==='d'?'daily':'weekly')+'" aria-label="repeats '+(t.rep==='d'?'daily':'weekly')+'">↻</span>':'')+'</span><span class="meta"><span class="left '+(t.done?'':l.c)+'">'+(t.done?'Done':esc(l.t))+' · '+esc(shortDay(t.date))+'</span><span class="pri '+t.pri+'">'+t.pri+'</span></span><button type="button" class="xdel" data-del="'+esc(t.id)+'" aria-label="Delete '+esc(t.title)+'" style="border:0;background:none;color:var(--muted);min-height:44px;min-width:40px;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';}).join(''):'<p class="empty">No tasks.</p>';
+ fillTaskSelect();
 }
 $('#tasks').addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.id;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t){t.done=e.target.checked;
  /* repeating task: ticking it adds the next one (daily or weekly), once */
- if(t.done&&(t.rep==='d'||t.rep==='w')&&window.StudyTodayX){const nd=StudyTodayX.nextDate(t.date,t.rep,today),nid=String(t.id).replace(/~\d{4}-\d{2}-\d{2}$/,'')+'~'+nd;if(nd&&!st.tasks.some(x=>x.id===nid)){const n=Object.assign({},t,{id:nid,date:nd,done:false});st.tasks.push(n);}}
+ if(t.done&&(t.rep==='d'||t.rep==='w')&&window.StudyTodayX){const nd=StudyTodayX.nextDate(t.date,t.rep,today),nid=String(t.id).replace(/~\d{4}-\d{2}-\d{2}$/,'')+'~'+nd;if(nd&&!st.tasks.some(x=>x.id===nid)){const n=Object.assign({},t,{id:nid,date:nd,done:false,rdone:0});st.tasks.push(n);}}
  save();renderAll();}});
 $('#tasks').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id)return;const t=st.tasks.find(x=>x.id===id);if(t&&confirm('Delete "'+t.title+'"?')){st.tasks=st.tasks.filter(x=>x.id!==id);save();renderAll();}});
 $('#taskForm').onsubmit=e=>{e.preventDefault();const title=$('#tTitle').value.trim(),date=$('#tDate').value;if(!title||!date)return;
  const m=/(บัญชี|acc)/i.test(title)?'acc':/(เศรษฐ|eco)/i.test(title)?'eco':/(คณิต|math)/i.test(title)?'math':undefined;
  const t={id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),title:title.slice(0,80),date,pri:$('#tPri').value,done:false};if(m)t.course=m;if($('#tRep').value)t.rep=$('#tRep').value;
- st.tasks.push(t);save();$('#tTitle').value='';renderAll();};
+ const rn=parseInt($('#tRounds').value,10);if(rn>=1&&rn<=20)t.rounds=rn;
+ st.tasks.push(t);save();$('#tTitle').value='';$('#tRounds').value='';renderAll();};
 $('#fDone').addEventListener('change',()=>{limit=8;renderTasks();});
 $('#moreBtn').onclick=()=>{limit+=8;renderTasks();};
 $('#tDate').value=today;
