@@ -420,16 +420,21 @@
       var btn = 'min-height:44px;padding:0 14px;border:2.5px solid var(--ink,#111);border-radius:8px;background:var(--panel,#fff);color:var(--text,#111);font:700 14px var(--ui,system-ui);cursor:pointer';
       function paint() {
         var has = !!(api && key());
-        d.innerHTML = '<h2 id="cloudTitle" style="margin:0 0 6px;font:700 22px var(--num,serif)">Cloud sync</h2>'
+        if (pairing) {                                                        // waiting for approval: only the code and Close
+          d.innerHTML = '<h2 id="cloudTitle" style="margin:0 0 10px;font:700 22px var(--num,serif)">Cloud sync</h2>'
+            + '<p id="cloudMsg" role="status" aria-live="polite" aria-label="Approval code ' + pairing.code.split('').join(' ') + '" style="margin:0 0 14px;font:700 48px/1.1 var(--num,monospace);letter-spacing:.12em">' + pairing.code.slice(0, 3) + ' ' + pairing.code.slice(3) + '</p>'
+            + '<div style="display:flex;gap:8px"><button type="button" data-a="close" style="' + btn + '">Close</button></div>';
+        } else {
+          d.innerHTML = '<h2 id="cloudTitle" style="margin:0 0 6px;font:700 22px var(--num,serif)">Cloud sync</h2>'
           + '<p id="cloudMsg" role="status" style="margin:0 0 12px;color:var(--muted,#555)">' + label().replace(/</g, '&lt;') + '</p>'
           + (api ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Quiz answers, review schedule, flashcards, notes, exams, plan ticks, the timetable, tasks, grades and the cover, icon and card images sync automatically: when a page opens, after changes and every few minutes.</p>' : '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">The sync server has not been switched on for this site yet.</p>')
-          + (pairing ? '<p style="margin:0 0 6px">On your iPad: Cloud sync → <b>Approve a computer</b>, then type</p><p aria-live="polite" style="margin:0 0 14px;font:700 40px/1.1 var(--num,monospace);letter-spacing:.12em">' + pairing.code.slice(0, 3) + ' ' + pairing.code.slice(3) + '</p>' : '')
           + (has && isSession() ? '<p style="margin:0 0 14px;font-size:13px;color:var(--muted,#555)">Signed in from another device until ' + new Date(sessionEnd()).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '. Sign out before you leave a shared computer.</p>' : '')
           + '<div style="display:flex;flex-wrap:wrap;gap:8px">'
           + (api ? (has ? '<button type="button" data-a="now" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sync now</button><button type="button" data-a="auto" aria-pressed="' + autoOn() + '" style="' + btn + '">Auto sync: ' + (autoOn() ? 'on' : 'off') + '</button>'
               + (isSession() ? '<button type="button" data-a="logout" style="' + btn + '">Sign out</button>' : '<button type="button" data-a="approve" style="' + btn + '">Approve a computer</button><button type="button" data-a="revoke" style="' + btn + '">Sign out all computers</button><button type="button" data-a="key" style="' + btn + '">Change key</button>')
-            : pairing ? '' : '<button type="button" data-a="pair" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sign in from iPad</button><button type="button" data-a="key" style="' + btn + '">Set sync key</button>') : '')
+            : '<button type="button" data-a="pair" style="' + btn + ';background:var(--ink,#111);color:var(--paper,#fff)">Sign in from iPad</button><button type="button" data-a="key" style="' + btn + '">Set sync key</button>') : '')
           + '<button type="button" data-a="close" style="' + btn + '">Close</button></div>';
+        }
         d.querySelectorAll('button').forEach(function (b) {
           b.onclick = function () {
             var a = b.getAttribute('data-a');
