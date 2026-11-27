@@ -440,7 +440,7 @@ function renderChips(){
 }
 /* one line under each plan item: why it is on today's list */
 const FOCUS=document.documentElement.classList.contains('focus');
-const sub=t=>t.kind==='chapter'?'For '+t.exam+(t.days!=null?' in '+t.days+(t.days===1?' day':' days'):'')+(t.reason?' · '+(FOCUS?t.reason.replace(/ · \d+ new cards/,''):t.reason):''):(t.detail||'');
+const sub=t=>t.kind==='chapter'?'For '+t.exam+(t.days!=null?' in '+t.days+(t.days===1?' day':' days'):'')+(t.reason?' · '+(FOCUS?t.reason.replace(/ · \d+ new cards/,''):t.reason):'')+(t.pace?' · about '+t.pace+' questions a day to finish':''):(t.detail||'');
 function renderPlan(){
  const plan=T.buildPlan(settings.exams,summaries,settings,now),doneToday=settings.tasks[plan.today]||{},p=parts(plan.today);
  /* quiz review (spaced repetition) leads the plan: missed questions come back on schedule */

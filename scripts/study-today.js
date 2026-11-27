@@ -101,6 +101,19 @@
   const seenDefaults=[...new Set([...seen,...DEFAULT_EXAMS.map(d=>d.id)])];
   return {exams,done:s.done&&typeof s.done==='object'?s.done:{},tasks:s.tasks&&typeof s.tasks==='object'?s.tasks:{},timetable:normalizeTimetable(s.timetable),seenDefaults};
  }
+ /* Work back from the exam date: questions still to answer plus wrong ones to redo, spread over the study days left (the last day is final review). */
+ function runway(exams,summaries,now){
+  const out=[];
+  for(const e of exams){
+   const d=daysUntil(e.date,now),sum=summaries&&summaries[e.course];
+   if(!(d>0)||!sum||!Array.isArray(e.cats)||!e.cats.length)continue;
+   let fresh=0,wrong=0;
+   for(const id of e.cats){const p=sum.per&&sum.per[id];if(!p)continue;fresh+=Math.max(0,p.quiz-p.answered);wrong+=Math.max(0,p.answered-p.correct);}
+   const left=fresh+wrong,studyDays=Math.max(1,d-1);
+   out.push({examId:e.id,course:e.course,title:e.title,days:d,fresh,wrong,left,perDay:left?Math.ceil(left/studyDays):0});
+  }
+  return out.sort((a,b)=>a.days-b.days);
+ }
  function buildPlan(exams,summaries,settings,now){
   const today=dayKey(now),tasks=[];
   const reviewNow=Object.values(summaries).reduce((n,s)=>n+(s?s.reviewNow:0),0);
@@ -127,7 +140,9 @@
    remaining.slice(0,k).forEach(p=>tasks.push({id:e.id+':'+p.id,kind:'chapter',examId:e.id,course:e.course,cat:p.id,
     title:p.label,exam:e.title,days:e.days,detail:'Summary → Cards → Practice',reason:reason(p),done:done[p.id]===today}));
   });
-  return {today,tasks,upcoming};
+  const rw=runway(exams,summaries,now);
+  tasks.forEach(t=>{if(t.kind==='chapter'){const r=rw.find(x=>x.examId===t.examId);if(r&&r.perDay)t.pace=r.perDay;}});
+  return {today,tasks,upcoming,runway:rw};
  }
  function weakSpots(summaries,limit){
   const out=[];
@@ -141,5 +156,5 @@
   else{const t={...(next.tasks[dayKey(now)]||{})};if(doneFlag)t[task.id]=true;else delete t[task.id];next.tasks={[dayKey(now)]:t};}
   return next;
  }
- return {SETTINGS_KEY,COURSES,LANGS,normalizeTimetable,classesOn,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,buildPlan,weakSpots,markChapter};
+ return {SETTINGS_KEY,COURSES,LANGS,normalizeTimetable,classesOn,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,runway,buildPlan,weakSpots,markChapter};
 });
