@@ -1,1 +1,2 @@
 - Decluttered Today, Practice and Mock exam: removed helper sentences, hid empty sections (weak chapters, study time), shortened empty pinned formulas.
+- Today hides empty Quiz review/Tasks cards and zero stats on subject cards; Practice shows only Cram Mode links when no formulas are pinned.

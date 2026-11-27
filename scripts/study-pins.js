@@ -95,6 +95,8 @@
  }
  /* practice.html: pins for each course with tabs */
  function mountPractice(el){css();const keys=Object.keys(NAMES);let c=keys[0];
+  if(!keys.some(k=>parsePins(pinText(k)).length)){/* nothing pinned: no empty box, only the Cram Mode links */
+   el.innerHTML='<div class="sp-tabs" role="group" aria-label="Cram Mode">'+keys.map(k=>'<a class="sp-b" href="'+k+'.html?tab=prac&cram=1">Cram Mode · '+NAMES[k]+'</a>').join('')+'</div>';return;}
   try{const s=sessionStorage.getItem('studyos.pins.tab');if(NAMES[s])c=s;}catch(e){}
   el.innerHTML='<div class="sp-tabs" role="group" aria-label="Subject">'+keys.map(k=>'<button type="button" data-c="'+k+'" aria-pressed="'+(k===c)+'">'+NAMES[k]+'</button>').join('')+'</div><div></div>';
   const box=pinsBox(el.lastElementChild,c,true);
