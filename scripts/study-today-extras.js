@@ -47,7 +47,7 @@
  function css(){if($('#txCss'))return;const s=document.createElement('style');s.id='txCss';s.textContent=CSS;document.head.appendChild(s);}
  /* ---------- study time ---------- */
  function renderTime(){const el=$('#studyTime');if(!el)return;const w=weekTime(readJ(LOGKEY),Date.now()),total=w.reduce((n,[,v])=>n+v,0),max=Math.max(1,...w.map(([,v])=>v));
-  el.innerHTML='<h3>Study time this week</h3><p class="sub">Pomodoro minutes per subject, Monday to today'+(total?' · '+(Math.round(total/6)/10)+' h in all':'')+'</p>'
+  el.hidden=!w.length;if(!w.length){el.innerHTML='';return;}el.innerHTML='<h3>Study time this week</h3><p class="sub">'+(Math.round(total/6)/10)+' h in all</p>'
    +(w.length?w.map(([k,v])=>'<div class="tx-bar"><span>'+esc(NAMES[k]||k)+'</span><i role="img" aria-label="'+esc((NAMES[k]||k)+' '+v+' minutes')+'"><b style="width:'+Math.round(v/max*100)+'%"></b></i><span>'+(v>=60?(Math.round(v/6)/10)+' h':v+' min')+'</span></div>').join('')
     +((()=>{const miss=['acc','eco','math'].filter(k=>!w.some(([x])=>x===k));return miss.length?'<p class="sub" style="margin-top:6px">No Pomodoro yet this week: '+miss.map(k=>NAMES[k]).join(', ')+'.</p>':'';})())
     :'<p class="sub">Pick a subject under the Pomodoro timer; finished 25-minute sessions show up here.</p>');}

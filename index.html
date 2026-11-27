@@ -237,7 +237,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 <a class="cont" id="continue" hidden></a>
 <div class="wng qg" id="qGoal" hidden></div>
 <a class="wng" id="wordGoal" hidden></a>
-<div class="wng-tools"><button type="button" id="wordAdd" class="wng-add">+ New word</button><span class="wng-hint">Jot down a word you meet while studying. It goes to WordNest → My words.</span></div>
+<div class="wng-tools"><button type="button" id="wordAdd" class="wng-add" title="Jot down a word. It goes to WordNest → My words.">+ New word</button></div>
 <dialog id="wordAddDlg" class="wng-dlg" aria-labelledby="wordAddT"><form method="dialog" id="wordAddForm"><h2 id="wordAddT">New English word</h2>
 <label for="waEn">Word</label><input id="waEn" required maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false">
 <label for="waTh">Meaning (Thai)</label><input id="waTh" required maxlength="120" autocomplete="off">
@@ -428,15 +428,15 @@ function renderChips(){
  const topN=top&&summaries[top.key]?summaries[top.key].reviewNow:0;
  /* quiz review (spaced repetition) comes first: the owner mostly studies with quizzes */
  const qd=T.COURSES.map(c=>({c,n:window.StudyReview?StudyReview.countRaw(read('study-'+c.key),now):0})).sort((a,b)=>b.n-a.n),quizDue=qd.reduce((n,x)=>n+x.n,0),qTop=qd[0];
- const cells=['<a class="sb" href="'+(quizDue?link(qTop.c,'prac')+'&review=1':dueTotal&&!FOCUS?link(top,'cards'):'practice.html')+'"><span class="n">'+quizDue+'</span><span class="l">Quiz review</span><span class="s">'+(quizDue?esc(qTop.c.name)+' has '+qTop.n+(dueTotal&&!FOCUS?' · '+dueTotal+' cards due':''):dueTotal&&!FOCUS?dueTotal+' cards due':'All caught up')+'</span></a>',
-  '<a class="sb'+(late?' alert':'')+'" href="#tasks"><span class="n">'+open.length+'</span><span class="l">Tasks</span><span class="s">'+(late?late+' late':open.length?'Open':'Nothing open')+'</span></a>'];
+ const cells=[];if(quizDue||(dueTotal&&!FOCUS))cells.push('<a class="sb" href="'+(quizDue?link(qTop.c,'prac')+'&review=1':dueTotal&&!FOCUS?link(top,'cards'):'practice.html')+'"><span class="n">'+quizDue+'</span><span class="l">Quiz review</span><span class="s">'+(quizDue?esc(qTop.c.name)+' has '+qTop.n+(dueTotal&&!FOCUS?' · '+dueTotal+' cards due':''):dueTotal&&!FOCUS?dueTotal+' cards due':'All caught up')+'</span></a>');
+ if(open.length)cells.push('<a class="sb'+(late?' alert':'')+'" href="#tasks"><span class="n">'+open.length+'</span><span class="l">Tasks</span><span class="s">'+(late?late+' late':'Open')+'</span></a>');
  /* the next exam is the hero (renderHero); the third cell is the next class from the timetable */
  const nc=nextClass();
  cells.push(nc?'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="w">'+esc(nc.when)+' · '+nc.x.start+'</span><span class="nm">'+esc(nc.x.name)+'</span>'+(nc.x.code?'<span class="s">'+esc(nc.x.code)+'</span>':'')+'</a>'
   :'<a class="sb ncls" href="calendar.html"><span class="l">Next class</span><span class="nm">'+(settings.timetable.length?'None this week':'No timetable')+'</span><span class="s">'+(settings.timetable.length?'Open Calendar':'Import it in Calendar')+'</span></a>');
  renderHero(ne);
  const chips=cells;
- $('#chips').innerHTML=chips.join('');
+ $('#chips').innerHTML=chips.join('');$('#chips').className='chips scoreboard n'+chips.length;
 }
 /* one line under each plan item: why it is on today's list */
 const FOCUS=document.documentElement.classList.contains('focus');
@@ -496,7 +496,7 @@ function renderSubjects(){
   const s=summaries[c.key],ne=upcoming().find(e=>e.course===c.key);
   const pct=s&&s.total?Math.round(s.seen/s.total*100):0;
   return '<article class="subj s-'+c.key+' t-'+c.key+'"><div class="cv" data-cv="'+c.key+'" aria-hidden="true"><span class="cvm">'+esc(c.full)+'</span></div><button type="button" class="pic" data-img="'+c.key+'" aria-label="Change '+esc(c.name)+' image">'+DOTS+'</button><div class="b"><h3>'+esc(c.name)+'</h3><p class="sub">'+(ne?'Exam '+(ne.d===0?'today':ne.d===1?'tomorrow':'in '+ne.d+' days'):'&nbsp;')+'</p>'
-   +(s&&FOCUS?(()=>{let q=0,a=0,r=0;for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}const qp=q?Math.round(a/q*100):0;return '<div class="st"><div><b>'+a+'</b>done</div><div><b>'+(a?Math.round(r/a*100):0)+'%</b>correct</div></div><div class="bar" role="img" aria-label="'+qp+'% of questions done"><i style="width:'+qp+'%"></i></div>';})()
+   +(s&&FOCUS?(()=>{let q=0,a=0,r=0;for(const x of Object.values(s.per)){q+=x.quiz;a+=x.answered;r+=x.correct;}const qp=q?Math.round(a/q*100):0;if(!a)return '';return '<div class="st"><div><b>'+a+'</b>done</div><div><b>'+(a?Math.round(r/a*100):0)+'%</b>correct</div></div><div class="bar" role="img" aria-label="'+qp+'% of questions done"><i style="width:'+qp+'%"></i></div>';})()
    :s?'<div class="st"><div><b>'+s.reviewNow+'</b>due</div><div><b>'+pct+'%</b>seen</div></div><div class="bar" role="img" aria-label="'+pct+'% seen"><i style="width:'+pct+'%"></i></div>':'<p class="empty" style="padding:0 0 10px">'+(loadFailed?'Could not load':'Loading…')+'</p>')
    +'<div class="acts">'+(FOCUS?'<a class="main" href="'+link(c,'prac')+'">Practice</a>':'<a class="main" href="'+link(c,'cards')+'">Cards</a><a href="'+link(c,'prac')+'">Practice</a>')+'</div><a class="lk" href="hub.html#'+c.key+'">Lessons →</a></div></article>';});
  const lang=(l,cv,_flag,acts)=>{const ls=langSum[l.key];return '<article class="subj s-'+cv+' t-'+l.key+'"><div class="cv" data-cv="'+cv+'" aria-hidden="true"><span class="cvm">'+(l.key==='eng'?'EN':'ZH')+'</span></div><button type="button" class="pic" data-img="'+cv+'" aria-label="Change '+l.name+' image">'+DOTS+'</button><div class="b"><h3>'+l.name+'</h3><p class="sub">Vocabulary · WordNest</p>'

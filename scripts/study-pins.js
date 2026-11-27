@@ -60,7 +60,7 @@
  function css(){if(document.getElementById('spCss'))return;const s=document.createElement('style');s.id='spCss';s.textContent=CSS;document.head.appendChild(s);}
  function pinsHTML(c){const p=parsePins(pinText(c));
   return p.length?'<ul>'+p.map(x=>'<li>'+(x.title?'<b>'+esc(x.title)+'</b>':'')+esc(x.body)+'</li>').join('')+'</ul>'
-   :'<p class="sp-none">No pinned formulas yet. Tap Edit and write one per line, e.g. <code>COGS :: Beginning inventory + Purchases − Ending inventory</code></p>';}
+   :'<p class="sp-none">None yet.</p>';}
  const EXAMPLE={acc:'COGS :: Beginning inventory + Net purchases − Ending inventory\nGross profit :: Net sales − COGS\nAdjusted bank balance :: Bank + Deposits in transit − Outstanding checks',
   eco:'GDP (expenditure) :: C + I + G + (X − M)\nInflation rate :: (CPI now − CPI before) ÷ CPI before × 100\nMoney multiplier :: 1 ÷ reserve ratio',
   math:'Simple interest :: I = P × r × t\nCompound amount :: A = P(1 + r/n)^(nt)\nP(A or B) :: P(A) + P(B) − P(A and B)'};
@@ -95,6 +95,8 @@
  }
  /* practice.html: pins for each course with tabs */
  function mountPractice(el){css();const keys=Object.keys(NAMES);let c=keys[0];
+  if(!keys.some(k=>parsePins(pinText(k)).length)){/* nothing pinned: no empty box, only the Cram Mode links */
+   el.innerHTML='<div class="sp-tabs" role="group" aria-label="Cram Mode">'+keys.map(k=>'<a class="sp-b" href="'+k+'.html?tab=prac&cram=1">Cram Mode · '+NAMES[k]+'</a>').join('')+'</div>';return;}
   try{const s=sessionStorage.getItem('studyos.pins.tab');if(NAMES[s])c=s;}catch(e){}
   el.innerHTML='<div class="sp-tabs" role="group" aria-label="Subject">'+keys.map(k=>'<button type="button" data-c="'+k+'" aria-pressed="'+(k===c)+'">'+NAMES[k]+'</button>').join('')+'</div><div></div>';
   const box=pinsBox(el.lastElementChild,c,true);

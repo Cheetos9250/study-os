@@ -1,0 +1,4 @@
+- Decluttered Today, Practice and Mock exam: removed helper sentences, hid empty sections (weak chapters, study time), shortened empty pinned formulas.
+- Today hides empty Quiz review/Tasks cards and zero stats on subject cards; Practice shows only Cram Mode links when no formulas are pinned.
+- Practice hides the Notes box (notes data, sync and the floating Notes button on course pages are unchanged).
+- Practice hides the Excel, My PDF sets and Accounting textbook cards (pages still reachable by link).

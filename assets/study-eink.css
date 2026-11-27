@@ -178,3 +178,5 @@ main>h2::after{content:"";flex:1;border-bottom:2.5px solid var(--bezel-ink);opac
  .hx-n,.hx-clock{font-size:96px}
 }
 @media(max-width:560px){.exams{grid-template-columns:1fr}}
+
+@media(min-width:701px){.chips.scoreboard.n1{grid-template-columns:minmax(0,1fr)}.chips.scoreboard.n2{grid-template-columns:minmax(0,1fr) minmax(0,1.7fr)}}
