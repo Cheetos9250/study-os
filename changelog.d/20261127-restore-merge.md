@@ -1,0 +1,1 @@
+Restore: new **Merge** step on progress-restore.html. When this browser already has progress (so the old restore is blocked), quiz history and flashcard schedules are combined with the backup (newer answer per question/card wins, nothing deleted, every write read back and rolled back on failure). Other differing data is left untouched. Same rules as cloud sync; no new keys.

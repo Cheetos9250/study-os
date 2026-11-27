@@ -65,6 +65,13 @@
     <button type="button" id="restore" disabled>Restore missing progress</button>
     <p>This operation does not touch Notion, Cloudflare, Study Planner IndexedDB, or any stored sync keys. It does not restore data that was never in the backup file. The original textbook PDF is not included; select it again in the reader if needed.</p>
   </div>
+  <div class="panel">
+    <h2>3. Merge with the progress already here</h2>
+    <p>If this browser already has some progress, the file above may be blocked. <strong>Merge</strong> combines quiz history and flashcard schedules with the backup: for each question or card the newer answer wins, and nothing is deleted. Anything else that differs is left as it is.</p>
+    <p class="notice">Tip: <a href="progress-backup.html">download a backup of this browser first</a>. Merge cannot be undone with one tap.</p>
+    <button type="button" id="merge" disabled>Merge into this browser</button>
+    <p id="mergeStatus" role="status" aria-live="polite"></p>
+  </div>
 </main>
 <script src="scripts/study-progress-backup.js?v=20261113-textbook"></script>
 <script src="scripts/study-progress-restore.js?v=20261113-textbook"></script>
@@ -75,7 +82,8 @@
   var input = document.getElementById("file");
   var restore = document.getElementById("restore");
   var status = document.getElementById("status");
-  var backupText = null;
+  var backupText = null, mergeText = null;
+  var merge = document.getElementById("merge"), mergeStatus = document.getElementById("mergeStatus");
   var selection = 0;
   var preview = document.getElementById("preview");
   function datasetName(key) {
@@ -99,7 +107,7 @@
   }
   input.addEventListener("change", async function() {
     var request = ++selection;
-    restore.disabled = true;
+    restore.disabled = true; merge.disabled = true; mergeText = null; mergeStatus.textContent = "";
     backupText = null;
     preview.replaceChildren();
     var file = input.files && input.files[0];
@@ -118,8 +126,14 @@
           preview.appendChild(item);
         });
       });
+      var mp = core.mergePlan(window.localStorage, raw, location.origin);
+      if (mp.merge.length || mp.missing.length && result.conflicts.length) {
+        mergeText = raw;
+        merge.disabled = false;
+        mergeStatus.textContent = "Ready: " + mp.merge.length + " data sets can be combined, " + mp.missing.length + " missing ones added" + (mp.skipped.length ? ", " + mp.skipped.length + " different ones left untouched" : "") + ". No changes have been made.";
+      }
       if (result.conflicts.length) {
-        status.textContent = "Blocked: " + result.conflicts.length + " existing data sets differ from this backup. No changes have been made.";
+        status.textContent = "Blocked: " + result.conflicts.length + " existing data sets differ from this backup. No changes have been made." + (mp.merge.length ? " You can merge quiz and flashcard history in step 3." : "");
         return;
       }
       backupText = raw;
@@ -128,6 +142,19 @@
     } catch (error) {
       if (request !== selection) return;
       status.textContent = "Backup check failed: " + error.message;
+    }
+  });
+  merge.addEventListener("click", function() {
+    if (!mergeText || merge.disabled) return;
+    if (!window.confirm("Merge the backup into this browser? Newer answers win, nothing is deleted.")) return;
+    merge.disabled = true; restore.disabled = true;
+    try {
+      var o = core.restoreMerge(window.localStorage, mergeText, location.origin);
+      mergeText = null; backupText = null; preview.replaceChildren();
+      mergeStatus.textContent = "Done: " + o.merged + " data sets combined, " + o.added + " added, " + o.alreadyPresent + " already matched" + (o.skipped.length ? ", " + o.skipped.length + " different ones left untouched" : "") + ". Reload a course to check.";
+    } catch (error) {
+      mergeText = null;
+      mergeStatus.textContent = "Merge stopped: " + error.message;
     }
   });
   restore.addEventListener("click", function() {
