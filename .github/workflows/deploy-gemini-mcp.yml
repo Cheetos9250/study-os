@@ -62,5 +62,7 @@ jobs:
           grep -q '"isError":true' /tmp/body && { echo "Tool could not read progress"; exit 1; } || true
           code=$(curl -s -o /tmp/export -w '%{http_code}' -H "Authorization: Bearer $GEMINI_MCP_TOKEN" "https://study-os-gemini-mcp.kasidit09022550.workers.dev/export")
           echo "Export HTTP $code"; test "$code" = 200; grep -q '"Questions"' /tmp/export || { echo "No Questions table"; exit 1; }
+          code=$(curl -s -o /tmp/plan -w '%{http_code}' -H "Authorization: Bearer $GEMINI_MCP_TOKEN" "https://study-os-gemini-mcp.kasidit09022550.workers.dev/plan")
+          echo "Plan HTTP $code"; test "$code" = 200; grep -q '"v":1' /tmp/plan || { echo "No ecosystem/v1 plan"; exit 1; }
           noauth=$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -d "$body" "$base")
           echo "Without token: HTTP $noauth"; test "$noauth" = 401

@@ -7,6 +7,7 @@
 - Data is as fresh as the last cloud sync from any device (the site syncs automatically).
 - `GET /export` (Bearer token): every table for the Google Sheet **Study OS data** — Summary, Questions (the whole acc/eco/math bank from `bank.json`, with the student's answer and result), Notes, Tasks, Grades, Exams, Classes.
 - `bank.json` is built at deploy by `node scripts/build-question-bank.cjs workers/gemini-mcp/bank.json` (same ids as the course engine; not committed). Redeploy after adding questions.
+- `GET /plan` (Bearer token): **ecosystem/v1** open tasks, upcoming exams and the weekly timetable for Life OS (`ecosystem-v1.mjs`, contract in `docs/ecosystem.md`). `GET /digest` also carries `"v":1`.
 - `GET /summary` (Bearer token): overview + today's classes as one Markdown page, for the Google Doc script.
 - Tools: `get_questions` (whole bank, filter by chapter / wrong / right / unanswered, paged), `get_overview` (exams, per-chapter answered / % right, weak chapters, last practice), `get_wrong_questions` (course, optional chapter, limit), `get_schedule` (exams and the classes on a date).
 - The sync key stays inside the Worker. Clients only hold `MCP_READ_TOKEN`. Change the GitHub secret `GEMINI_MCP_TOKEN` and redeploy to revoke every client.

@@ -4,6 +4,7 @@
 import T from '../../scripts/study-today.js';
 import G from '../../scripts/study-gemini.js';
 import R from '../../scripts/study-review.js';
+import {VERSION} from './ecosystem-v1.mjs';
 
 const DAY=86400000,WEAK_BELOW=70,WEAK_MIN=3;
 
@@ -28,5 +29,5 @@ export async function digestFeed(env,now,deps){
   try{const [D,doc]=await Promise.all([deps.courseData(env,c),deps.progress(env,c.key).catch(()=>null)]);return courseDigest(c,D,doc,now);}
   catch{return null;}}));
  const courses=out.filter(Boolean);
- return {generated:now,courses,totals:{cards_due:courses.reduce((n,c)=>n+c.cards_due,0),quiz_due:courses.reduce((n,c)=>n+c.quiz_due,0)}};
+ return {v:VERSION,kind:'digest',generated:now,courses,totals:{cards_due:courses.reduce((n,c)=>n+c.cards_due,0),quiz_due:courses.reduce((n,c)=>n+c.quiz_due,0)}};
 }

@@ -8,6 +8,7 @@
 import T from '../../scripts/study-today.js';
 import G from '../../scripts/study-gemini.js';
 import {digestFeed} from './study-digest.mjs';
+import {planFeed} from './ecosystem-v1.mjs';
 // Built at deploy by scripts/build-question-bank.cjs (not committed): every acc/eco/math practice question with the engine's ids.
 import BANK from './bank.json' with {type:'json'};
 
@@ -151,8 +152,8 @@ export default {
  async fetch(request,env){
   const url=new URL(request.url);
   if(url.pathname==='/health')return json({ok:true});
-  const isSummary=url.pathname==='/summary',isExport=url.pathname==='/export',isDigest=url.pathname==='/digest';
-  const m=isSummary||isExport||isDigest?[]:url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
+  const isSummary=url.pathname==='/summary',isExport=url.pathname==='/export',isDigest=url.pathname==='/digest',isPlan=url.pathname==='/plan';
+  const m=isSummary||isExport||isDigest||isPlan?[]:url.pathname.match(/^\/mcp(?:\/([A-Za-z0-9_-]{1,200}))?\/?$/);
   if(!m)return json({error:'Not found'},404);
   if(typeof env.MCP_READ_TOKEN!=='string'||env.MCP_READ_TOKEN.length<32||typeof env.PROGRESS_SYNC_KEY!=='string')return json({error:'Not configured'},503);
   const auth=(request.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');
@@ -169,6 +170,12 @@ export default {
   if(isDigest){
    if(request.method!=='GET')return json({error:'Method not allowed'},405,{Allow:'GET'});
    try{return json(await digestFeed(env,Date.now(),{progress,courseData}));}catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
+  }
+  // GET /plan (Bearer token only): ecosystem/v1 open tasks, upcoming exams and the timetable for Life OS (no grades, notes or answers).
+  if(isPlan){
+   if(request.method!=='GET')return json({error:'Method not allowed'},405,{Allow:'GET'});
+   try{const [today,home]=await Promise.all([progress(env,'today'),progress(env,'home')]);return json(planFeed(today,home,Date.now()));}
+   catch(e){return json({error:'Could not read Study OS: '+e.message},502);}
   }
   // GET /export (Bearer token only): every table for the Google Sheet (Questions, Notes, Tasks, Grades, Exams, Classes, Summary).
   if(isExport){
