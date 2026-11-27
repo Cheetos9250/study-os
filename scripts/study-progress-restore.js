@@ -264,5 +264,80 @@
       throw new Error("Restore did not complete; attempted rollback of newly added entries. Check stored progress before retrying.");
     }
   }
-  return { plan: plan, restoreMissing: restoreMissing };
+  /* ---------- merge restore (27 Nov 2026) ----------
+     For a browser that already has some progress: instead of refusing, combine quiz history (`study-<course>`) and flashcard
+     schedules (`<mark>-srs`) with the backup using the same rules as cloud sync (`mergeCourse` in study-cloud.js; a test keeps
+     them equal): per question / per card the newer answer wins, nothing is deleted, other fields stay as they are here.
+     Any other differing key is left untouched and reported as skipped. Every write is read back; on failure all earlier writes
+     of this run are put back to their previous values. */
+  function isQuizKey(key) { return /^study-(acc|eco|math|eng|zh)$/.test(key); }
+  function mergeable(key) { return isQuizKey(key) || /-srs$/.test(key); }
+  function mergeQuiz(a, b) {
+    var out = Object.assign({}, a, { ans: {}, ats: {}, rv: {}, fsrs: {}, known: [] });
+    var rst = Math.max(a.rst || 0, b.rst || 0); out.rst = rst;
+    var ids = {};
+    Object.keys(a.ans || {}).concat(Object.keys(b.ans || {})).forEach(function (id) { ids[id] = 1; });
+    Object.keys(ids).forEach(function (id) {
+      if (id === "__proto__" || id === "constructor" || id === "prototype") return;
+      var ha = a.ans && a.ans[id] !== undefined, hb = b.ans && b.ans[id] !== undefined;
+      var ta = (a.ats || {})[id] || 0, tb = (b.ats || {})[id] || 0;
+      var useA = ha && (!hb || ta >= tb), t = useA ? ta : tb, src = useA ? a : b;
+      if (rst && t < rst) return;
+      out.ans[id] = src.ans[id]; out.ats[id] = t;
+      if ((src.rv || {})[id]) out.rv[id] = src.rv[id];
+      if ((src.fsrs || {})[id]) out.fsrs[id] = src.fsrs[id];
+    });
+    var known = {};
+    (a.known || []).concat(b.known || []).forEach(function (k) { known[k] = 1; });
+    out.known = Object.keys(known);
+    return out;
+  }
+  function mergeSrs(a, b) {
+    var out = Object.assign({}, a, { s: {} }), SA = a.s || {}, SB = b.s || {};
+    Object.keys(SA).concat(Object.keys(SB)).forEach(function (id) {
+      if (id === "__proto__" || id === "constructor" || id === "prototype") return;
+      var x = SA[id], y = SB[id];
+      out.s[id] = !x ? y : !y ? x : ((x.ts || 0) >= (y.ts || 0) ? x : y);
+    });
+    var MA = a.m || { day: 0, newDone: 0 }, MB = b.m || { day: 0, newDone: 0 };
+    out.m = MA.day > MB.day ? MA : MB.day > MA.day ? MB : { day: MA.day, newDone: Math.max(MA.newDone || 0, MB.newDone || 0) };
+    return out;
+  }
+  function mergeRaw(key, localRaw, backupRaw) {
+    var l = JSON.parse(localRaw), b = JSON.parse(backupRaw);
+    return JSON.stringify(isQuizKey(key) ? mergeQuiz(l, b) : mergeSrs(l, b));
+  }
+  function mergePlan(storage, text, currentOrigin) {
+    var p = plan(storage, text, currentOrigin);
+    return { missing: p.missing, identical: p.identical, merge: p.conflicts.filter(mergeable), skipped: p.conflicts.filter(function (k) { return !mergeable(k); }) };
+  }
+  function restoreMerge(storage, text, currentOrigin) {
+    if (!storage || typeof storage.setItem !== "function" || typeof storage.removeItem !== "function")
+      throw new Error("Writable browser storage is unavailable");
+    var entries = readEntries(text, currentOrigin), mp = mergePlan(storage, text, currentOrigin);
+    var writes = []; // [key, previous value or null, new value]
+    mp.missing.forEach(function (k) { writes.push([k, null, entries[k]]); });
+    mp.merge.forEach(function (k) {
+      var cur = storage.getItem(k), merged;
+      try { merged = mergeRaw(k, cur, entries[k]); requireProgressValue(k, merged); }
+      catch (_) { throw new Error("Could not combine " + k + "; nothing was changed."); }
+      if (merged !== cur) writes.push([k, cur, merged]);
+    });
+    var done = [];
+    try {
+      writes.forEach(function (w) {
+        if (storage.getItem(w[0]) !== w[1]) throw new Error("Progress changed during restore; stopped.");
+        done.push(w);
+        storage.setItem(w[0], w[2]);
+        if (storage.getItem(w[0]) !== w[2]) throw new Error("Restore read-back failed.");
+      });
+      return { added: mp.missing.length, merged: writes.length - mp.missing.length, alreadyPresent: mp.identical.length, skipped: mp.skipped.slice() };
+    } catch (_) {
+      for (var i = done.length - 1; i >= 0; i--) {
+        try { if (done[i][1] === null) storage.removeItem(done[i][0]); else storage.setItem(done[i][0], done[i][1]); } catch (ignored) { /* reported below */ }
+      }
+      throw new Error("Merge did not complete; earlier changes were put back. Check your progress before retrying.");
+    }
+  }
+  return { plan: plan, restoreMissing: restoreMissing, mergePlan: mergePlan, restoreMerge: restoreMerge, mergeRaw: mergeRaw };
 });
