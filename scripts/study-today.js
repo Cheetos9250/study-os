@@ -114,6 +114,44 @@
   }
   return out.sort((a,b)=>a.days-b.days);
  }
+ /* Quiz reviews coming due per day from the review schedule rv {id: [box, dueMs]} (the FSRS due day); day 0 also holds what is already overdue. */
+ function reviewByDay(studyRaw,now,n){
+  const out=Array(n).fill(0),rv=readJSON(studyRaw,{}).rv;
+  if(!rv||typeof rv!=='object')return out;
+  const t0=sod(now);
+  for(const k of Object.keys(rv)){const v=rv[k];if(!Array.isArray(v)||!Number.isFinite(v[1]))continue;let i=Math.floor((v[1]-t0)/DAY);if(i<0)i=0;if(i<n)out[i]++;}
+  return out;
+ }
+ /* Plan backwards from every upcoming exam, all subjects at once: the work left in each exam's chapters (new questions + wrong ones),
+    weakest chapters first, split evenly over the study days before that exam; the day before is final review. Reads only; nothing stored. */
+ function backPlan(exams,summaries,now,reviewByCourse){
+  const up=(exams||[]).map(e=>({e,d:daysUntil(e.date,now)})).filter(x=>x.d>0&&Array.isArray(x.e.cats)&&x.e.cats.length&&summaries&&summaries[x.e.course]).sort((a,b)=>a.d-b.d);
+  if(!up.length)return {days:[],exams:0};
+  const n=Math.min(22,up[up.length-1].d+1),days=[];
+  for(let i=0;i<n;i++)days.push({offset:i,iso:dayKey(now+i*DAY),items:[],qs:0,review:0,exam:null});
+  const courses=new Set();
+  for(const {e,d} of up){
+   courses.add(e.course);
+   if(d<n)days[d].exam={examId:e.id,course:e.course,title:e.title};
+   if(d-1<n)days[d-1].items.push({kind:'final',examId:e.id,course:e.course,title:e.title,qs:0});
+   const sum=summaries[e.course],studyDays=Math.max(1,d-1);
+   const scope=e.cats.map(id=>sum.per[id]).filter(Boolean).map(p=>({p,w:Math.max(0,p.quiz-p.answered)+Math.max(0,p.answered-p.correct)})).filter(x=>x.w>0).sort((a,b)=>priority(b.p)-priority(a.p));
+   const total=scope.reduce((m,x)=>m+x.w,0);if(!total)continue;
+   const target=Math.max(1,Math.ceil(total/studyDays));
+   let day=0,cap=target;
+   for(const {p,w} of scope){
+    let left=w;
+    while(left>0){
+     const take=day>=studyDays-1?left:Math.min(left,cap);
+     if(day<n){const cell=days[day],hit=cell.items.find(x=>x.kind==='chapter'&&x.examId===e.id&&x.cat===p.id);if(hit)hit.qs+=take;else cell.items.push({kind:'chapter',examId:e.id,course:e.course,cat:p.id,label:p.label,title:e.title,qs:take});cell.qs+=take;}
+     left-=take;cap-=take;
+     if(cap<=0&&day<studyDays-1){day++;cap=target;}
+    }
+   }
+  }
+  for(const c of courses){const r=reviewByCourse&&reviewByCourse[c];if(Array.isArray(r))for(let i=0;i<n;i++)days[i].review+=r[i]||0;}
+  return {days,exams:up.length};
+ }
  function buildPlan(exams,summaries,settings,now){
   const today=dayKey(now),tasks=[];
   const reviewNow=Object.values(summaries).reduce((n,s)=>n+(s?s.reviewNow:0),0);
@@ -156,5 +194,5 @@
   else{const t={...(next.tasks[dayKey(now)]||{})};if(doneFlag)t[task.id]=true;else delete t[task.id];next.tasks={[dayKey(now)]:t};}
   return next;
  }
- return {SETTINGS_KEY,COURSES,LANGS,normalizeTimetable,classesOn,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,runway,buildPlan,weakSpots,markChapter};
+ return {SETTINGS_KEY,COURSES,LANGS,normalizeTimetable,classesOn,DEFAULT_EXAMS,sod,dayKey,dateStart,daysUntil,parseCourseData,summarize,accuracy,priority,normalizeExams,loadSettings,runway,buildPlan,reviewByDay,backPlan,weakSpots,markChapter};
 });

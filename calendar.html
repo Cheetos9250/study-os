@@ -123,6 +123,15 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
 @media(max-width:700px){.week{grid-template-columns:1fr}.wd{min-height:0}.wd:not(.has){display:none}}
 
 
+.plan-day{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.plan-day:last-child{border-bottom:0}
+.plan-day.today{font-weight:800}
+.plan-d{font-weight:800}.plan-d small{display:block;font-weight:600;color:var(--mute,inherit);opacity:.7}
+.plan-items{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.plan-chip{display:inline-flex;gap:6px;align-items:baseline;padding:4px 10px;border:2px solid currentColor;border-radius:999px;font-size:13px;font-weight:700}
+.plan-chip.final{border-style:dashed}.plan-chip.exam{background:var(--ink,#111);color:var(--paper,#fff);border-color:var(--ink,#111)}
+.plan-chip.rv{opacity:.75}
+@media(max-width:520px){.plan-day{grid-template-columns:1fr}}
 </style>
 <link rel="stylesheet" href="assets/study-world.css?v=9">
 <script src="scripts/study-theme.js?v=6"></script>
@@ -151,6 +160,11 @@ details.ex summary .when{color:var(--muted);font-size:13px;white-space:nowrap}
  <div id="examList"></div>
  <div class="btns" style="margin-top:12px"><button type="button" class="add" id="addExam">+ Add exam</button><button type="button" class="add" id="icsExams">Add to iPad Calendar</button><button type="button" class="add" id="resetExams" style="color:var(--red)">Reset</button></div>
  <p class="status" id="saveStatus" role="status"></p>
+</section>
+<h2>Plan back from exams</h2>
+<section class="box" aria-label="Study plan worked back from the exam dates">
+ <p class="status" id="planNote"></p>
+ <div id="planList"></div>
 </section>
 </main>
 </div>
@@ -251,6 +265,19 @@ function importTimetable(text){const m=String(text||'').trim().match(/#timetable
  settings.timetable=list;if(save())$('#ttStatus').textContent='Imported '+list.length+' classes.';return true;}
 if(/^#timetable=/.test(location.hash)){importTimetable(location.hash);history.replaceState(null,'',location.pathname+location.search);}
 $('#pasteClass').onclick=()=>{const v=prompt('Paste the timetable link');if(v===null)return;if(!importTimetable(v))$('#ttStatus').textContent='That is not a timetable link.';render();};
+function renderPlan(){
+ const T2=T,now=Date.now(),sums={},rev={};
+ for(const c of T2.COURSES)if(data[c.key])sums[c.key]=T2.summarize(data[c.key],read(c.mark+'-srs'),read('study-'+c.key),now);
+ const r0=T2.backPlan(settings.exams,sums,now,null),n=r0.days.length;
+ for(const c of T2.COURSES)if(sums[c.key])rev[c.key]=T2.reviewByDay(read('study-'+c.key),now,n);
+ const r=T2.backPlan(settings.exams,sums,now,rev),cn={};T2.COURSES.forEach(c=>cn[c.key]=c.full||c.name);
+ $('#planNote').textContent=n?'Worked back from your '+r.exams+' upcoming exam'+(r.exams>1?'s':'')+': new and wrong questions, weakest chapters first. Plain numbers, nothing is saved.':'';
+ $('#planList').innerHTML=n?r.days.map(d=>{
+  const p=parts(d.iso),chips=d.items.map(x=>x.kind==='final'?'<span class="plan-chip final">Final review · '+esc(cn[x.course]||x.course)+'</span>':'<span class="plan-chip">'+esc(cn[x.course]||x.course)+' · '+esc(x.label)+' <small>'+x.qs+' q</small></span>').join('')
+   +(d.exam?'<span class="plan-chip exam">Exam · '+esc(d.exam.title)+'</span>':'')+(d.review?'<span class="plan-chip rv">Review due '+d.review+'</span>':'');
+  return '<div class="plan-day'+(d.offset===0?' today':'')+'"><div class="plan-d">'+(d.offset===0?'Today':shortDay(d.iso))+'<small>'+(d.qs?d.qs+' new / wrong q':'')+'</small></div><div class="plan-items">'+(chips||'<span style="opacity:.6">Free day</span>')+'</div></div>';}).join('')
+  :'<p class="status">No upcoming exam with chapters yet. Add one in the exam schedule above.</p>';
+}
 function renderLead(){
  const d=new Date(Date.now()+7*3600000),hm=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
  const next=T.classesOn(settings.timetable,today).filter(x=>!x.skip&&x.end>hm)[0];
@@ -263,7 +290,7 @@ function renderLead(){
  $('#lead').innerHTML='<div class="bub"><b>'+say+'</b><span>'+sub+'</span></div>'+btn;
 }
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-go]');if(b){const t=document.getElementById(b.dataset.go);if(t)t.click();}});
-function render(){renderLead();const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id||d.dataset.cid);renderCal();renderWeek();renderExams();open.forEach(id=>{openExam(id);const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;});}
+function render(){renderLead();renderPlan();const open=[...document.querySelectorAll('details.ex[open]')].map(d=>d.dataset.id||d.dataset.cid);renderCal();renderWeek();renderExams();open.forEach(id=>{openExam(id);const d=document.querySelector('details[data-cid="'+id+'"]');if(d)d.open=true;});}
 render();
 Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{}))).then(render);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){settings=T.loadSettings(read(T.SETTINGS_KEY));render();}});
