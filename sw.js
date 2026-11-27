@@ -6,7 +6,7 @@
      to the network, untouched.
    - New deploy: a changed sw.js installs, skips waiting and claims open pages; old caches are deleted. */
 'use strict';
-const VERSION = 'studyos-v1';
+const VERSION = 'studyos-v2';
 const CACHE = VERSION + '-files';
 const CORE = [
   './', 'index.html', 'flashcards.html', 'practice.html', 'hub.html', 'calendar.html', 'grades.html', 'stats.html',
@@ -18,6 +18,22 @@ const CORE = [
   'data/textbook-sos/ch8.json', 'data/textbook-sos/ch9.json',
   'data/math-written/ch5.json', 'data/math-written/ch6.json', 'data/math-written/ch7.json'
 ];
+/* Web Share Target (Android Chrome, installed app): Share > Study OS sends an image as a POST to tutor.html?share=1.
+   Keep the first image in a cache that is NOT named studyos-* (so a new deploy never deletes it), then redirect to
+   tutor.html?shared=1, which reads it once and removes it. Nothing leaves the device. */
+const SHARE_CACHE = 'share-inbox-v1', SHARE_KEY = 'shared-image';
+async function takeShare(req) {
+  try {
+    const form = await req.formData();
+    const f = form.get('photo');
+    if (f && f.type && f.type.indexOf('image/') === 0 && f.size) {
+      const cache = await caches.open(SHARE_CACHE);
+      await cache.put(SHARE_KEY, new Response(f, { headers: { 'content-type': f.type } }));
+      return Response.redirect(new URL('tutor.html?shared=1', self.location.href).href, 303);
+    }
+  } catch (e) { /* fall through */ }
+  return Response.redirect(new URL('tutor.html?shared=0', self.location.href).href, 303);
+}
 const SKIP = /\/data\/config\.json$/;
 const FILE = /\.(html|js|css|json|webmanifest|png|svg|ico|jpg|jpeg|gif|webp|woff2?)$/i;
 
@@ -63,6 +79,10 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const req = event.request;
+  if (req.method === 'POST' && new URL(req.url).pathname.endsWith('/tutor.html') && new URL(req.url).searchParams.get('share') === '1') {
+    event.respondWith(takeShare(req));
+    return;
+  }
   if (!wanted(req)) return; // config.json, other origins, POST/PUT: browser default, never cached
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
