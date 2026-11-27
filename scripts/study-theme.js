@@ -21,6 +21,8 @@
  function cycle(){mode=NEXT[mode];apply(mode);try{if(mode==='auto')localStorage.removeItem(KEY);else localStorage.setItem(KEY,mode);}catch(e){}return mode;}
  /* Ask the browser to keep this site's data instead of clearing it under storage pressure (iPadOS honours this best for home-screen apps). */
  try{if(navigator.storage&&navigator.storage.persisted&&navigator.storage.persist)navigator.storage.persisted().then(function(p){if(!p)return navigator.storage.persist();}).catch(function(){});}catch(e){}
+ /* offline pill and "new version" bar (scripts/study-offline.js, next to this file) */
+ try{var cs0=document.currentScript;if(cs0&&cs0.src){var so=document.createElement('script');so.src=new URL('study-offline.js?v=1',cs0.src).href;so.async=true;document.head.appendChild(so);}}catch(e){}
  /* Offline support: register sw.js (site root, next to this scripts/ folder) on https only. It caches site files, never study data. */
  try{var cs=document.currentScript;if('serviceWorker' in navigator&&location.protocol==='https:'&&cs&&cs.src){var swu=new URL('../sw.js',cs.src);window.addEventListener('load',function(){navigator.serviceWorker.register(swu.href,{scope:new URL('./',swu).href}).catch(function(){});});}}catch(e){}
  /* read-only view of Today's running Pomodoro (studyos.pomo.v1 is written only by index.html) */

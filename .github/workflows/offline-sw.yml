@@ -3,9 +3,9 @@ name: Study OS offline (service worker)
 on:
   push:
     branches: [main]
-    paths: ["sw.js", "scripts/study-theme.js", "tests/offline-sw*.cjs", "tests/wordnest-offline-browser.cjs", "vocabloom/**", "mock.html", ".github/workflows/offline-sw.yml"]
+    paths: ["sw.js", "scripts/study-theme.js", "scripts/study-offline.js", "tests/offline-*.cjs", "tests/offline-sw*.cjs", "tests/wordnest-offline-browser.cjs", "vocabloom/**", "mock.html", ".github/workflows/offline-sw.yml"]
   pull_request:
-    paths: ["sw.js", "scripts/study-theme.js", "tests/offline-sw*.cjs", "tests/wordnest-offline-browser.cjs", "vocabloom/**", "mock.html", ".github/workflows/offline-sw.yml"]
+    paths: ["sw.js", "scripts/study-theme.js", "scripts/study-offline.js", "tests/offline-*.cjs", "tests/offline-sw*.cjs", "tests/wordnest-offline-browser.cjs", "vocabloom/**", "mock.html", ".github/workflows/offline-sw.yml"]
   workflow_dispatch:
 
 concurrency:
@@ -31,6 +31,10 @@ jobs:
         env:
           NODE_PATH: ${{ runner.temp }}/sw/node_modules
         run: node tests/offline-sw-browser.cjs
+      - name: Offline UI and update bar (real browser)
+        env:
+          NODE_PATH: ${{ runner.temp }}/sw/node_modules
+        run: node tests/offline-ui-browser.cjs
       - name: WordNest and mock exam offline
         env:
           NODE_PATH: ${{ runner.temp }}/sw/node_modules
