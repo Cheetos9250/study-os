@@ -1,0 +1,1 @@
+- Practice: the **More** row (Shuffle, Clear answers) now opens as a tidy second row instead of a raised, misaligned pill.
