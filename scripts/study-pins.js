@@ -60,7 +60,7 @@
  function css(){if(document.getElementById('spCss'))return;const s=document.createElement('style');s.id='spCss';s.textContent=CSS;document.head.appendChild(s);}
  function pinsHTML(c){const p=parsePins(pinText(c));
   return p.length?'<ul>'+p.map(x=>'<li>'+(x.title?'<b>'+esc(x.title)+'</b>':'')+esc(x.body)+'</li>').join('')+'</ul>'
-   :'<p class="sp-none">No pinned formulas yet. Tap Edit and write one per line, e.g. <code>COGS :: Beginning inventory + Purchases − Ending inventory</code></p>';}
+   :'<p class="sp-none">None yet.</p>';}
  const EXAMPLE={acc:'COGS :: Beginning inventory + Net purchases − Ending inventory\nGross profit :: Net sales − COGS\nAdjusted bank balance :: Bank + Deposits in transit − Outstanding checks',
   eco:'GDP (expenditure) :: C + I + G + (X − M)\nInflation rate :: (CPI now − CPI before) ÷ CPI before × 100\nMoney multiplier :: 1 ÷ reserve ratio',
   math:'Simple interest :: I = P × r × t\nCompound amount :: A = P(1 + r/n)^(nt)\nP(A or B) :: P(A) + P(B) − P(A and B)'};

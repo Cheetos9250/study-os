@@ -1,0 +1,1 @@
+- Decluttered Today, Practice and Mock exam: removed helper sentences, hid empty sections (weak chapters, study time), shortened empty pinned formulas.
