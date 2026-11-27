@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&amp;family=Mali:wght@500;600;700&amp;display=swap">
+<meta name="description" content="Study OS — every formula from the course data">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Study OS">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0f" media="(prefers-color-scheme: dark)">
+<title>Formulas — Study OS</title>
+<link rel="stylesheet" href="assets/study-world.css?v=9">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+.page{max-width:900px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 96px max(18px,env(safe-area-inset-left))}
+.fbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.tf{display:flex;flex-wrap:wrap;border:2.5px solid var(--ink);border-radius:6px;overflow:hidden}
+.tf button{min-height:44px;padding:6px 12px;border:0;background:var(--panel);color:var(--text);font:700 14px var(--ui);cursor:pointer}
+.tf button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+#q{flex:1;min-width:180px;min-height:44px;border:2px solid var(--ink);border-radius:var(--r-s);background:var(--panel);color:var(--text);font:600 16px var(--ui);padding:0 12px}
+label.sl{display:inline-flex;gap:8px;align-items:center;font-size:14px;font-weight:700;min-height:44px}
+label.sl input{width:22px;height:22px}
+.panel{background:var(--panel);border:var(--bw) solid var(--ink);border-radius:var(--r);padding:12px 16px;margin:12px 0}
+.panel h2{margin:0 0 6px;font-size:17px}
+.none{font-size:13px;color:var(--muted);margin:2px 0}
+.f{border-top:2px solid var(--line-soft);padding:9px 0}.f:first-of-type{border-top:0}
+.f b{display:block;font-size:14px}
+.f pre{margin:4px 0 2px;font:700 16px/1.55 var(--num,var(--ui));white-space:pre-wrap;overflow-wrap:anywhere}
+.f small{font-size:12px;color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+</style>
+<script src="scripts/study-theme.js?v=6"></script>
+<script src="scripts/study-accent.js?v=2"></script>
+<link rel="stylesheet" href="assets/study-eink-base.css?v=1">
+</head>
+<body>
+<div class="page">
+<h1>Formulas</h1>
+<main>
+<div class="fbar"><div class="tf" id="tabs" role="group" aria-label="Subject"></div><input id="q" type="search" placeholder="Search a formula…" aria-label="Search formulas"><label class="sl"><input type="checkbox" id="slide"> Slide-cited only</label></div>
+<div id="out"><p class="note">Loading…</p></div>
+<p class="note">Every formula is copied from the lesson summaries and flashcards already in Study OS (nothing added by hand). The tag shows where it came from: <b>Slide</b> = a flashcard that cites a slide, <b>Summary</b> = lesson summary table, <b>Card</b> = flashcard without a slide number. Read-only; nothing is stored.</p>
+</main>
+</div>
+<script src="scripts/study-nav.js?v=16"></script>
+<script>
+(function(){
+'use strict';
+var DATA=null,course='acc',TAG={slide:'Slide',sum:'Summary',card:'Card'};
+var tabs=document.getElementById('tabs'),out=document.getElementById('out'),q=document.getElementById('q'),sl=document.getElementById('slide');
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+function render(){
+ out.textContent='';if(!DATA)return;
+ var C=DATA.courses[course],term=q.value.trim().toLowerCase(),only=sl.checked,empty=[],shown=0;
+ C.cats.forEach(function(cat){
+  var items=C.items.filter(function(i){return i.ch===cat[0]&&(!only||i.src==='slide')&&(!term||(i.title+' '+i.formula).toLowerCase().indexOf(term)>=0);});
+  if(!items.length){empty.push(cat[1]);return;}
+  var p=el('section','panel'),h=el('h2',null,cat[1]);p.appendChild(h);
+  items.forEach(function(i){var d=el('div','f');d.appendChild(el('b',null,i.title));d.appendChild(el('pre',null,i.formula));d.appendChild(el('small',null,TAG[i.src]+(i.ref&&i.src!=='card'?' · '+i.ref:'')));p.appendChild(d);shown++;});
+  out.appendChild(p);
+ });
+ if(!shown)out.appendChild(el('p','note','No formulas match.'));
+ else if(empty.length)out.appendChild(el('p','none','No formula found in: '+empty.join(' · ')));
+}
+fetch('data/formulas.json').then(function(r){return r.json();}).then(function(j){
+ DATA=j;Object.keys(j.courses).forEach(function(k){var b=el('button',null,j.courses[k].name+' ('+j.courses[k].items.length+')');b.type='button';b.setAttribute('aria-pressed',k===course?'true':'false');b.onclick=function(){course=k;[].forEach.call(tabs.children,function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');render();};tabs.appendChild(b);});
+ render();
+}).catch(function(){out.textContent='Could not load formulas.';});
+q.addEventListener('input',render);sl.addEventListener('change',render);
+})();
+</script>
+</body>
+</html>

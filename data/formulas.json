@@ -1,0 +1,889 @@
+{
+ "generated": "node scripts/build-formulas.cjs",
+ "courses": {
+  "acc": {
+   "name": "Accounting",
+   "cats": [
+    [
+     "c1",
+     "01 Business"
+    ],
+    [
+     "c2",
+     "02 Recording"
+    ],
+    [
+     "c3",
+     "03 Adjusting"
+    ],
+    [
+     "c4",
+     "04 Cycle"
+    ],
+    [
+     "c5",
+     "05 Merchandising"
+    ],
+    [
+     "c6",
+     "06 Inventory"
+    ],
+    [
+     "c7",
+     "07 AIS"
+    ],
+    [
+     "c8",
+     "08 Cash"
+    ],
+    [
+     "c9",
+     "09 Receivables"
+    ]
+   ],
+   "items": [
+    {
+     "ch": "c1",
+     "title": "สมการบัญชีคืออะไร ทำไมต้องสมดุล",
+     "formula": "Assets = Liabilities + Equity\nสินทรัพย์ทุกบาทได้มาจากเจ้าหนี้หรือเจ้าของ จึงต้องเท่ากันเสมอ",
+     "src": "slide",
+     "ref": "Slide 20",
+     "id": "01-19"
+    },
+    {
+     "ch": "c1",
+     "title": "ROA",
+     "formula": "ROA = Net Income ÷ Average Total Assets\nวัดว่าใช้สินทรัพย์สร้างกำไรได้ดีแค่ไหน",
+     "src": "slide",
+     "ref": "Slide 42",
+     "id": "01-30"
+    },
+    {
+     "ch": "c1",
+     "title": "สมการบัญชีแบบขยาย (Expanded accounting equation)",
+     "formula": "Assets = Liabilities + (Owner’s capital − Drawings + Revenues − Expenses)\nRevenues เพิ่ม Equity · Expenses และ Drawings ลด Equity",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-1"
+    },
+    {
+     "ch": "c1",
+     "title": "สมการบัญชี",
+     "formula": "Assets = Liabilities + Equity",
+     "src": "sum",
+     "ref": "พื้นฐานการบัญชี"
+    },
+    {
+     "ch": "c1",
+     "title": "ROA",
+     "formula": "Net income ÷ Avg total assets",
+     "src": "sum",
+     "ref": "พื้นฐานการบัญชี"
+    },
+    {
+     "ch": "c2",
+     "title": "Debt ratio คำนวณอย่างไร ค่าสูงหมายถึงอะไร",
+     "formula": "Debt ratio = Total Liabilities ÷ Total Assets\nสูง = มีโอกาสชำระหนี้ไม่ได้ในอนาคตมากขึ้น (ความเสี่ยงหนี้สูง)",
+     "src": "slide",
+     "ref": "Slide 2-37",
+     "id": "02-24"
+    },
+    {
+     "ch": "c3",
+     "title": "Straight-line depreciation",
+     "formula": "(Asset cost − Residual value) ÷ Useful life",
+     "src": "slide",
+     "ref": "Slide 3-14",
+     "id": "03-10"
+    },
+    {
+     "ch": "c3",
+     "title": "Profit margin",
+     "formula": "Net profit ÷ Net sales",
+     "src": "slide",
+     "ref": "Slide 3-37",
+     "id": "03-21"
+    },
+    {
+     "ch": "c3",
+     "title": "Book value ของสินทรัพย์ถาวร",
+     "formula": "Book value = Cost − Accumulated depreciation",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-3"
+    },
+    {
+     "ch": "c3",
+     "title": "ตัด Prepaid expense เป็นค่าใช้จ่ายต่องวด",
+     "formula": "จำนวนที่จ่าย ÷ จำนวนเดือนที่คุ้มครอง × จำนวนเดือนที่ใช้ไปแล้ว\nDr. Expense / Cr. Prepaid",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-4"
+    },
+    {
+     "ch": "c3",
+     "title": "รับรู้ Unearned revenue เป็นรายได้",
+     "formula": "รายได้รับล่วงหน้า ÷ จำนวนงวดทั้งหมด × งวดที่ให้บริการแล้ว\nDr. Unearned revenue / Cr. Revenue",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-5"
+    },
+    {
+     "ch": "c3",
+     "title": "ดอกเบี้ยค้างจ่าย/ค้างรับ ณ วันปรับปรุง",
+     "formula": "Interest = Principal × Rate × Time (เศษส่วนของปี)\nค้างจ่าย: Dr. Interest expense / Cr. Interest payable\nค้างรับ: Dr. Interest receivable / Cr. Interest revenue",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-6"
+    },
+    {
+     "ch": "c3",
+     "title": "Tip",
+     "formula": "Straight-line = (Cost − Salvage) ÷ Life",
+     "src": "sum",
+     "ref": "Adjusting entries 4 แบบ"
+    },
+    {
+     "ch": "c4",
+     "title": "Current ratio คำนวณอย่างไร บอกอะไร",
+     "formula": "Current assets ÷ Current liabilities\nใช้ดูความสามารถชำระหนี้ระยะสั้น",
+     "src": "slide",
+     "ref": "Slide 4-37",
+     "id": "04-20"
+    },
+    {
+     "ch": "c4",
+     "title": "Working capital",
+     "formula": "Working capital = Current assets − Current liabilities\nเป็นบวก = มีสภาพคล่องพอชำระหนี้ระยะสั้น",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-7"
+    },
+    {
+     "ch": "c4",
+     "title": "Current ratio",
+     "formula": "Current assets ÷ Current liabilities",
+     "src": "sum",
+     "ref": "Classified balance sheet"
+    },
+    {
+     "ch": "c5",
+     "title": "COGS",
+     "formula": "Beginning inventory + Net purchases = Merchandise available for sale\nCOGS = Available for sale − Ending inventory",
+     "src": "slide",
+     "ref": "Slide 5-30",
+     "id": "05-20"
+    },
+    {
+     "ch": "c5",
+     "title": "Acid-test ratio คำนวณอย่างไร เกณฑ์เท่าไร",
+     "formula": "(Cash + S-T Investments + Current Receivables) ÷ Current Liabilities\nควร ≥ 1.0 (ไม่รวม Inventory)",
+     "src": "slide",
+     "ref": "Slide 5-35",
+     "id": "05-23"
+    },
+    {
+     "ch": "c5",
+     "title": "Gross margin ratio",
+     "formula": "(Net sales − COGS) ÷ Net sales\n= สัดส่วนยอดขายที่เหลือไว้จ่ายค่าใช้จ่ายและเป็นกำไร",
+     "src": "slide",
+     "ref": "Slide 5-36",
+     "id": "05-24"
+    },
+    {
+     "ch": "c5",
+     "title": "Net sales",
+     "formula": "Net sales = Sales − Sales returns and allowances − Sales discounts",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-8"
+    },
+    {
+     "ch": "c5",
+     "title": "Net purchases และต้นทุนสินค้าที่ซื้อมา",
+     "formula": "Net purchases = Purchases − Purchase returns and allowances − Purchase discounts\nCost of merchandise purchased = Net purchases + Freight-in",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-9"
+    },
+    {
+     "ch": "c5",
+     "title": "Gross margin ratio",
+     "formula": "(Net sales − COGS) ÷ Net sales",
+     "src": "sum",
+     "ref": "อัตราส่วน"
+    },
+    {
+     "ch": "c5",
+     "title": "Acid-test",
+     "formula": "Quick assets ÷ Current liabilities",
+     "src": "sum",
+     "ref": "อัตราส่วน"
+    },
+    {
+     "ch": "c5",
+     "title": "Key Profitability Ratios",
+     "formula": "Gross Profit Rate = (Gross Profit) / (Net Sales) × 100% Profit Margin = (Net Income) / (Net Sales) × 100%",
+     "src": "sum",
+     "ref": "Multiple-Step Income Statement & Ratios (งบกำไรขาดทุนแบบหลายขั้นและอัตราส่วน)"
+    },
+    {
+     "ch": "c6",
+     "title": "Inventory turnover",
+     "formula": "COGS ÷ Average inventory\nAverage inventory = (ต้นงวด + ปลายงวด) ÷ 2",
+     "src": "slide",
+     "ref": "Slide 6-33",
+     "id": "06-20"
+    },
+    {
+     "ch": "c6",
+     "title": "Days’ sales in inventory",
+     "formula": "(Ending inventory ÷ COGS) × 365\n= สินค้าคงเหลือพอขายได้กี่วัน",
+     "src": "slide",
+     "ref": "Slide 6-34",
+     "id": "06-21"
+    },
+    {
+     "ch": "c6",
+     "title": "หา COGS และ Ending inventory แบบ Periodic",
+     "formula": "Goods available for sale = Beginning inventory + Cost of merchandise purchased\nCOGS = Goods available − Ending inventory\nEnding inventory = Goods available − COGS",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-10"
+    },
+    {
+     "ch": "c6",
+     "title": "Inventory turnover",
+     "formula": "COGS ÷ Avg inventory",
+     "src": "sum",
+     "ref": "การวัดมูลค่าและอัตราส่วน"
+    },
+    {
+     "ch": "c6",
+     "title": "Days' sales in inventory",
+     "formula": "Ending inv ÷ COGS × 365",
+     "src": "sum",
+     "ref": "การวัดมูลค่าและอัตราส่วน"
+    },
+    {
+     "ch": "c6",
+     "title": "Formula",
+     "formula": "Cost of Goods Available for Sale (COGAS) = Beginning Inventory + Net Purchases",
+     "src": "sum",
+     "ref": "Inventory Costing Methods (วิธีการคำนวณต้นทุนสินค้าคงเหลือ)"
+    },
+    {
+     "ch": "c6",
+     "title": "Formula",
+     "formula": "COGAS = Ending Inventory + Cost of Goods Sold (COGS)",
+     "src": "sum",
+     "ref": "Inventory Costing Methods (วิธีการคำนวณต้นทุนสินค้าคงเหลือ)"
+    },
+    {
+     "ch": "c6",
+     "title": "Formula",
+     "formula": "NRV = Estimated Selling Price - Estimated Costs to Complete and Sell",
+     "src": "sum",
+     "ref": "Lower-of-Cost-or-Net-Realizable-Value (LCNRV) (การตีราคาสินค้าด้วยราคาทุนหรือมูลค่าสุทธิที่จะได้รับที่ต่ำกว่า)"
+    },
+    {
+     "ch": "c6",
+     "title": "Inventory Ratios",
+     "formula": "Inventory Turnover = (Cost of Goods Sold) / (Average Inventory), where Average Inventory = (Beg. Inv. + End. Inv.) / 2 Days in Inventory = 365 / Inventory Turnover",
+     "src": "sum",
+     "ref": "Inventory Estimation Methods & Ratios (การประมาณราคาสินค้าคงเหลือและอัตราส่วน)"
+    },
+    {
+     "ch": "c7",
+     "title": "Segment return on assets",
+     "formula": "Segment operating profit ÷ Segment average assets\nใช้ดูว่าส่วนงานใดใช้สินทรัพย์ได้คุ้มที่สุด",
+     "src": "slide",
+     "ref": "Slide 7-23",
+     "id": "07-22"
+    },
+    {
+     "ch": "c8",
+     "title": "Days’ sales uncollected",
+     "formula": "(Accounts receivable ÷ Net sales) × 365\n= อีกกี่วันจะได้รับเงินจากการขายเชื่อ",
+     "src": "slide",
+     "ref": "Slide 8-30",
+     "id": "08-24"
+    },
+    {
+     "ch": "c8",
+     "title": "ตรวจยอด Petty cash",
+     "formula": "Cash ที่เหลือ + ใบสำคัญจ่ายที่ใช้ไป = ยอด Petty cash fund\nผลต่างคือ Cash over/short",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-14"
+    },
+    {
+     "ch": "c9",
+     "title": "Accounts receivable turnover",
+     "formula": "Net sales ÷ Average accounts receivable (net)\nบอกประสิทธิภาพการให้เครดิตเพื่อสร้างรายได้",
+     "src": "slide",
+     "ref": "Slide 9-35",
+     "id": "09-25"
+    },
+    {
+     "ch": "c9",
+     "title": "Net realizable value ของลูกหนี้",
+     "formula": "NRV = Accounts receivable − Allowance for doubtful accounts",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-15"
+    },
+    {
+     "ch": "c9",
+     "title": "Maturity value ของตั๋วเงินรับ",
+     "formula": "Maturity value = Principal + Interest = P × (1 + R × T)\nInterest = P × R × T (T = วัน ÷ 360 ในวิชานี้)",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-16"
+    },
+    {
+     "ch": "c9",
+     "title": "Interest",
+     "formula": "P × R × T (360 วัน)",
+     "src": "sum",
+     "ref": "ตั๋วเงินรับ"
+    },
+    {
+     "ch": "c9",
+     "title": "A/R turnover",
+     "formula": "Net sales ÷ Avg net A/R",
+     "src": "sum",
+     "ref": "ตั๋วเงินรับ"
+    }
+   ]
+  },
+  "eco": {
+   "name": "Economics",
+   "cats": [
+    [
+     "c2",
+     "Micro · 002 Economic Way of Thinking"
+    ],
+    [
+     "c3",
+     "Micro · 003 Demand & Supply"
+    ],
+    [
+     "g",
+     "Macro · GDP"
+    ],
+    [
+     "i",
+     "Macro · Inflation & CPI"
+    ],
+    [
+     "b",
+     "Macro · Business Cycle"
+    ],
+    [
+     "a",
+     "Macro · AD–AS"
+    ],
+    [
+     "d",
+     "Macro · Growth & Development"
+    ],
+    [
+     "m",
+     "Macro · Money & Banking"
+    ],
+    [
+     "f",
+     "Macro · Fiscal Policy"
+    ],
+    [
+     "n",
+     "Macro · Monetary Policy"
+    ]
+   ],
+   "items": [
+    {
+     "ch": "c3",
+     "title": "Equilibrium",
+     "formula": "Qd = Qs",
+     "src": "sum",
+     "ref": "Demand & Supply"
+    },
+    {
+     "ch": "g",
+     "title": "2 วิธีคำนวณ GDP",
+     "formula": "Expenditure approach = รวมรายจ่ายซื้อสินค้าขั้นสุดท้าย\nIncome approach = รวมรายได้ (ค่าตอบแทนแรงงาน ค่าเช่า ดอกเบี้ยสุทธิ กำไร)",
+     "src": "card",
+     "ref": "GDP",
+     "id": "m1-8"
+    },
+    {
+     "ch": "g",
+     "title": "GDP แบบ Expenditure approach",
+     "formula": "GDP = C + I + G + (X − M)\nC ครัวเรือน · I ธุรกิจลงทุน · G รัฐ · X ส่งออก · M นำเข้า",
+     "src": "card",
+     "ref": "GDP",
+     "id": "m1-9"
+    },
+    {
+     "ch": "g",
+     "title": "GDP chain price index (Deflator) และสูตร Real GDP",
+     "formula": "ดัชนีเทียบราคาสินค้าขั้นสุดท้ายทั้งหมดกับปีฐาน\nReal GDP = Nominal GDP ÷ GDP chain price index × 100",
+     "src": "card",
+     "ref": "GDP",
+     "id": "m1-19"
+    },
+    {
+     "ch": "g",
+     "title": "Net exports",
+     "formula": "Net exports = X − M (ส่งออก − นำเข้า)\nบวก = เกินดุลการค้า · ลบ = ขาดดุล",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-1"
+    },
+    {
+     "ch": "g",
+     "title": "ด้านรายจ่าย",
+     "formula": "GDP = C + I + G + (X − M)",
+     "src": "sum",
+     "ref": "GDP: นับอะไร ไม่นับอะไร"
+    },
+    {
+     "ch": "g",
+     "title": "Real GDP",
+     "formula": "Nominal GDP ÷ GDP Deflator × 100",
+     "src": "sum",
+     "ref": "GDP vs GNP · Real GDP · อัตราแลกเปลี่ยน"
+    },
+    {
+     "ch": "g",
+     "title": "I",
+     "formula": "Gross private domestic investment = Fixed investment + Change in business inventories",
+     "src": "sum",
+     "ref": "2 วิธีคำนวณ GDP: Expenditure vs Income"
+    },
+    {
+     "ch": "g",
+     "title": "X − M",
+     "formula": "Net exports = ส่งออก − นำเข้า",
+     "src": "sum",
+     "ref": "2 วิธีคำนวณ GDP: Expenditure vs Income"
+    },
+    {
+     "ch": "g",
+     "title": "Income approach",
+     "formula": "GDP = Compensation of employees + Rents + Profits + Net interest + Indirect business taxes + Depreciation",
+     "src": "sum",
+     "ref": "2 วิธีคำนวณ GDP: Expenditure vs Income"
+    },
+    {
+     "ch": "i",
+     "title": "CPI",
+     "formula": "(ต้นทุนตะกร้า ณ ราคาปีปัจจุบัน ÷ ต้นทุนตะกร้าเดียวกัน ณ ราคาปีฐาน) × 100",
+     "src": "card",
+     "ref": "Inflation",
+     "id": "m3-5"
+    },
+    {
+     "ch": "i",
+     "title": "อัตราเงินเฟ้อ",
+     "formula": "(CPI ปีนี้ − CPI ปีก่อน) ÷ CPI ปีก่อน × 100",
+     "src": "card",
+     "ref": "Inflation",
+     "id": "m3-8"
+    },
+    {
+     "ch": "i",
+     "title": "CPI",
+     "formula": "ตะกร้าปีนี้ ÷ ตะกร้าปีฐาน × 100 (ปีฐาน CPI = 100 เสมอ)",
+     "src": "sum",
+     "ref": "Inflation: นิยาม & สาเหตุ"
+    },
+    {
+     "ch": "i",
+     "title": "Inflation rate",
+     "formula": "(CPI ปี 2 − CPI ปี 1) ÷ CPI ปี 1 × 100",
+     "src": "sum",
+     "ref": "Inflation: นิยาม & สาเหตุ"
+    },
+    {
+     "ch": "i",
+     "title": "Real income",
+     "formula": "Nominal income ÷ CPI × 100",
+     "src": "sum",
+     "ref": "Inflation: นิยาม & สาเหตุ"
+    },
+    {
+     "ch": "i",
+     "title": "Real income",
+     "formula": "Nominal income ÷ (CPI / 100)",
+     "src": "sum",
+     "ref": "Purchasing power · Real income · ผลต่อความมั่งคั่ง"
+    },
+    {
+     "ch": "b",
+     "title": "Unemployment rate คืออะไร",
+     "formula": "% ของ Civilian labor force ที่ไม่มีงานและกำลังหางาน\n= Unemployed ÷ Civilian labor force × 100",
+     "src": "card",
+     "ref": "Business Cycle",
+     "id": "m2-8"
+    },
+    {
+     "ch": "b",
+     "title": "Civilian labor force",
+     "formula": "Labor force = Employed + Unemployed (ว่างงานและกำลังหางาน)\nคนที่ไม่หางานไม่นับในกำลังแรงงาน",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-3"
+    },
+    {
+     "ch": "b",
+     "title": "Unemployment rate",
+     "formula": "Unemployed ÷ Labor force × 100",
+     "src": "sum",
+     "ref": "ตลาดแรงงาน & Full employment"
+    },
+    {
+     "ch": "b",
+     "title": "Unemployment rate",
+     "formula": "Unemployed ÷ Civilian labor force × 100",
+     "src": "sum",
+     "ref": "Labor force: ใครนับ ใครไม่นับ (BLS)"
+    },
+    {
+     "ch": "d",
+     "title": "อัตราการเติบโตของ Real GDP",
+     "formula": "Growth rate = (Real GDP ปีนี้ − Real GDP ปีก่อน) ÷ Real GDP ปีก่อน × 100",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-5"
+    },
+    {
+     "ch": "d",
+     "title": "GDP per capita",
+     "formula": "GDP ÷ จำนวนประชากรทั้งหมด",
+     "src": "sum",
+     "ref": "วัดความกินดีอยู่ดี: GDP per capita, IACs vs LDCs"
+    },
+    {
+     "ch": "m",
+     "title": "Money multiplier",
+     "formula": "Money multiplier = 1 ÷ rr\nเงินฝากเพิ่มสูงสุด = เงินฝากใหม่ × (1 ÷ rr)",
+     "src": "card",
+     "ref": "Money & Banking",
+     "id": "m6-11"
+    },
+    {
+     "ch": "m",
+     "title": "Quantity theory of money (สมการแลกเปลี่ยน)",
+     "formula": "M × V = P × Y\nM = ปริมาณเงิน, V = ความเร็วการหมุนของเงิน, P = ระดับราคา, Y = Real GDP\nถ้า V และ Y คงที่ M เพิ่ม → P เพิ่มในสัดส่วนเดียวกัน",
+     "src": "card",
+     "ref": "Money & Banking",
+     "id": "m6-15"
+    },
+    {
+     "ch": "m",
+     "title": "Required reserves และ Excess reserves",
+     "formula": "Required reserves = Deposits × rr\nExcess reserves = Total reserves − Required reserves\nให้กู้ได้สูงสุด = Excess reserves",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-6"
+    },
+    {
+     "ch": "m",
+     "title": "Velocity ของเงิน (V)",
+     "formula": "จาก M × V = P × Y → V = (P × Y) ÷ M",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-7"
+    },
+    {
+     "ch": "m",
+     "title": "Money multiplier",
+     "formula": "1 ÷ rr",
+     "src": "sum",
+     "ref": "Money & Banking"
+    },
+    {
+     "ch": "m",
+     "title": "Quantity theory",
+     "formula": "M × V = P × Y",
+     "src": "sum",
+     "ref": "Money & Banking"
+    },
+    {
+     "ch": "f",
+     "title": "Spending multiplier (ตัวคูณรายจ่ายรัฐ)",
+     "formula": "k = 1 ÷ (1 − MPC) = 1 ÷ MPS\nΔGDP = ΔG × k",
+     "src": "card",
+     "ref": "Fiscal Policy",
+     "id": "m7-6"
+    },
+    {
+     "ch": "f",
+     "title": "Tax multiplier",
+     "formula": "Tax multiplier = −MPC ÷ (1 − MPC)\nเครื่องหมายลบ: ขึ้นภาษี → GDP ลด",
+     "src": "card",
+     "ref": "Fiscal Policy",
+     "id": "m7-8"
+    },
+    {
+     "ch": "f",
+     "title": "ดุลงบประมาณ (Budget balance)",
+     "formula": "Budget balance = T − G\nบวก = Surplus · ลบ = Deficit · เท่ากับ 0 = Balanced budget",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-9"
+    },
+    {
+     "ch": "f",
+     "title": "Spending multiplier",
+     "formula": "1 ÷ (1 − MPC)",
+     "src": "sum",
+     "ref": "Fiscal Policy"
+    },
+    {
+     "ch": "f",
+     "title": "Tax multiplier",
+     "formula": "−MPC ÷ (1 − MPC)",
+     "src": "sum",
+     "ref": "Fiscal Policy"
+    },
+    {
+     "ch": "f",
+     "title": "Balanced budget",
+     "formula": "multiplier = 1",
+     "src": "sum",
+     "ref": "Fiscal Policy"
+    },
+    {
+     "ch": "f",
+     "title": "Spending multiplier",
+     "formula": "1 ÷ (1 − MPC) = 1 ÷ MPS",
+     "src": "sum",
+     "ref": "Fiscal policy: เครื่องมือ, multiplier, supply-side"
+    },
+    {
+     "ch": "f",
+     "title": "Tax multiplier",
+     "formula": "−MPC ÷ (1 − MPC) ขนาดน้อยกว่า spending multiplier อยู่ 1 เสมอ",
+     "src": "sum",
+     "ref": "Fiscal policy: เครื่องมือ, multiplier, supply-side"
+    }
+   ]
+  },
+  "math": {
+   "name": "Math for Life",
+   "cats": [
+    [
+     "c5",
+     "05 Financial Math"
+    ],
+    [
+     "c6",
+     "06 Sets & Venn"
+    ],
+    [
+     "c7",
+     "07 Prob & Stats"
+    ]
+   ],
+   "items": [
+    {
+     "ch": "c5",
+     "title": "Discount และ Sale price",
+     "formula": "d = p × m (markdown)\ns = p − d = p × c (c = complement = 1 − m)",
+     "src": "card",
+     "ref": "Ch.5",
+     "id": "05-9"
+    },
+    {
+     "ch": "c5",
+     "title": "Sales tax และ Total price คำนวณอย่างไร? (ยาง 4,500 VAT 7%)",
+     "formula": "Tax = Price × rate · Total = Price × (1 + rate)\n4,500 × 1.07 = 4,815",
+     "src": "card",
+     "ref": "Ch.5",
+     "id": "05-12"
+    },
+    {
+     "ch": "c5",
+     "title": "Simple interest และ Future value",
+     "formula": "I = Prt\nA = P + I = P(1 + rt)",
+     "src": "card",
+     "ref": "Ch.5",
+     "id": "05-13"
+    },
+    {
+     "ch": "c5",
+     "title": "Compound interest",
+     "formula": "A = P(1 + i)^N\ni = r/n · N = nt (n: ปีละ 1, 2, 4, 12, 360)",
+     "src": "card",
+     "ref": "Ch.5",
+     "id": "05-20"
+    },
+    {
+     "ch": "c5",
+     "title": "Percent increase / decrease",
+     "formula": "เปลี่ยนแปลง % = (ค่าใหม่ − ค่าเก่า) ÷ ค่าเก่า × 100\nบวก = เพิ่ม · ลบ = ลด (ฐานคือ “ค่าเก่า” เสมอ)",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-1"
+    },
+    {
+     "ch": "c5",
+     "title": "Present value จากดอกเบี้ยทบต้น",
+     "formula": "P = A ÷ (1 + i)^N\ni = r/n · N = nt",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-2"
+    },
+    {
+     "ch": "c5",
+     "title": "Simple",
+     "formula": "I = Prt · A = P(1+rt)",
+     "src": "sum",
+     "ref": "สูตรดอกเบี้ย"
+    },
+    {
+     "ch": "c5",
+     "title": "Compound",
+     "formula": "A = P(1+i)^N · i = r/m · N = mt",
+     "src": "sum",
+     "ref": "สูตรดอกเบี้ย"
+    },
+    {
+     "ch": "c5",
+     "title": "Present value",
+     "formula": "P = A/(1+i)^N",
+     "src": "sum",
+     "ref": "สูตรดอกเบี้ย"
+    },
+    {
+     "ch": "c5",
+     "title": "Add-on ค่างวด",
+     "formula": "m = P(1+rt) / (12t)",
+     "src": "sum",
+     "ref": "สูตรดอกเบี้ย"
+    },
+    {
+     "ch": "c5",
+     "title": "Credit card",
+     "formula": "I = ADB × r × วัน/365",
+     "src": "sum",
+     "ref": "สูตรดอกเบี้ย"
+    },
+    {
+     "ch": "c5",
+     "title": "Sale price",
+     "formula": "Original × (1 − d)",
+     "src": "sum",
+     "ref": "เปอร์เซ็นต์"
+    },
+    {
+     "ch": "c5",
+     "title": "With tax",
+     "formula": "Original × (1 + tax)",
+     "src": "sum",
+     "ref": "เปอร์เซ็นต์"
+    },
+    {
+     "ch": "c5",
+     "title": "หาราคาเดิม",
+     "formula": "p = s / c",
+     "src": "sum",
+     "ref": "เปอร์เซ็นต์"
+    },
+    {
+     "ch": "c5",
+     "title": "A is P% of W",
+     "formula": "P/100 = A/W",
+     "src": "sum",
+     "ref": "เปอร์เซ็นต์"
+    },
+    {
+     "ch": "c6",
+     "title": "นับ |A ∪ B|",
+     "formula": "|A ∪ B| = |A| + |B| − |A ∩ B|\nคณิต 45 อังกฤษ 41 ทั้งคู่ 12 → 74",
+     "src": "card",
+     "ref": "Ch.6",
+     "id": "06-13"
+    },
+    {
+     "ch": "c6",
+     "title": "สองเซต",
+     "formula": "|A∪B| = |A| + |B| − |A∩B|",
+     "src": "sum",
+     "ref": "แบบสำรวจ"
+    },
+    {
+     "ch": "c7",
+     "title": "ความน่าจะเป็นเมื่อทุกผลลัพธ์มีโอกาสเท่ากัน",
+     "formula": "P(E) = s/n\ns = จำนวนที่สนใจ · n = จำนวนใน sample space",
+     "src": "card",
+     "ref": "Ch.7",
+     "id": "07-3"
+    },
+    {
+     "ch": "c7",
+     "title": "Percentile rank",
+     "formula": "(จำนวนที่ต่ำกว่า ÷ N) × 100\nคะแนน 70 จาก 10 คน มี 6 คนต่ำกว่า → 60",
+     "src": "card",
+     "ref": "Ch.7",
+     "id": "07-20"
+    },
+    {
+     "ch": "c7",
+     "title": "Class rank จาก percentile",
+     "formula": "Class rank = N − ⌊(percentile/100) × N⌋\nLee P85 ห้อง 50 คน → 50 − 42 = 8",
+     "src": "card",
+     "ref": "Ch.7",
+     "id": "07-22"
+    },
+    {
+     "ch": "c7",
+     "title": "Mean และ Standard deviation (ประชากร)",
+     "formula": "Mean μ = Σx ÷ N\nσ = √[ Σ(x − μ)² ÷ N ]",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-4"
+    },
+    {
+     "ch": "c7",
+     "title": "Probability ของ complement (P(A′))",
+     "formula": "P(A′) = 1 − P(A)\nใช้เมื่อหา “อย่างน้อยหนึ่ง” ง่ายกว่าด้วยการหา “ไม่มีเลย”",
+     "src": "card",
+     "ref": "Formula",
+     "id": "fx-5"
+    },
+    {
+     "ch": "c7",
+     "title": "P(E)",
+     "formula": "เอื้อ ÷ ทั้งหมด",
+     "src": "sum",
+     "ref": "ความน่าจะเป็น"
+    },
+    {
+     "ch": "c7",
+     "title": "Mutually exclusive",
+     "formula": "P(A∩B) = 0",
+     "src": "sum",
+     "ref": "ความน่าจะเป็น"
+    },
+    {
+     "ch": "c7",
+     "title": "Weighted avg",
+     "formula": "Σ(ค่า×น้ำหนัก)/Σน้ำหนัก",
+     "src": "sum",
+     "ref": "สถิติ"
+    },
+    {
+     "ch": "c7",
+     "title": "Percentile rank",
+     "formula": "ต่ำกว่า ÷ N × 100",
+     "src": "sum",
+     "ref": "สถิติ"
+    }
+   ]
+  }
+ }
+}
