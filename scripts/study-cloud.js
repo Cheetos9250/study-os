@@ -20,7 +20,7 @@
   /* ---------- pure merges (exported for tests) ---------- */
   /* course progress: the same rules as the course pages' own sync engine, plus the review schedule */
   function mergeCourse(a, b) {
-    var A = a.study || {}, B = b.study || {}, out = { study: { ans: {}, ats: {}, rst: 0, known: [], rv: {} }, srs: { s: {}, m: { day: 0, newDone: 0 } } };
+    var A = a.study || {}, B = b.study || {}, out = { study: { ans: {}, ats: {}, rst: 0, known: [], rv: {}, fsrs: {} }, srs: { s: {}, m: { day: 0, newDone: 0 } } };
     var rst = Math.max(A.rst || 0, B.rst || 0); out.study.rst = rst;
     var ids = {}; Object.keys(A.ans || {}).concat(Object.keys(B.ans || {})).forEach(function (id) { ids[id] = 1; });
     Object.keys(ids).forEach(function (id) {
@@ -30,6 +30,7 @@
       if (rst && t < rst) return;
       out.study.ans[id] = useA ? A.ans[id] : B.ans[id]; out.study.ats[id] = t;
       var rv = useA ? (A.rv || {})[id] : (B.rv || {})[id]; if (rv) out.study.rv[id] = rv;
+      var fs = useA ? (A.fsrs || {})[id] : (B.fsrs || {})[id]; if (fs) out.study.fsrs[id] = fs;
     });
     var known = {}; (A.known || []).concat(B.known || []).forEach(function (k) { known[k] = 1; });
     out.study.known = Object.keys(known);
@@ -218,10 +219,10 @@
     try { st = JSON.parse(rs || '{}') || {}; } catch (e) {}
     try { sr = JSON.parse(rf || '{}') || {}; } catch (e) {}
     return { raw: J([rs, rf]), st: st, sr: sr,
-      value: { study: { ans: st.ans || {}, ats: st.ats || {}, rst: st.rst || 0, known: st.known || [], rv: st.rv || {} }, srs: { s: sr.s || {}, m: sr.m || { day: 0, newDone: 0 } } } };
+      value: { study: { ans: st.ans || {}, ats: st.ats || {}, rst: st.rst || 0, known: st.known || [], rv: st.rv || {}, fsrs: st.fsrs || {} }, srs: { s: sr.s || {}, m: sr.m || { day: 0, newDone: 0 } } } };
   }
   function writeCourse(s, cur, merged) {
-    var st = Object.assign({}, cur.st, { ans: merged.study.ans, ats: merged.study.ats, rst: merged.study.rst, known: merged.study.known, rv: merged.study.rv });
+    var st = Object.assign({}, cur.st, { ans: merged.study.ans, ats: merged.study.ats, rst: merged.study.rst, known: merged.study.known, rv: merged.study.rv, fsrs: merged.study.fsrs });
     var sr = Object.assign({}, cur.sr, { s: merged.srs.s, m: merged.srs.m });
     if (J(cur.value.study) !== J(merged.study)) ls.set('study-' + s.id, J(st));
     if (J(cur.value.srs) !== J(merged.srs) && (Object.keys(merged.srs.s).length || cur.sr.s)) ls.set(s.mark + '-srs', J(sr));

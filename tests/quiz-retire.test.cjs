@@ -3,11 +3,11 @@ const __cs=require('./course-source.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const R=require('../scripts/study-review.js');const DAY=86400000;
 const read=f=>__cs.read(path.join(__dirname,'..',f),'utf8');
-test('a question retires after 4 correct answers in a row and comes back only when its 30/90-day review is due',()=>{
+test('a question retires once its FSRS interval reaches a month and comes back only when that review is due',()=>{
   const now=Date.UTC(2026,10,16,5);const store={ans:{q:1},ats:{q:now},rv:{}};
-  let t=now;for(let i=0;i<3;i++){R.record(store,'q',true,t);t=store.rv.q[1];}
-  assert.equal(store.rv.q[0],3);assert.equal(R.isRetired(store,'q',t-1),false,'3 in a row is not retired yet');
-  R.record(store,'q',true,t);assert.equal(store.rv.q[0],4);assert.equal(R.isRetired(store,'q',t+DAY),true);
+  let t=now;for(let i=0;i<2;i++){R.record(store,'q',true,t);t=store.rv.q[1];}
+  assert.ok(store.rv.q[0]<4);assert.equal(R.isRetired(store,'q',t-1),false,'a short interval is not retired');
+  R.record(store,'q',true,t);assert.ok(store.rv.q[0]>=4);assert.equal(R.isRetired(store,'q',t+DAY),true);
   assert.equal(R.isRetired(store,'q',store.rv.q[1]+1),false,'due again: back in the deck');
   R.record(store,'q',false,t+DAY);assert.equal(store.rv.q[0],0,'a wrong answer un-retires it');
   assert.equal(R.retiredRaw(JSON.stringify({ans:{a:1,b:1},rv:{a:[4,now+30*DAY],b:[2,now+DAY]}}),now),1);
