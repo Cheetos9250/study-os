@@ -458,6 +458,7 @@ function renderPlan(){
   if(t.kind==='quiz')acts='<a class="main" href="'+link(t.top,'prac')+'&review=1">Start review</a>';
   else if(t.kind==='review'){const best=T.COURSES.map(x=>({x,n:summaries[x.key]?summaries[x.key].reviewNow:0})).sort((a,b)=>b.n-a.n)[0];if(best&&best.n)acts='<a class="main" href="'+link(best.x,'cards')+'">Review '+esc(best.x.name)+' ('+best.n+')</a>';}
   else if(c&&t.kind==='chapter')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a><a href="'+link(c,'cards',t.cat)+'">Cards</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>'+(c.key==='acc'&&/^c[1-9]$/.test(t.cat)?'<a href="pdf-sets.html?book=1&ch='+t.cat.slice(1)+'">Textbook</a>':'');
+  else if(c&&t.kind==='examrev')acts='<a class="main" href="'+link(c,'prac',t.cats.join(','))+'&exam=1">Start exam review</a>';
   else if(c&&t.kind==='missed')acts='<a class="main" href="'+link(c,'prac',t.cats.join(','))+'&missed=1">Redo missed</a>';
   else if(c&&t.kind==='weak')acts=(FOCUS?'':'<a href="'+link(c,'sum',t.cat)+'">Summary</a>')+'<a class="main" href="'+link(c,'prac',t.cat)+'">Practice</a>';
   else if(c&&t.kind==='final')acts=(FOCUS?'':'<a href="'+link(c,'sum')+'">Summaries</a>')+'<a class="main" href="'+link(c,'prac',(t.cats||[]).join(','))+'">Practice</a><a href="mock.html?course='+c.key+'">Mock exam</a>';
