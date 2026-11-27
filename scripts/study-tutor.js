@@ -128,21 +128,34 @@
   if(kind==='mistakes')return 'จุดที่นักศึกษามักทำผิดใน'+where+' มีอะไรบ้าง บอกวิธีจำหรือวิธีเช็กคำตอบให้ไม่พลาด';
   if(kind==='plan'){const ex=(o.exams||[]).map(e=>'- '+e.name+': '+e.date+' (อีก '+e.days+' วัน)').join('\n');
    return 'ช่วยจัดแผนอ่านหนังสือรายวันจนถึงวันสอบ ให้เหมาะกับเวลาที่เหลือ บอกว่าวันไหนควรอ่านบทไหนและทำแบบฝึกหัดอะไร'+(ex?'\nวันสอบของผม:\n'+ex:'');}
+  if(kind==='qfile')return qfilePrompt(o);
   return '';
  }
+ /* Questions from my notes: asks for the exact Markdown layout the Drive question inbox reads (docs/gemini-question-prompt.md). */
+ const INBOX_SUBJECTS=['Accounting','Economics','Math for Life'];
+ function qfilePrompt(o){
+  const n=Math.min(20,Math.max(1,parseInt(o.n,10)||10)),subj=INBOX_SUBJECTS.includes(o.subject)?o.subject:'';
+  return 'Use the attached photo of my notes (and the text below, if any) to write '+n+' new multiple-choice questions in English'+(subj?' for my '+subj+' course':'')+'.\n\nOutput ONLY a Markdown file in exactly this layout, with nothing before or after it:\n\n'
+   +'Subject: '+(subj||'<Accounting, Economics or Math for Life>')+'\nChapter: <copy exactly from the list below>\n\n---\nQuestion: <one paragraph; put any numbers it needs inside it>\nA) <option>\nB) <option>\nC) <option>\nD) <option>\nAnswer: <one letter, A to D>\nExplanation: <say why the right answer is right only; never explain the wrong options>\n\n---\nQuestion: ...\n\n'
+   +'Rules:\n- Exactly 4 options, exactly one right. Spread the right answer over A, B, C and D.\n- Base every question on what the notes show; do not invent facts the notes do not support.\n- Chapter must be copied exactly from this list. Accounting: 01 Business, 02 Recording, 03 Adjusting, 04 Cycle, 05 Merchandising, 06 Inventory, 07 AIS, 08 Cash, 09 Receivables. Economics: Micro · 002 Economic Way of Thinking, Micro · 003 Demand & Supply, Macro · GDP, Macro · Inflation & CPI, Macro · Business Cycle, Macro · AD\u2013AS, Macro · Growth & Development, Macro · Money & Banking, Macro · Fiscal Policy, Macro · Monetary Policy. Math for Life: 05 Financial Math, 06 Sets & Venn, 07 Prob & Stats.\n- No tables inside a question or option. Write amounts as plain numbers (for example 12,500).'
+   +(o.topic?'\n\nExtra text from me:\n'+o.topic:'');
+ }
+ /* a finished reply is a question file when it starts with the Subject and Chapter lines */
+ function isQFile(t){return /^\s*Subject:[^\n]+\n\s*Chapter:[^\n]+/.test(String(t||''))&&/\nQuestion:/.test(String(t||''));}
  /* typed commands in the chat box: /quiz 10 inventory, /explain, /summary, /example, /check <working>, /mistakes, /plan, /new, /help */
  const COMMANDS=[['/explain','[topic]','Explain the chapter (or a topic)'],['/quiz','[number] [topic]','Multiple-choice quiz, one question at a time'],
   ['/summary','[topic]','Short summary to review before the exam'],['/example','[topic]','One exam-style problem, solved step by step'],
   ['/check','<your working>','Check your answer or working (or attach a photo)'],['/mistakes','[topic]','Common mistakes and how to avoid them'],
-  ['/plan','','Daily study plan to your exams (uses Calendar exam dates)'],['/new','','Start a new chat'],['/help','','Show these commands']];
+  ['/questions','[number] [notes]','Photo of your notes to a question file for the Drive inbox'],['/plan','','Daily study plan to your exams (uses Calendar exam dates)'],['/new','','Start a new chat'],['/help','','Show these commands']];
  function command(text){
   const m=/^\/([a-z]+)\b\s*([\s\S]*)$/i.exec(String(text||'').trim());if(!m)return null;
   const name=m[1].toLowerCase(),rest=m[2].trim();
   if(name==='new'||name==='help')return {action:name};
   if(name==='quiz'){const k=/^(\d{1,2})\b\s*([\s\S]*)$/.exec(rest);return {kind:'quiz',n:k?k[1]:'',topic:k?k[2].trim():rest};}
+  if(name==='questions'){const k=/^(\d{1,2})\b\s*([\s\S]*)$/.exec(rest);return {kind:'qfile',n:k?k[1]:'',topic:k?k[2].trim():rest};}
   if(['explain','summary','example','check','mistakes','plan'].includes(name))return {kind:name,topic:rest};
   return {action:'unknown',name};
  }
  function help(){return '**Commands** (type in the box, then Send)\n\n| Command | What it does |\n|---|---|\n'+COMMANDS.map(c=>'| '+c[0]+(c[1]?' '+c[1]:'')+' | '+c[2]+' |').join('\n')+'\n\nPick a subject and chapter first so the tutor reads your course notes. Example: /quiz 10 inventory';}
- return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,COMMANDS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl,pickModel,backupModel,quick,command,help};
+ return {KEY,SKEY,CHAT,PROVIDERS,MAX_TURNS,COMMANDS,normalize,notes,system,request,reply,modelsRequest,models,baseUrl,pickModel,backupModel,quick,qfilePrompt,isQFile,command,help};
 });
