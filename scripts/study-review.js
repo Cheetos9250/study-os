@@ -113,7 +113,34 @@
     try { var s = JSON.parse(raw || 'null'); return s && typeof s === 'object' ? dueIds(s, now).length : 0; }
     catch (e) { return 0; }
   }
-  var api = { fsrsWeights: W, retrievability: retrievability, interval: interval, boxOf: boxOf, migrate: migrate, stateOf: stateOf, rollback: rollback, GAPS: GAPS, RETIRE: RETIRE, OLD: OLD, isOld: isOld, oldRaw: oldRaw, isRetired: isRetired, retiredRaw: retiredRaw, sod: sod, next: next, record: record, seed: seed, isDue: isDue, dueIds: dueIds, countRaw: countRaw };
+  /* Pre-exam review set (27 Nov 2026): the questions I keep missing, picked from existing answer history and FSRS state; reads only, stores nothing.
+     A question is a candidate when it is wrong now, in review box 0, hard for me (FSRS difficulty >= 6.5) or probably forgotten (recall < 60%). */
+  var EXAM_PER_CAT = 15;
+  function hardScore(store, q, now) {
+    var id = q.id, a = store.ans && store.ans[id];
+    if (a === undefined) return 0;
+    var wrong = a !== q.right, e = store.rv && store.rv[id], box0 = valid(e) && e[0] === 0;
+    var st = stateOf(store, id, now), d = st ? st[1] : 5, r = st ? retrievability(Math.max(0, (now - st[2]) / DAY), st[0]) : 1;
+    if (!(wrong || box0 || d >= 6.5 || r < 0.6)) return 0;
+    return (wrong ? 100 : 0) + (box0 ? 50 : 0) + d * 3 + (1 - r) * 20 + 1;
+  }
+  /* ids of the hardest questions, `perCat` per chapter (default 15), chapters in the order given by `opts.order` (else first seen) */
+  function examSet(store, questions, now, opts) {
+    opts = opts || {};
+    var per = opts.perCat > 0 ? opts.perCat : EXAM_PER_CAT, cats = opts.cats && opts.cats.length ? opts.cats : null, by = {}, order = [];
+    for (var i = 0; i < questions.length; i++) {
+      var q = questions[i];
+      if (cats && cats.indexOf(q.cat) < 0) continue;
+      var sc = hardScore(store, q, now); if (!sc) continue;
+      if (!by[q.cat]) { by[q.cat] = []; order.push(q.cat); }
+      by[q.cat].push({ id: String(q.id), sc: sc });
+    }
+    if (opts.order) order.sort(function (x, y) { return opts.order.indexOf(x) - opts.order.indexOf(y); });
+    var out = [];
+    order.forEach(function (c) { by[c].sort(function (x, y) { return y.sc - x.sc; }).slice(0, per).forEach(function (x) { out.push(x.id); }); });
+    return out;
+  }
+  var api = { hardScore: hardScore, examSet: examSet, EXAM_PER_CAT: EXAM_PER_CAT, fsrsWeights: W, retrievability: retrievability, interval: interval, boxOf: boxOf, migrate: migrate, stateOf: stateOf, rollback: rollback, GAPS: GAPS, RETIRE: RETIRE, OLD: OLD, isOld: isOld, oldRaw: oldRaw, isRetired: isRetired, retiredRaw: retiredRaw, sod: sod, next: next, record: record, seed: seed, isDue: isDue, dueIds: dueIds, countRaw: countRaw };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.StudyReview = api;
 })(typeof window !== 'undefined' ? window : this);

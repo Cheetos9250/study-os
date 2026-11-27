@@ -131,6 +131,9 @@
     scope.filter(p=>{const a=accuracy(p);return a!==null&&p.answered>=2&&a<0.7;}).sort((a,b)=>accuracy(a)-accuracy(b)).slice(0,2)
      .forEach(p=>tasks.push({id:e.id+':weak:'+p.id,kind:'weak',examId:e.id,course:e.course,cat:p.id,title:'Weak chapter: '+p.label,detail:Math.round(accuracy(p)*100)+'% correct · practise until it is above 70%',exam:e.title,days:e.days}));
    }
+   /* exam review (last 7 days): this exam's most-missed questions per chapter in one set (course page ?exam=1) */
+   if(e.days<=7){const asked=scope.filter(p=>p.answered>p.correct),n=asked.reduce((k,p)=>k+Math.max(0,p.answered-p.correct),0);
+    if(n)tasks.push({id:e.id+':examrev',kind:'examrev',examId:e.id,course:e.course,cats:asked.map(p=>p.id),title:'Exam review: '+e.title,detail:'Your most-missed questions per chapter · exam in '+e.days+' day'+(e.days>1?'s':''),exam:e.title,days:e.days});}
    const remaining=scope.filter(p=>!done[p.id]||done[p.id]===today).sort((a,b)=>priority(b)-priority(a));
    if(e.days===1||!remaining.length){
     tasks.push({id:e.id+':final',kind:'final',examId:e.id,course:e.course,cats:e.cats.slice(),title:'Final review: '+e.title,detail:'Summaries + practice in all exam chapters'});return;

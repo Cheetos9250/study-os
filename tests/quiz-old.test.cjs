@@ -24,7 +24,7 @@ test('earlier answers count: any stored streak of 1 or more is old; unanswered o
 });
 test('quiz pages hide old questions from the normal deck and show only them under Old questions',()=>{
   for(const f of ['acc.html','eco.html','math.html']){const s=read(f);
-    assert.match(s,/&&\(reviewOnly\|\|\(showOld\?isOldQ\(q\):!isOldQ\(q\)\)\)&&/,f);
+    assert.match(s,/&&\(reviewOnly\|\|examRev\|\|\(showOld\?isOldQ\(q\):!isOldQ\(q\)\)\)&&/,f);
     assert.match(s,/>Old questions<span class="n">/,f);assert.match(s,/showOld=!showOld/,f);
     assert.match(s,/StudyReview\.isOld\(store,q\.id\)/,f);}
 });
