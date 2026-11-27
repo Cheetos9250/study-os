@@ -1,0 +1,21 @@
+{
+ "note": "Typed from the teacher's slide PDFs in Drive folder 'สไลด์เรียน' (27 Nov 2026). Only formulas written on the slides.",
+ "eco": [
+  {"ch":"g","title":"GDP (expenditure approach)","formula":"GDP = C + I + G + (X − M)\nC = households · I = firms (gross private domestic investment) · G = government · X = exports · M = imports","ref":"Measuring a Nation's Output.pdf"},
+  {"ch":"g","title":"Net exports","formula":"Net exports = Exports − Imports","ref":"Measuring a Nation's Output.pdf"},
+  {"ch":"g","title":"Real GDP","formula":"Real GDP = Nominal GDP ÷ GDP chain price index (GDP deflator) × 100","ref":"Measuring a Nation's Output.pdf"},
+  {"ch":"b","title":"What causes business cycles","formula":"Real GDP = C + I + G + (X − M)","ref":"Business Cycle and Unemployment.pdf"},
+  {"ch":"b","title":"Unemployment rate","formula":"Unemployment rate = (Unemployed ÷ Civilian labor force) × 100","ref":"Business Cycle and Unemployment.pdf"},
+  {"ch":"b","title":"Full employment (natural rate)","formula":"Natural rate of unemployment = Frictional + Structural\n(about 5% = 3% frictional + 2% structural)","ref":"Business Cycle and Unemployment.pdf"},
+  {"ch":"i","title":"CPI","formula":"CPI = (Cost of market basket at current-year prices ÷ Cost of same market basket at base-year prices) × 100","ref":"Inflation.pdf"},
+  {"ch":"i","title":"Annual inflation rate","formula":"Inflation rate = ((CPI in given year − CPI in previous year) ÷ CPI in previous year) × 100","ref":"Inflation.pdf"},
+  {"ch":"i","title":"Real income","formula":"Real income = Nominal income ÷ CPI (as decimal, or CPI/100)","ref":"Inflation.pdf"},
+  {"ch":"d","title":"GDP per capita","formula":"GDP per capita = GDP ÷ Total population","ref":"Growth and Development.pdf"},
+  {"ch":"f","title":"Marginal propensity to consume (MPC)","formula":"MPC = Change in consumption spending ÷ Change in income","ref":"Fiscal Policy.pdf"},
+  {"ch":"f","title":"MPC and MPS","formula":"MPC + MPS = 1","ref":"Fiscal Policy.pdf"},
+  {"ch":"f","title":"Spending multiplier","formula":"Spending multiplier = 1 ÷ (1 − MPC)  or  1 ÷ MPS","ref":"Fiscal Policy.pdf"},
+  {"ch":"f","title":"Tax multiplier","formula":"Tax multiplier = 1 − Spending multiplier\n(MPC 0.75 → spending multiplier 4 → tax multiplier −3)","ref":"Fiscal Policy.pdf"},
+  {"ch":"n","title":"M1 (money supply)","formula":"M1 = Currency + Checkable deposits","ref":"Monetary Policy.pdf"},
+  {"ch":"n","title":"M2 (money supply)","formula":"M2 = M1 + Savings deposits + Small time deposits (less than $100,000)","ref":"Monetary Policy.pdf"}
+ ]
+}

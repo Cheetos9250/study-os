@@ -411,6 +411,27 @@
     },
     {
      "ch": "g",
+     "title": "GDP (expenditure approach)",
+     "formula": "GDP = C + I + G + (X − M)\nC = households · I = firms (gross private domestic investment) · G = government · X = exports · M = imports",
+     "src": "slide",
+     "ref": "Measuring a Nation's Output.pdf"
+    },
+    {
+     "ch": "g",
+     "title": "Net exports",
+     "formula": "Net exports = Exports − Imports",
+     "src": "slide",
+     "ref": "Measuring a Nation's Output.pdf"
+    },
+    {
+     "ch": "g",
+     "title": "Real GDP",
+     "formula": "Real GDP = Nominal GDP ÷ GDP chain price index (GDP deflator) × 100",
+     "src": "slide",
+     "ref": "Measuring a Nation's Output.pdf"
+    },
+    {
+     "ch": "g",
      "title": "2 วิธีคำนวณ GDP",
      "formula": "Expenditure approach = รวมรายจ่ายซื้อสินค้าขั้นสุดท้าย\nIncome approach = รวมรายได้ (ค่าตอบแทนแรงงาน ค่าเช่า ดอกเบี้ยสุทธิ กำไร)",
      "src": "card",
@@ -479,6 +500,27 @@
     {
      "ch": "i",
      "title": "CPI",
+     "formula": "CPI = (Cost of market basket at current-year prices ÷ Cost of same market basket at base-year prices) × 100",
+     "src": "slide",
+     "ref": "Inflation.pdf"
+    },
+    {
+     "ch": "i",
+     "title": "Annual inflation rate",
+     "formula": "Inflation rate = ((CPI in given year − CPI in previous year) ÷ CPI in previous year) × 100",
+     "src": "slide",
+     "ref": "Inflation.pdf"
+    },
+    {
+     "ch": "i",
+     "title": "Real income",
+     "formula": "Real income = Nominal income ÷ CPI (as decimal, or CPI/100)",
+     "src": "slide",
+     "ref": "Inflation.pdf"
+    },
+    {
+     "ch": "i",
+     "title": "CPI",
      "formula": "(ต้นทุนตะกร้า ณ ราคาปีปัจจุบัน ÷ ต้นทุนตะกร้าเดียวกัน ณ ราคาปีฐาน) × 100",
      "src": "card",
      "ref": "Inflation",
@@ -522,6 +564,27 @@
     },
     {
      "ch": "b",
+     "title": "What causes business cycles",
+     "formula": "Real GDP = C + I + G + (X − M)",
+     "src": "slide",
+     "ref": "Business Cycle and Unemployment.pdf"
+    },
+    {
+     "ch": "b",
+     "title": "Unemployment rate",
+     "formula": "Unemployment rate = (Unemployed ÷ Civilian labor force) × 100",
+     "src": "slide",
+     "ref": "Business Cycle and Unemployment.pdf"
+    },
+    {
+     "ch": "b",
+     "title": "Full employment (natural rate)",
+     "formula": "Natural rate of unemployment = Frictional + Structural\n(about 5% = 3% frictional + 2% structural)",
+     "src": "slide",
+     "ref": "Business Cycle and Unemployment.pdf"
+    },
+    {
+     "ch": "b",
      "title": "Unemployment rate คืออะไร",
      "formula": "% ของ Civilian labor force ที่ไม่มีงานและกำลังหางาน\n= Unemployed ÷ Civilian labor force × 100",
      "src": "card",
@@ -549,6 +612,13 @@
      "formula": "Unemployed ÷ Civilian labor force × 100",
      "src": "sum",
      "ref": "Labor force: ใครนับ ใครไม่นับ (BLS)"
+    },
+    {
+     "ch": "d",
+     "title": "GDP per capita",
+     "formula": "GDP per capita = GDP ÷ Total population",
+     "src": "slide",
+     "ref": "Growth and Development.pdf"
     },
     {
      "ch": "d",
@@ -613,6 +683,34 @@
     },
     {
      "ch": "f",
+     "title": "Marginal propensity to consume (MPC)",
+     "formula": "MPC = Change in consumption spending ÷ Change in income",
+     "src": "slide",
+     "ref": "Fiscal Policy.pdf"
+    },
+    {
+     "ch": "f",
+     "title": "MPC and MPS",
+     "formula": "MPC + MPS = 1",
+     "src": "slide",
+     "ref": "Fiscal Policy.pdf"
+    },
+    {
+     "ch": "f",
+     "title": "Spending multiplier",
+     "formula": "Spending multiplier = 1 ÷ (1 − MPC)  or  1 ÷ MPS",
+     "src": "slide",
+     "ref": "Fiscal Policy.pdf"
+    },
+    {
+     "ch": "f",
+     "title": "Tax multiplier",
+     "formula": "Tax multiplier = 1 − Spending multiplier\n(MPC 0.75 → spending multiplier 4 → tax multiplier −3)",
+     "src": "slide",
+     "ref": "Fiscal Policy.pdf"
+    },
+    {
+     "ch": "f",
      "title": "Spending multiplier (ตัวคูณรายจ่ายรัฐ)",
      "formula": "k = 1 ÷ (1 − MPC) = 1 ÷ MPS\nΔGDP = ΔG × k",
      "src": "card",
@@ -669,6 +767,20 @@
      "formula": "−MPC ÷ (1 − MPC) ขนาดน้อยกว่า spending multiplier อยู่ 1 เสมอ",
      "src": "sum",
      "ref": "Fiscal policy: เครื่องมือ, multiplier, supply-side"
+    },
+    {
+     "ch": "n",
+     "title": "M1 (money supply)",
+     "formula": "M1 = Currency + Checkable deposits",
+     "src": "slide",
+     "ref": "Monetary Policy.pdf"
+    },
+    {
+     "ch": "n",
+     "title": "M2 (money supply)",
+     "formula": "M2 = M1 + Savings deposits + Small time deposits (less than $100,000)",
+     "src": "slide",
+     "ref": "Monetary Policy.pdf"
     }
    ]
   },

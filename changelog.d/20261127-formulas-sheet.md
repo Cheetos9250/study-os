@@ -1,1 +1,1 @@
-- New **Formulas** page (nav → More tools): every formula already in the acc/eco/math summaries and flashcards on one searchable sheet, grouped by chapter, with its source. Built by `scripts/build-formulas.cjs` into `data/formulas.json`.
+- New **Formulas** page (nav → More tools): every formula already in the acc/eco/math summaries and flashcards on one searchable sheet, grouped by chapter, with its source. Economics also has formulas typed from the teacher slide PDFs (`data/formulas-slides.json`). Built by `scripts/build-formulas.cjs` into `data/formulas.json`.
