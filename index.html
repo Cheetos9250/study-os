@@ -135,6 +135,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 @media(max-width:420px){.wng{padding:12px 14px}.wng .wdue{min-width:76px}.wng .wdue .n{font-size:32px}}
 @media(max-width:420px){.cont{padding:12px 14px}.cont .cd{min-width:86px}.cont .cd .n{font-size:38px}}
 .bk .acts{margin:0;flex-basis:100%;padding-left:36px}.bk .bk-miss{display:block;margin-top:2px;font-weight:700}.bk .bk-msg{flex-basis:100%;margin:0;padding-left:36px;font-size:14px;font-weight:700;color:var(--green,#1f7448)}.bk .bk-msg.bad{color:var(--red,#c21f2f)}.bk .acts a[aria-disabled=true]{opacity:.5;pointer-events:none}
+#remindBox .acts{padding-left:0}#remindBox{margin:12px 0 0}
 /* wide screens: the reminder sits in the empty space beside the title */
 @media(min-width:760px){.headrow{display:flex;align-items:flex-end;gap:24px}.headrow .head{flex:none}.headrow .bk{flex:1 1 380px;max-width:560px;margin:18px 0 4px auto}.headrow .bk p{min-width:0}}
 /* Today: ink manga panels, speech bubble, hatched timer (after study-world.css) */
@@ -225,6 +226,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 </header>
 <div class="bk" id="backupNudge" role="status" hidden></div>
 </div>
+<div class="bk" id="remindBox" role="status" hidden></div>
 <section class="hero" aria-label="Next exam and cover">
 <div class="hx" id="heroExam"></div>
 <div class="cover" id="cover">
@@ -281,6 +283,7 @@ a.sb:hover{background:var(--dots),var(--panel)}
 </main>
 </div>
 <script src="scripts/study-review.js?v=3"></script>
+<script src="scripts/study-remind.js?v=1"></script>
 <script src="scripts/study-stats.js?v=1"></script>
 <script src="scripts/study-motivation.js?v=1"></script>
 <script src="scripts/study-today-extras.js?v=2"></script>
@@ -644,7 +647,23 @@ function renderPracticeGoal(){
   +'<span class="qgo"><a href="practice.html">Practice →</a><button type="button" id="qGoalSet" aria-label="Daily goal: '+g+' questions. Change">Goal: '+g+'</button></span>';
  $('#qGoalSet').onclick=()=>{st.qgoal=M.nextGoal(g);save();renderPracticeGoal();};
 }
-function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderContinue();renderPracticeGoal();renderWordGoal();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
+/* review reminders (scripts/study-remind.js): opt-in, this device only; shows while the app is open, plus the icon badge */
+function renderRemind(){
+ const el=$('#remindBox'),R=window.StudyRemind;if(!el||!R||!Object.keys(summaries).length)return;
+ const cards=Object.values(summaries).reduce((n,s)=>n+(s?s.reviewNow:0),0),quiz=window.StudyReview?T.COURSES.reduce((n,c)=>n+StudyReview.countRaw(read('study-'+c.key),Date.now()),0):0;
+ const on=R.read().on&&R.permission()==='granted';
+ if(on)R.update(cards,quiz);
+ if(!R.supported()){el.hidden=true;return;}
+ if(R.permission()==='denied'){el.hidden=false;el.innerHTML='<p><b>Reminders are blocked</b>Allow notifications for this site in the browser settings to turn them on.</p>';return;}
+ if(!on&&(cards+quiz===0||R.read().on===false&&sessionStorage.getItem('studyos.remind-later')==='1')){el.hidden=true;return;}
+ el.hidden=false;
+ el.innerHTML=on?'<p><b>Review reminders on</b>You get a notice once a day when cards or questions are due, while Study OS is open. When it is closed, the Telegram morning message covers it.</p><div class="acts"><a href="#" id="rmOff">Turn off</a></div>'
+  :'<p><b>'+(cards+quiz)+' to review</b>Get a reminder once a day when cards or questions are due (only while Study OS is open).</p><div class="acts"><a class="main" href="#" id="rmOn">Remind me</a><a href="#" id="rmLater">Later</a></div>';
+ const a=$('#rmOn');if(a)a.onclick=e=>{e.preventDefault();R.enable().then(()=>renderRemind());};
+ const b=$('#rmOff');if(b)b.onclick=e=>{e.preventDefault();R.disable();renderRemind();};
+ const c=$('#rmLater');if(c)c.onclick=e=>{e.preventDefault();try{sessionStorage.setItem('studyos.remind-later','1');}catch{}el.hidden=true;};
+}
+function renderAll(){settings=T.loadSettings(read(T.SETTINGS_KEY));renderBackupNudge();renderContinue();renderRemind();renderPracticeGoal();renderWordGoal();renderChips();renderClasses();renderPlan();renderExams();renderTasks();renderSubjects();}
 renderAll();
 Promise.all(T.COURSES.map(c=>fetch(c.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{data[c.key]=T.parseCourseData(h);}).catch(()=>{loadFailed++;}))).then(()=>{compute();renderAll();});
 Promise.all(T.LANGS.map(l=>fetch(l.data,{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text();}).then(h=>{langData[l.key]=T.parseCourseData(h);}).catch(()=>{}))).then(()=>{compute();renderSubjects();});

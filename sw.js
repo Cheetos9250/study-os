@@ -87,3 +87,14 @@ self.addEventListener('fetch', event => {
     }
   })());
 });
+
+/* Reminder notification tap (scripts/study-remind.js): open or focus Today */
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || 'index.html', self.registration.scope).href;
+  event.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) { if ('focus' in c) { try { await c.focus(); return; } catch (e) {} } }
+    await self.clients.openWindow(url);
+  })());
+});
