@@ -87,7 +87,7 @@
   const key=typeof D==='object'&&D&&D.key;if(!NAMES[key])return;
   const tab=document.getElementById('tab-prac');if(!tab||document.getElementById('spCourse'))return;
   css();const wrap=document.createElement('div');wrap.id='spCourse';tab.insertBefore(wrap,tab.firstChild);
-  const cram=/[?&]cram=1\b/.test(location.search),pins=document.createElement('div');wrap.appendChild(pins);pinsBox(pins,key,cram);
+  const cram=/[?&]cram=1\b/.test(location.search),pins=document.createElement('div');wrap.appendChild(pins);if(cram||parsePins(pinText(key)).length)pinsBox(pins,key,cram); /* no pins yet: nothing on the practice page (add them on Practice) */
   if(cram){const label=id=>{const c=(D.cats||[]).find(x=>x[0]===id);return id==='general'?'General':c?c[1]:id;},list=courseCards(key,label),box=document.createElement('section');
    box.className='sp-pins';box.innerHTML='<b>🃏 Note cards ('+list.length+')</b>'+(list.length?cardsHTML(list):'<p class="sp-none">Write lines like <code>Normal balance of AR :: Debit</code> in your chapter notes and they show up here as flip cards.</p>');
    wrap.appendChild(box);wireCards(box,list);document.title=(NAMES[key])+' · Cram Mode — Study OS';

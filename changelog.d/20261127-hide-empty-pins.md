@@ -1,0 +1,1 @@
+- Course practice pages no longer show the empty "Pinned formulas" box; it appears once you have pinned formulas (add them on Practice) and always in Cram Mode.
