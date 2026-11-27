@@ -43,6 +43,7 @@
  +'@media(max-width:999.98px){#qn{left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));height:min(46vh,420px);border-width:3px 0 3px}html.qn-open body{padding-bottom:calc(72px + min(46vh,420px) + env(safe-area-inset-bottom))!important}#qnBtn{bottom:calc(84px + env(safe-area-inset-bottom))}html.qn-open #qnBtn{display:none}}'
  +'html.qn-ready:not(.qn-open) body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}'
  +'@media(max-width:899.98px){html.qn-ready:not(.qn-open) body{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}}'
+ +'#studyNav .sn-tool{display:none}@media(max-width:899.98px){#studyNav .sn-tool{display:flex;align-items:center;gap:14px;min-height:48px}#studyNav .sn-tool svg{width:20px;height:20px;flex:none}#qnBtn{display:none!important}}'
  +'@media(max-width:899.98px){#qnBtn{width:52px;padding:0;justify-content:center}#qnBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
  +'@media(min-width:900px){html.qn-ready:not(.qn-open) body{padding-right:76px!important}html.qn-ready:not(.qn-open) #qnBtn{right:max(12px,env(safe-area-inset-right));width:52px;padding:0;justify-content:center}html.qn-ready:not(.qn-open) #qnBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}}'
  +'#qn.full{top:0!important;right:0!important;bottom:0!important;left:0!important;width:auto!important;height:auto!important;z-index:96;border-width:0!important;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}'
@@ -90,6 +91,8 @@
   cb.onclick=function(){cardsOn(cv.hidden);};
   sel.addEventListener('change',function(){if(!cv.hidden)setTimeout(paintCards,0);});
   btn.onclick=function(){setOpen(true);};
+  // phones/portrait iPad: the floating button is hidden (it sat on the answers) and lives in the bottom bar's More menu instead
+  (function(){var n=0;function put(){var f=document.getElementById('snFoot'),nav=document.getElementById('studyNav');if(!f||!nav){if(n++<30)setTimeout(put,100);return;}if(f.querySelector('[data-tool="qnBtn"]'))return;var t=document.createElement('button');t.type='button';t.className='sn-tool';t.dataset.tool='qnBtn';t.innerHTML=PEN+'<span>Notes</span>';t.onclick=function(){nav.classList.remove('sn-open');var m=nav.querySelector('.sn-more');if(m)m.setAttribute('aria-expanded','false');btn.click();};f.insertBefore(t,f.firstChild);}put();})();
   panel.querySelector('.qn-x:not(.qn-f)').onclick=function(){setOpen(false);};
   panel.querySelector('.qn-f').onclick=function(){if(panel.hidden)setOpen(true);setFull(!panel.classList.contains('full'));ta.focus({preventScroll:true});};
   setFull(false);

@@ -1,0 +1,1 @@
+Practice on phones and portrait iPad: the floating Calculator and Notes buttons no longer sit on the answer choices. They are the first two items of the bottom bar's More menu there. Desktop and landscape iPad keep the floating buttons.
