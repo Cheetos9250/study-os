@@ -31,7 +31,7 @@ test('quiz pages keep review state inside the backed-up study-<course> key and c
     assert.match(s,/StudyReview\.record\(store,q\.id,store\.ans\[q\.id\]===q\.right,Date\.now\(\)\); save\(\);/,f);
     assert.match(s,/id="revBtn"/,f);assert.match(s,/\[\?&\]review=1/,f);
     assert.match(s,/store\.ans=\{\}; store\.ats=\{\}; store\.rv=\{\};/,f);
-    assert.match(s,/known:store\.known\|\|\[\],rv:store\.rv\|\|\{\}\}/,f);
+    assert.match(s,/known:store\.known\|\|\[\],rv:store\.rv\|\|\{\},fsrs:store\.fsrs\|\|\{\}\}/,f);
     assert.doesNotMatch(s,/localStorage\.setItem\(['"]studyos\.quiz/,f);}
 });
 test('Today and Practice show questions due for review',()=>{

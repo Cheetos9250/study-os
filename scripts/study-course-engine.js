@@ -359,7 +359,7 @@ function wireQ(){
   const rt=$('#retBtn'); if(rt) rt.onclick=()=>{showOld=!showOld;qpos=0;buildDeck();renderQ()};
   const gb=$('#genBtn'); if(gb) gb.onclick=()=>{genLoad();qJump=null;qpos=0;save();buildDeck();renderQ()};
   const sh=$('#shufBtn'); if(sh) sh.onclick=()=>{shuffleOn=!shuffleOn;buildDeck();renderQ()};
-  const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rv={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
+  const r=$('#resetBtn'); if(r) r.onclick=()=>{ if(!window.confirm('Clear all practice answers for this subject? Scores and answer history will be removed.')) return; store.ans={}; store.ats={}; store.rv={}; store.fsrs={}; store.rst=Date.now(); save(); buildDeck(); renderQ(); };
 }
 
 /* ---------- tabs ---------- */
@@ -567,7 +567,7 @@ window.__xs=(()=>{
   async function cfg(){ if(api) return api; try{ const c=await fetch('data/config.json',{cache:'no-store'}); if(c.ok){ const j=await c.json(); const original=String(j.api||'').replace(/\/+$/,''); const next=String(j.progress_api||original).replace(/\/+$/,''); contentApi=original; api=next; progressKeyName=next&&next!==original?PROGRESS_LSK:LSK; } }catch(e){} return api; }
   const say=(t,ok)=>{ if(msgEl){ msgEl.textContent=t; msgEl.style.color=ok?'var(--ok,#1d7a4a)':'var(--bad,#b3261e)'; } };
   const hhmm=()=>new Intl.DateTimeFormat('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'}).format(new Date());
-  function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[],rv:store.rv||{}}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
+  function local(){ return {study:{ans:store.ans||{},ats:store.ats||{},rst:store.rst||0,known:store.known||[],rv:store.rv||{},fsrs:store.fsrs||{}}, srs:{s:srs||{},m:meta||{day:0,newDone:0}}}; }
   function merge(a,b){
     const A=a.study||{}, B=b.study||{}, out={study:{ans:{},ats:{},rst:0,known:[]},srs:{s:{},m:{day:0,newDone:0}}};
     const rst=Math.max(A.rst||0,B.rst||0); out.study.rst=rst;
@@ -578,7 +578,7 @@ window.__xs=(()=>{
       const useA=ha&&(!hb||ta>=tb), v=useA?A.ans[id]:B.ans[id], t=useA?ta:tb;
       if(!(ha||hb)) return; if(rst&&t<rst) return;
       out.study.ans[id]=v; out.study.ats[id]=t;
-      const rvx=useA?(A.rv||{})[id]:(B.rv||{})[id]; if(rvx)(out.study.rv=out.study.rv||{})[id]=rvx;
+      const rvx=useA?(A.rv||{})[id]:(B.rv||{})[id]; if(rvx)(out.study.rv=out.study.rv||{})[id]=rvx; const fsx=useA?(A.fsrs||{})[id]:(B.fsrs||{})[id]; if(fsx)(out.study.fsrs=out.study.fsrs||{})[id]=fsx;
     });
     out.study.known=[...new Set([...(A.known||[]),...(B.known||[])])];
     const SA=(a.srs||{}).s||{}, SB=(b.srs||{}).s||{};
@@ -593,7 +593,7 @@ window.__xs=(()=>{
   function apply(m){
     applying=true;
     try{
-      store.ans=m.study.ans; store.ats=m.study.ats; store.rst=m.study.rst; store.known=m.study.known; store.rv=m.study.rv||{}; window.StudyReview&&StudyReview.seed(store,QS,Date.now()); save();
+      store.ans=m.study.ans; store.ats=m.study.ats; store.rst=m.study.rst; store.known=m.study.known; store.rv=m.study.rv||{}; store.fsrs=m.study.fsrs||{}; window.StudyReview&&StudyReview.seed(store,QS,Date.now()); save();
       srs=m.srs.s; meta=m.srs.m; saveS();
       try{ buildDeck(true); renderQ(); cardsRow(); if(!shown) renderCard(); }catch(e){}
     } finally { applying=false; }
