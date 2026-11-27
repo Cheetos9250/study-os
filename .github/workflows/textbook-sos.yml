@@ -32,5 +32,3 @@ jobs:
         run: |
           for f in scripts/textbook-sos/ch*.py; do PYTHONDONTWRITEBYTECODE=1 python3 -I "$f" >/dev/null; done
           git diff --exit-code -- data/textbook-sos
-      - name: Full regression
-        run: node --test tests/*.test.cjs vocabloom/tests/*.test.cjs

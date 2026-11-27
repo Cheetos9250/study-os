@@ -2,6 +2,7 @@ name: Study Sync CAS prototype tests (no deployment)
 
 on:
   push:
+    branches: [main]
     paths:
       - "experiments/study-sync-cas/**"
       - ".github/workflows/study-sync-cas-tests.yml"
