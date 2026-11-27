@@ -1,0 +1,1 @@
+CI: the full Node + Python regression now runs once (`tests.yml`) instead of in six workflows; docs, changelog fragments and plain images skip it. Browser workflows cache Playwright browsers; experiment workflows no longer run on every branch push.

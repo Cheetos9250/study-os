@@ -26,6 +26,11 @@ jobs:
           node-version: '22'
       - run: node --test tests/practice-keep-position.test.cjs
       - run: npm install --prefix "$RUNNER_TEMP/pp" --no-save --ignore-scripts playwright@1.62.1
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-1.62.1-chromium-${{ runner.os }}
       - run: '"$RUNNER_TEMP/pp/node_modules/.bin/playwright" install --with-deps chromium'
       - name: Browser check
         env:
