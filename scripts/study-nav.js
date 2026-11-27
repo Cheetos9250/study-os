@@ -12,7 +12,8 @@
  ];
  var MORE=[
   {href:'grades.html',label:'Grades',icon:'grades'},
- {href:'stats.html',label:'Stats',icon:'stats'},
+  {href:'stats.html',label:'Stats',icon:'stats'},
+  {href:'formulas.html',label:'Formulas',icon:'lessons'},
   {href:'desk.html',label:'Desk display',icon:'desk'},
   {href:'tutor.html',label:'AI tutor',icon:'tutor'},
   {href:'gemini.html',label:'Share with Gemini',icon:'tutor'},
