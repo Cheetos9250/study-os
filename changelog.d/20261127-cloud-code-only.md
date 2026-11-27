@@ -1,0 +1,1 @@
+- Cloud sync dialog: while waiting for approval it now shows only the 6-digit code and Close.
