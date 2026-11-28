@@ -258,6 +258,9 @@ function askAI(q,mine){ return '<div style="margin-top:8px"><a class="btn" style
 /* Cram Mode (?tab=prac&cram=1): one read-only page of the questions to fix before the exam — answered wrong now,
    or back in review box 0 — each with its right answer and explanation. Never changes answers. */
 const CRAM=/[?&]cram=1\b/.test(location.search);
+/* "Report a problem" (28 Nov 2026): every answered question links to feedback.html with its id and text filled in,
+   so a wrong answer key or explanation (e.g. in Drive inbox questions) can be sent as a GitHub issue. Sends nothing by itself. */
+function reportLink(q){ const m='Problem with a '+D.key+' question\nQuestion id: '+q.id+' (chapter '+q.cat+')\n'+String(q.q||'').replace(/\*\*/g,'').slice(0,400)+'\n\nWhat is wrong: '; return '<a class="report" style="display:inline-flex;align-items:center;min-height:44px;font-size:.85em;opacity:.8;color:inherit" href="feedback.html?from='+encodeURIComponent(D.key+'-prac')+'&msg='+encodeURIComponent(m)+'">Report a problem with this question</a>'; }
 function cramList(){
   const rv=store.rv||{};
   return QS.filter(q=>!q.open&&!q.gen&&(!qcats.size||qcats.has(q.cat))&&store.ans[q.id]!==undefined&&(store.ans[q.id]!==q.right||(Array.isArray(rv[q.id])&&rv[q.id][0]===0)))
@@ -323,7 +326,7 @@ function renderQ(){
   q.order.forEach((oi,k)=>{ let cls='opt'; if(done){ cls+= oi===q.right?' right':(oi===ch?' wrong':' dim'); }
     h+='<button type="button" class="'+cls+'" data-oi="'+oi+'" '+(done?'disabled':'')+'><span class="k">'+'ABCD'[k]+'</span><span>'+rich(q.opts[oi])+'</span></button>'; });
   h+='</div>';
-  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+jpics(q,'after')+(ok?'':askAI(q,ch))+'</div>'; }
+  if(done){ const ok=ch===q.right; h+='<div class="explain '+(ok?'good':'bad')+'"><b class="v">'+(ok?'Correct':'Not quite · answer '+'ABCD'[q.order.indexOf(q.right)])+'</b>'+rich(q.exp)+jpics(q,'after')+(ok?'':askAI(q,ch))+reportLink(q)+'</div>'; }
   }
   const scrOn=!!window.StudyScratch&&!q.gen, scrId=D.key+':'+q.id;
   const aiOn=!!window.StudyAskInline&&!!window.StudyTutor&&!q.open&&Array.isArray(q.order);
@@ -384,6 +387,8 @@ function scopeT(){ const sc=CARDS.filter(c=>c.cat===fcat); const seen=sc.filter(
 function renderSync(){
   const box=$('#sync'); const page=(D.pages||{})[fcat];
   if(!box) return;
+  /* Notion is retired (owner, 15 Nov 2026): never offer "Save result to Notion". */
+  box.hidden=true; return;
   if(fcat==='all'||!page||!((owner&&mcp)||(window.__xs&&window.__xs.reviewReady()))){ box.hidden=true; return; }
   const t=scopeT(); if(t.n===0||t.g+t.b<t.n){ box.hidden=true; return; }
   box.hidden=false; const pass=t.g/t.n>=PASS, pct=Math.round(t.g/t.n*100);
