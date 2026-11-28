@@ -1,0 +1,1 @@
+- Docs only: `AGENTS.md` (= `CLAUDE.md`) cut from 38 KB to about 5 KB (rules + map); the full page table, storage keys, sync status and open items moved unchanged to `docs/agents-reference.md`. New `data/README.md` explains what each data file is. No site change.
