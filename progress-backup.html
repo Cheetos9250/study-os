@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://accounts.google.com https://apis.google.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self'">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
@@ -70,14 +70,31 @@
       <p>Preview a saved backup and add data sets that are missing from this browser. If existing data differs, recovery is blocked.</p>
       <p><a href="progress-restore.html" style="display:inline-flex;align-items:center;min-height:44px">Open restore tool →</a></p>
     </div>
+    <div class="panel" id="storage">
+      <h2>Storage on this device</h2>
+      <p>Safari gives this site about 5 MB for progress. When it is full, new answers cannot be saved.</p>
+      <p id="storageUse" role="status"></p>
+      <ul id="storageTop" class="muted"></ul>
+      <p class="muted">Big items are usually Today's cover and card pictures and the Scratchpad drawings. Nothing here is changed or deleted by this page.</p>
+    </div>
     <div class="panel">
       <h2>Important limitations</h2>
       <p>This is a <strong>read-only backup</strong>, not a restore tool. It does not overwrite your existing progress.</p>
-      <p>This backup excludes <strong>Study Planner</strong> records in IndexedDB and records stored only in Cloudflare or Notion. Export those separately when their tools are available. The original textbook PDF is not included; keep your own copy and select it again in the reader when needed.</p>
+      <p><strong>Not in this file:</strong> the PDF files in My PDF sets and the textbook PDF (keep your own copies and add them again), and the pictures in lesson notes (they are kept on Cloud sync when it is on, so set the sync key on every device). Your answers, notes text, PDF-set answers and Scratchpad drawings are included.</p>
       <p>Before clearing Safari, changing devices, or upgrading, save and check the file in Files/iCloud Drive. Do not delete your original progress. If you use an iPad Home Screen app, launch this page from that same app: its storage may be separate from Safari.</p>
     </div>
   </main>
   <script src="scripts/study-progress-backup.js?v=20261113-compare"></script>
+  <script src="scripts/study-storage.js?v=1"></script>
+  <script>
+    (function(){
+      var S = window.StudyStorage; if (!S) return;
+      var u = S.usage(window.localStorage), pct = Math.round(u.ratio * 100);
+      document.getElementById("storageUse").textContent = "Used " + S.fmt(u.bytes) + " of about 5 MB (" + pct + "%)" + (u.ratio >= S.WARN ? ". Almost full: download a backup now." : ".");
+      var ul = document.getElementById("storageTop");
+      u.top.forEach(function (r) { var li = document.createElement("li"); li.textContent = r[0] + ": " + S.fmt(r[1]); ul.appendChild(li); });
+    })();
+  </script>
   <script>
     (function(){
       "use strict";

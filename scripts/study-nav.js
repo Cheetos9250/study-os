@@ -201,6 +201,8 @@
  });
  /* Page-open counts on this device (scripts/study-usage.js); the nav itself still reads and writes no study data. */
  if(!window.StudyUsage){var us=document.createElement('script');us.src=navSrc?new URL('study-usage.js?v=3',navSrc).href:'scripts/study-usage.js?v=1';document.head.appendChild(us);}
+ /* Storage-full warning (scripts/study-storage.js): measures saved-data size only, reads no study data. */
+ if(!window.StudyStorage){var sg=document.createElement('script');sg.src=navSrc?new URL('study-storage.js?v=1',navSrc).href:'scripts/study-storage.js?v=1';document.head.appendChild(sg);}
  window.StudyNav={TABS:TABS,active:active,timesUp:timesUp,search:openSearch};
  if(document.body)pomo();else document.addEventListener('DOMContentLoaded',pomo);
  if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);

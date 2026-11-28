@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://accounts.google.com https://apis.google.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,6 +51,8 @@ table{border-collapse:collapse;width:100%;font-size:14px}td{padding:6px 4px;bord
 <script>
 (function(){'use strict';
 var $=function(s){return document.querySelector(s);},U=window.StudyUsage,from=(new URLSearchParams(location.search).get('from')||'').replace(/[^a-z0-9-]/gi,'').slice(0,40);
+/* ?msg= prefills the box (the course pages' "Report a problem" link: question id and text). Nothing is sent until Send. */
+var pre=(new URLSearchParams(location.search).get('msg')||'').slice(0,1500);if(pre&&!$('#msg').value)$('#msg').value=pre;
 function sum(){return U?U.summary(localStorage,14):{days:0,pages:[],times:[]};}
 function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
 var s=sum();var tm={};(s.times||[]).forEach(function(p){tm[p[0]]=p[1];});$('#use').innerHTML=s.pages.length?'<table><tr><td></td><td>opens</td><td>time</td></tr>'+s.pages.slice(0,25).map(function(p){return '<tr><td>'+esc(p[0])+'</td><td>'+p[1]+'</td><td>'+(tm[p[0]]?U.fmt(tm[p[0]]):'')+'</td></tr>';}).join('')+'</table><p class="note">'+s.days+' day(s) with use. Time counts only while the page is open and in use.</p>':'<p class="note">No pages counted yet.</p>';
